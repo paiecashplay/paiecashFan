@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Lancer PaieCashPlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a3e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        h1 {
+            color: #00B0E0;
+            font-size: 42px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 40px;
+        }
+        
+        .steps {
+            background: rgba(0,176,224,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(0,176,224,0.3);
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        
+        .step-number {
+            background: #00B0E0;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .command-box {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #00ff88;
+            border: 1px solid rgba(0,255,136,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .command-box:hover {
+            background: rgba(0,0,0,0.5);
+            border-color: rgba(0,255,136,0.6);
+            transform: scale(1.02);
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #00B0E0 0%, #0088b0 100%);
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,176,224,0.4);
+        }
+        
+        .button:hover {
+            background: linear-gradient(135deg, #0098c2 0%, #006a8a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,176,224,0.6);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button.secondary {
+            background: linear-gradient(135deg, #ff3366 0%, #cc2952 100%);
+            box-shadow: 0 4px 15px rgba(255,51,102,0.4);
+        }
+        
+        .button.secondary:hover {
+            background: linear-gradient(135deg, #cc2952 0%, #991f3e 100%);
+            box-shadow: 0 6px 20px rgba(255,51,102,0.6);
+        }
+        
+        .warning {
+            background: rgba(255,165,0,0.1);
+            border: 2px solid rgba(255,165,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .warning-title {
+            color: #ffa500;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .warning-text {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .success-message {
+            display: none;
+            background: rgba(0,255,136,0.1);
+            border: 2px solid rgba(0,255,136,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .copy-btn {
+            background: rgba(0,255,136,0.2);
+            border: 1px solid rgba(0,255,136,0.4);
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(0,255,136,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏟️</div>
+        <h1>PaieCashPlay</h1>
+        <p class="subtitle">Super App Fan - Olympique de Marseille</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Ouvrir le terminal (cmd sur Windows)</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Copier et coller cette commande :</div>
+            </div>
+            
+            <div class="command-box" id="command" onclick="copyCommand()">
+                python3 -m http.server 8000
+            </div>
+            <button class="copy-btn" onclick="copyCommand()">📋 Copier la commande</button>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Attendre "Serving HTTP..."</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">Cliquer sur un bouton ci-dessous :</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <a href="http://localhost:8000/test.html" class="button" target="_blank">
+                ✅ Ouvrir la page de test
+            </a>
+            
+            <a href="http://localhost:8000/app.html" class="button secondary" target="_blank">
+                🚀 Ouvrir l'application directement
+            </a>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+            <div style="font-weight: 700; font-size: 18px; margin-bottom: 10px;">Commande copiée !</div>
+            <div>Collez-la dans le terminal et appuyez sur Entrée</div>
+        </div>
+        
+        <div class="warning">
+            <div class="warning-title">⚠️ Important</div>
+            <div class="warning-text">
+                Si les liens ne fonctionnent pas, c'est que le serveur n'est pas lancé.<br>
+                <strong>Lancez d'abord la commande dans le terminal</strong>, puis cliquez sur les boutons.
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 14px; color: rgba(255,255,255,0.5);">
+            💡 Astuce : Si "python3" ne fonctionne pas, essayez "python" à la place
+        </div>
+    </div>
+    
+    <script>
+        function copyCommand() {
+            const command = document.getElementById('command').textContent.trim();
+            navigator.clipboard.writeText(command).then(() => {
+                const successMessage = document.getElementById('successMessage');
+                successMessage.classList.add('show');
+                
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                alert('Commande : ' + command + '\n\nCopiez cette commande manuellement');
+            });
+        }
+        
+        // Vérifier si le serveur est accessible
+        async function checkServer() {
+            try {
+                const response = await fetch('http://localhost:8000/test.html', { method: 'HEAD' });
+                if (response.ok) {
+                    document.querySelector('.warning').style.display = 'none';
+                }
+            } catch (e) {
+                // Server not running
+            }
+        }
+        
+        checkServer();
+        setInterval(checkServer, 5000);
+    </script>
+</body>
+</html>

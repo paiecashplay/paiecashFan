@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Choisissez votre club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* SEARCH BAR */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab:hover,
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* GRID */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .club-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .club-info {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .federation-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            border-color: #FFD700;
+        }
+
+        .federation-card:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+            border-color: #FFD700;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .clubs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .club-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">⚽💰</div>
+        <h1>PaieCashFan</h1>
+        <p class="subtitle">Choisissez votre club ou fédération pour commencer</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Rechercher un club, une fédération...">
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('ligue1')">🇫🇷 Ligue 1</div>
+        <div class="tab" onclick="switchTab('ligue2')">🇫🇷 Ligue 2</div>
+        <div class="tab" onclick="switchTab('fifa')">🌍 FIFA</div>
+        <div class="tab" onclick="switchTab('uefa')">🇪🇺 UEFA</div>
+        <div class="tab" onclick="switchTab('caf')">🌍 CAF</div>
+        <div class="tab" onclick="switchTab('conmebol')">🌎 CONMEBOL</div>
+        <div class="tab" onclick="switchTab('afc')">🌏 AFC</div>
+        <div class="tab" onclick="switchTab('concacaf')">🌎 CONCACAF</div>
+    </div>
+
+    <div class="container">
+        <!-- LIGUE 1 -->
+        <div class="section active" id="ligue1">
+            <div class="section-title">
+                <span>🇫🇷 Ligue 1</span>
+                <span class="badge">18 clubs</span>
+            </div>
+            <div class="clubs-grid" id="ligue1Grid"></div>
+        </div>
+
+        <!-- LIGUE 2 -->
+        <div class="section" id="ligue2">
+            <div class="section-title">
+                <span>🇫🇷 Ligue 2</span>
+                <span class="badge">20 clubs</span>
+            </div>
+            <div class="clubs-grid" id="ligue2Grid"></div>
+        </div>
+
+        <!-- FIFA -->
+        <div class="section" id="fifa">
+            <div class="section-title">
+                <span>🌍 FIFA - Fédérations Mondiales</span>
+                <span class="badge">211 nations</span>
+            </div>
+            <div class="clubs-grid" id="fifaGrid"></div>
+        </div>
+
+        <!-- UEFA -->
+        <div class="section" id="uefa">
+            <div class="section-title">
+                <span>🇪🇺 UEFA - Europe</span>
+                <span class="badge">55 nations</span>
+            </div>
+            <div class="clubs-grid" id="uefaGrid"></div>
+        </div>
+
+        <!-- CAF -->
+        <div class="section" id="caf">
+            <div class="section-title">
+                <span>🌍 CAF - Afrique</span>
+                <span class="badge">54 nations</span>
+            </div>
+            <div class="clubs-grid" id="cafGrid"></div>
+        </div>
+
+        <!-- CONMEBOL -->
+        <div class="section" id="conmebol">
+            <div class="section-title">
+                <span>🌎 CONMEBOL - Amérique du Sud</span>
+                <span class="badge">10 nations</span>
+            </div>
+            <div class="clubs-grid" id="conmebolGrid"></div>
+        </div>
+
+        <!-- AFC -->
+        <div class="section" id="afc">
+            <div class="section-title">
+                <span>🌏 AFC - Asie</span>
+                <span class="badge">47 nations</span>
+            </div>
+            <div class="clubs-grid" id="afcGrid"></div>
+        </div>
+
+        <!-- CONCACAF -->
+        <div class="section" id="concacaf">
+            <div class="section-title">
+                <span>🌎 CONCACAF - Amérique du Nord & Centrale</span>
+                <span class="badge">41 nations</span>
+            </div>
+            <div class="clubs-grid" id="concacafGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Données des clubs et fédérations
+        const data = {
+            ligue1: [
+                { name: "Paris Saint-Germain", logo: "⚽", ville: "Paris", id: "psg" },
+                { name: "Olympique de Marseille", logo: "⚽", ville: "Marseille", id: "om" },
+                { name: "Olympique Lyonnais", logo: "⚽", ville: "Lyon", id: "ol" },
+                { name: "AS Monaco", logo: "⚽", ville: "Monaco", id: "monaco" },
+                { name: "LOSC Lille", logo: "⚽", ville: "Lille", id: "lille" },
+                { name: "OGC Nice", logo: "⚽", ville: "Nice", id: "nice" },
+                { name: "RC Lens", logo: "⚽", ville: "Lens", id: "lens" },
+                { name: "Stade Rennais", logo: "⚽", ville: "Rennes", id: "rennes" },
+                { name: "RC Strasbourg", logo: "⚽", ville: "Strasbourg", id: "strasbourg" },
+                { name: "Stade Brestois", logo: "⚽", ville: "Brest", id: "brest" },
+                { name: "Montpellier HSC", logo: "⚽", ville: "Montpellier", id: "montpellier" },
+                { name: "Stade de Reims", logo: "⚽", ville: "Reims", id: "reims" },
+                { name: "FC Nantes", logo: "⚽", ville: "Nantes", id: "nantes" },
+                { name: "Toulouse FC", logo: "⚽", ville: "Toulouse", id: "toulouse" },
+                { name: "Le Havre AC", logo: "⚽", ville: "Le Havre", id: "lehavre" },
+                { name: "AJ Auxerre", logo: "⚽", ville: "Auxerre", id: "auxerre" },
+                { name: "Angers SCO", logo: "⚽", ville: "Angers", id: "angers" },
+                { name: "Paris FC", logo: "⚽", ville: "Paris", id: "paris-fc" }
+            ],
+            ligue2: [
+                { name: "FC Metz", logo: "⚽", ville: "Metz", id: "metz" },
+                { name: "Clermont Foot", logo: "⚽", ville: "Clermont", id: "clermont" },
+                { name: "EA Guingamp", logo: "⚽", ville: "Guingamp", id: "guingamp" },
+                { name: "SM Caen", logo: "⚽", ville: "Caen", id: "caen" },
+                { name: "Grenoble Foot", logo: "⚽", ville: "Grenoble", id: "grenoble" },
+                { name: "Rodez AF", logo: "⚽", ville: "Rodez", id: "rodez" },
+                { name: "AC Ajaccio", logo: "⚽", ville: "Ajaccio", id: "ajaccio" },
+                { name: "USL Dunkerque", logo: "⚽", ville: "Dunkerque", id: "dunkerque" },
+                { name: "Pau FC", logo: "⚽", ville: "Pau", id: "pau" },
+                { name: "AS Saint-Étienne", logo: "⚽", ville: "Saint-Étienne", id: "saintetienne" },
+                { name: "Amiens SC", logo: "⚽", ville: "Amiens", id: "amiens" },
+                { name: "Paris FC B", logo: "⚽", ville: "Paris", id: "paris-fc-b" },
+                { name: "Valenciennes FC", logo: "⚽", ville: "Valenciennes", id: "valenciennes" },
+                { name: "SC Bastia", logo: "⚽", ville: "Bastia", id: "bastia" },
+                { name: "FC Lorient", logo: "⚽", ville: "Lorient", id: "lorient" },
+                { name: "Troyes AC", logo: "⚽", ville: "Troyes", id: "troyes" },
+                { name: "Dijon FCO", logo: "⚽", ville: "Dijon", id: "dijon" },
+                { name: "Chamois Niortais", logo: "⚽", ville: "Niort", id: "niort" },
+                { name: "Red Star FC", logo: "⚽", ville: "Paris", id: "redstar" },
+                { name: "US Orléans", logo: "⚽", ville: "Orléans", id: "orleans" }
+            ],
+            fifa: [
+                { name: "FIFA", logo: "🏆", ville: "Mondial", id: "fifa", type: "federation" },
+                { name: "Coupe du Monde 2026", logo: "🏆", ville: "USA, Canada, Mexique", id: "worldcup2026", type: "federation" }
+            ],
+            uefa: [
+                { name: "UEFA", logo: "🇪🇺", ville: "Europe", id: "uefa", type: "federation" },
+                { name: "France", logo: "🇫🇷", ville: "France", id: "france", type: "federation" },
+                { name: "Allemagne", logo: "🇩🇪", ville: "Allemagne", id: "germany", type: "federation" },
+                { name: "Espagne", logo: "🇪🇸", ville: "Espagne", id: "spain", type: "federation" },
+                { name: "Italie", logo: "🇮🇹", ville: "Italie", id: "italy", type: "federation" },
+                { name: "Angleterre", logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", ville: "Angleterre", id: "england", type: "federation" },
+                { name: "Portugal", logo: "🇵🇹", ville: "Portugal", id: "portugal", type: "federation" },
+                { name: "Pays-Bas", logo: "🇳🇱", ville: "Pays-Bas", id: "netherlands", type: "federation" },
+                { name: "Belgique", logo: "🇧🇪", ville: "Belgique", id: "belgium", type: "federation" },
+                { name: "Croatie", logo: "🇭🇷", ville: "Croatie", id: "croatia", type: "federation" },
+                { name: "Danemark", logo: "🇩🇰", ville: "Danemark", id: "denmark", type: "federation" },
+                { name: "Suisse", logo: "🇨🇭", ville: "Suisse", id: "switzerland", type: "federation" },
+                { name: "Autriche", logo: "🇦🇹", ville: "Autriche", id: "austria", type: "federation" },
+                { name: "Pologne", logo: "🇵🇱", ville: "Pologne", id: "poland", type: "federation" },
+                { name: "Suède", logo: "🇸🇪", ville: "Suède", id: "sweden", type: "federation" },
+                { name: "Ukraine", logo: "🇺🇦", ville: "Ukraine", id: "ukraine", type: "federation" },
+                { name: "Serbie", logo: "🇷🇸", ville: "Serbie", id: "serbia", type: "federation" },
+                { name: "Turquie", logo: "🇹🇷", ville: "Turquie", id: "turkey", type: "federation" },
+                { name: "République Tchèque", logo: "🇨🇿", ville: "Tchèquie", id: "czech", type: "federation" },
+                { name: "Roumanie", logo: "🇷🇴", ville: "Roumanie", id: "romania", type: "federation" }
+            ],
+            caf: [
+                { name: "CAF", logo: "🌍", ville: "Afrique", id: "caf", type: "federation" },
+                { name: "Sénégal", logo: "🇸🇳", ville: "Sénégal", id: "senegal", type: "federation" },
+                { name: "Maroc", logo: "🇲🇦", ville: "Maroc", id: "morocco", type: "federation" },
+                { name: "Égypte", logo: "🇪🇬", ville: "Égypte", id: "egypt", type: "federation" },
+                { name: "Nigeria", logo: "🇳🇬", ville: "Nigeria", id: "nigeria", type: "federation" },
+                { name: "Cameroun", logo: "🇨🇲", ville: "Cameroun", id: "cameroon", type: "federation" },
+                { name: "Tunisie", logo: "🇹🇳", ville: "Tunisie", id: "tunisia", type: "federation" },
+                { name: "Algérie", logo: "🇩🇿", ville: "Algérie", id: "algeria", type: "federation" },
+                { name: "Ghana", logo: "🇬🇭", ville: "Ghana", id: "ghana", type: "federation" },
+                { name: "Côte d'Ivoire", logo: "🇨🇮", ville: "Côte d'Ivoire", id: "ivorycoast", type: "federation" },
+                { name: "Mali", logo: "🇲🇱", ville: "Mali", id: "mali", type: "federation" },
+                { name: "Burkina Faso", logo: "🇧🇫", ville: "Burkina Faso", id: "burkinafaso", type: "federation" },
+                { name: "Afrique du Sud", logo: "🇿🇦", ville: "Afrique du Sud", id: "southafrica", type: "federation" },
+                { name: "RD Congo", logo: "🇨🇩", ville: "RD Congo", id: "drcongo", type: "federation" }
+            ],
+            conmebol: [
+                { name: "CONMEBOL", logo: "🌎", ville: "Amérique du Sud", id: "conmebol", type: "federation" },
+                { name: "Brésil", logo: "🇧🇷", ville: "Brésil", id: "brazil", type: "federation" },
+                { name: "Argentine", logo: "🇦🇷", ville: "Argentine", id: "argentina", type: "federation" },
+                { name: "Uruguay", logo: "🇺🇾", ville: "Uruguay", id: "uruguay", type: "federation" },
+                { name: "Colombie", logo: "🇨🇴", ville: "Colombie", id: "colombia", type: "federation" },
+                { name: "Chili", logo: "🇨🇱", ville: "Chili", id: "chile", type: "federation" },
+                { name: "Pérou", logo: "🇵🇪", ville: "Pérou", id: "peru", type: "federation" },
+                { name: "Équateur", logo: "🇪🇨", ville: "Équateur", id: "ecuador", type: "federation" },
+                { name: "Paraguay", logo: "🇵🇾", ville: "Paraguay", id: "paraguay", type: "federation" },
+                { name: "Venezuela", logo: "🇻🇪", ville: "Venezuela", id: "venezuela", type: "federation" },
+                { name: "Bolivie", logo: "🇧🇴", ville: "Bolivie", id: "bolivia", type: "federation" }
+            ],
+            afc: [
+                { name: "AFC", logo: "🌏", ville: "Asie", id: "afc", type: "federation" },
+                { name: "Japon", logo: "🇯🇵", ville: "Japon", id: "japan", type: "federation" },
+                { name: "Corée du Sud", logo: "🇰🇷", ville: "Corée du Sud", id: "southkorea", type: "federation" },
+                { name: "Iran", logo: "🇮🇷", ville: "Iran", id: "iran", type: "federation" },
+                { name: "Arabie Saoudite", logo: "🇸🇦", ville: "Arabie Saoudite", id: "saudiarabia", type: "federation" },
+                { name: "Qatar", logo: "🇶🇦", ville: "Qatar", id: "qatar", type: "federation" },
+                { name: "Australie", logo: "🇦🇺", ville: "Australie", id: "australia", type: "federation" },
+                { name: "Irak", logo: "🇮🇶", ville: "Irak", id: "iraq", type: "federation" },
+                { name: "Émirats Arabes Unis", logo: "🇦🇪", ville: "EAU", id: "uae", type: "federation" },
+                { name: "Chine", logo: "🇨🇳", ville: "Chine", id: "china", type: "federation" },
+                { name: "Ouzbékistan", logo: "🇺🇿", ville: "Ouzbékistan", id: "uzbekistan", type: "federation" }
+            ],
+            concacaf: [
+                { name: "CONCACAF", logo: "🌎", ville: "Amérique du Nord", id: "concacaf", type: "federation" },
+                { name: "États-Unis", logo: "🇺🇸", ville: "États-Unis", id: "usa", type: "federation" },
+                { name: "Mexique", logo: "🇲🇽", ville: "Mexique", id: "mexico", type: "federation" },
+                { name: "Canada", logo: "🇨🇦", ville: "Canada", id: "canada", type: "federation" },
+                { name: "Costa Rica", logo: "🇨🇷", ville: "Costa Rica", id: "costarica", type: "federation" },
+                { name: "Jamaïque", logo: "🇯🇲", ville: "Jamaïque", id: "jamaica", type: "federation" },
+                { name: "Panama", logo: "🇵🇦", ville: "Panama", id: "panama", type: "federation" },
+                { name: "Honduras", logo: "🇭🇳", ville: "Honduras", id: "honduras", type: "federation" },
+                { name: "El Salvador", logo: "🇸🇻", ville: "El Salvador", id: "salvador", type: "federation" }
+            ]
+        };
+
+        // Charger les clubs dans chaque section
+        function loadClubs() {
+            Object.keys(data).forEach(section => {
+                const grid = document.getElementById(section + 'Grid');
+                data[section].forEach(club => {
+                    const card = document.createElement('div');
+                    card.className = 'club-card' + (club.type === 'federation' ? ' federation-card' : '');
+                    card.innerHTML = `
+                        <div class="club-logo">${club.logo}</div>
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-info">${club.ville}</div>
+                    `;
+                    card.onclick = () => selectClub(club);
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        // Changer d'onglet
+        function switchTab(tabName) {
+            // Masquer toutes les sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+
+            // Mettre à jour les tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Sélectionner un club
+        function selectClub(club) {
+            // Sauvegarder le club sélectionné
+            localStorage.setItem('selectedClub', JSON.stringify(club));
+            
+            // Rediriger vers l'application
+            window.location.href = 'app.html';
+        }
+
+        // Recherche
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.club-card').forEach(card => {
+                const name = card.querySelector('.club-name').textContent.toLowerCase();
+                const ville = card.querySelector('.club-info').textContent.toLowerCase();
+                if (name.includes(search) || ville.includes(search)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialiser
+        loadClubs();
+    </script>
+</body>
+</html>

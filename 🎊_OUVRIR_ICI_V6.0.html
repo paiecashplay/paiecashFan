@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎊 PaieCashFan V6.0 - Agentic Commerce</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .tech-stack {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .tech-stack h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .tech-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .tech-item {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .workflow {
+            margin: 40px 0;
+        }
+
+        .workflow h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .workflow-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin: 0 auto 15px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .arrow {
+                display: block;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎊 PaieCashFan V6.0</h1>
+        <div class="subtitle">Agentic Commerce - E-commerce Conversationnel Intelligent</div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value">6</span>
+                <span class="stat-label">Modules Créés</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">~2800</span>
+                <span class="stat-label">Lignes de Code</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">100%</span>
+                <span class="stat-label">Fonctionnel</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">126</span>
+                <span class="stat-label">Clubs/Fédérations</span>
+            </div>
+        </div>
+
+        <h2 style="text-align: center; color: #333; margin: 40px 0 30px;">✨ Fonctionnalités Principales</h2>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🛍️</div>
+                <div class="feature-title">WooCommerce</div>
+                <div class="feature-desc">Connexion boutique WordPress avec catalogue produits en temps réel</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Paiement QR Code</div>
+                <div class="feature-desc">Génération QR Codes pour paiements instantanés (expire 5 min)</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">IA Commerce</div>
+                <div class="feature-desc">Agent conversationnel pour achats directs dans le chat</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚽</div>
+                <div class="feature-title">Données Clubs</div>
+                <div class="feature-desc">Résultats matchs, classements, promos en temps réel</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛒</div>
+                <div class="feature-title">Panier Intelligent</div>
+                <div class="feature-desc">Gestion panier avec localStorage et calcul auto frais</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💳</div>
+                <div class="feature-title">4 Paiements</div>
+                <div class="feature-desc">SMS, QR Code, Crypto (USDT/USDC), Carte bancaire</div>
+            </div>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="🧪_TEST_V6.0_AGENTIC_COMMERCE.html" class="btn btn-primary">
+                🧪 Tester Maintenant
+            </a>
+            <a href="🎉_VERSION_6.0_AGENTIC_COMMERCE.md" class="btn btn-secondary">
+                📖 Documentation
+            </a>
+            <a href="🚀_DEMARRAGE_RAPIDE_V6.0.md" class="btn btn-secondary">
+                🚀 Démarrage Rapide
+            </a>
+        </div>
+
+        <div class="workflow">
+            <h3>🎯 Workflow Utilisateur</h3>
+            <div class="workflow-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Recherche</div>
+                    <div class="step-desc">"Je veux un maillot"</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">IA Propose</div>
+                    <div class="step-desc">Produits + Prix + Promos</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Ajout Panier</div>
+                    <div class="step-desc">Taille, quantité...</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Paiement</div>
+                    <div class="step-desc">SMS / QR / Crypto / Carte</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">✅ Validé</div>
+                    <div class="step-desc">Commande confirmée</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <h3>🔧 Stack Technique</h3>
+            <div class="tech-items">
+                <div class="tech-item">JavaScript ES6+</div>
+                <div class="tech-item">WooCommerce REST API</div>
+                <div class="tech-item">QRCode.js</div>
+                <div class="tech-item">LocalStorage</div>
+                <div class="tech-item">Fetch API</div>
+                <div class="tech-item">Async/Await</div>
+                <div class="tech-item">Event System</div>
+                <div class="tech-item">Smart Caching</div>
+            </div>
+        </div>
+
+        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 10px; margin: 30px 0;">
+            <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Configuration Requise</h4>
+            <p style="color: #856404; margin: 0;">
+                <strong>Avant la production</strong>, configurez les clés API WooCommerce dans 
+                <code style="background: #fff; padding: 2px 8px; border-radius: 3px;">js/woocommerce-connector.js</code>
+                (lignes 9-10). Voir <a href="🚀_DEMARRAGE_RAPIDE_V6.0.md" style="color: #667eea;">Démarrage Rapide</a> pour les instructions.
+            </p>
+        </div>
+
+        <div style="background: #d1ecf1; border-left: 4px solid #0c5460; padding: 20px; border-radius: 10px; margin: 30px 0;">
+            <h4 style="color: #0c5460; margin-bottom: 10px;">💡 Mode Démo Disponible</h4>
+            <p style="color: #0c5460; margin: 0;">
+                Toutes les fonctionnalités fonctionnent en <strong>mode démo</strong> sans configuration API. 
+                Les produits, résultats et données sont simulés pour permettre les tests immédiatement.
+            </p>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="index.html" class="btn btn-secondary">
+                🏠 Accueil
+            </a>
+            <a href="app.html" class="btn btn-secondary">
+                ⚽ Application Club
+            </a>
+            <a href="chat-ia.html" class="btn btn-secondary">
+                💬 Chat IA
+            </a>
+        </div>
+
+        <div class="footer">
+            <p><strong>PaieCashFan V6.0 - Agentic Commerce</strong></p>
+            <p style="margin-top: 10px;">Créé le 10 décembre 2025</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">E-commerce conversationnel intelligent pour 126 clubs et fédérations</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cartes Minimalistes - PaieCashFan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929, #1a2744);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 50px;
+            color: rgba(255,255,255,0.7);
+        }
+        .info-box {
+            background: rgba(74, 222, 128, 0.1);
+            border: 2px solid #4ade80;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 60px;
+            text-align: center;
+            color: white;
+        }
+        .info-box h2 {
+            color: #4ade80;
+            margin-bottom: 10px;
+        }
+        .cartes-grid {
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        .carte-container {
+            text-align: center;
+        }
+        .carte-image {
+            width: 100%;
+            max-width: 550px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        .carte-image:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+        .carte-info {
+            margin-top: 20px;
+            color: white;
+        }
+        .carte-info h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .carte-info p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 60px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4ade80, #3b82f6);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Cartes Minimalistes</h1>
+        <p class="subtitle">Design Simple - Dimensions Identiques</p>
+        
+        <div class="info-box">
+            <h2>Design Minimaliste UNIQUEMENT</h2>
+            <p>Photo joueur + Logo club + PaieCash + Numero + Nom + Mastercard</p>
+            <p>ZERO texte superflu - ZERO regression</p>
+        </div>
+
+        <div class="cartes-grid">
+            <div class="carte-container">
+                <img src="https://www.genspark.ai/api/files/s/vooy58Fb" 
+                     alt="Carte Salah Liverpool" 
+                     class="carte-image">
+                <div class="carte-info">
+                    <h3>Mohamed Salah - Liverpool FC</h3>
+                    <p>Template identique Pepe Villarreal</p>
+                    <p style="font-size: 14px; opacity: 0.6; margin-top: 5px;">N 5412 7534 9876 5440</p>
+                </div>
+            </div>
+
+            <div class="carte-container">
+                <img src="https://www.genspark.ai/api/files/s/i073XN8E" 
+                     alt="Carte Mane Al-Nassr" 
+                     class="carte-image">
+                <div class="carte-info">
+                    <h3>Sadio Mane - Al-Nassr FC</h3>
+                    <p>Template identique Pepe Villarreal</p>
+                    <p style="font-size: 14px; opacity: 0.6; margin-top: 5px;">N 5412 7534 9876 5442</p>
+                </div>
+            </div>
+
+            <div class="carte-container">
+                <img src="https://www.genspark.ai/api/files/s/SVHvpPgB" 
+                     alt="Carte Mahrez Al-Ahli" 
+                     class="carte-image">
+                <div class="carte-info">
+                    <h3>Riyad Mahrez - Al-Ahli Saudi FC</h3>
+                    <p>Template identique Pepe Villarreal</p>
+                    <p style="font-size: 14px; opacity: 0.6; margin-top: 5px;">N 5412 7534 9876 5444</p>
+                </div>
+            </div>
+
+            <div class="carte-container">
+                <img src="https://www.genspark.ai/api/files/s/HCj6Ce0Z" 
+                     alt="Carte Osimhen Galatasaray" 
+                     class="carte-image">
+                <div class="carte-info">
+                    <h3>Victor Osimhen - Galatasaray SK</h3>
+                    <p>Template identique Pepe Villarreal</p>
+                    <p style="font-size: 14px; opacity: 0.6; margin-top: 5px;">N 5412 7534 9876 5446</p>
+                </div>
+            </div>
+
+            <div class="carte-container">
+                <img src="https://www.genspark.ai/api/files/s/s1mWNY8E" 
+                     alt="Carte Partey Arsenal" 
+                     class="carte-image">
+                <div class="carte-info">
+                    <h3>Thomas Partey - Arsenal FC</h3>
+                    <p>Template identique Pepe Villarreal</p>
+                    <p style="font-size: 14px; opacity: 0.6; margin-top: 5px;">N 5412 7534 9876 5448</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="index.html" class="btn">Retour Accueil</a>
+            <a href="cartes-joueurs-africains.html" class="btn">Voir Toutes les Cartes</a>
+        </div>
+    </div>
+</body>
+</html>

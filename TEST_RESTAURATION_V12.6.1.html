@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Test Restauration V12.6.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .status-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .check-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .check-icon {
+            font-size: 28px;
+        }
+        .check-content {
+            flex: 1;
+        }
+        .check-label {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .check-desc {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+        .btn-warning:hover {
+            box-shadow: 0 15px 40px rgba(245, 158, 11, 0.4);
+        }
+        .highlight {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        .highlight h3 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Test Restauration V12.6.1</h1>
+            <p>Vérification des corrections appliquées</p>
+        </div>
+        
+        <div class="status-box">
+            <div class="status-title">
+                <span>✅</span>
+                <span>Corrections Appliquées</span>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">✅</div>
+                <div class="check-content">
+                    <div class="check-label">index.html restauré</div>
+                    <div class="check-desc">Version V12.5 (fonctionnelle) restaurée depuis backup</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">✅</div>
+                <div class="check-content">
+                    <div class="check-label">clubs-national-3-data.js ajouté</div>
+                    <div class="check-desc">110+ clubs National 3 (8 groupes A-H)</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">✅</div>
+                <div class="check-content">
+                    <div class="check-label">Fichiers CAF ajoutés</div>
+                    <div class="check-desc">54 pays africains (CAF_FEDERATIONS + CAF_MEMBERS)</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">✅</div>
+                <div class="check-content">
+                    <div class="check-label">Code JavaScript modifié</div>
+                    <div class="check-desc">National 3 et CAF intégrés dans loadAllSportsData()</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-box">
+            <div class="status-title">
+                <span>⏳</span>
+                <span>À Tester</span>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">⏳</div>
+                <div class="check-content">
+                    <div class="check-label">110+ clubs National 3 visibles ?</div>
+                    <div class="check-desc">Ouvrir index.html et vérifier la section "Équipes"</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">⏳</div>
+                <div class="check-content">
+                    <div class="check-label">54 pays CAF visibles ?</div>
+                    <div class="check-desc">Chercher "Cameroun", "Sénégal", "Côte d'Ivoire" dans index.html</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">⏳</div>
+                <div class="check-content">
+                    <div class="check-label">Paiements fonctionnels ?</div>
+                    <div class="check-desc">Ouvrir app-universal-simple.html et tester un paiement</div>
+                </div>
+            </div>
+            
+            <div class="check-item">
+                <div class="check-icon">⏳</div>
+                <div class="check-content">
+                    <div class="check-label">Envoi de factures ?</div>
+                    <div class="check-desc">Vérifier après un paiement réussi</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="window.location.href='index.html'">
+            🏠 Tester index.html (National 3 + CAF)
+        </button>
+        
+        <button class="btn btn-warning" onclick="window.location.href='app-universal-simple.html?club=olympique-de-marseille'">
+            💳 Tester Paiements (app-universal-simple.html)
+        </button>
+        
+        <div class="highlight">
+            <h3>📌 Régression Identifiée</h3>
+            <p>L'utilisateur a signalé que la V12.6 avait <strong>cassé</strong> :</p>
+            <ul style="margin-left: 20px; margin-top: 10px; line-height: 2;">
+                <li>❌ Paiements et visualisation</li>
+                <li>❌ Envoi de factures</li>
+                <li>❌ 110+ clubs National 3</li>
+                <li>❌ 54 pays africains CAF</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>Solution :</strong> Restauration de index.html depuis V12.5 + ajout des fichiers JavaScript manquants</p>
+        </div>
+    </div>
+</body>
+</html>

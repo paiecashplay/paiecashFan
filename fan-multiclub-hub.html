@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAN MULTICLUB - Tous les Clubs de Football</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* HEADER */
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 24px 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+        }
+        
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .brand h1 {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        
+        /* HERO */
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 48px;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #cbd5e1;
+            max-width: 800px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-value {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* CATEGORIES */
+        .categories {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 48px 80px;
+        }
+        
+        .category-section {
+            margin-bottom: 64px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .category-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .category-info h3 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .category-info p {
+            font-size: 16px;
+            color: #94a3b8;
+        }
+        
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        
+        .club-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .club-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .club-card:hover {
+            transform: translateY(-8px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        }
+        
+        .club-card:hover::before {
+            opacity: 1;
+        }
+        
+        .club-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .club-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+        
+        .club-logo {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .club-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        
+        .club-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-soon {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+        
+        .club-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .club-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+        
+        .detail-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .club-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .club-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+        
+        .club-cta.disabled {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .club-cta.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 24px;
+            }
+            
+            .hero {
+                padding: 48px 24px;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .categories {
+                padding: 0 24px 48px;
+            }
+            
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">⚽</div>
+                <div class="brand">
+                    <h1>FAN MULTICLUB</h1>
+                    <p>Tous les clubs de football réunis</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <h2>Votre Super App pour<br>Tous les Clubs de Football</h2>
+        <p>
+            Accédez à votre club préféré : professionnel homme ou femme, tous championnats, football amateur.
+            Une application unique pour gérer votre passion du football.
+        </p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Clubs Actifs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100+</div>
+                <div class="stat-label">Clubs À Venir</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">∞</div>
+                <div class="stat-label">Championnats</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="categories">
+        <!-- LIGUE 1 MASCULINE -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">⚽</div>
+                <div class="category-info">
+                    <h3>Ligue 1 - Hommes</h3>
+                    <p>Championnat professionnel masculin français</p>
+                </div>
+            </div>
+            
+            <div class="clubs-grid">
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM">
+                            </div>
+                            <span class="club-status status-active">Actif</span>
+                        </div>
+                        <h4 class="club-name">Olympique de Marseille</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Stade Vélodrome - 67 000 places</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>OM Coin</span>
+                            </div>
+                        </div>
+                        <a href="app.html" class="club-cta">
+                            <span>Accéder à l'app</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg" alt="PSG">
+                            </div>
+                            <span class="club-status status-soon">Bientôt</span>
+                        </div>
+                        <h4 class="club-name">Paris Saint-Germain</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Parc des Princes - 48 000 places</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>PSG Coin</span>
+                            </div>
+                        </div>
+                        <span class="club-cta disabled">
+                            <span>Prochainement</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/f/f2/Olympique_Lyonnais_logo.svg" alt="OL">
+                            </div>
+                            <span class="club-status status-soon">Bientôt</span>
+                        </div>
+                        <h4 class="club-name">Olympique Lyonnais</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Groupama Stadium - 59 000 places</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>OL Coin</span>
+                            </div>
+                        </div>
+                        <span class="club-cta disabled">
+                            <span>Prochainement</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIGUE 2 MASCULINE -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">⚽</div>
+                <div class="category-info">
+                    <h3>Ligue 2 - Hommes</h3>
+                    <p>Championnat professionnel masculin français - 2ème division</p>
+                </div>
+            </div>
+            
+            <div class="clubs-grid">
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/2/22/Paris_FC_logo_2020.svg/1200px-Paris_FC_logo_2020.svg.png" alt="Paris FC">
+                            </div>
+                            <span class="club-status status-active">Actif</span>
+                        </div>
+                        <h4 class="club-name">Paris Football Club</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Stade Jean Bouin - 20 000 places</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>PFC Coin</span>
+                            </div>
+                        </div>
+                        <a href="clubs/paris-fc/app.html" class="club-cta">
+                            <span>Accéder à l'app</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIGUE 1 FEMININE -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">👩⚽</div>
+                <div class="category-info">
+                    <h3>D1 Arkema - Femmes</h3>
+                    <p>Championnat professionnel féminin français</p>
+                </div>
+            </div>
+            
+            <div class="clubs-grid">
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/f/f2/Olympique_Lyonnais_logo.svg" alt="OL Féminin">
+                            </div>
+                            <span class="club-status status-soon">Bientôt</span>
+                        </div>
+                        <h4 class="club-name">OL Féminin</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Groupama Stadium</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🏆</span>
+                                <span>8x Champions League</span>
+                            </div>
+                        </div>
+                        <span class="club-cta disabled">
+                            <span>Prochainement</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg" alt="PSG Féminin">
+                            </div>
+                            <span class="club-status status-soon">Bientôt</span>
+                        </div>
+                        <h4 class="club-name">PSG Féminin</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏟️</span>
+                                <span>Parc des Princes</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🏆</span>
+                                <span>Champions League 2024</span>
+                            </div>
+                        </div>
+                        <span class="club-cta disabled">
+                            <span>Prochainement</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTBALL AMATEUR -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">⚽</div>
+                <div class="category-info">
+                    <h3>Football Amateur</h3>
+                    <p>National, Régional, Départemental - Tous les championnats amateurs</p>
+                </div>
+            </div>
+            
+            <div class="clubs-grid">
+                <div class="club-card">
+                    <div class="club-card-content">
+                        <div class="club-header">
+                            <div class="club-logo">⚽</div>
+                            <span class="club-status status-soon">Bientôt</span>
+                        </div>
+                        <h4 class="club-name">Votre Club Amateur</h4>
+                        <div class="club-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏆</span>
+                                <span>National / Régional / Départemental</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>Coin personnalisé</span>
+                            </div>
+                        </div>
+                        <span class="club-cta disabled">
+                            <span>Prochainement</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        console.log('🎉 FAN MULTICLUB - Hub Universel du Football');
+        console.log('⚽ 2 clubs actifs : OM + Paris FC');
+        console.log('🌍 Vision : Tous les clubs pro (H/F) + Amateur');
+    </script>
+</body>
+</html>

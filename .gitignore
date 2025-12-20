@@ -1,0 +1,91 @@
+# ========================================
+# PAIECASHFAN - GITIGNORE
+# ========================================
+
+# ===== FICHIERS SYSTÈME =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== NODE MODULES (si vous en avez) =====
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# ===== ENVIRONNEMENT & SECRETS =====
+.env
+.env.local
+.env.production
+*.key
+*.pem
+config/secrets.js
+
+# ===== CLÉS API (IMPORTANT !) =====
+# Ne JAMAIS committer les vraies clés API
+**/api-keys.js
+**/credentials.json
+
+# ===== FICHIERS TEMPORAIRES =====
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.cache/
+
+# ===== IDE / ÉDITEURS =====
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ===== BUILD / DIST =====
+dist/
+build/
+*.min.js
+*.min.css
+
+# ===== TESTS =====
+coverage/
+.nyc_output/
+
+# ===== SYSTÈME D'EXPLOITATION =====
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# ===== WINDOWS =====
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===== LINUX =====
+*~
+.directory
+
+# ===== FICHIERS SENSIBLES SPÉCIFIQUES À PAIECASHFAN =====
+# Clés API NOWPayments
+💰_nowpayments-integration.js.backup
+*nowpayments*api*key*
+
+# Clés WooCommerce
+woocommerce-credentials.js
+
+# Fichiers de configuration avec secrets
+config/production.js
+config/api-keys.json
+
+# Base de données locale (si vous en utilisez)
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== NOTES PERSONNELLES =====
+TODO_PRIVATE.md
+NOTES_PERSONNELLES.md

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Choisissez votre club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin: 40px 0 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 50px;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .club-card.active {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .club-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }
+
+        .club-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .club-league {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .club-country {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .badge-active {
+            background: rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+
+        .badge-soon {
+            background: rgba(251, 146, 60, 0.3);
+            color: #fb923c;
+            border: 1px solid #fb923c;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ PaieCashFan</h1>
+        <p class="subtitle">Choisissez votre club et supportez-le avec PaieCash</p>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Rechercher un club..." onkeyup="searchClubs()">
+        </div>
+
+        <div class="clubs-grid" id="clubsGrid"></div>
+    </div>
+
+    <script>
+        const clubs = [
+            // LIGUE 1 FRANCE
+            { name: 'Olympique de Marseille', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🔵', active: true, url: 'app-om.html' },
+            { name: 'Paris FC', league: 'Ligue 1', country: '🇫🇷 France', emoji: '⚪', active: true, url: 'app-paris-fc.html' },
+            { name: 'Paris Saint-Germain', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🔴', active: false },
+            { name: 'Olympique Lyonnais', league: 'Ligue 1', country: '🇫🇷 France', emoji: '⚪', active: false },
+            { name: 'AS Monaco', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🔴', active: false },
+            { name: 'OGC Nice', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🔴', active: false },
+            { name: 'RC Lens', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🟡', active: false },
+            { name: 'Lille OSC', league: 'Ligue 1', country: '🇫🇷 France', emoji: '🔴', active: false },
+
+            // PREMIER LEAGUE
+            { name: 'Manchester United', league: 'Premier League', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', emoji: '🔴', active: false },
+            { name: 'Liverpool FC', league: 'Premier League', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', emoji: '🔴', active: false },
+            { name: 'Chelsea FC', league: 'Premier League', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', emoji: '🔵', active: false },
+            { name: 'Arsenal FC', league: 'Premier League', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', emoji: '🔴', active: false },
+
+            // LA LIGA
+            { name: 'Real Madrid', league: 'La Liga', country: '🇪🇸 Spain', emoji: '⚪', active: false },
+            { name: 'FC Barcelona', league: 'La Liga', country: '🇪🇸 Spain', emoji: '🔵', active: false },
+            { name: 'Atlético Madrid', league: 'La Liga', country: '🇪🇸 Spain', emoji: '🔴', active: false },
+
+            // SERIE A
+            { name: 'Juventus FC', league: 'Serie A', country: '🇮🇹 Italy', emoji: '⚪', active: false },
+            { name: 'AC Milan', league: 'Serie A', country: '🇮🇹 Italy', emoji: '🔴', active: false },
+            { name: 'Inter Milan', league: 'Serie A', country: '🇮🇹 Italy', emoji: '🔵', active: false },
+
+            // BUNDESLIGA
+            { name: 'Bayern Munich', league: 'Bundesliga', country: '🇩🇪 Germany', emoji: '🔴', active: false },
+            { name: 'Borussia Dortmund', league: 'Bundesliga', country: '🇩🇪 Germany', emoji: '🟡', active: false }
+        ];
+
+        function renderClubs(clubsList = clubs) {
+            const grid = document.getElementById('clubsGrid');
+            grid.innerHTML = clubsList.map(club => `
+                <div class="club-card ${club.active ? 'active' : ''}" onclick="selectClub('${club.url}', ${club.active})">
+                    <div class="club-logo">${club.emoji}</div>
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-league">${club.league}</div>
+                    <div class="club-country">${club.country}</div>
+                    <div class="badge ${club.active ? 'badge-active' : 'badge-soon'}">
+                        ${club.active ? 'ACTIF' : 'BIENTÔT'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchClubs() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = clubs.filter(club => 
+                club.name.toLowerCase().includes(search) ||
+                club.league.toLowerCase().includes(search) ||
+                club.country.toLowerCase().includes(search)
+            );
+            renderClubs(filtered);
+        }
+
+        function selectClub(url, active) {
+            if (active && url) {
+                window.location.href = url;
+            } else {
+                alert('Ce club sera bientôt disponible ! 🚀');
+            }
+        }
+
+        // Init
+        renderClubs();
+    </script>
+</body>
+</html>

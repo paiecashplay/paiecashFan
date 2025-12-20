@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Connectez-vous à votre équipe préférée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #8b5cf6 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            margin: 50px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            border-color: #10b981;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .club-logo {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .club-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .club-league {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 60px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .clubs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PaieCashFan</h1>
+        <p class="subtitle">Connectez-vous à votre équipe préférée</p>
+        <p>💰 Wallet Crypto • 🎟️ NFT Tickets • 🤖 IA Vocale • 450+ Clubs</p>
+        
+        <div class="nav-buttons">
+            <a href="onboarding.html" class="nav-btn">📚 Guide de démarrage</a>
+            <a href="support.html" class="nav-btn">💬 Support & Aide</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2 class="section-title">⚽ Clubs de Football Français</h2>
+            <p class="section-subtitle">228 clubs • Ligue 1 → National 3</p>
+            
+            <h3 class="section-title" style="font-size: 24px; margin-top: 40px;">Ligue 1</h3>
+            <div class="clubs-grid" id="ligue1Grid">
+                <div class="loading">Chargement des clubs de Ligue 1...</div>
+            </div>
+
+            <h3 class="section-title" style="font-size: 24px; margin-top: 40px;">Ligue 2</h3>
+            <div class="clubs-grid" id="ligue2Grid">
+                <div class="loading">Chargement des clubs de Ligue 2...</div>
+            </div>
+
+            <h3 class="section-title" style="font-size: 24px; margin-top: 40px;">National</h3>
+            <div class="clubs-grid" id="nationalGrid">
+                <div class="loading">Chargement des clubs de National...</div>
+            </div>
+
+            <h3 class="section-title" style="font-size: 24px; margin-top: 40px;">National 2</h3>
+            <div class="clubs-grid" id="national2Grid">
+                <div class="loading">Chargement des clubs de National 2...</div>
+            </div>
+
+            <h3 class="section-title" style="font-size: 24px; margin-top: 40px;">National 3</h3>
+            <div class="clubs-grid" id="national3Grid">
+                <div class="loading">Chargement des clubs de National 3...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🌍 Équipes Nationales & Internationales</h2>
+            <p class="section-subtitle">70+ équipes • Coupe du Monde 2026</p>
+            <div class="clubs-grid" id="equipesNationalesGrid">
+                <div class="loading">Chargement des équipes nationales...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🏀 Autres Sports</h2>
+            <p class="section-subtitle">Basketball • Handball • Rugby • Volleyball</p>
+            <div class="clubs-grid" id="autresSportsGrid">
+                <div class="loading">Chargement des autres sports...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>PaieCashFan</strong> • 450+ Clubs & Équipes</p>
+        <p style="margin-top: 10px;">Wallet Crypto • NFT Tickets • IA Vocale</p>
+        <p style="margin-top: 20px;">© 2025 PaieCashFan. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Chargement des données des clubs -->
+    <script src="clubs-football-complet.js"></script>
+    <script src="clubs-national-3-data.js"></script>
+    <script src="equipes-nationales-internationales.js"></script>
+    <script src="autres-sports-data.js"></script>
+
+    <script>
+        // Fonction de rendu des clubs
+        function renderClubs(clubs, gridId) {
+            const grid = document.getElementById(gridId);
+            if (!grid) {
+                console.error(`Grid ${gridId} not found`);
+                return;
+            }
+
+            if (!clubs || clubs.length === 0) {
+                grid.innerHTML = '<div class="loading">Aucun club disponible</div>';
+                return;
+            }
+
+            grid.innerHTML = clubs.map(club => `
+                <div class="club-card" onclick="window.location.href='${club.path}'">
+                    <div class="club-logo">${club.logo}</div>
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-league">${club.league}</div>
+                </div>
+            `).join('');
+
+            console.log(`✅ ${clubs.length} clubs affichés dans ${gridId}`);
+        }
+
+        // Attendre que le DOM soit chargé
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 PaieCashFan - Chargement des clubs...');
+
+            // Vérifier que les données sont chargées
+            if (typeof ligue1Clubs === 'undefined') {
+                console.error('❌ clubs-football-complet.js non chargé');
+                return;
+            }
+
+            if (typeof coupeMondeUEFA === 'undefined') {
+                console.error('❌ equipes-nationales-internationales.js non chargé');
+                return;
+            }
+
+            // Rendre les clubs de football
+            renderClubs(ligue1Clubs, 'ligue1Grid');
+            renderClubs(ligue2Clubs, 'ligue2Grid');
+            renderClubs(nationalClubs, 'nationalGrid');
+            
+            // National 2 - tous les groupes
+            const allNational2 = [
+                ...(national2GroupeA || []),
+                ...(national2GroupeB || []),
+                ...(national2GroupeC || [])
+            ];
+            renderClubs(allNational2, 'national2Grid');
+
+            // National 3 - tous les groupes
+            const allNational3 = [
+                ...(national3GroupeA || []),
+                ...(national3GroupeB || []),
+                ...(national3GroupeC || []),
+                ...(national3GroupeD || []),
+                ...(national3GroupeE || []),
+                ...(national3GroupeF || []),
+                ...(national3GroupeG || []),
+                ...(national3GroupeH || [])
+            ];
+            renderClubs(allNational3, 'national3Grid');
+
+            // Équipes nationales - toutes les confédérations
+            const toutesEquipesNationales = [
+                ...(coupeMondeUEFA || []),
+                ...(coupeMondeConmebol || []),
+                ...(coupeMondeAFC || []),
+                ...(coupeMondeCaf || []),
+                ...(coupeMondeConcacaf || []),
+                ...(coupeMondeOFC || []),
+                ...(championsLeagueEquipes || []),
+                ...(can2026Equipes || []),
+                ...(copaAmericaEquipes || []),
+                ...(coupeAsieEquipes || []),
+                ...(goldCupEquipes || [])
+            ];
+            renderClubs(toutesEquipesNationales, 'equipesNationalesGrid');
+
+            // Autres sports
+            const autresSportsData = [
+                ...(basketballClubs || []),
+                ...(handballClubs || []),
+                ...(rugbyClubs || []),
+                ...(volleyballClubs || []),
+                ...(federations || [])
+            ];
+            renderClubs(autresSportsData, 'autresSportsGrid');
+
+            // Statistiques
+            console.log('📊 STATISTIQUES:');
+            console.log('⚽ Ligue 1:', (ligue1Clubs || []).length);
+            console.log('⚽ Ligue 2:', (ligue2Clubs || []).length);
+            console.log('⚽ National:', (nationalClubs || []).length);
+            console.log('⚽ National 2:', allNational2.length);
+            console.log('⚽ National 3:', allNational3.length);
+            console.log('🌍 Équipes nationales:', toutesEquipesNationales.length);
+            console.log('🏀 Autres sports:', autresSportsData.length);
+            console.log('🎉 TOTAL:', 
+                (ligue1Clubs || []).length + 
+                (ligue2Clubs || []).length + 
+                (nationalClubs || []).length + 
+                allNational2.length + 
+                allNational3.length + 
+                toutesEquipesNationales.length + 
+                autresSportsData.length
+            );
+        });
+    </script>
+</body>
+</html>

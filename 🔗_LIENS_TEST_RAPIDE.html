@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Liens Test PaieCashFan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.8s ease;
+        }
+
+        .section h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 32px;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .link-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(10px);
+            border-color: #4ade80;
+            box-shadow: 0 5px 20px rgba(74, 222, 128, 0.3);
+        }
+
+        .link-card h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-card p {
+            font-size: 15px;
+            opacity: 0.8;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .link-btn:hover {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .link-btn.secondary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .link-btn.secondary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #4ade80;
+            margin-left: 10px;
+        }
+
+        .badge.new {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+            border-color: #fb923c;
+        }
+
+        .badge.demo {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4ade80;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .section h2 {
+                font-size: 22px;
+            }
+
+            .link-card h3 {
+                font-size: 18px;
+            }
+
+            .link-btn {
+                display: block;
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🔗 PaieCashFan - Liens Test</h1>
+            <p>Tous les liens pour visualiser et tester l'application</p>
+        </div>
+
+        <!-- SECTION 1: ACCUEIL UNIVERSEL -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🌍</span>
+                Accueil Universel Multi-Sports
+                <span class="badge new">NOUVEAU</span>
+            </h2>
+            
+            <div class="link-card" onclick="window.open('accueil-multi-sports-universel.html', '_blank')">
+                <h3>
+                    🏠 Page d'Accueil Universelle
+                    <span class="badge">16 CLUBS</span>
+                </h3>
+                <p>
+                    <strong>✨ Nouveauté :</strong> Tous les sports (⚽🏉🏀🤾), tous les clubs en un seul endroit !<br>
+                    <strong>🎯 Fonctionnalités :</strong> Stories horizontales, recherche universelle, filtres par sport, détection langue auto (FR/EN), géolocalisation<br>
+                    <strong>📱 Mobile-first :</strong> Design responsive optimisé pour smartphone
+                </p>
+                <a href="accueil-multi-sports-universel.html" class="link-btn" target="_blank">🚀 Ouvrir l'Accueil</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('accueil-multi-sports-universel.html'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Sports Intégrés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Clubs Disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Langues (FR/EN)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">26 KB</div>
+                    <div class="stat-label">Taille Fichier</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: APPLICATIONS CLUB -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">⚽</span>
+                Applications Club (V4 FINAL)
+            </h2>
+            
+            <!-- OM -->
+            <div class="link-card" onclick="window.open('app-om-v4-FINAL.html', '_blank')">
+                <h3>
+                    🔵⚪ Olympique de Marseille
+                    <span class="badge">ACTIF</span>
+                </h3>
+                <p>
+                    <strong>🎯 7 Sections complètes :</strong> Accueil (stories + social), Fidélité (5 niveaux + 15 badges), Légendes (Stéphane Mbia + Live Shopping), Billetterie NFT, Boutique NFT (joueurs/légendes/moments), Paiement (wallet + 6 partenaires), Profil<br>
+                    <strong>👥 12,500 fans</strong> | <strong>🏆 Ligue 1</strong> | <strong>🏟️ Orange Vélodrome</strong>
+                </p>
+                <a href="app-om-v4-FINAL.html" class="link-btn" target="_blank">⚽ Ouvrir App OM</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('app-om-v4-FINAL.html'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <!-- PARIS FC -->
+            <div class="link-card" onclick="window.open('app-paris-fc-v4-FINAL.html', '_blank')">
+                <h3>
+                    🔵⚪ Paris FC
+                    <span class="badge">ACTIF</span>
+                </h3>
+                <p>
+                    <strong>🎯 7 Sections complètes :</strong> Architecture identique à l'OM avec branding Paris FC<br>
+                    <strong>👥 4,200 fans</strong> | <strong>🏆 Ligue 1</strong> (corrigé ✅) | <strong>🏟️ Stade Charléty</strong><br>
+                    <strong>⭐ Ambassadeur :</strong> Nicolas Laspalles (gardien historique)
+                </p>
+                <a href="app-paris-fc-v4-FINAL.html" class="link-btn" target="_blank">⚽ Ouvrir App Paris FC</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('app-paris-fc-v4-FINAL.html'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Sections / App</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">85 KB</div>
+                    <div class="stat-label">Taille Fichier</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">60+</div>
+                    <div class="stat-label">Fonctionnalités</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">16,700</div>
+                    <div class="stat-label">Total Fans</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: TESTS & DOCUMENTATION -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🧪</span>
+                Tests & Documentation
+            </h2>
+            
+            <!-- Guide Test -->
+            <div class="link-card" onclick="window.open('🧪_GUIDE_TEST_V4_FINAL.html', '_blank')">
+                <h3>
+                    🧪 Guide de Test Interactif
+                    <span class="badge demo">60+ TESTS</span>
+                </h3>
+                <p>
+                    <strong>✅ Tests couverts :</strong> Navigation, stories, gamification, NFT, paiements, sécurité, responsive<br>
+                    <strong>📊 Format interactif :</strong> Checklist cliquable avec instructions détaillées<br>
+                    <strong>🎯 Idéal pour :</strong> QA, démonstrations, onboarding nouveaux testeurs
+                </p>
+                <a href="🧪_GUIDE_TEST_V4_FINAL.html" class="link-btn" target="_blank">🧪 Ouvrir Guide Test</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('🧪_GUIDE_TEST_V4_FINAL.html'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <!-- README -->
+            <div class="link-card" onclick="window.open('README.md', '_blank')">
+                <h3>
+                    📖 Documentation Complète (README)
+                    <span class="badge">15 KB</span>
+                </h3>
+                <p>
+                    <strong>📚 Contenu :</strong> Architecture technique, guide duplication club (45 min), roadmap 2025, métriques, partenariats<br>
+                    <strong>🎯 Sections :</strong> Fonctionnalités, authentification, expansion internationale, tests, sécurité<br>
+                    <strong>💡 Bonus :</strong> Guide démarrage rapide pour fans, développeurs et clubs
+                </p>
+                <a href="README.md" class="link-btn" target="_blank">📖 Lire README</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('README.md'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <!-- Stratégie Mondiale -->
+            <div class="link-card" onclick="window.open('🌍_STRATEGIE_MULTI_SPORTS_MONDIALE.md', '_blank')">
+                <h3>
+                    🌍 Stratégie Multi-Sports Mondiale
+                    <span class="badge new">VISION 2025</span>
+                </h3>
+                <p>
+                    <strong>🚀 Expansion Afrique :</strong> Roadmap détaillée Q1-Q4 2025 (Ouest, Nord, Est/Australe)<br>
+                    <strong>💡 Innovations :</strong> Mobile Money, mode Low Data, multilangue (6 langues), micro-paiements<br>
+                    <strong>📈 Objectifs 2025 :</strong> 60 clubs, 20 pays, 500K fans, 10M€ volume transactions
+                </p>
+                <a href="🌍_STRATEGIE_MULTI_SPORTS_MONDIALE.md" class="link-btn" target="_blank">🌍 Voir Stratégie</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('🌍_STRATEGIE_MULTI_SPORTS_MONDIALE.md'); return false;">📋 Copier le lien</a>
+            </div>
+        </div>
+
+        <!-- SECTION 4: AUTHENTIFICATION -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🔐</span>
+                Système d'Authentification
+            </h2>
+            
+            <!-- Connexion -->
+            <div class="link-card" onclick="window.open('connexion.html', '_blank')">
+                <h3>
+                    🔐 Page de Connexion
+                    <span class="badge">INTÉGRÉ</span>
+                </h3>
+                <p>
+                    <strong>🎯 Méthodes :</strong> Email + mot de passe, Google, Facebook, Apple<br>
+                    <strong>🔄 Redirection :</strong> Vers accueil universel ou app club (selon sélection)<br>
+                    <strong>💾 Persistance :</strong> LocalStorage (session utilisateur)
+                </p>
+                <a href="connexion.html" class="link-btn" target="_blank">🔐 Ouvrir Connexion</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('connexion.html'); return false;">📋 Copier le lien</a>
+            </div>
+
+            <!-- Inscription -->
+            <div class="link-card" onclick="window.open('inscription.html', '_blank')">
+                <h3>
+                    ✍️ Page d'Inscription
+                </h3>
+                <p>
+                    <strong>📝 Création compte :</strong> Email, mot de passe, confirmation<br>
+                    <strong>🔗 Onboarding :</strong> Sélection club favori après inscription<br>
+                    <strong>🎁 Bonus :</strong> 100 points de bienvenue
+                </p>
+                <a href="inscription.html" class="link-btn" target="_blank">✍️ Ouvrir Inscription</a>
+                <a href="#" class="link-btn secondary" onclick="copyLink('inscription.html'); return false;">📋 Copier le lien</a>
+            </div>
+        </div>
+
+        <!-- SECTION 5: PARCOURS UTILISATEUR COMPLET -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🎯</span>
+                Parcours Utilisateur Recommandé
+            </h2>
+            
+            <div class="link-card">
+                <h3>📍 Étape 1 : Découverte</h3>
+                <p>Commencez par l'<strong>Accueil Universel</strong> pour voir tous les clubs et sports disponibles</p>
+                <a href="accueil-multi-sports-universel.html" class="link-btn" target="_blank">🚀 Accueil Universel</a>
+            </div>
+
+            <div class="link-card">
+                <h3>📍 Étape 2 : Connexion (optionnel)</h3>
+                <p>Connectez-vous pour sauvegarder vos préférences et progresser dans la gamification</p>
+                <a href="connexion.html" class="link-btn" target="_blank">🔐 Se Connecter</a>
+            </div>
+
+            <div class="link-card">
+                <h3>📍 Étape 3 : Choisir un Club</h3>
+                <p>Sélectionnez votre club favori (OM ou Paris FC actuellement actifs)</p>
+                <a href="app-om-v4-FINAL.html" class="link-btn" target="_blank">⚽ OM</a>
+                <a href="app-paris-fc-v4-FINAL.html" class="link-btn" target="_blank">⚽ Paris FC</a>
+            </div>
+
+            <div class="link-card">
+                <h3>📍 Étape 4 : Explorer l'App</h3>
+                <p>Testez les 7 sections : Stories, Gamification, Live Shopping, NFT, Wallet, Profil...</p>
+                <a href="🧪_GUIDE_TEST_V4_FINAL.html" class="link-btn secondary" target="_blank">🧪 Suivre Guide Test</a>
+            </div>
+        </div>
+
+        <!-- SECTION 6: STATISTIQUES GLOBALES -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">📊</span>
+                Statistiques Globales du Projet
+            </h2>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Fichiers HTML</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Clubs Intégrés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Sports</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Apps Actives</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Sections / App</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">60+</div>
+                    <div class="stat-label">Fonctionnalités</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Badges</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Partenaires</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>🌟 PaieCashFan - Supporte ton Club 🌟</p>
+            <p>Version 4.0 FINAL | Décembre 2024</p>
+            <p>Un supporter, une app, zéro frontière</p>
+        </div>
+    </div>
+
+    <script>
+        function copyLink(filename) {
+            const baseUrl = window.location.origin + window.location.pathname.replace('🔗_LIENS_TEST_RAPIDE.html', '');
+            const fullUrl = baseUrl + filename;
+            
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('✅ Lien copié dans le presse-papier !\n\n' + fullUrl);
+            }).catch(err => {
+                console.error('Erreur copie:', err);
+                prompt('Copiez ce lien manuellement:', fullUrl);
+            });
+        }
+
+        // Animation au scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'all 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Console info
+        console.log('%c🔗 PaieCashFan - Liens Test', 'font-size: 20px; font-weight: bold; color: #667eea;');
+        console.log('%c✅ 5 fichiers HTML disponibles', 'font-size: 14px; color: #4ade80;');
+        console.log('%c⚽ 16 clubs intégrés (4 sports)', 'font-size: 14px; color: #4ade80;');
+        console.log('%c🌍 Expansion mondiale prévue 2025', 'font-size: 14px; color: #4ade80;');
+    </script>
+</body>
+</html>

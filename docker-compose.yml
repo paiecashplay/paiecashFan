@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  gateway:
+    build: ./gateway
+    ports:
+      - "3100:3100"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - marseille
+      - parisfc
+
+  # Microservice Marseille (OM)
+  marseille:
+    build: ./microservices/marseille
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - CLUB_ID=om
+      - CLUB_NAME=Olympique de Marseille
+      - DATABASE_URL=mongodb://mongo-marseille:27017/om_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_OM}
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - mongo-marseille
+
+  # Base de données Marseille
+  mongo-marseille:
+    image: mongo:6.0
+    volumes:
+      - marseille-data:/data/db
+    networks:
+      - paiecashplay-network
+
+  # Microservice Paris FC
+  parisfc:
+    build: ./microservices/parisfc
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - CLUB_ID=parisfc
+      - CLUB_NAME=Paris Football Club
+      - DATABASE_URL=mongodb://mongo-parisfc:27017/parisfc_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_PARISFC}
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - mongo-parisfc
+
+  # Base de données Paris FC
+  mongo-parisfc:
+    image: mongo:6.0
+    volumes:
+      - parisfc-data:/data/db
+    networks:
+      - paiecashplay-network
+
+  # Microservice Lyon (OL)
+  lyon:
+    build: ./microservices/lyon
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - CLUB_ID=ol
+      - CLUB_NAME=Olympique Lyonnais
+      - DATABASE_URL=mongodb://mongo-lyon:27017/lyon_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_LYON}
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - mongo-lyon
+
+  # Base de données Lyon
+  mongo-lyon:
+    image: mongo:6.0
+    volumes:
+      - lyon-data:/data/db
+    networks:
+      - paiecashplay-network
+
+  # Microservice PSG
+  psg:
+    build: ./microservices/psg
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - CLUB_ID=psg
+      - CLUB_NAME=Paris Saint-Germain
+      - DATABASE_URL=mongodb://mongo-psg:27017/psg_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_PSG}
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - mongo-psg
+
+  # Base de données PSG
+  mongo-psg:
+    image: mongo:6.0
+    volumes:
+      - psg-data:/data/db
+    networks:
+      - paiecashplay-network
+
+  # Microservice Monaco
+  monaco:
+    build: ./microservices/monaco
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - CLUB_ID=monaco
+      - CLUB_NAME=AS Monaco
+      - DATABASE_URL=mongodb://mongo-monaco:27017/monaco_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_MONACO}
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - mongo-monaco
+
+  # Base de données Monaco
+  mongo-monaco:
+    image: mongo:6.0
+    volumes:
+      - monaco-data:/data/db
+    networks:
+      - paiecashplay-network
+
+  # Redis (Cache partagé)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - paiecashplay-network
+
+  # Dashboard Admin
+  admin:
+    build: ./admin
+    ports:
+      - "3200:3200"
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - paiecashplay-network
+    depends_on:
+      - redis
+      - gateway
+
+networks:
+  paiecashplay-network:
+    driver: bridge
+
+volumes:
+  marseille-data:
+  parisfc-data:
+  lyon-data:
+  psg-data:
+  monaco-data:

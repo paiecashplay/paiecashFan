@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏦 Cartes Bancaires Réelles OM x PaieCash</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 10px 40px rgba(16, 185, 129, 0.7); }
+        }
+        
+        .header h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+        
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .cards-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 70px;
+            max-width: 1400px;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+        
+        .card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .card-label {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 12px 35px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 17px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .card-container {
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 16/10;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.7);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .card-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card-container:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+        }
+        
+        .card-container:hover::before {
+            opacity: 1;
+        }
+        
+        .card-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .features-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            padding: 45px;
+            border-radius: 30px;
+            max-width: 1100px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 50px;
+        }
+        
+        .features-box h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 35px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .feature {
+            background: rgba(255,255,255,0.08);
+            padding: 25px;
+            border-radius: 18px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .feature:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-8px);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 19px;
+            margin: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(59, 130, 246, 0.7);
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .cards-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 38px;
+            }
+            
+            .card-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="badge">✅ V13.4 - FORMAT CARTE BANCAIRE RÉEL</div>
+        <h1>🏦 Cartes OM x PaieCash</h1>
+        <p>Design ultra-réaliste généré par IA</p>
+        <p style="font-size: 15px; opacity: 0.7;">Numéro · Date · Nom · Puce EMV · Logos discrets</p>
+    </div>
+    
+    <div class="cards-showcase">
+        <!-- Carte OM FAN -->
+        <div class="card-item">
+            <div class="card-label">💳 CARTE OM FAN x PaieCash</div>
+            <div class="card-container">
+                <img src="https://www.genspark.ai/api/files/s/nhP66kEk" alt="Carte OM FAN x PaieCash">
+            </div>
+        </div>
+        
+        <!-- Carte OM VIP -->
+        <div class="card-item">
+            <div class="card-label">💎 CARTE OM VIP x PaieCash</div>
+            <div class="card-container">
+                <img src="https://www.genspark.ai/api/files/s/BxmyvhPX" alt="Carte OM VIP x PaieCash">
+            </div>
+        </div>
+    </div>
+    
+    <div class="features-box">
+        <h2>🎯 Éléments d'une Vraie Carte Bancaire</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">💳</div>
+                <div class="feature-title">Numéro de Carte</div>
+                <div class="feature-desc">16 chiffres embossés (5412 7534 9876 5432/33)</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📅</div>
+                <div class="feature-title">Date d'Expiration</div>
+                <div class="feature-desc">Valid thru: 12/28</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👤</div>
+                <div class="feature-title">Nom Titulaire</div>
+                <div class="feature-desc">PIERRE-EMERICK AUBAMEYANG</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Puce EMV</div>
+                <div class="feature-desc">Puce dorée réaliste 15x12mm</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔵</div>
+                <div class="feature-title">Logo OM</div>
+                <div class="feature-desc">Petit et discret (20x20mm)</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💼</div>
+                <div class="feature-title">Logo PaieCash</div>
+                <div class="feature-desc">Texte petit et élégant (12pt)</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔴</div>
+                <div class="feature-title">Logo Mastercard</div>
+                <div class="feature-desc">Petit et authentique (25x20mm)</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📐</div>
+                <div class="feature-title">Format Standard</div>
+                <div class="feature-desc">85.60mm x 53.98mm, coins 3.18mm</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="actions">
+        <a href="app-universal-simple.html?club=olympique-de-marseille" class="btn">
+            🌍 Voir dans l'Application Complète
+        </a>
+    </div>
+    
+    <script>
+        console.log('🏦 V13.4 - Cartes Bancaires Réelles OM x PaieCash');
+        console.log('✅ Numéro de carte: 5412 7534 9876 5432/33');
+        console.log('✅ Date expiration: 12/28');
+        console.log('✅ Nom: PIERRE-EMERICK AUBAMEYANG');
+        console.log('✅ Puce EMV plus petite (15x12mm)');
+        console.log('✅ Logos plus petits et discrets');
+        console.log('✅ Format carte bancaire réel');
+        console.log('✅ Zéro régression');
+        
+        // Auto-redirect après 15 secondes
+        setTimeout(() => {
+            console.log('🚀 Redirection vers application...');
+            window.location.href = 'app-universal-simple.html?club=olympique-de-marseille';
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Soldes</title>
+</head>
+<body>
+    <h1>Test Mise à Jour Soldes</h1>
+    
+    <p>Solde Total : <span id="soldeTotal">1247.50 €</span></p>
+    <p>Wallet : <span id="soldeWallet">625.00</span>€</p>
+    <p>Carte : <span id="soldeCarte">622.50</span>€</p>
+    <p>Cashback : <span id="cashback">37.20</span>€</p>
+    
+    <button onclick="testerRecharge()">Recharger 50€</button>
+    <button onclick="testerRetrait()">Retirer 100€</button>
+    
+    <script>
+        let state = {
+            wallet: 625.00,
+            carte: 622.50,
+            cashback: 37.20
+        };
+
+        function updateSoldes() {
+            const total = state.wallet + state.carte + state.cashback;
+            console.log("Mise à jour des soldes :", state);
+            
+            document.getElementById('soldeTotal').textContent = total.toFixed(2) + ' €';
+            document.getElementById('soldeWallet').textContent = state.wallet.toFixed(2);
+            document.getElementById('soldeCarte').textContent = state.carte.toFixed(2);
+            document.getElementById('cashback').textContent = state.cashback.toFixed(2);
+        }
+
+        function testerRecharge() {
+            state.wallet += 50;
+            updateSoldes();
+            alert('Rechargé ! Nouveau wallet : ' + state.wallet);
+        }
+
+        function testerRetrait() {
+            state.wallet -= 100;
+            state.carte += 100;
+            updateSoldes();
+            alert('Retiré ! Wallet : ' + state.wallet + ', Carte : ' + state.carte);
+        }
+    </script>
+</body>
+</html>

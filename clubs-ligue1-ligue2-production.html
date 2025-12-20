@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCash - Clubs Ligue 1 & Ligue 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        /* HEADER */
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        /* SEARCH */
+        .search-section {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+        
+        /* FILTERS */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+        
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #007AFF;
+        }
+        
+        /* CLUBS GRID */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        /* CLUB CARD */
+        .club-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+        }
+        .club-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: #007AFF;
+        }
+        .club-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin: 0 auto 20px;
+        }
+        .club-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .club-stats {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+        .club-status {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #34C759;
+            color: white;
+        }
+        
+        /* STATS */
+        .stats-bar {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007AFF;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>⚽ PaieCash - Clubs Professionnels</h1>
+        <p>Tous les clubs de Ligue 1 & Ligue 2 - Saison 2024/2025</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number" id="totalClubs">36</div>
+            <div class="stat-label">Clubs Totaux</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">18</div>
+            <div class="stat-label">Ligue 1</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">18</div>
+            <div class="stat-label">Ligue 2</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="avgSpectators">-</div>
+            <div class="stat-label">Moyenne Spectateurs</div>
+        </div>
+    </div>
+
+    <!-- SEARCH & FILTERS -->
+    <div class="search-section">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Rechercher un club..." oninput="filterClubs()">
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterByLeague('all')">Tous les clubs</button>
+            <button class="filter-btn" onclick="filterByLeague('ligue1')">Ligue 1 Uber Eats</button>
+            <button class="filter-btn" onclick="filterByLeague('ligue2')">Ligue 2 BKT</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- LIGUE 1 -->
+        <div class="section-title" id="ligue1Title">⚽ Ligue 1 Uber Eats (18 clubs)</div>
+        <div class="clubs-grid" id="ligue1Grid"></div>
+
+        <!-- LIGUE 2 -->
+        <div class="section-title" id="ligue2Title">⚽ Ligue 2 BKT (18 clubs)</div>
+        <div class="clubs-grid" id="ligue2Grid"></div>
+    </div>
+
+    <script>
+        // DONNÉES DES CLUBS (Source: LFP + PDF fourni)
+        const clubsData = {
+            ligue1: [
+                { id: 'psg', name: 'Paris Saint-Germain', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/psg.png', spectators: 47418 },
+                { id: 'om', name: 'Olympique de Marseille', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/marseille.png', spectators: 62716 },
+                { id: 'monaco', name: 'AS Monaco', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/monaco.png', spectators: 6870 },
+                { id: 'lille', name: 'LOSC Lille', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/lille.png', spectators: 36187 },
+                { id: 'lyon', name: 'Olympique Lyonnais', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/lyon.png', spectators: 46701 },
+                { id: 'lens', name: 'RC Lens', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/lens.png', spectators: 37704 },
+                { id: 'nice', name: 'OGC Nice', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/nice.png', spectators: 28500 },
+                { id: 'rennes', name: 'Stade Rennais', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/rennes.png', spectators: 27800 },
+                { id: 'reims', name: 'Stade de Reims', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/reims.png', spectators: 18900 },
+                { id: 'toulouse', name: 'Toulouse FC', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/toulouse.png', spectators: 22300 },
+                { id: 'strasbourg', name: 'RC Strasbourg', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/strasbourg.png', spectators: 24100 },
+                { id: 'nantes', name: 'FC Nantes', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/nantes.png', spectators: 31200 },
+                { id: 'brest', name: 'Stade Brestois 29', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/brest.png', spectators: 14800 },
+                { id: 'montpellier', name: 'Montpellier HSC', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/montpellier.png', spectators: 16500 },
+                { id: 'auxerre', name: 'AJ Auxerre', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/auxerre.png', spectators: 16200 },
+                { id: 'angers', name: 'Angers SCO', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/angers.png', spectators: 14700 },
+                { id: 'havre', name: 'Le Havre AC', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/havre.png', spectators: 19800 },
+                { id: 'steetienne', name: 'AS Saint-Étienne', logo: 'https://www.ligue1.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/saintetienne.png', spectators: 35400 }
+            ],
+            ligue2: [
+                { id: 'parisfc', name: 'Paris FC', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/paris.png', spectators: 8500 },
+                { id: 'laval', name: 'Stade Lavallois', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/laval.png', spectators: 7200 },
+                { id: 'lorient', name: 'FC Lorient', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/lorient.png', spectators: 14300 },
+                { id: 'dunkerque', name: 'USL Dunkerque', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/dunkerque.png', spectators: 3800 },
+                { id: 'metz', name: 'FC Metz', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/metz.png', spectators: 21500 },
+                { id: 'guingamp', name: 'En Avant Guingamp', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/guingamp.png', spectators: 11200 },
+                { id: 'ajaccio', name: 'AC Ajaccio', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/ajaccio.png', spectators: 5600 },
+                { id: 'pau', name: 'Pau FC', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/pau.png', spectators: 7800 },
+                { id: 'grenoble', name: 'Grenoble Foot 38', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/grenoble.png', spectators: 9500 },
+                { id: 'caen', name: 'SM Caen', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/caen.png', spectators: 16700 },
+                { id: 'troyes', name: 'ES Troyes AC', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/troyes.png', spectators: 9200 },
+                { id: 'amiens', name: 'Amiens SC', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/amiens.png', spectators: 10500 },
+                { id: 'rodez', name: 'Rodez AF', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/rodez.png', spectators: 4100 },
+                { id: 'clermont', name: 'Clermont Foot 63', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/clermont.png', spectators: 10800 },
+                { id: 'bastia', name: 'SC Bastia', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/bastia.png', spectators: 8900 },
+                { id: 'martigues', name: 'FC Martigues', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/martigues.png', spectators: 2400 },
+                { id: 'redstar', name: 'Red Star FC', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/red-star.png', spectators: 5300 },
+                { id: 'annecy', name: 'FC Annecy', logo: 'https://www.ligue2.fr/-/media/Project/LFP/shared/Images/Clubs/2024-2025/172x172/annecy.png', spectators: 8200 }
+            ]
+        };
+
+        // Générer les cartes
+        function generateClubCard(club, league) {
+            return `
+                <div class="club-card" data-league="${league}" data-name="${club.name.toLowerCase()}" onclick="selectClub('${club.id}', '${club.name}')">
+                    <img src="${club.logo}" alt="${club.name}" class="club-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><text x=%2250%%22 y=%2250%%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22>⚽</text></svg>'">
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-stats">Moy. Spectateurs: ${club.spectators.toLocaleString()}</div>
+                    <span class="club-status">PaieCash Activé</span>
+                </div>
+            `;
+        }
+
+        // Afficher les clubs
+        function displayClubs() {
+            const ligue1Grid = document.getElementById('ligue1Grid');
+            const ligue2Grid = document.getElementById('ligue2Grid');
+
+            ligue1Grid.innerHTML = clubsData.ligue1.map(club => generateClubCard(club, 'ligue1')).join('');
+            ligue2Grid.innerHTML = clubsData.ligue2.map(club => generateClubCard(club, 'ligue2')).join('');
+
+            // Calculer moyenne spectateurs
+            const allClubs = [...clubsData.ligue1, ...clubsData.ligue2];
+            const avgSpectators = Math.round(allClubs.reduce((sum, club) => sum + club.spectators, 0) / allClubs.length);
+            document.getElementById('avgSpectators').textContent = avgSpectators.toLocaleString();
+        }
+
+        // Filtrer par ligue
+        function filterByLeague(league) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const ligue1Title = document.getElementById('ligue1Title');
+            const ligue2Title = document.getElementById('ligue2Title');
+            const ligue1Grid = document.getElementById('ligue1Grid');
+            const ligue2Grid = document.getElementById('ligue2Grid');
+
+            if (league === 'all') {
+                ligue1Title.style.display = 'block';
+                ligue2Title.style.display = 'block';
+                ligue1Grid.style.display = 'grid';
+                ligue2Grid.style.display = 'grid';
+            } else if (league === 'ligue1') {
+                ligue1Title.style.display = 'block';
+                ligue2Title.style.display = 'none';
+                ligue1Grid.style.display = 'grid';
+                ligue2Grid.style.display = 'none';
+            } else if (league === 'ligue2') {
+                ligue1Title.style.display = 'none';
+                ligue2Title.style.display = 'block';
+                ligue1Grid.style.display = 'none';
+                ligue2Grid.style.display = 'grid';
+            }
+        }
+
+        // Recherche
+        function filterClubs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.club-card').forEach(card => {
+                const clubName = card.dataset.name;
+                card.style.display = clubName.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        // Sélectionner un club
+        function selectClub(clubId, clubName) {
+            // Rediriger vers l'app du club
+            if (confirm(`Ouvrir l'application PaieCash pour ${clubName} ?`)) {
+                // Pour l'instant, rediriger vers OM comme template
+                window.location.href = 'app-om-COMPLET.html';
+            }
+        }
+
+        // Initialiser
+        displayClubs();
+    </script>
+</body>
+</html>

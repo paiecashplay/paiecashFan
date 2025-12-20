@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Test Moteur de Recherche - Debug</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .search-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .search-input:focus {
+            border-color: #60a5fa;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-clear {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .result-icon {
+            font-size: 30px;
+        }
+        
+        .result-info {
+            flex: 1;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+        
+        .result-desc {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
+        .result-price {
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .no-results-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .debug-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .debug-title {
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+        
+        .debug-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-queries {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .test-btn {
+            padding: 10px 20px;
+            background: rgba(96, 165, 250, 0.3);
+            border: 2px solid #60a5fa;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: rgba(96, 165, 250, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test Moteur de Recherche - Debug</h1>
+        
+        <div class="search-section">
+            <h2 style="margin-bottom: 20px;">Recherche en temps réel</h2>
+            
+            <div class="search-box">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput" 
+                       placeholder="🔍 Rechercher une équipe, un club..."
+                       autocomplete="off">
+                <button class="search-clear" id="searchClear">✕</button>
+            </div>
+            
+            <div class="test-queries">
+                <button class="test-btn" onclick="testSearch('Liverpool')">🔴 Liverpool</button>
+                <button class="test-btn" onclick="testSearch('PSG')">🔵 PSG</button>
+                <button class="test-btn" onclick="testSearch('OM')">⚪ OM</button>
+                <button class="test-btn" onclick="testSearch('Bayern')">🔴 Bayern</button>
+                <button class="test-btn" onclick="testSearch('Arsenal')">🔴 Arsenal</button>
+                <button class="test-btn" onclick="testSearch('Galatasaray')">🟡 Galatasaray</button>
+                <button class="test-btn" onclick="testSearch('Monaco')">🔴 Monaco</button>
+                <button class="test-btn" onclick="testSearch('Real')">⚪ Real Madrid</button>
+            </div>
+            
+            <div class="results" id="results"></div>
+            
+            <div class="debug-section" id="debugInfo">
+                <div class="debug-title">📊 Informations de Debug</div>
+                <div id="debugContent"></div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalClubs">0</div>
+                <div class="stat-label">Clubs disponibles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalAliases">0</div>
+                <div class="stat-label">Alias disponibles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="searchCount">0</div>
+                <div class="stat-label">Recherches effectuées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="resultsCount">0</div>
+                <div class="stat-label">Résultats trouvés</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Initialisation du test du moteur de recherche...');
+        
+        // Base de données des clubs
+        const clubNames = {
+            'olympique-de-marseille': { name: 'Olympique de Marseille', alias: ['OM', 'Marseille', 'Olympique'], icon: '⚪🔵' },
+            'paris-saint-germain': { name: 'Paris Saint-Germain', alias: ['PSG', 'Paris'], icon: '🔴🔵' },
+            'olympique-lyonnais': { name: 'Olympique Lyonnais', alias: ['OL', 'Lyon'], icon: '🔴🔵' },
+            'as-monaco': { name: 'AS Monaco', alias: ['Monaco', 'ASM'], icon: '🔴⚪' },
+            'losc-lille': { name: 'LOSC Lille', alias: ['Lille', 'LOSC'], icon: '🔴⚪' },
+            'rc-lens': { name: 'RC Lens', alias: ['Lens', 'Racing'], icon: '🟡🔴' },
+            'sco-angers': { name: 'SCO Angers', alias: ['Angers', 'SCO'], icon: '⚪⚫' },
+            'stade-rennais': { name: 'Stade Rennais', alias: ['Rennes', 'Stade'], icon: '🔴⚫' },
+            'ogc-nice': { name: 'OGC Nice', alias: ['Nice', 'OGC'], icon: '🔴⚫' },
+            'arsenal': { name: 'Arsenal FC', alias: ['Arsenal', 'Gunners'], icon: '🔴⚪' },
+            'liverpool': { name: 'Liverpool FC', alias: ['Liverpool', 'Reds', 'LFC'], icon: '🔴' },
+            'manchester-city': { name: 'Manchester City', alias: ['Man City', 'City', 'Citizens'], icon: '💙' },
+            'bayern-munich': { name: 'Bayern Munich', alias: ['Bayern', 'Munich'], icon: '🔴⚪' },
+            'real-madrid': { name: 'Real Madrid', alias: ['Real', 'Madrid', 'Merengues'], icon: '⚪' },
+            'galatasaray': { name: 'Galatasaray SK', alias: ['Galatasaray', 'Gala', 'Cimbom'], icon: '🟡🔴' },
+            'fenerbahce': { name: 'Fenerbahçe SK', alias: ['Fenerbahçe', 'Fener', 'Fenerbahce'], icon: '🟡🔵' },
+            'besiktas': { name: 'Beşiktaş JK', alias: ['Beşiktaş', 'Besiktas', 'BJK'], icon: '⚫⚪' }
+        };
+        
+        // Statistiques
+        let stats = {
+            searchCount: 0,
+            totalClubs: Object.keys(clubNames).length,
+            totalAliases: 0
+        };
+        
+        // Calculer le nombre total d'alias
+        Object.values(clubNames).forEach(club => {
+            stats.totalAliases += club.alias ? club.alias.length : 0;
+        });
+        
+        // Afficher les statistiques initiales
+        updateStats();
+        
+        // Éléments du DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const results = document.getElementById('results');
+        const debugContent = document.getElementById('debugContent');
+        
+        // Fonction de recherche
+        function performSearch(query) {
+            console.log(`🔍 Recherche: "${query}"`);
+            stats.searchCount++;
+            
+            const lowerQuery = query.toLowerCase().trim();
+            const searchResults = [];
+            const debugInfo = {
+                query: query,
+                lowerQuery: lowerQuery,
+                matches: []
+            };
+            
+            if (lowerQuery.length === 0) {
+                results.innerHTML = '';
+                updateDebug(debugInfo);
+                return;
+            }
+            
+            // Chercher dans les clubs
+            Object.entries(clubNames).forEach(([slug, data]) => {
+                const matchName = data.name.toLowerCase().includes(lowerQuery);
+                const matchAlias = data.alias && data.alias.some(alias => alias.toLowerCase().includes(lowerQuery));
+                
+                if (matchName || matchAlias) {
+                    searchResults.push({
+                        type: 'club',
+                        icon: data.icon,
+                        title: data.name,
+                        desc: `Slug: ${slug}`,
+                        slug: slug,
+                        matchedBy: matchName ? 'nom' : 'alias'
+                    });
+                    
+                    debugInfo.matches.push({
+                        club: data.name,
+                        slug: slug,
+                        matchName: matchName,
+                        matchAlias: matchAlias,
+                        aliases: data.alias
+                    });
+                }
+            });
+            
+            console.log(`✅ ${searchResults.length} résultat(s) trouvé(s)`);
+            displayResults(searchResults, query);
+            updateDebug(debugInfo);
+            updateStats(searchResults.length);
+        }
+        
+        // Afficher les résultats
+        function displayResults(searchResults, query) {
+            if (searchResults.length === 0) {
+                results.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">😞</div>
+                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Aucun résultat trouvé</div>
+                        <div style="opacity: 0.7;">Essayez "Liverpool", "PSG", "OM", "Bayern"...</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            results.innerHTML = `
+                <div style="padding: 15px; background: rgba(96, 165, 250, 0.2); border-radius: 10px; margin-bottom: 15px; font-weight: bold;">
+                    ✅ ${searchResults.length} résultat${searchResults.length > 1 ? 's' : ''} pour "${query}"
+                </div>
+                ${searchResults.map(result => `
+                    <div class="result-item" onclick="selectClub('${result.slug}', '${result.title}')">
+                        <div class="result-icon">${result.icon}</div>
+                        <div class="result-info">
+                            <div class="result-title">${result.title}</div>
+                            <div class="result-desc">${result.desc} • Trouvé par: ${result.matchedBy}</div>
+                        </div>
+                        <div style="color: #60a5fa;">→</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        // Mettre à jour le debug
+        function updateDebug(debugInfo) {
+            debugContent.innerHTML = `
+                <div class="debug-item"><strong>Requête:</strong> "${debugInfo.query}"</div>
+                <div class="debug-item"><strong>Normalisée:</strong> "${debugInfo.lowerQuery}"</div>
+                <div class="debug-item"><strong>Résultats:</strong> ${debugInfo.matches.length}</div>
+                ${debugInfo.matches.length > 0 ? `
+                    <div class="debug-item" style="margin-top: 10px;"><strong>Détails des matches:</strong></div>
+                    ${debugInfo.matches.map(match => `
+                        <div class="debug-item" style="padding-left: 20px; font-size: 11px;">
+                            • ${match.club}<br>
+                            &nbsp;&nbsp;Slug: ${match.slug}<br>
+                            &nbsp;&nbsp;Match nom: ${match.matchName ? '✅' : '❌'}<br>
+                            &nbsp;&nbsp;Match alias: ${match.matchAlias ? '✅' : '❌'}<br>
+                            &nbsp;&nbsp;Alias: ${match.aliases.join(', ')}
+                        </div>
+                    `).join('')}
+                ` : ''}
+            `;
+        }
+        
+        // Mettre à jour les statistiques
+        function updateStats(resultsCount = 0) {
+            document.getElementById('totalClubs').textContent = stats.totalClubs;
+            document.getElementById('totalAliases').textContent = stats.totalAliases;
+            document.getElementById('searchCount').textContent = stats.searchCount;
+            if (resultsCount > 0) {
+                document.getElementById('resultsCount').textContent = resultsCount;
+            }
+        }
+        
+        // Sélectionner un club
+        function selectClub(slug, name) {
+            console.log(`✅ Club sélectionné: ${name} (${slug})`);
+            alert(`✅ Club sélectionné: ${name}\n\nSlug: ${slug}\n\nURL: app-universal-simple.html?club=${slug}`);
+        }
+        
+        // Fonction de test
+        function testSearch(query) {
+            searchInput.value = query;
+            searchInput.focus();
+            performSearch(query);
+            searchClear.style.display = 'block';
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            searchClear.style.display = value ? 'block' : 'none';
+            performSearch(value);
+        });
+        
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            results.innerHTML = '';
+            searchInput.focus();
+        });
+        
+        // Focus automatique
+        searchInput.focus();
+        
+        console.log('✅ Test du moteur de recherche prêt!');
+        console.log(`📊 ${stats.totalClubs} clubs disponibles`);
+        console.log(`📊 ${stats.totalAliases} alias disponibles`);
+    </script>
+</body>
+</html>

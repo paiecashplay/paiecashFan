@@ -1,0 +1,3619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Chargement...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .club-logo-header {
+            width: 50px;
+            height: 50px;
+        }
+
+        .header-info h2 {
+            font-size: 18px;
+        }
+
+        .header-info p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 5px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* BARRE DE RECHERCHE */
+        .search-container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 45px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .search-input:focus {
+            background: rgba(255,255,255,0.15);
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .search-clear:hover {
+            background: #ef4444;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(30, 30, 50, 0.98);
+            border-radius: 15px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-result-item:hover {
+            background: rgba(96, 165, 250, 0.2);
+        }
+
+        .search-result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .search-result-desc {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .search-result-price {
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .search-no-results {
+            padding: 30px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* MENU */
+        .menu {
+            display: flex;
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* CONTAINER */
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* WALLET CARD */
+        .wallet-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .wallet-balance {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .wallet-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* BUTTONS */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* CRYPTO CARDS */
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .crypto-card {
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .crypto-card:hover {
+            transform: scale(1.05);
+        }
+
+        /* PRODUCT GRID */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .product-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .product-card.selected {
+            border: 3px solid #4ade80;
+            background: rgba(74, 222, 128, 0.2);
+        }
+
+        .product-img {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #4ade80;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* QR CODE */
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .qr-pattern {
+            width: 200px;
+            height: 200px;
+            background: 
+                linear-gradient(0deg, transparent 45%, #000 45%, #000 55%, transparent 55%),
+                linear-gradient(90deg, transparent 45%, #000 45%, #000 55%, transparent 55%);
+            background-size: 20px 20px;
+            position: relative;
+        }
+
+        .qr-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #3b82f6;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .crypto-grid, .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <!-- CHARGEMENT BASES DE DONNÉES -->
+    <script src="⭐_LEGENDES_CLUBS_DATABASE.js"></script>
+    <script src="🌍_TOUTES_FEDERATIONS_FIFA.js"></script>
+    <!-- CAF déjà inclus dans TOUTES_FEDERATIONS_FIFA.js -->
+    <script src="🌍_TOUTES_COMPETITIONS_2026.js"></script>
+    <script src="clubs-football-complet.js"></script>
+    <script src="🏀_BASKET_FEDERATIONS_CLUBS.js"></script>
+    <script src="🤾_HANDBALL_FEDERATIONS_CLUBS.js"></script>
+    <script src="🏉_RUGBY_VOLLEY_FEDERATIONS_CLUBS.js"></script>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <button onclick="window.location.href='index.html'" style="background: rgba(59, 130, 246, 0.8); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 15px;">
+                ← Tous les clubs
+            </button>
+            <div id="clubLogoHeaderContainer" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(255,255,255,0.1);">
+                ⚽
+            </div>
+            <div class="header-info">
+                <h2 id="clubNameHeader">Mon Club</h2>
+                <p>Platine 💎</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <div style="position: relative;">
+                <div class="user-avatar">👤</div>
+                <div class="notification-badge">5</div>
+            </div>
+            <div style="font-size: 12px; margin-top: 5px;">ETOT Constantin Nicolas</div>
+            <div style="font-size: 11px; opacity: 0.7;">etot@paiecash.com</div>
+            <button onclick="seDeconnecter()" style="margin-top: 10px; padding: 8px 15px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                🚪 Déconnexion
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRE DE RECHERCHE -->
+    <div class="search-container">
+        <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Rechercher un produit, une légende, un club..." 
+                autocomplete="off"
+            />
+            <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="menu">
+        <button class="menu-btn active" onclick="showSection('accueil')">🏠 Accueil</button>
+        <button class="menu-btn" onclick="showSection('fidelite')">💎 Fidélité</button>
+        <button class="menu-btn" onclick="showSection('legendes')">⭐ Légendes</button>
+        <button class="menu-btn" onclick="showSection('billets')">🎟️ Billets</button>
+        <button class="menu-btn" onclick="showSection('boutique')">🛍️ Boutique</button>
+        <button class="menu-btn" onclick="showSection('transactions')">📊 Transactions</button>
+        <button class="menu-btn" onclick="showSection('paiement')">💳 Paiement</button>
+        <button class="menu-btn" onclick="showSection('profil')">👤 Profil</button>
+    </div>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- ACCUEIL -->
+        <div class="section active" id="accueil">
+            <div class="card">
+                <div class="card-title" id="welcomeMessage">👋 Bienvenue !</div>
+                <p>Vous êtes connecté en tant que <strong id="userName">ETOT Constantin Nicolas</strong></p>
+                <p style="margin-top: 10px;">Niveau : Platine 💎 | 4,250 points</p>
+            </div>
+
+            <!-- WALLET PAIECASH -->
+            <div class="wallet-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="font-size: 22px; font-weight: bold; letter-spacing: 3px;">PAIECASH</div>
+                    <div id="walletClubDisplay" style="font-size: 14px; opacity: 0.9;">⚽ Chargement...</div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">SOLDE TOTAL</div>
+                    <div style="font-size: 36px; font-weight: bold;" id="soldeTotal-accueil">1247.50 €</div>
+                    <div style="font-size: 14px; margin-top: 5px; display: flex; gap: 15px;">
+                        <span>💵 Wallet : <span id="soldeWallet-accueil">625.00</span>€</span>
+                        <span>💳 Carte : <span id="soldeCarte-accueil">622.50</span>€</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 16px; color: #90EE90;">+ <span id="cashback-accueil">37.20</span>€ cashback</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 12px; opacity: 0.8; margin-bottom: 5px;">N° Identification</div>
+                    <div style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">5234 8765 1234 5678</div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <div>
+                            <div style="font-size: 11px; opacity: 0.7;">Titulaire</div>
+                            <div style="font-size: 14px; font-weight: bold;">ETOT CONSTANTIN</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; opacity: 0.7;">Expire</div>
+                            <div style="font-size: 14px; font-weight: bold;">12/34</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="showSection('paiement')" style="width: 100%; background: white; color: #667eea; font-weight: bold;">💳 Gérer Wallet & Paiements</button>
+            </div>
+
+            <!-- TRANSACTIONS RÉCENTES -->
+            <div class="card">
+                <div class="card-title">📊 Transactions Récentes</div>
+                <div id="transactionsRecentes">
+                    <!-- Les transactions s'afficheront ici dynamiquement -->
+                    <div style="text-align: center; padding: 30px; opacity: 0.5;">
+                        <div style="font-size: 50px; margin-bottom: 10px;">📊</div>
+                        <p style="font-size: 14px;">Aucune transaction récente</p>
+                        <p style="font-size: 12px; margin-top: 5px; opacity: 0.7;">Vos transactions apparaîtront ici</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="showSection('transactions')" style="margin-top: 15px; width: 100%;">Voir toutes les transactions</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Actions Rapides</div>
+                <button class="btn" onclick="showSection('paiement')">💳 Aller au Paiement</button>
+                <button class="btn btn-secondary" onclick="showSection('boutique')">🛍️ Aller à la Boutique</button>
+            </div>
+        </div>
+
+        <!-- FIDÉLITÉ -->
+        <div class="section" id="fidelite">
+            <div class="card">
+                <div class="card-title">💎 Programme Fidélité</div>
+                <p style="margin-bottom: 20px;">Niveau Platine 💎</p>
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Progression</div>
+                    <div style="background: rgba(255,255,255,0.3); height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: white; height: 100%; width: 42.5%;"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 18px; font-weight: bold;">4,250 / 10,000 points</div>
+                </div>
+                <p>Contenu à venir...</p>
+            </div>
+        </div>
+
+        <!-- LÉGENDES -->
+        <div class="section" id="legendes">
+            <div class="card">
+                <div class="card-title">⭐ Légendes & Ambassadeurs du Club</div>
+                <p style="margin-bottom: 20px;">Découvrez les légendes qui ont marqué l'histoire du club et soutenez leurs associations en achetant leurs NFTs collectors.</p>
+                
+                <div id="legendes-container" style="display: grid; gap: 25px; margin-top: 25px;">
+                    <!-- Les légendes seront chargées dynamiquement ici via JavaScript -->
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">⏳</div>
+                        <p>Chargement des légendes du club...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS TEMPS RÉEL -->
+        <div class="section" id="transactions">
+            <div class="card">
+                <div class="card-title">📊 Transactions en Temps Réel</div>
+                <p style="margin-bottom: 20px;">Historique complet de vos transactions avec mise à jour instantanée</p>
+                
+                <!-- Filtres -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('toutes')" style="padding: 10px 20px;">Toutes</button>
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('boutique')" style="padding: 10px 20px;">🛍️ Boutique</button>
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('wallet')" style="padding: 10px 20px;">💵 Wallet</button>
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('crypto')" style="padding: 10px 20px;">₿ Crypto</button>
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('alipay')" style="padding: 10px 20px;">🇨🇳 Alipay</button>
+                    <button class="btn btn-secondary" onclick="filtrerTransactions('wechat')" style="padding: 10px 20px;">🇨🇳 WeChat</button>
+                </div>
+                
+                <!-- Liste des transactions -->
+                <div id="listeTransactionsComplete" style="display: grid; gap: 15px;">
+                    <!-- Les transactions seront ajoutées ici dynamiquement -->
+                    <div style="text-align: center; padding: 40px; opacity: 0.5;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">📊</div>
+                        <p>Aucune transaction pour le moment</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Les transactions s'afficheront ici en temps réel après vos achats</p>
+                    </div>
+                </div>
+                
+                <!-- Statistiques -->
+                <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px;">
+                    <div class="card-title" style="margin-bottom: 15px;">📈 Statistiques</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.7;">Total dépensé</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #ff6b6b;" id="totalDepense">0.00 €</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.7;">Total cashback gagné</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #4ade80;" id="totalCashback">0.00 €</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.7;">Nombre de transactions</div>
+                            <div style="font-size: 24px; font-weight: bold;" id="nombreTransactions">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BILLETS -->
+        <div class="section" id="billets">
+            <div class="card">
+                <div class="card-title">🎟️ Billetterie Officielle</div>
+                <p style="margin-bottom: 20px;">Achetez vos billets pour les prochains matchs</p>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-img" style="font-size: 60px;">⚽</div>
+                        <div class="product-name">Match à Domicile</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">Prochain match</div>
+                        <div class="product-price">45 €</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-img" style="font-size: 60px;">🏆</div>
+                        <div class="product-name">Match Européen</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">Champions League</div>
+                        <div class="product-price">85 €</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MARCHÉ FAN-TO-FAN BILLETS -->
+            <div class="card">
+                <div class="card-title">🎫 Marché Fan-to-Fan - Billets</div>
+                <p style="margin-bottom: 20px;">Billets revendus par des fans vérifiés</p>
+                <div class="product-grid">
+                    <div class="product-card" style="position: relative; border: 2px solid #10b981;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                            ✓ Vendeur vérifié
+                        </div>
+                        <div class="product-img" style="font-size: 60px;">🎟️</div>
+                        <div class="product-name">OM - PSG</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">Tribune Ganay - Rang 12</div>
+                        <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @OMFan123</div>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0;">
+                            <div style="text-decoration: line-through; opacity: 0.6; font-size: 12px;">65 €</div>
+                            <div class="product-price">58 €</div>
+                        </div>
+                        <div style="font-size: 10px; color: #10b981; font-weight: bold;">-11% vs prix officiel</div>
+                    </div>
+
+                    <div class="product-card" style="position: relative; border: 2px solid #10b981;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                            ✓ Vendeur vérifié
+                        </div>
+                        <div class="product-img" style="font-size: 60px;">🎟️</div>
+                        <div class="product-name">OM - OL</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">Virage Sud - Rang 8</div>
+                        <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @MarseilleForever</div>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0;">
+                            <div style="text-decoration: line-through; opacity: 0.6; font-size: 12px;">45 €</div>
+                            <div class="product-price">40 €</div>
+                        </div>
+                        <div style="font-size: 10px; color: #10b981; font-weight: bold;">-11% vs prix officiel</div>
+                    </div>
+
+                    <div class="product-card" style="position: relative; border: 2px solid #10b981;">
+                        <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                            ✓ Vendeur vérifié
+                        </div>
+                        <div class="product-img" style="font-size: 60px;">🎟️</div>
+                        <div class="product-name">OM - Nice</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">Tribune Jean Bouin - Rang 15</div>
+                        <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @SupporterOM</div>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0;">
+                            <div style="text-decoration: line-through; opacity: 0.6; font-size: 12px;">50 €</div>
+                            <div class="product-price">43 €</div>
+                        </div>
+                        <div style="font-size: 10px; color: #10b981; font-weight: bold;">-14% vs prix officiel</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAIEMENT -->
+        <div class="section" id="paiement">
+            <div class="wallet-card">
+                <div class="wallet-info">PAIECASH</div>
+                <div class="wallet-info">SOLDE TOTAL</div>
+                <div class="wallet-balance" id="soldeTotal">1247.50 €</div>
+                <div class="wallet-info">Wallet (<span id="soldeWallet">625.00</span>€) + Carte (<span id="soldeCarte">622.50</span>€) + <span id="cashback">37.20</span>€ cashback</div>
+            </div>
+
+            <button class="btn" onclick="rechargerWallet()">💰 Recharger Wallet</button>
+            <button class="btn btn-secondary" onclick="retirerVersCarte()">💸 Retirer vers Carte</button>
+
+            <!-- WALLET MULTI-CLUB - ÉCOSYSTÈME SPORT -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1)); border: 2px solid rgba(59, 130, 246, 0.3);">
+                <div class="card-title">👛 Wallet Écosystème Sport</div>
+                <p style="margin-bottom: 15px;">6 Stablecoins de clubs français - Parité 1:1 avec l'EUR</p>
+                
+                <div style="background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">🔐 Système Non-Custodial</div>
+                    <div style="font-size: 11px; opacity: 0.9;">Adresse: <code style="font-size: 10px;">0x742d35Cc6634C0532925a3b844Bc9e7595f8f3a</code></div>
+                    <div style="font-size: 11px; opacity: 0.9; margin-top: 5px;">✅ Achat/revente facile entre les 6 clubs | Interopérabilité totale</div>
+                </div>
+
+                <div class="crypto-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <!-- OM COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('OM Coin', 2450, 2450)" style="background: linear-gradient(135deg, #3b82f6, #1e40af); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">🏟️ Olympique Marseille</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">2,450.00 OMC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 2,450.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 OMC = 1 EUR</div>
+                    </div>
+
+                    <!-- PSG COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('PSG Coin', 150, 150)" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">⚜️ Paris Saint-Germain</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">150.00 PSC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 150.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 PSC = 1 EUR</div>
+                    </div>
+
+                    <!-- OL COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('OL Coin', 75, 75)" style="background: linear-gradient(135deg, #ef4444, #dc2626); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">🦁 Olympique Lyonnais</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">75.00 OLC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 75.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 OLC = 1 EUR</div>
+                    </div>
+
+                    <!-- MONACO COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('Monaco Coin', 50, 50)" style="background: linear-gradient(135deg, #dc2626, #991b1b); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">🏴 AS Monaco</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">50.00 ASC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 50.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 ASC = 1 EUR</div>
+                    </div>
+
+                    <!-- LILLE COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('LOSC Coin', 100, 100)" style="background: linear-gradient(135deg, #dc2626, #b91c1c); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">🐶 LOSC Lille</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">100.00 LSC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 100.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 LSC = 1 EUR</div>
+                    </div>
+
+                    <!-- LENS COIN -->
+                    <div class="crypto-card" onclick="choisirProduitCrypto('RC Lens Coin', 80, 80)" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); position: relative; padding: 20px; border-radius: 15px; color: white; cursor: pointer;">
+                        <div style="font-size: 12px; opacity: 0.9;">💛 RC Lens</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">80.00 RCL</div>
+                        <div style="font-size: 11px; opacity: 0.8;">= 80.00 EUR</div>
+                        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold;">1 RCL = 1 EUR</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0, 176, 224, 0.2); border-radius: 10px;">
+                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">💡 Avantages Écosystème Sport</div>
+                    <div style="font-size: 11px; display: grid; gap: 5px;">
+                        <div>✅ Achat/revente sans frais entre les 6 clubs</div>
+                        <div>✅ Réductions exclusives dans toutes les boutiques</div>
+                        <div>✅ +2% de cashback supplémentaire</div>
+                        <div>✅ Priorité billetterie multi-clubs</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="convertirCrypto()" style="margin-top: 15px;">🔄 Convertir entre Stablecoins</button>
+            </div>
+
+            <!-- CRYPTO CLASSIQUES -->
+            <div class="card">
+                <div class="card-title">💎 Mes Crypto Classiques</div>
+                <div class="crypto-grid">
+                    <div class="crypto-card" onclick="choisirProduitCrypto('USDC', 847.30, 801.25)" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <div style="font-size: 12px; opacity: 0.9;">USDC</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="usdc">847.30 $</div>
+                        <div style="font-size: 11px; opacity: 0.8;">≈ 801.25 €</div>
+                    </div>
+                    <div class="crypto-card" onclick="choisirProduitCrypto('Bitcoin', 0.012, 450)" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+                        <div style="font-size: 12px; opacity: 0.9;">Bitcoin</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">0.012 BTC</div>
+                        <div style="font-size: 11px; opacity: 0.8;">≈ 450 €</div>
+                    </div>
+                    <div class="crypto-card" onclick="choisirProduitCrypto('Ethereum', 0.25, 380)" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <div style="font-size: 12px; opacity: 0.9;">Ethereum</div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">0.25 ETH</div>
+                        <div style="font-size: 11px; opacity: 0.8;">≈ 380 €</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="convertirCrypto()" style="margin-top: 20px;">🔄 Convertir / Échanger</button>
+            </div>
+
+            <!-- QR CODE -->
+            <div class="card">
+                <div class="card-title">📱 Recevoir un Paiement</div>
+                <button class="btn" onclick="afficherQRCode()">📲 Afficher QR Code PaieCash</button>
+            </div>
+
+            <!-- CARTE BANCAIRE -->
+            <div class="card">
+                <div class="card-title">💳 Ma Carte Bancaire OM</div>
+                <div style="background: linear-gradient(135deg, #1e3a8a, #0ea5e9); padding: 30px; border-radius: 20px; color: white; margin-bottom: 15px;">
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 14px; opacity: 0.9;">CARTE OFFICIELLE</div>
+                        <div style="font-size: 20px; font-weight: bold;">OLYMPIQUE DE MARSEILLE</div>
+                    </div>
+                    <div style="font-size: 20px; letter-spacing: 3px; margin: 20px 0;">5234 8765 1234 5678</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div><div style="font-size: 10px;">TITULAIRE</div><div style="font-weight: bold;">ETOT CONSTANTIN</div></div>
+                        <div><div style="font-size: 10px;">EXPIRE</div><div style="font-weight: bold;">12/27</div></div>
+                        <div><div style="font-size: 10px;">CVV</div><div style="font-weight: bold;" id="cvv">***</div></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <button class="btn btn-secondary" onclick="voirPIN()">👁️ Voir PIN</button>
+                    <button class="btn btn-secondary" onclick="gererLimites()">⚙️ Limites</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOUTIQUE -->
+        <div class="section" id="boutique">
+            <!-- LIVE STREAM BOUTIQUE -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="position: relative; background: black; aspect-ratio: 16/9;">
+                    <video style="width: 100%; height: 100%; object-fit: cover;" autoplay loop muted playsinline>
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                    <div style="position: absolute; top: 15px; left: 15px; background: #ef4444; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                        <span style="display: inline-block; width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite;"></span>
+                        🔴 DIRECT
+                    </div>
+                    <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                            👁️ 2,347
+                        </div>
+                        <div style="background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                            ❤️ 892
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 20px 15px 15px;">
+                        <h3 style="margin: 0; font-size: 16px; font-weight: bold;">🛍️ Live Stream Boutique du Club</h3>
+                        <p style="margin: 5px 0 0; font-size: 13px; opacity: 0.9;">Shopping en direct - Nouveautés & Exclusivités</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLETS BOUTIQUE -->
+            <div style="display: flex; gap: 10px; padding: 15px 20px; background: rgba(0,0,0,0.3); overflow-x: auto; white-space: nowrap;">
+                <button class="boutique-tab active" onclick="showBoutiqueTab('officiel')" data-tab="officiel" style="padding: 10px 20px; border-radius: 20px; border: none; background: rgba(255,255,255,0.2); color: white; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                    🏪 Boutique Officielle
+                </button>
+                <button class="boutique-tab" onclick="showBoutiqueTab('fan-articles')" data-tab="fan-articles" style="padding: 10px 20px; border-radius: 20px; border: none; background: rgba(255,255,255,0.1); color: white; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+                    👤 Ventes Fan (Articles)
+                </button>
+            </div>
+            
+            <div style="padding: 15px 20px; background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; margin: 0;">
+                <p style="font-size: 13px; opacity: 0.95;">
+                    💡 <strong>NFTs de Légendes :</strong> Découvrez les NFTs des légendes du club dans l'onglet "⭐ Légendes" du menu principal !
+                </p>
+            </div>
+
+            <!-- BARRE DE PAIEMENT STICKY (TOUJOURS VISIBLE EN HAUT) -->
+            <div id="sticky-payment-bar" style="position: sticky; top: 0; z-index: 100; background: linear-gradient(135deg, #10b981, #059669); padding: 15px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 3px;">Votre panier</div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <span style="font-size: 18px; font-weight: bold;" id="sticky-nb-produits">0 produit</span>
+                            <span style="font-size: 22px; font-weight: bold; color: #fbbf24;" id="sticky-total">0.00 €</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn" onclick="payerBoutique()" style="padding: 12px 25px; font-size: 15px; font-weight: bold; background: #1e40af; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin: 0;">
+                            💳 PAYER MAINTENANT
+                        </button>
+                        <button class="btn" onclick="payerBoutiqueBNPL()" style="padding: 12px 25px; font-size: 15px; font-weight: bold; background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin: 0;">
+                            📅 Payer en 3x/4x/6x
+                        </button>
+                        <button onclick="viderPanier()" style="padding: 12px 20px; background: rgba(239,68,68,0.9); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                            🗑️ Vider
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENU TAB: BOUTIQUE OFFICIELLE -->
+            <div class="boutique-content" id="boutique-officiel" style="display: block;">
+                <div class="card">
+                    <div class="card-title">🏪 Boutique Officielle</div>
+                    <p style="margin-bottom: 20px;">Sélectionnez un ou plusieurs produits</p>
+                    <div class="product-grid" id="boutique-grid">
+                        <!-- Les produits WooCommerce seront chargés ici dynamiquement -->
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.2); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Produits sélectionnés:</span>
+                            <strong id="nbProduits">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total:</span>
+                            <strong id="totalBoutique" style="color: #4ade80; font-size: 20px;">0.00 €</strong>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="payerBoutique()" style="margin-top: 15px;">💳 Payer (choisir moyen)</button>
+                    <button class="btn" onclick="payerBoutiqueBNPL()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">💳 Payer en 3x/4x/6x (BNPL)</button>
+                </div>
+            </div>
+
+            <!-- CONTENU TAB: VENTES FAN ARTICLES -->
+            <div class="boutique-content" id="boutique-fan-articles" style="display: none;">
+                <div class="card">
+                    <div class="card-title">👤 Ventes Fan-to-Fan - Articles</div>
+                    <p style="margin-bottom: 20px;">Articles d'occasion vendus par des fans</p>
+                    <div class="product-grid">
+                        <div class="product-card" style="position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                ✓ Vérifié
+                            </div>
+                            <div class="product-img" style="font-size: 60px;">🧣</div>
+                            <div class="product-name">Écharpe Vintage 1993</div>
+                            <div style="font-size: 11px; opacity: 0.7; margin: 5px 0;">Saison Ligue des Champions</div>
+                            <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @JeanMarseille</div>
+                            <div class="product-price">45 €</div>
+                            <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">État: Excellent | Année: 1993</div>
+                        </div>
+                        <div class="product-card" style="position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                ✓ Vérifié
+                            </div>
+                            <div class="product-img" style="font-size: 60px;">👕</div>
+                            <div class="product-name">Maillot Drogba 2003</div>
+                            <div style="font-size: 11px; opacity: 0.7; margin: 5px 0;">Collector #11 Floqué</div>
+                            <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @OMCollector</div>
+                            <div class="product-price">280 €</div>
+                            <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">État: Neuf | Édition limitée</div>
+                        </div>
+                        <div class="product-card" style="position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                ✓ Vérifié
+                            </div>
+                            <div class="product-img" style="font-size: 60px;">🧢</div>
+                            <div class="product-name">Casquette Rétro OM</div>
+                            <div style="font-size: 11px; opacity: 0.7; margin: 5px 0;">Collection 1998</div>
+                            <div style="font-size: 12px; color: #60a5fa; margin: 5px 0;">Vendu par: @FanOMPure</div>
+                            <div class="product-price">32 €</div>
+                            <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">État: Très bon | Rare</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABONNEMENT -->
+        <div class="section" id="abonnement">
+            <div class="card">
+                <div class="card-title">📅 Abonnements & Pass</div>
+                <div class="product-grid">
+                    <div class="product-card" onclick="acheterAbonnement('Pass Mensuel', 29.90)">
+                        <div class="product-img">🎫</div>
+                        <div class="product-name">Pass Mensuel</div>
+                        <div class="product-price">29.90 €/mois</div>
+                        <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">Accès tous les matchs</div>
+                    </div>
+                    <div class="product-card" onclick="acheterAbonnement('Pass Annuel', 299.00)">
+                        <div class="product-img">🎟️</div>
+                        <div class="product-name">Pass Annuel</div>
+                        <div class="product-price">299.00 €/an</div>
+                        <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">-20% vs mensuel</div>
+                    </div>
+                    <div class="product-card" onclick="acheterAbonnement('VIP Platinum', 1999.00)">
+                        <div class="product-img">👑</div>
+                        <div class="product-name">VIP Platinum</div>
+                        <div class="product-price">1999.00 €/an</div>
+                        <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">Accès loges</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PARTENAIRES -->
+        <div class="section" id="partenaires">
+            <div class="card">
+                <div class="card-title">🤝 Partenaires avec Cashback</div>
+                <p style="margin-bottom: 20px;">Choisissez votre partenaire pour voir le menu</p>
+                <div style="display: grid; gap: 15px;">
+                    <div onclick="ouvrirMenuPartenaire('McDonald\\'s', 5)" style="background: rgba(255, 193, 7, 0.2); padding: 20px; border-radius: 15px; cursor: pointer;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🍔</div>
+                        <div style="font-weight: bold; font-size: 18px;">McDonald's</div>
+                        <div style="color: #4ade80; font-weight: bold; margin-top: 5px;">Cashback 5%</div>
+                    </div>
+                    <div onclick="ouvrirMenuPartenaire('Carrefour', 3)" style="background: rgba(0, 82, 204, 0.2); padding: 20px; border-radius: 15px; cursor: pointer;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🛒</div>
+                        <div style="font-weight: bold; font-size: 18px;">Carrefour</div>
+                        <div style="color: #4ade80; font-weight: bold; margin-top: 5px;">Cashback 3%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFIL -->
+        <div class="section" id="profil">
+            <div class="card">
+                <div class="card-title">👤 Mon Profil</div>
+                <p style="margin-bottom: 10px;"><strong>Nom :</strong> ETOT Constantin Nicolas</p>
+                <p style="margin-bottom: 10px;"><strong>Email :</strong> etot@paiecash.com</p>
+                <p style="margin-bottom: 10px;"><strong>Niveau :</strong> Platine 💎</p>
+                <p style="margin-bottom: 10px;"><strong>Points :</strong> 4,250</p>
+            </div>
+            <div class="card">
+                <div class="card-title">⚙️ Paramètres</div>
+                <button class="btn">🔔 Notifications</button>
+                <button class="btn btn-secondary">🔒 Sécurité</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🌐 Sélecteur de Langue</div>
+                <p style="margin-bottom: 15px; font-size: 14px; opacity: 0.8;">Choisissez votre langue préférée. La détection automatique par géolocalisation est activée.</p>
+                <div id="selecteurLangue">
+                    <!-- Le sélecteur sera généré dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <div class="modal-title" id="modalTitle"></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- INTÉGRATION WOOCOMMERCE -->
+    <script src="woocommerce-integration.js"></script>
+    
+    <!-- PRODUITS PHARES (e-SIM + Mastercard) -->
+    <script src="🏆_PRODUITS_PHARES_CLUBS.js"></script>
+    
+    <!-- SCRAPER PRODUITS CLUBS -->
+    <script src="🛍️_SCRAPER_PRODUITS_CLUBS.js"></script>
+    
+    <!-- MULTI-LANGUES I18N -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+    
+    <!-- NOWPAYMENTS (Paiement Crypto) -->
+    <script src="💰_nowpayments-integration.js"></script>
+
+    <script>
+        // ÉTAT GLOBAL
+        let state = {
+            wallet: 625.00,
+            carte: 622.50,
+            cashback: 37.20,
+            usdc: 847.30,
+            omcoin: 2450,
+            pscoin: 150,
+            olcoin: 75,
+            ascoin: 50,
+            lscoin: 100,
+            rclcoin: 80,
+            produitsSelectionnes: [],
+            transactions: [], // Historique des transactions temps réel
+            filtreTransaction: 'toutes' // Filtre actif
+        };
+
+        // MAP DES STABLECOINS PAR CLUB
+        const clubStablecoins = {
+            'olympique-de-marseille': { code: 'OMC', balance: 2450, name: 'OM Coin' },
+            'paris-saint-germain': { code: 'PSC', balance: 150, name: 'PSG Coin' },
+            'olympique-lyonnais': { code: 'OLC', balance: 75, name: 'OL Coin' },
+            'as-monaco': { code: 'ASC', balance: 50, name: 'AS Monaco Coin' },
+            'losc-lille': { code: 'LSC', balance: 100, name: 'LOSC Coin' },
+            'rc-lens': { code: 'RCL', balance: 80, name: 'RC Lens Coin' },
+            'sco-angers': { code: 'ANC', balance: 120, name: 'Angers Coin' },
+            'stade-rennais': { code: 'SRC', balance: 90, name: 'Rennes Coin' },
+            'ogc-nice': { code: 'ONC', balance: 110, name: 'Nice Coin' },
+            'arsenal-fc': { code: 'AFC', balance: 200, name: 'Arsenal Coin' },
+            'liverpool-fc': { code: 'LFC', balance: 180, name: 'Liverpool Coin' },
+            'bayern-munich': { code: 'BMC', balance: 220, name: 'Bayern Coin' },
+            'real-madrid': { code: 'RMC', balance: 250, name: 'Real Madrid Coin' },
+            'galatasaray': { code: 'GSC', balance: 300, name: 'Galatasaray Coin' },
+            'fenerbahce': { code: 'FBC', balance: 280, name: 'Fenerbahçe Coin' },
+            'besiktas': { code: 'BJC', balance: 260, name: 'Beşiktaş Coin' }
+        };
+
+        // FONCTION POUR DÉTECTER LE CLUB ACTIF
+        function getCurrentClub() {
+            // 1. Vérifier URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubParam = urlParams.get('club');
+            if (clubParam) return clubParam.toLowerCase();
+
+            // 2. Vérifier localStorage
+            const savedClub = localStorage.getItem('currentClub');
+            if (savedClub) return savedClub;
+
+            // 3. Par défaut : Olympique de Marseille
+            return 'olympique-de-marseille';
+        }
+
+        // FONCTION POUR OBTENIR LE STABLECOIN DU CLUB ACTIF
+        function getClubStablecoin() {
+            const club = getCurrentClub();
+            return clubStablecoins[club] || clubStablecoins['olympique-de-marseille'];
+        }
+
+        // PRODUITS BOUTIQUE
+        const produitsBoutique = [
+            { id: 1, nom: "Maillot Domicile", prix: 89.99, emoji: "👕" },
+            { id: 2, nom: "Écharpe OM", prix: 19.99, emoji: "🧣" },
+            { id: 3, nom: "Casquette", prix: 24.99, emoji: "🧢" },
+            { id: 4, nom: "Survêtement", prix: 129.99, emoji: "🏃" },
+            { id: 5, nom: "Ballon Officiel", prix: 29.99, emoji: "⚽" },
+            { id: 6, nom: "Gourde OM", prix: 14.99, emoji: "🍶" }
+        ];
+
+        // MENU MCDONALD'S
+        const menuMcDonalds = [
+            { id: 1, nom: "Big Mac Menu", prix: 9.50, emoji: "🍔" },
+            { id: 2, nom: "McChicken Menu", prix: 8.90, emoji: "🍗" },
+            { id: 3, nom: "Royal Deluxe Menu", prix: 10.50, emoji: "👑" },
+            { id: 4, nom: "Filet-O-Fish Menu", prix: 8.50, emoji: "🐟" },
+            { id: 5, nom: "McFlurry", prix: 3.50, emoji: "🍦" },
+            { id: 6, nom: "Happy Meal", prix: 4.50, emoji: "🎁" }
+        ];
+        
+        // ========== PRODUITS SCRAPÉS (INLINE) ==========
+        // Fallback si le fichier externe n'est pas chargé
+        if (typeof getProduitsClub === 'undefined') {
+            window.getProduitsClub = function(clubSlug, limite = 15) {
+                const produitsOM = [
+                    { id: 'om-1', nom: 'Maillot Domicile 2024/25', prix: 89.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'om-2', nom: 'Écharpe OM Classique', prix: 19.99, emoji: '🧣', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-3', nom: 'Survêtement Entraînement', prix: 129.99, emoji: '🏃', categorie: 'Vêtements', disponible: true },
+                    { id: 'om-4', nom: 'Casquette OM', prix: 24.99, emoji: '🧢', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-5', nom: 'Ballon Officiel', prix: 29.99, emoji: '⚽', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-6', nom: 'Maillot Extérieur 2024/25', prix: 89.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'om-7', nom: 'Gourde Isotherme OM', prix: 14.99, emoji: '🍶', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-8', nom: 'Sweat à Capuche', prix: 69.99, emoji: '🧥', categorie: 'Vêtements', disponible: true },
+                    { id: 'om-9', nom: 'Short Domicile', prix: 39.99, emoji: '🩳', categorie: 'Vêtements', disponible: true },
+                    { id: 'om-10', nom: 'T-Shirt Logo', prix: 34.99, emoji: '👕', categorie: 'Vêtements', disponible: true },
+                    { id: 'om-11', nom: 'Chaussettes Officielles', prix: 12.99, emoji: '🧦', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-12', nom: 'Sac à Dos', prix: 44.99, emoji: '🎒', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-13', nom: 'Drapeau Géant', prix: 29.99, emoji: '🚩', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-14', nom: 'Porte-Clés Premium', prix: 9.99, emoji: '🔑', categorie: 'Accessoires', disponible: true },
+                    { id: 'om-15', nom: 'Mug Collector', prix: 16.99, emoji: '☕', categorie: 'Accessoires', disponible: true }
+                ];
+                
+                const produitsPSG = [
+                    { id: 'psg-1', nom: 'Maillot Domicile 2024/25', prix: 99.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'psg-2', nom: 'Écharpe PSG Paris', prix: 22.99, emoji: '🧣', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-3', nom: 'Survêtement Premium', prix: 149.99, emoji: '🏃', categorie: 'Vêtements', disponible: true },
+                    { id: 'psg-4', nom: 'Casquette PSG', prix: 27.99, emoji: '🧢', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-5', nom: 'Ballon Jordan PSG', prix: 34.99, emoji: '⚽', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-6', nom: 'Maillot Extérieur 2024/25', prix: 99.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'psg-7', nom: 'Gourde PSG Premium', prix: 17.99, emoji: '🍶', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-8', nom: 'Sweat Jordan x PSG', prix: 89.99, emoji: '🧥', categorie: 'Vêtements', disponible: true },
+                    { id: 'psg-9', nom: 'Short Domicile', prix: 44.99, emoji: '🩳', categorie: 'Vêtements', disponible: true },
+                    { id: 'psg-10', nom: 'T-Shirt Paris', prix: 39.99, emoji: '👕', categorie: 'Vêtements', disponible: true },
+                    { id: 'psg-11', nom: 'Chaussettes Match', prix: 14.99, emoji: '🧦', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-12', nom: 'Sac à Dos Jordan', prix: 59.99, emoji: '🎒', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-13', nom: 'Drapeau PSG', prix: 32.99, emoji: '🚩', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-14', nom: 'Porte-Clés Jordan', prix: 12.99, emoji: '🔑', categorie: 'Accessoires', disponible: true },
+                    { id: 'psg-15', nom: 'Mug PSG Collector', prix: 19.99, emoji: '☕', categorie: 'Accessoires', disponible: true }
+                ];
+                
+                const produitsOL = [
+                    { id: 'ol-1', nom: 'Maillot Domicile 2024/25', prix: 84.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'ol-2', nom: 'Écharpe OL', prix: 18.99, emoji: '🧣', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-3', nom: 'Survêtement OL', prix: 119.99, emoji: '🏃', categorie: 'Vêtements', disponible: true },
+                    { id: 'ol-4', nom: 'Casquette OL', prix: 23.99, emoji: '🧢', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-5', nom: 'Ballon OL', prix: 28.99, emoji: '⚽', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-6', nom: 'Maillot Extérieur 2024/25', prix: 84.99, emoji: '👕', categorie: 'Maillots', disponible: true },
+                    { id: 'ol-7', nom: 'Gourde OL', prix: 13.99, emoji: '🍶', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-8', nom: 'Sweat OL', prix: 64.99, emoji: '🧥', categorie: 'Vêtements', disponible: true },
+                    { id: 'ol-9', nom: 'Short Domicile', prix: 37.99, emoji: '🩳', categorie: 'Vêtements', disponible: true },
+                    { id: 'ol-10', nom: 'T-Shirt Logo OL', prix: 32.99, emoji: '👕', categorie: 'Vêtements', disponible: true },
+                    { id: 'ol-11', nom: 'Chaussettes OL', prix: 11.99, emoji: '🧦', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-12', nom: 'Sac à Dos OL', prix: 42.99, emoji: '🎒', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-13', nom: 'Drapeau OL', prix: 27.99, emoji: '🚩', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-14', nom: 'Porte-Clés OL', prix: 8.99, emoji: '🔑', categorie: 'Accessoires', disponible: true },
+                    { id: 'ol-15', nom: 'Mug OL Collector', prix: 15.99, emoji: '☕', categorie: 'Accessoires', disponible: true }
+                ];
+                
+                // Détecter le club
+                const slug = clubSlug.toLowerCase();
+                if (slug.includes('marseille') || slug.includes('om')) {
+                    return produitsOM.slice(0, limite);
+                } else if (slug.includes('paris') || slug.includes('psg')) {
+                    return produitsPSG.slice(0, limite);
+                } else if (slug.includes('lyon') || slug.includes('ol')) {
+                    return produitsOL.slice(0, limite);
+                }
+                
+                return [];
+            };
+            
+            console.log('✅ Produits scrapés chargés en INLINE (fallback)');
+        }
+
+        // INIT
+        window.onload = async function() {
+            afficherProduitsBoutique();
+            updateSoldes();
+            displayLegends(); // Charger les légendes du club
+            chargerTransactionsLocales(); // Charger l'historique des transactions
+            
+            // Initialiser le sélecteur de langue
+            if (typeof genererSelecteurLangue === 'function') {
+                const selecteur = document.getElementById('selecteurLangue');
+                if (selecteur) {
+                    selecteur.innerHTML = genererSelecteurLangue();
+                }
+            }
+            
+            // Charger les produits WooCommerce
+            if (typeof initWooCommerce === 'function') {
+                await initWooCommerce();
+            }
+        };
+
+        function afficherProduitsBoutique() {
+            const grid = document.getElementById('boutique-grid');
+            const clubSlug = getCurrentClub();
+            
+            // 1️⃣ AFFICHER LES PRODUITS PHARES EN PREMIER
+            let html = '';
+            if (window.PRODUITS_PHARES) {
+                html += window.PRODUITS_PHARES.renderProduitsPharesHTML(clubSlug);
+            }
+            
+            // 2️⃣ PRODUITS SCRAPÉS DU CLUB (MAX 15)
+            if (typeof getProduitsClub === 'function') {
+                const produitsScrapés = getProduitsClub(clubSlug, 15);
+                console.log(`🛍️ ${produitsScrapés.length} produits scrapés pour ${clubSlug}`);
+                
+                if (produitsScrapés && produitsScrapés.length > 0) {
+                    // Badge visuel pour indiquer les produits scrapés
+                    html += `<div style="grid-column: 1/-1; background: linear-gradient(135deg, #10b981, #059669); padding: 15px; border-radius: 12px; margin-bottom: 10px; text-align: center;">
+                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">✅ ${produitsScrapés.length} Produits Officiels Scrapés</div>
+                        <div style="font-size: 13px; opacity: 0.9;">Directement depuis la boutique officielle du club</div>
+                    </div>`;
+                    
+                    html += produitsScrapés.map(p => `
+                        <div class="product-card" onclick="toggleProduitScrapé('${p.id}')" id="product-scraped-${p.id}" style="position: relative; cursor: pointer;">
+                            <div style="position: absolute; top: 8px; right: 8px; background: #10b981; color: white; padding: 3px 8px; border-radius: 8px; font-size: 9px; font-weight: bold; z-index: 10;">SCRAPÉ</div>
+                            ${p.image ? `<img src="${p.image}" alt="${p.nom}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 200px; align-items: center; justify-content: center; font-size: 4em; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); border-radius: 12px 12px 0 0;">${p.emoji || '🛍️'}</div>` : `<div class="product-img">${p.emoji || '🛍️'}</div>`}
+                            <div class="product-name">${p.nom}</div>
+                            <div class="product-price">${p.prix.toFixed(2)} €</div>
+                            <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">${p.categorie}</div>
+                            ${!p.disponible ? '<div style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold;">Rupture</div>' : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    console.warn('⚠️ Aucun produit scrapé trouvé pour', clubSlug);
+                }
+            } else {
+                console.error('❌ Fonction getProduitsClub non disponible');
+            }
+            
+            // 3️⃣ PRODUITS CLASSIQUES (FALLBACK)
+            html += produitsBoutique.map(p => `
+                <div class="product-card" onclick="toggleProduit(${p.id})" id="product-${p.id}">
+                    <div class="product-img">${p.emoji}</div>
+                    <div class="product-name">${p.nom}</div>
+                    <div class="product-price">${p.prix.toFixed(2)} €</div>
+                </div>
+            `).join('');
+            
+            grid.innerHTML = html;
+        }
+        
+        function toggleProduitScrapé(id) {
+            const clubSlug = getCurrentClub();
+            const produitsScrapés = getProduitsClub(clubSlug, 15);
+            const produit = produitsScrapés.find(p => p.id === id);
+            
+            if (!produit) {
+                console.error('Produit scrapé introuvable:', id);
+                return;
+            }
+            
+            // Afficher les détails du produit au lieu de l'ajouter directement
+            afficherDetailsProduit(produit);
+        }
+        
+        // ========== AFFICHER DÉTAILS PRODUIT ==========
+        function afficherDetailsProduit(produit) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            // Générer code promo unique
+            const userName = localStorage.getItem('userName') || 'FAN';
+            const codePromo = `${userName.toUpperCase()}-OM-${Date.now().toString().slice(-4)}`;
+            const lienPartage = `https://paiecashfan.com/product/${produit.id}?ref=${codePromo}`;
+            
+            // Images multiples
+            const images = produit.images || [produit.image];
+            const imageGallery = images.map((img, index) => `
+                <img src="${img}" alt="${produit.nom}" style="width: 100%; max-width: 150px; border-radius: 10px; cursor: pointer; transition: transform 0.3s;" onclick="agrandirImage('${img}')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            `).join('');
+            
+            // Tailles disponibles
+            const taillesHTML = produit.tailles ? `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 13px; opacity: 0.8; margin-bottom: 8px;">Taille :</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${produit.tailles.map(t => `
+                            <button onclick="selectionnerTaille('${t}')" id="taille-${t}" class="btn-taille" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: bold;">${t}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+            
+            // Couleurs disponibles
+            const couleursHTML = produit.couleurs ? `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 13px; opacity: 0.8; margin-bottom: 8px;">Couleur :</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${produit.couleurs.map(c => `
+                            <button onclick="selectionnerCouleur('${c}')" id="couleur-${c}" class="btn-couleur" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: bold;">${c}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+            
+            // Spécifications
+            const specsHTML = produit.specifications ? `
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 15px; font-weight: bold; margin-bottom: 10px;">📋 Spécifications</div>
+                    ${Object.entries(produit.specifications).map(([key, value]) => `
+                        <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span style="opacity: 0.7; text-transform: capitalize;">${key.replace('_', ' ')} :</span>
+                            <strong>${value}</strong>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
+            
+            title.textContent = produit.nom;
+            body.innerHTML = `
+                <div>
+                    <!-- Image principale -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${images[0]}" alt="${produit.nom}" style="width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    </div>
+                    
+                    <!-- Galerie d'images -->
+                    ${images.length > 1 ? `
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; overflow-x: auto;">
+                            ${imageGallery}
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Prix et catégorie -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 36px; font-weight: bold; color: #4ade80;">${produit.prix.toFixed(2)} €</div>
+                        <div style="font-size: 14px; opacity: 0.7; margin-top: 5px;">${produit.categorie}</div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <p style="opacity: 0.9; line-height: 1.6;">${produit.description}</p>
+                    </div>
+                    
+                    <!-- Tailles -->
+                    ${taillesHTML}
+                    
+                    <!-- Couleurs -->
+                    ${couleursHTML}
+                    
+                    <!-- Spécifications -->
+                    ${specsHTML}
+                    
+                    <!-- Partage avec code promo -->
+                    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">🎁 Partagez et gagnez 5% de cashback !</div>
+                        <div style="font-size: 13px; opacity: 0.9; margin-bottom: 10px;">Votre ami achète → Vous recevez 5% du montant</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                            <div style="font-size: 11px; opacity: 0.8; margin-bottom: 5px;">Votre code promo :</div>
+                            <div style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">${codePromo}</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button class="btn" onclick="copierLienPartage('${lienPartage}', '${codePromo}')" style="padding: 10px; font-size: 13px; background: white; color: #f59e0b;">
+                                📋 Copier le lien
+                            </button>
+                            <button class="btn" onclick="partagerWhatsApp('${produit.nom}', '${lienPartage}', '${codePromo}')" style="padding: 10px; font-size: 13px; background: #25D366; color: white;">
+                                📱 WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons d'action -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="closeModal()">
+                            Annuler
+                        </button>
+                        <button class="btn" onclick="ajouterProduitAuPanier('${produit.id}')" style="background: #10b981; font-weight: bold;">
+                            🛒 Ajouter au panier
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        // Fonctions auxiliaires pour détails produit
+        let tailleSelectionnee = null;
+        let couleurSelectionnee = null;
+        
+        function selectionnerTaille(taille) {
+            tailleSelectionnee = taille;
+            document.querySelectorAll('.btn-taille').forEach(btn => {
+                btn.style.background = 'rgba(255,255,255,0.1)';
+                btn.style.borderColor = 'rgba(255,255,255,0.3)';
+            });
+            const btn = document.getElementById(`taille-${taille}`);
+            if (btn) {
+                btn.style.background = '#10b981';
+                btn.style.borderColor = '#10b981';
+            }
+        }
+        
+        function selectionnerCouleur(couleur) {
+            couleurSelectionnee = couleur;
+            document.querySelectorAll('.btn-couleur').forEach(btn => {
+                btn.style.background = 'rgba(255,255,255,0.1)';
+                btn.style.borderColor = 'rgba(255,255,255,0.3)';
+            });
+            const btn = document.getElementById(`couleur-${couleur}`);
+            if (btn) {
+                btn.style.background = '#10b981';
+                btn.style.borderColor = '#10b981';
+            }
+        }
+        
+        function ajouterProduitAuPanier(produitId) {
+            const clubSlug = getCurrentClub();
+            const produitsScrapés = getProduitsClub(clubSlug, 15);
+            const produit = produitsScrapés.find(p => p.id === produitId);
+            
+            if (!produit) return;
+            
+            // Vérifier si taille/couleur requise
+            if (produit.tailles && !tailleSelectionnee) {
+                alert('⚠️ Veuillez sélectionner une taille');
+                return;
+            }
+            
+            if (produit.couleurs && !couleurSelectionnee) {
+                alert('⚠️ Veuillez sélectionner une couleur');
+                return;
+            }
+            
+            // Ajouter au panier avec options
+            const produitAvecOptions = {
+                ...produit,
+                taille: tailleSelectionnee,
+                couleur: couleurSelectionnee
+            };
+            
+            state.produitsSelectionnes.push(produitAvecOptions);
+            
+            const card = document.getElementById(`product-scraped-${produitId}`);
+            if (card) {
+                card.classList.add('selected');
+                card.style.border = '2px solid #10b981';
+                card.style.transform = 'scale(1.05)';
+            }
+            
+            updatePanier();
+            closeModal();
+            
+            alert(`✅ ${produit.nom} ajouté au panier !\n${tailleSelectionnee ? 'Taille: ' + tailleSelectionnee : ''}${couleurSelectionnee ? '\nCouleur: ' + couleurSelectionnee : ''}`);
+            
+            // Reset sélections
+            tailleSelectionnee = null;
+            couleurSelectionnee = null;
+        }
+        
+        function agrandirImage(url) {
+            window.open(url, '_blank');
+        }
+        
+        function copierLienPartage(lien, code) {
+            navigator.clipboard.writeText(lien).then(() => {
+                alert(`✅ Lien copié !\n\nCode promo: ${code}\n\nPartagez-le et gagnez 5% de cashback si votre ami achète !`);
+            });
+        }
+        
+        function partagerWhatsApp(nomProduit, lien, code) {
+            const message = `🎁 Regarde ce super produit OM !\n\n${nomProduit}\n\nUtilise mon code promo: ${code}\n${lien}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function toggleProduit(id) {
+            const produit = produitsBoutique.find(p => p.id === id);
+            if (!produit) {
+                console.error('Produit introuvable:', id);
+                return;
+            }
+            
+            const index = state.produitsSelectionnes.findIndex(p => p.id === id);
+            const card = document.getElementById(`product-${id}`);
+            
+            if (index > -1) {
+                // Désélection
+                state.produitsSelectionnes.splice(index, 1);
+                if (card) {
+                    card.classList.remove('selected');
+                    card.style.border = '2px solid rgba(255,255,255,0.2)';
+                    card.style.transform = 'scale(1)';
+                }
+                console.log('✅ Produit retiré:', produit.nom);
+            } else {
+                // Sélection
+                state.produitsSelectionnes.push(produit);
+                if (card) {
+                    card.classList.add('selected');
+                    card.style.border = '2px solid #10b981';
+                    card.style.transform = 'scale(1.05)';
+                }
+                console.log('✅ Produit ajouté:', produit.nom);
+            }
+            
+            console.log('📦 Panier actuel:', state.produitsSelectionnes.length, 'produits');
+            updatePanier();
+        }
+        
+        // Fonction pour gérer les produits phares
+        function toggleProduitPhare(productId) {
+            const clubSlug = getCurrentClub();
+            const produitsPhares = window.PRODUITS_PHARES.getProduitsPharesClub(clubSlug);
+            const produit = produitsPhares.find(p => p.id === productId);
+            
+            if (!produit) {
+                console.error('Produit phare introuvable:', productId);
+                return;
+            }
+            
+            const index = state.produitsSelectionnes.findIndex(p => p.id === productId);
+            const card = document.getElementById(`product-${productId}`);
+            
+            if (index > -1) {
+                // Désélection
+                state.produitsSelectionnes.splice(index, 1);
+                if (card) {
+                    card.style.border = '2px solid ' + produit.couleur1 + '40';
+                    card.style.transform = 'scale(1)';
+                    card.style.boxShadow = 'none';
+                }
+                console.log('✅ Produit phare retiré:', produit.nom);
+            } else {
+                // Sélection
+                state.produitsSelectionnes.push({
+                    id: produit.id,
+                    nom: produit.nom,
+                    prix: produit.prix,
+                    type: produit.type
+                });
+                if (card) {
+                    card.style.border = '3px solid #10b981';
+                    card.style.transform = 'scale(1.08)';
+                    card.style.boxShadow = '0 10px 30px rgba(16,185,129,0.5)';
+                }
+                console.log('✅ Produit phare ajouté:', produit.nom);
+            }
+            
+            console.log('📦 Panier actuel:', state.produitsSelectionnes.length, 'produits');
+            updatePanier();
+        }
+        
+        // Fonction pour voir les détails d'un produit phare
+        function voirDetailsProduitPhare(productId) {
+            const clubSlug = getCurrentClub();
+            const produitsPhares = window.PRODUITS_PHARES.getProduitsPharesClub(clubSlug);
+            const produit = produitsPhares.find(p => p.id === productId);
+            
+            if (!produit) return;
+            
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            title.textContent = produit.emoji + ' ' + produit.nom;
+            body.innerHTML = `
+                <div style="max-width: 600px; text-align: left;">
+                    <div style="font-size: 16px; margin-bottom: 20px; line-height: 1.6; opacity: 0.9;">
+                        ${produit.description}
+                    </div>
+                    
+                    <div style="background: rgba(16,185,129,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">✨ Caractéristiques</h4>
+                        ${produit.specifications.map(spec => `
+                            <div style="margin-bottom: 10px; font-size: 14px; line-height: 1.5;">${spec}</div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="background: rgba(59,130,246,0.1); padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🎁 Avantages</h4>
+                        ${produit.avantages.map(avantage => `
+                            <div style="margin-bottom: 10px; font-size: 14px; line-height: 1.5;">• ${avantage}</div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn" onclick="toggleProduitPhare('${produit.id}'); closeModal()" style="flex: 1; background: linear-gradient(135deg, #10b981, #059669);">
+                            ✅ SÉLECTIONNER
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 0.5;">
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function updatePanier() {
+            const nb = state.produitsSelectionnes.length;
+            const total = state.produitsSelectionnes.reduce((sum, p) => sum + p.prix, 0);
+            
+            // Mise à jour du panier classique
+            document.getElementById('nbProduits').textContent = nb;
+            document.getElementById('totalBoutique').textContent = total.toFixed(2) + ' €';
+            
+            // Mise à jour de la barre sticky
+            updateStickyPaymentBar(nb, total);
+        }
+
+        function updateStickyPaymentBar(nb, total) {
+            const stickyBar = document.getElementById('sticky-payment-bar');
+            const stickyNb = document.getElementById('sticky-nb-produits');
+            const stickyTotal = document.getElementById('sticky-total');
+            
+            if (!stickyBar || !stickyNb || !stickyTotal) return;
+            
+            // Afficher/masquer la barre selon le nombre de produits
+            if (nb > 0) {
+                stickyBar.style.display = 'block';
+                stickyNb.textContent = `${nb} produit${nb > 1 ? 's' : ''}`;
+                stickyTotal.textContent = total.toFixed(2) + ' €';
+            } else {
+                stickyBar.style.display = 'none';
+            }
+        }
+
+        function viderPanier() {
+            if (confirm('🗑️ Voulez-vous vraiment vider votre panier ?')) {
+                // Désélectionner tous les produits
+                state.produitsSelectionnes.forEach(p => {
+                    const card = document.getElementById(`product-${p.id}`) || document.getElementById(`woo-product-${p.id}`);
+                    if (card) {
+                        card.classList.remove('selected');
+                        card.style.border = '2px solid rgba(255,255,255,0.2)';
+                        card.style.transform = 'scale(1)';
+                    }
+                });
+                
+                // Vider le panier
+                state.produitsSelectionnes = [];
+                updatePanier();
+            }
+        }
+
+        function updateSoldes() {
+            const total = state.wallet + state.carte + state.cashback;
+            
+            // Mise à jour section Paiement
+            document.getElementById('soldeTotal').textContent = total.toFixed(2) + ' €';
+            document.getElementById('soldeWallet').textContent = state.wallet.toFixed(2);
+            document.getElementById('soldeCarte').textContent = state.carte.toFixed(2);
+            document.getElementById('cashback').textContent = state.cashback.toFixed(2);
+            
+            // Mise à jour section Accueil (synchronisation)
+            const accueilTotal = document.getElementById('soldeTotal-accueil');
+            const accueilWallet = document.getElementById('soldeWallet-accueil');
+            const accueilCarte = document.getElementById('soldeCarte-accueil');
+            const accueilCashback = document.getElementById('cashback-accueil');
+            
+            if (accueilTotal) accueilTotal.textContent = total.toFixed(2) + ' €';
+            if (accueilWallet) accueilWallet.textContent = state.wallet.toFixed(2);
+            if (accueilCarte) accueilCarte.textContent = state.carte.toFixed(2);
+            if (accueilCashback) accueilCashback.textContent = state.cashback.toFixed(2);
+        }
+
+        // ========== GESTION TRANSACTIONS TEMPS RÉEL ==========
+        function ajouterTransactionTempsReel(transaction) {
+            // Générer ID unique et horodatage
+            const id = 'TRX-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            const date = new Date();
+            const dateFormatee = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const heureFormatee = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Transaction complète
+            const transactionComplete = {
+                id: id,
+                nom: transaction.nom || 'Transaction',
+                montant: transaction.montant || 0,
+                cashback: transaction.cashback || 0,
+                type: transaction.type || 'boutique',
+                date: dateFormatee,
+                heure: heureFormatee,
+                timestamp: date.getTime()
+            };
+            
+            // Ajouter au début du tableau (plus récent en premier)
+            state.transactions.unshift(transactionComplete);
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('transactions', JSON.stringify(state.transactions));
+            
+            // Rafraîchir l'affichage
+            afficherTransactions();
+            afficherTransactionsRecentes(); // Mettre à jour l'accueil
+            
+            // Mettre à jour les statistiques
+            updateStatistiquesTransactions();
+            
+            // Log pour debug
+            console.log('✅ Transaction ajoutée:', transactionComplete);
+        }
+
+        function afficherTransactions() {
+            const container = document.getElementById('listeTransactionsComplete');
+            if (!container) return;
+            
+            // Filtrer les transactions selon le filtre actif
+            let transactionsFiltrees = state.transactions;
+            if (state.filtreTransaction !== 'toutes') {
+                transactionsFiltrees = state.transactions.filter(t => t.type === state.filtreTransaction);
+            }
+            
+            // Si aucune transaction
+            if (transactionsFiltrees.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; opacity: 0.5;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">📊</div>
+                        <p>Aucune transaction ${state.filtreTransaction !== 'toutes' ? 'de type ' + state.filtreTransaction : ''}</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Les transactions s'afficheront ici en temps réel</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Icônes par type
+            const icones = {
+                'boutique': '🛍️',
+                'wallet': '💵',
+                'carte': '💳',
+                'crypto': '₿',
+                'alipay': '🇨🇳',
+                'wechat': '💬',
+                'nft': '🎨'
+            };
+            
+            // Générer HTML
+            container.innerHTML = transactionsFiltrees.map(t => {
+                const couleur = t.montant >= 0 ? '#4ade80' : '#ff6b6b';
+                const icone = icones[t.type] || '💰';
+                
+                return `
+                    <div class="transaction-item" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, ${couleur}, rgba(255,255,255,0.1)); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                    ${icone}
+                                </div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 16px;">${t.nom}</div>
+                                    <div style="font-size: 12px; opacity: 0.7;">${t.date} - ${t.heure}</div>
+                                    ${t.cashback > 0 ? `<div style="font-size: 11px; color: #4ade80; margin-top: 3px;">+${t.cashback.toFixed(2)}€ cashback</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 20px; font-weight: bold; color: ${couleur};">
+                                    ${t.montant >= 0 ? '+' : ''}${t.montant.toFixed(2)} €
+                                </div>
+                                <div style="font-size: 11px; opacity: 0.7; margin-top: 3px;">ID: ${t.id.substr(0, 18)}...</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filtrerTransactions(type) {
+            state.filtreTransaction = type;
+            afficherTransactions();
+        }
+
+        function updateStatistiquesTransactions() {
+            // Calculer statistiques
+            const totalDepense = state.transactions
+                .filter(t => t.montant < 0)
+                .reduce((sum, t) => sum + Math.abs(t.montant), 0);
+            
+            const totalCashback = state.transactions
+                .reduce((sum, t) => sum + (t.cashback || 0), 0);
+            
+            const nombreTransactions = state.transactions.length;
+            
+            // Mettre à jour l'affichage
+            const elemDepense = document.getElementById('totalDepense');
+            const elemCashback = document.getElementById('totalCashback');
+            const elemNombre = document.getElementById('nombreTransactions');
+            
+            if (elemDepense) elemDepense.textContent = totalDepense.toFixed(2) + ' €';
+            if (elemCashback) elemCashback.textContent = totalCashback.toFixed(2) + ' €';
+            if (elemNombre) elemNombre.textContent = nombreTransactions;
+        }
+
+        function chargerTransactionsLocales() {
+            const saved = localStorage.getItem('transactions');
+            if (saved) {
+                state.transactions = JSON.parse(saved);
+                afficherTransactions();
+                updateStatistiquesTransactions();
+                afficherTransactionsRecentes(); // Mettre à jour l'accueil
+            }
+        }
+
+        function afficherTransactionsRecentes() {
+            const container = document.getElementById('transactionsRecentes');
+            if (!container) return;
+            
+            // Prendre les 3 dernières transactions
+            const dernieres = state.transactions.slice(0, 3);
+            
+            if (dernieres.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; opacity: 0.5;">
+                        <div style="font-size: 50px; margin-bottom: 10px;">📊</div>
+                        <p style="font-size: 14px;">Aucune transaction récente</p>
+                        <p style="font-size: 12px; margin-top: 5px; opacity: 0.7;">Vos transactions apparaîtront ici</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Icônes par type
+            const icones = {
+                'boutique': '🛍️',
+                'wallet': '💵',
+                'carte': '💳',
+                'crypto': '₿',
+                'alipay': '🇨🇳',
+                'wechat': '💬',
+                'nft': '🎨'
+            };
+            
+            container.innerHTML = dernieres.map(t => {
+                const couleur = t.montant >= 0 ? '#4ade80' : '#ff6b6b';
+                const icone = icones[t.type] || '💰';
+                
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-icon" style="background: linear-gradient(135deg, ${couleur}, rgba(255,255,255,0.1));">${icone}</div>
+                        <div class="transaction-details">
+                            <div class="transaction-name">${t.nom}</div>
+                            <div class="transaction-date">${t.date} - ${t.heure}</div>
+                        </div>
+                        <div class="transaction-amount" style="color: ${couleur};">${t.montant >= 0 ? '+' : ''}${t.montant.toFixed(2)} EUR</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // GESTION DES ONGLETS BOUTIQUE
+        function showBoutiqueTab(tabName) {
+            // Cacher tous les contenus
+            document.querySelectorAll('.boutique-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Désactiver tous les boutons d'onglets
+            document.querySelectorAll('.boutique-tab').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'rgba(255,255,255,0.1)';
+            });
+            
+            // Afficher le contenu sélectionné
+            const selectedContent = document.getElementById(`boutique-${tabName}`);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Activer le bouton sélectionné
+            const selectedBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+                selectedBtn.style.background = 'rgba(255,255,255,0.2)';
+            }
+        }
+
+        // ACHAT DE NFT AVEC LE STABLECOIN DU CLUB ACTIF
+        function acheterNFT(nftName, prix) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            // Récupérer le stablecoin du club actif
+            const clubCoin = getClubStablecoin();
+            const coinBalance = clubCoin.balance;
+            const coinCode = clubCoin.code;
+            const coinName = clubCoin.name;
+            
+            if (coinBalance < prix) {
+                title.innerHTML = '❌ Solde Insuffisant';
+                body.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">😔</div>
+                        <p style="margin-bottom: 15px;">Vous n'avez pas assez de <strong>${coinName} (${coinCode})</strong> pour acheter ce NFT.</p>
+                        <p style="margin-bottom: 10px;">Prix du NFT: <strong style="color: #fbbf24;">${prix} ${coinCode}</strong></p>
+                        <p style="margin-bottom: 20px;">Votre solde: <strong style="color: #ef4444;">${coinBalance.toFixed(2)} ${coinCode}</strong></p>
+                        <button class="btn" onclick="closeModal(); showSection('paiement')">💰 Recharger ${coinCode}</button>
+                        <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 10px;">Fermer</button>
+                    </div>
+                `;
+            } else {
+                title.innerHTML = '🎨 Confirmer Achat NFT';
+                body.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🎨</div>
+                        <h3 style="margin-bottom: 15px;">${nftName}</h3>
+                        <p style="margin-bottom: 10px;">Prix: <strong style="color: #fbbf24;">${prix} ${coinCode}</strong></p>
+                        <p style="margin-bottom: 20px;">Solde actuel: <strong>${coinBalance.toFixed(2)} ${coinCode}</strong></p>
+                        <p style="margin-bottom: 20px; opacity: 0.8;">Nouveau solde après achat: <strong>${(coinBalance - prix).toFixed(2)} ${coinCode}</strong></p>
+                        <button class="btn" onclick="confirmerAchatNFT('${nftName}', ${prix}, '${coinCode}')">✅ Confirmer l'Achat</button>
+                        <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 10px;">Annuler</button>
+                    </div>
+                `;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function confirmerAchatNFT(nftName, prix, coinCode) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            // Mettre à jour le solde du club
+            const clubCoin = getClubStablecoin();
+            clubCoin.balance -= prix;
+            
+            title.innerHTML = '✅ NFT Acheté !';
+            body.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+                    <h3 style="margin-bottom: 15px; color: #10b981;">Félicitations !</h3>
+                    <p style="margin-bottom: 10px;">Vous avez acheté le NFT:</p>
+                    <p style="margin-bottom: 15px; font-size: 18px; font-weight: bold; color: #fbbf24;">${nftName}</p>
+                    <p style="margin-bottom: 20px;">Prix payé: <strong>${prix} ${coinCode}</strong></p>
+                    <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <p style="font-size: 13px; margin-bottom: 10px;">Le NFT a été ajouté à votre collection !</p>
+                        <p style="font-size: 11px; opacity: 0.8;">Vous pouvez le retrouver dans votre profil.</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Nouveau solde: <strong>${clubCoin.balance.toFixed(2)} ${coinCode}</strong></p>
+                    </div>
+                    <button class="btn" onclick="closeModal()">👍 Super !</button>
+                    <button class="btn btn-secondary" onclick="closeModal(); showSection('legendes')" style="margin-top: 10px;">⭐ Voir d'autres Légendes</button>
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function seDeconnecter() {
+            if (confirm('🚪 Voulez-vous vraiment vous déconnecter ?')) {
+                window.location.href = 'accueil-clubs.html';
+            }
+        }
+
+        // VOIR TICKET DE TRANSACTION (CLIQUABLE)
+        function voirTicket(merchant, date, txId, amount, cashback) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            const amountColor = amount > 0 ? '#90EE90' : '#ff6b6b';
+            const amountSign = amount > 0 ? '+' : '';
+            
+            title.innerHTML = '🧾 Ticket de Transaction';
+            body.innerHTML = `
+                <div style="background: white; color: #333; padding: 20px; border-radius: 10px; max-width: 400px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                    <div style="text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px;">
+                        <div style="font-size: 20px; font-weight: bold; color: #667eea; margin-bottom: 5px;">PAIECASH</div>
+                        <div id="ticketClubDisplay" style="font-size: 14px; color: #666;">⚽ Chargement...</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 3px;">MARCHAND</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #333;">${merchant}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 3px;">DATE & HEURE</div>
+                        <div style="font-size: 14px; color: #333;">${date}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 3px;">ID TRANSACTION</div>
+                        <div style="font-size: 14px; color: #333; font-family: monospace;">${txId}</div>
+                    </div>
+                    
+                    <div style="border-top: 2px dashed #ccc; padding-top: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 16px; font-weight: bold; color: #333;">MONTANT</div>
+                            <div style="font-size: 24px; font-weight: bold; color: ${amountColor};">${amountSign}${amount.toFixed(2)} EUR</div>
+                        </div>
+                        ${cashback > 0 ? `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
+                            <div style="font-size: 14px; color: #667eea;">✨ Cashback reçu</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #667eea;">+${cashback.toFixed(2)} EUR</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="alert('📥 Fonctionnalité \'Télécharger PDF\' en développement')" style="width: 100%; background: #667eea; color: white;">📥 Télécharger PDF</button>
+                </div>
+            `;
+            modal.classList.add('active');
+            
+            // Mettre à jour le nom du club dans le ticket après affichage
+            setTimeout(() => {
+                const ticketClubDisplayModal = body.querySelector('#ticketClubDisplay');
+                if (ticketClubDisplayModal && clubName && clubLogo) {
+                    ticketClubDisplayModal.textContent = `${clubLogo} ${clubName}`;
+                }
+            }, 50);
+        }
+
+        // RECHARGER WALLET
+        function rechargerWallet() {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '💰 Recharger Wallet';
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Solde actuel: <strong>${state.wallet.toFixed(2)} €</strong></p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                        <button class="btn" onclick="confirmerRecharge(20)">20 €</button>
+                        <button class="btn" onclick="confirmerRecharge(50)">50 €</button>
+                        <button class="btn" onclick="confirmerRecharge(100)">100 €</button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function confirmerRecharge(montant) {
+            state.wallet += montant;
+            updateSoldes();
+            alert(`✅ Rechargement de ${montant} € effectué !\n\nNouveau solde Wallet : ${state.wallet.toFixed(2)} €`);
+            closeModal();
+        }
+
+        // RETIRER VERS CARTE
+        function retirerVersCarte() {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '💸 Retirer vers Carte';
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Solde Wallet: <strong>${state.wallet.toFixed(2)} €</strong></p>
+                    <input type="number" id="montantRetrait" placeholder="Montant" max="${state.wallet}" style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; margin-bottom: 15px;">
+                    <button class="btn" onclick="confirmerRetrait()">✅ Retirer</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function confirmerRetrait() {
+            const montant = parseFloat(document.getElementById('montantRetrait').value);
+            if (montant > 0 && montant <= state.wallet) {
+                state.wallet -= montant;
+                state.carte += montant;
+                updateSoldes();
+                alert(`✅ Retrait de ${montant} € effectué !\n\nNouveau solde Wallet : ${state.wallet.toFixed(2)} €\nNouveau solde Carte : ${state.carte.toFixed(2)} €`);
+                closeModal();
+            } else {
+                alert('❌ Montant invalide');
+            }
+        }
+
+        // CONVERTIR CRYPTO
+        function convertirCrypto() {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '🔄 Convertir Crypto';
+            body.innerHTML = `
+                <div>
+                    <select id="cryptoSource" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                        <option value="usdc-${state.usdc}">USDC (${state.usdc} $)</option>
+                        <option value="omcoin-${state.omcoin}">OM Coin (${state.omcoin} OMC)</option>
+                    </select>
+                    <div style="text-align: center; margin: 10px 0; font-size: 24px;">⬇️</div>
+                    <select id="cryptoCible" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                        <option value="eur">Euro (EUR)</option>
+                        <option value="usdc">USDC</option>
+                        <option value="omcoin">OM Coin</option>
+                    </select>
+                    <input type="number" id="montantConversion" placeholder="Montant" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 15px;">
+                    <button class="btn" onclick="executerConversion()">✅ Convertir</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function executerConversion() {
+            const source = document.getElementById('cryptoSource').value;
+            const cible = document.getElementById('cryptoCible').value;
+            const montant = parseFloat(document.getElementById('montantConversion').value);
+            
+            if (montant > 0) {
+                // Simulation conversion
+                if (cible === 'eur') {
+                    state.wallet += montant * 0.95; // Taux de change simulé
+                }
+                updateSoldes();
+                alert(`✅ Conversion effectuée !\n\n${montant} ${source.split('-')[0].toUpperCase()} → EUR\n\nNouveau solde Wallet : ${state.wallet.toFixed(2)} €`);
+                closeModal();
+            } else {
+                alert('❌ Montant invalide');
+            }
+        }
+
+        // AFFICHER QR CODE
+        function afficherQRCode() {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            const clubCode = (clubName || 'CLUB').replace(/\s+/g, '-').toUpperCase().substring(0, 10);
+            const qrId = `PAIECASH-${clubCode}-` + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+            title.textContent = '📲 QR Code de Paiement';
+            body.innerHTML = `
+                <div style="text-align: center;">
+                    <p style="margin-bottom: 20px;">Scannez ce QR Code pour payer</p>
+                    <div class="qr-code">
+                        <div class="qr-pattern">
+                            <div class="qr-logo">PaieCash</div>
+                        </div>
+                        <div style="font-size: 11px; color: #1e293b; margin-top: 10px; text-align: center;">ID: ${qrId}</div>
+                    </div>
+                    <p style="margin-top: 20px; font-size: 13px; color: #64748b;">Valide 15 minutes</p>
+                    <button class="btn" onclick="closeModal()" style="margin-top: 20px;">Fermer</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        // VOIR PIN
+        function voirPIN() {
+            const pin = '1234';
+            alert(`🔐 Code PIN de votre carte :\n\n${pin}\n\n⚠️ Ne partagez jamais votre PIN`);
+        }
+
+        // GÉRER LIMITES
+        function gererLimites() {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '⚙️ Gérer les Limites de Carte';
+            body.innerHTML = `
+                <div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">💳 Limite quotidienne de paiement:</label>
+                        <input type="number" value="1000" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">💰 Limite quotidienne de retrait DAB:</label>
+                        <input type="number" value="500" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    </div>
+                    <button class="btn">✅ Enregistrer</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        // CHOISIR PRODUIT CRYPTO
+        function choisirProduitCrypto(crypto, solde, euroValue) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = `💎 Payer avec ${crypto}`;
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Solde: <strong>${solde} ${crypto}</strong> (≈ ${euroValue} €)</p>
+                    <p style="margin-bottom: 15px;">Que voulez-vous acheter ?</p>
+                    <button class="btn" onclick="showSection('boutique'); closeModal();">🛍️ Produits Boutique</button>
+                    <button class="btn" onclick="showSection('abonnement'); closeModal();">📅 Abonnement</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        // PAYER BOUTIQUE
+        // ========== RECOMMANDATIONS INTELLIGENTES ==========
+        function afficherRecommandations(totalActuel) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            // Récupérer les produits disponibles
+            const clubSlug = getCurrentClub();
+            const tousLesProduits = getProduitsClub(clubSlug, 15);
+            
+            // Filtrer les produits non sélectionnés
+            const produitsNonSelectionnes = tousLesProduits.filter(p => 
+                !state.produitsSelectionnes.find(ps => ps.id === p.id)
+            );
+            
+            // Recommander 3 produits aléatoires
+            const recommandations = produitsNonSelectionnes
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            title.textContent = '💡 Produits Recommandés';
+            body.innerHTML = `
+                <div>
+                    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">🎁 Vous avez sélectionné 1 produit</div>
+                        <div style="font-size: 13px; opacity: 0.9;">Voici des articles qui pourraient vous intéresser :</div>
+                    </div>
+                    
+                    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+                        ${recommandations.map(p => `
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="ajouterRecommandation('${p.id}')">
+                                <div style="font-size: 40px;">${p.emoji || '🛍️'}</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: bold; font-size: 15px;">${p.nom}</div>
+                                    <div style="font-size: 13px; opacity: 0.7; margin-top: 3px;">${p.categorie}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 18px; font-weight: bold; color: #4ade80;">${p.prix.toFixed(2)} €</div>
+                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 3px;">Cliquer pour ajouter</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="closeModal(); payerBoutique();">
+                            Non merci, payer
+                        </button>
+                        <button class="btn" onclick="closeModal();">
+                            Continuer mes achats
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        function ajouterRecommandation(produitId) {
+            const clubSlug = getCurrentClub();
+            const tousLesProduits = getProduitsClub(clubSlug, 15);
+            const produit = tousLesProduits.find(p => p.id === produitId);
+            
+            if (produit) {
+                toggleProduitScrapé(produitId);
+                closeModal();
+                alert(`✅ ${produit.nom} ajouté au panier !`);
+            }
+        }
+        
+        // ========== VÉRIFIER PROMOTIONS PERSONNALISÉES ==========
+        function verifierPromotions(total) {
+            const capaciteFinanciere = state.wallet + state.carte;
+            const clubStablecoin = getClubStablecoin();
+            const stablecoinBalance = clubStablecoin ? clubStablecoin.balance : 0;
+            
+            // Promotions selon capacité
+            let promotion = null;
+            
+            if (total >= 100 && total < 150 && capaciteFinanciere >= 150) {
+                promotion = {
+                    seuil: 150,
+                    remise: 10,
+                    message: "Dépensez 50€ de plus et obtenez 10€ de remise !"
+                };
+            } else if (total >= 150 && total < 200 && capaciteFinanciere >= 200) {
+                promotion = {
+                    seuil: 200,
+                    remise: 20,
+                    message: "Dépensez 50€ de plus et obtenez 20€ de remise !"
+                };
+            } else if (total >= 50 && total < 100 && capaciteFinanciere >= 100) {
+                promotion = {
+                    seuil: 100,
+                    remise: 5,
+                    message: "Atteignez 100€ et obtenez 5€ de remise !"
+                };
+            }
+            
+            if (promotion) {
+                afficherPromotion(promotion, total);
+            }
+        }
+        
+        function afficherPromotion(promotion, total) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            const manquant = promotion.seuil - total;
+            
+            title.textContent = '🎉 Promotion Disponible !';
+            body.innerHTML = `
+                <div>
+                    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🎁</div>
+                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${promotion.message}</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Il vous manque seulement ${manquant.toFixed(2)}€</div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Total actuel :</span>
+                            <strong>${total.toFixed(2)} €</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Seuil promo :</span>
+                            <strong style="color: #4ade80;">${promotion.seuil.toFixed(2)} €</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <span>Remise :</span>
+                            <strong style="color: #f59e0b;">-${promotion.remise.toFixed(2)} €</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px;">
+                            <span>Total final :</span>
+                            <strong style="color: #10b981;">${(promotion.seuil - promotion.remise).toFixed(2)} €</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="closeModal(); payerBoutique();">
+                            Non, payer maintenant
+                        </button>
+                        <button class="btn" onclick="closeModal();">
+                            Ajouter des produits
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        // ========== CALCULER MÉTHODE OPTIMALE ==========
+        function calculerMethodeOptimale(total, state) {
+            const capaciteWallet = state.wallet;
+            const capaciteCarte = state.carte;
+            const clubStablecoin = getClubStablecoin();
+            const stablecoinBalance = clubStablecoin ? clubStablecoin.balance : 0;
+            const stablecoinCode = clubStablecoin ? clubStablecoin.code : 'OMC';
+            
+            // Méthode recommandée selon capacité et cashback
+            if (stablecoinBalance >= total) {
+                return {
+                    html: `
+                        <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 20px; border-radius: 15px; margin-bottom: 15px; position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #fbbf24; color: #1a1a2e; padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: bold;">RECOMMANDÉ</div>
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">💎</div>
+                                <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">Payer avec ${stablecoinCode}</div>
+                                <div style="font-size: 13px; opacity: 0.9;">Solde : ${stablecoinBalance.toFixed(2)} ${stablecoinCode}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+                                <div style="font-size: 14px; font-weight: bold; color: #fbbf24;">🎁 +${(total * 0.03).toFixed(2)}€ cashback (3%)</div>
+                            </div>
+                            <button class="btn" onclick="payerAvecStablecoin('${stablecoinCode}', ${total})" style="width: 100%; background: white; color: #10b981; font-weight: bold; font-size: 16px; padding: 15px;">
+                                💎 Payer ${total.toFixed(2)}€ avec ${stablecoinCode}
+                            </button>
+                        </div>
+                    `
+                };
+            } else if (capaciteWallet >= total) {
+                return {
+                    html: `
+                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 15px; margin-bottom: 15px; position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #fbbf24; color: #1a1a2e; padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: bold;">RECOMMANDÉ</div>
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">💰</div>
+                                <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">Payer avec Wallet</div>
+                                <div style="font-size: 13px; opacity: 0.9;">Solde : ${capaciteWallet.toFixed(2)} €</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+                                <div style="font-size: 14px; font-weight: bold; color: #fbbf24;">🎁 +${(total * 0.02).toFixed(2)}€ cashback (2%)</div>
+                            </div>
+                            <button class="btn" onclick="payerAvecWallet(${total})" style="width: 100%; background: white; color: #667eea; font-weight: bold; font-size: 16px; padding: 15px;">
+                                💰 Payer ${total.toFixed(2)}€ avec Wallet
+                            </button>
+                        </div>
+                    `
+                };
+            } else if (capaciteCarte >= total) {
+                return {
+                    html: `
+                        <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 20px; border-radius: 15px; margin-bottom: 15px; position: relative;">
+                            <div style="position: absolute; top: 10px; right: 10px; background: #fbbf24; color: #1a1a2e; padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: bold;">RECOMMANDÉ</div>
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">💳</div>
+                                <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">Payer avec Carte</div>
+                                <div style="font-size: 13px; opacity: 0.9;">Solde : ${capaciteCarte.toFixed(2)} €</div>
+                            </div>
+                            <button class="btn" onclick="payerAvecCarte(${total})" style="width: 100%; background: white; color: #1e40af; font-weight: bold; font-size: 16px; padding: 15px;">
+                                💳 Payer ${total.toFixed(2)}€ avec Carte
+                            </button>
+                        </div>
+                    `
+                };
+            } else {
+                return {
+                    html: `
+                        <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 20px; border-radius: 15px; margin-bottom: 15px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+                            <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Solde insuffisant</div>
+                            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 15px;">Veuillez utiliser une autre méthode de paiement</div>
+                        </div>
+                    `
+                };
+            }
+        }
+        
+        function payerBoutique() {
+            if (state.produitsSelectionnes.length === 0) {
+                alert('❌ Veuillez sélectionner au moins un produit');
+                return;
+            }
+
+            const total = state.produitsSelectionnes.reduce((sum, p) => sum + p.prix, 0);
+            
+            // ✅ RECOMMANDATIONS INTELLIGENTES AVANT PAIEMENT
+            if (state.produitsSelectionnes.length === 1) {
+                afficherRecommandations(total);
+                return;
+            }
+            
+            // ✅ VÉRIFIER PROMOTIONS PERSONNALISÉES
+            verifierPromotions(total);
+            const clubStablecoinData = getClubStablecoin();
+            const clubStablecoin = clubStablecoinData ? clubStablecoinData.code : 'OMC';
+            // Convertir code (ex: 'OMC') en clé state (ex: 'omcoin')
+            const stablecoinKey = clubStablecoin.toLowerCase().replace(/c$/i, '') + 'coin';
+            const stablecoinBalance = state[stablecoinKey] !== undefined ? state[stablecoinKey] : (clubStablecoinData ? clubStablecoinData.balance : 0);
+            
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '💳 Paiement Personnalisé';
+            
+            // ✅ CALCULER MÉTHODE RECOMMANDÉE
+            const methodeRecommandee = calculerMethodeOptimale(total, state);
+            
+            body.innerHTML = `
+                <div>
+                    <!-- En-tête avec total -->
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Total à payer</div>
+                        <div style="font-size: 36px; font-weight: bold;">${total.toFixed(2)} €</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">${state.produitsSelectionnes.length} produit${state.produitsSelectionnes.length > 1 ? 's' : ''}</div>
+                    </div>
+                    
+                    <!-- Méthode recommandée -->
+                    ${methodeRecommandee.html}
+                    
+                    <!-- Autres méthodes -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 14px; opacity: 0.7; margin-bottom: 15px; text-align: center;">Autres moyens de paiement</div>
+                        <div style="display: grid; gap: 10px;">
+                            ${state.wallet >= total ? `<button class="btn btn-secondary" onclick="payerAvecWallet(${total})" style="padding: 12px;">💰 Wallet (${state.wallet.toFixed(2)} €)</button>` : ''}
+                            ${state.carte >= total ? `<button class="btn btn-secondary" onclick="payerAvecCarte(${total})" style="padding: 12px;">💳 Carte (${state.carte.toFixed(2)} €)</button>` : ''}
+                            ${stablecoinBalance >= total ? `<button class="btn btn-secondary" onclick="payerAvecStablecoin('${clubStablecoin}', ${total})" style="padding: 12px;">💎 ${clubStablecoin} (${stablecoinBalance.toFixed(2)})</button>` : ''}
+                            <button class="btn btn-secondary" onclick="payerAvecNOWPayments(${total})" style="padding: 12px;">₿ Crypto (300+ devises)</button>
+                            <button class="btn btn-secondary" onclick="payerModeTouriste(${total})" style="padding: 12px;">🌍 Alipay / WeChat Pay</button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">
+                        Annuler
+                    </button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        
+        // Fonction de paiement avec le stablecoin du club
+        // ========================================
+        // FONCTION AJOUT TRANSACTION TEMPS RÉEL
+        // ========================================
+        function ajouterTransactionTempsReel(transaction) {
+            const container = document.getElementById('transactionsRecentes');
+            if (!container) return;
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const transactionId = 'TRX-' + now.getFullYear() + (now.getMonth()+1).toString().padStart(2,'0') + now.getDate().toString().padStart(2,'0') + '-' + now.getTime();
+            
+            // Déterminer l'icône et le gradient selon le type
+            let icon = '💳';
+            let gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            
+            if (transaction.type === 'boutique') {
+                icon = '👕';
+                gradient = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
+            } else if (transaction.type === 'stablecoin') {
+                icon = '💎';
+                gradient = 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)';
+            } else if (transaction.type === 'wallet') {
+                icon = '💰';
+                gradient = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+            } else if (transaction.type === 'crypto') {
+                icon = '🌐';
+                gradient = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            } else if (transaction.type === 'alipay') {
+                icon = '🇨🇳';
+                gradient = 'linear-gradient(135deg, #1677ff 0%, #0958d9 100%)';
+            } else if (transaction.type === 'wechat') {
+                icon = '💬';
+                gradient = 'linear-gradient(135deg, #07c160 0%, #06ae56 100%)';
+            }
+            
+            const montantColor = transaction.montant < 0 ? '#ff6b6b' : '#10b981';
+            const montantClass = transaction.montant < 0 ? '' : 'positive';
+            
+            // Créer l'élément transaction
+            const transactionHTML = `
+                <div class="transaction-item" onclick="voirTicket('${transaction.nom}', '${dateStr}', '${transactionId}', ${transaction.montant}, ${transaction.cashback || 0})" style="animation: slideInRight 0.5s ease-out;">
+                    <div class="transaction-icon" style="background: ${gradient};">${icon}</div>
+                    <div class="transaction-details">
+                        <div class="transaction-name">${transaction.nom}</div>
+                        <div class="transaction-date">${dateStr} - ${timeStr}</div>
+                    </div>
+                    <div class="transaction-amount ${montantClass}" style="color: ${montantColor};">${transaction.montant.toFixed(2)} EUR</div>
+                </div>
+            `;
+            
+            // Insérer en PREMIER (plus récent en haut)
+            container.insertAdjacentHTML('afterbegin', transactionHTML);
+            
+            // Limiter à 10 transactions affichées
+            const allTransactions = container.querySelectorAll('.transaction-item');
+            if (allTransactions.length > 10) {
+                allTransactions[allTransactions.length - 1].remove();
+            }
+            
+            // Animation d'apparition
+            const newTransaction = container.firstElementChild;
+            newTransaction.style.opacity = '0';
+            setTimeout(() => {
+                newTransaction.style.transition = 'opacity 0.5s ease-out';
+                newTransaction.style.opacity = '1';
+            }, 10);
+        }
+
+        function payerAvecStablecoin(stablecoin, montant) {
+            const clubStablecoinData = getClubStablecoin();
+            const stablecoinCode = clubStablecoinData ? clubStablecoinData.code : stablecoin;
+            // Convertir code (ex: 'OMC') en clé state (ex: 'omcoin')
+            const stablecoinKey = stablecoinCode.toLowerCase().replace(/c$/i, '') + 'coin';
+            const balance = state[stablecoinKey] !== undefined ? state[stablecoinKey] : (clubStablecoinData ? clubStablecoinData.balance : 0);
+            
+            if (balance >= montant) {
+                // Réduire le solde
+                if (state[stablecoinKey]) {
+                    state[stablecoinKey] -= montant;
+                }
+                const cashback = montant * 0.03; // 3% cashback
+                state.cashback += cashback;
+                updateSoldes();
+                
+                // ✅ AJOUTER TRANSACTION TEMPS RÉEL
+                ajouterTransactionTempsReel({
+                    nom: `Boutique - Paiement ${stablecoinCode}`,
+                    montant: -montant,
+                    cashback: cashback,
+                    type: 'stablecoin'
+                });
+                
+                alert(`✅ Paiement de ${montant.toFixed(2)} ${stablecoinCode} réussi !\n\n+${cashback.toFixed(2)} € cashback ajouté`);
+                state.produitsSelectionnes = [];
+                afficherProduitsBoutique();
+                updatePanier();
+                closeModal();
+            } else {
+                alert(`❌ Solde ${stablecoinCode} insuffisant\n\nVotre solde : ${balance.toFixed(2)} ${stablecoinCode}\nMontant requis : ${montant.toFixed(2)} ${stablecoinCode}`);
+            }
+        }
+        
+        // Fonction de paiement avec NOWPayments
+        async function payerAvecNOWPayments(montant) {
+            console.log('💰 Paiement NOWPayments initié:', montant, '€');
+            
+            if (typeof window.NOWPayments === 'undefined') {
+                alert('❌ Module NOWPayments non chargé. Veuillez réessayer.');
+                return;
+            }
+            
+            try {
+                // Afficher le modal de sélection de crypto
+                window.NOWPayments.showCryptoSelectionModal(montant, async (cryptoSymbol, estimation) => {
+                    console.log('Crypto sélectionnée:', cryptoSymbol, estimation);
+                    
+                    try {
+                        // Créer le paiement NOWPayments
+                        const orderId = 'ORDER-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                        const orderDescription = `Boutique ${clubName || 'PaieCashPlay'} - ${state.produitsSelectionnes.length} produit(s)`;
+                        
+                        const paymentData = await window.NOWPayments.createPayment({
+                            priceAmount: montant,
+                            priceCurrency: 'EUR',
+                            payCurrency: cryptoSymbol,
+                            orderId: orderId,
+                            orderDescription: orderDescription,
+                            successUrl: window.location.href + '?payment=success',
+                            cancelUrl: window.location.href + '?payment=cancel'
+                        });
+                        
+                        console.log('✅ Paiement créé:', paymentData);
+                        
+                        // Afficher le modal de paiement
+                        if (typeof window.NOWPayments.showCryptoPaymentModal === 'function') {
+                            window.NOWPayments.showCryptoPaymentModal(paymentData);
+                        } else {
+                            // Fallback : afficher les infos de paiement
+                            alert(`✅ Paiement créé !\n\nEnvoyez ${paymentData.pay_amount} ${cryptoSymbol.toUpperCase()}\nÀ l'adresse : ${paymentData.pay_address}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur création paiement:', error);
+                        alert('❌ Erreur lors de la création du paiement. Veuillez réessayer.');
+                    }
+                });
+            } catch (error) {
+                console.error('Erreur paiement NOWPayments:', error);
+                alert('❌ Erreur lors du paiement. Veuillez réessayer.');
+            }
+        }
+
+        function payerAvecWallet(montant) {
+            if (state.wallet >= montant) {
+                state.wallet -= montant;
+                const cashback = montant * 0.02;
+                state.cashback += cashback;
+                updateSoldes();
+                
+                // ✅ AJOUTER TRANSACTION TEMPS RÉEL
+                ajouterTransactionTempsReel({
+                    nom: 'Boutique - Paiement Wallet',
+                    montant: -montant,
+                    cashback: cashback,
+                    type: 'wallet'
+                });
+                
+                alert(`✅ Paiement de ${montant.toFixed(2)} € avec Wallet réussi !\n\n+${cashback.toFixed(2)} € cashback ajouté`);
+                state.produitsSelectionnes = [];
+                afficherProduitsBoutique();
+                updatePanier();
+                closeModal();
+            } else {
+                alert('❌ Solde insuffisant');
+            }
+        }
+
+        function payerAvecCarte(montant) {
+            if (state.carte >= montant) {
+                state.carte -= montant;
+                updateSoldes();
+                
+                // ✅ AJOUTER TRANSACTION TEMPS RÉEL
+                ajouterTransactionTempsReel({
+                    nom: 'Boutique - Paiement Carte',
+                    montant: -montant,
+                    cashback: 0,
+                    type: 'boutique'
+                });
+                
+                alert(`✅ Paiement de ${montant.toFixed(2)} € avec Carte réussi !`);
+                state.produitsSelectionnes = [];
+                afficherProduitsBoutique();
+                updatePanier();
+                closeModal();
+            } else {
+                alert('❌ Solde insuffisant');
+            }
+        }
+
+        function payerAvecCrypto(crypto, montant) {
+            // ✅ AJOUTER TRANSACTION TEMPS RÉEL
+            ajouterTransactionTempsReel({
+                nom: `Boutique - Paiement ${crypto}`,
+                montant: -montant,
+                cashback: 0,
+                type: 'crypto'
+            });
+            
+            alert(`✅ Paiement de ${montant.toFixed(2)} € avec ${crypto} effectué !\n\nTransaction blockchain confirmée.`);
+            state.produitsSelectionnes = [];
+            afficherProduitsBoutique();
+            updatePanier();
+            closeModal();
+        }
+
+        function payerModeTouriste(montant) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '🌍 Mode Touriste';
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Total: <strong>${montant.toFixed(2)} €</strong></p>
+                    <button class="btn" onclick="payerAvecMethode('Alipay', ${montant})">🇨🇳 Alipay</button>
+                    <button class="btn" onclick="payerAvecMethode('WeChat Pay', ${montant})">🇨🇳 WeChat Pay</button>
+                    <button class="btn" onclick="payerAvecMethode('M-Pesa', ${montant})">🌍 M-Pesa</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function payerAvecMethode(methode, montant) {
+            // Déterminer le type de transaction selon la méthode
+            let type = 'boutique';
+            if (methode === 'Alipay') type = 'alipay';
+            else if (methode === 'WeChat Pay') type = 'wechat';
+            
+            // ✅ AJOUTER TRANSACTION TEMPS RÉEL
+            ajouterTransactionTempsReel({
+                nom: `Boutique - Paiement ${methode}`,
+                montant: -montant,
+                cashback: 0,
+                type: type
+            });
+            
+            alert(`✅ Paiement de ${montant.toFixed(2)} € avec ${methode} effectué !`);
+            state.produitsSelectionnes = [];
+            afficherProduitsBoutique();
+            updatePanier();
+            closeModal();
+        }
+
+        // PAYER BOUTIQUE BNPL
+        function payerBoutiqueBNPL() {
+            if (state.produitsSelectionnes.length === 0) {
+                alert('❌ Veuillez sélectionner au moins un produit');
+                return;
+            }
+
+            const total = state.produitsSelectionnes.reduce((sum, p) => sum + p.prix, 0);
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = '💳 BNPL - Payer Plus Tard';
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Total: <strong>${total.toFixed(2)} €</strong></p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <div onclick="selectBNPL(${total}, 3, 0)" style="background: linear-gradient(135deg, #10b981, #059669); padding: 15px; border-radius: 10px; cursor: pointer; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;">3x</div>
+                            <div style="font-size: 11px; margin-top: 5px;">SANS FRAIS</div>
+                            <div style="font-size: 14px; font-weight: bold; margin-top: 10px;">${(total / 3).toFixed(2)} €/mois</div>
+                        </div>
+                        <div onclick="selectBNPL(${total}, 4, 0.015)" style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 15px; border-radius: 10px; cursor: pointer; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;">4x</div>
+                            <div style="font-size: 11px; margin-top: 5px;">1.5% frais</div>
+                            <div style="font-size: 14px; font-weight: bold; margin-top: 10px;">${((total * 1.015) / 4).toFixed(2)} €/mois</div>
+                        </div>
+                        <div onclick="selectBNPL(${total}, 6, 0.025)" style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 15px; border-radius: 10px; cursor: pointer; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;">6x</div>
+                            <div style="font-size: 11px; margin-top: 5px;">2.5% frais</div>
+                            <div style="font-size: 14px; font-weight: bold; margin-top: 10px;">${((total * 1.025) / 6).toFixed(2)} €/mois</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 15px;">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function selectBNPL(montant, fois, tauxFrais) {
+            const frais = montant * tauxFrais;
+            const total = montant + frais;
+            const mensualite = total / fois;
+            
+            alert(`✅ Paiement en ${fois}x accepté !\n\nMontant: ${montant.toFixed(2)} €\nFrais: ${frais.toFixed(2)} €\nTotal: ${total.toFixed(2)} €\nMensualité: ${mensualite.toFixed(2)} € × ${fois}`);
+            state.produitsSelectionnes = [];
+            afficherProduitsBoutique();
+            updatePanier();
+            closeModal();
+        }
+
+        // ACHETER ABONNEMENT
+        function acheterAbonnement(nom, prix) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = `📅 ${nom}`;
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Prix: <strong>${prix.toFixed(2)} €</strong></p>
+                    <button class="btn" onclick="payerAbonnement('${nom}', ${prix}, 'Wallet')">💰 Payer avec Wallet</button>
+                    <button class="btn" onclick="payerAbonnement('${nom}', ${prix}, 'Carte')">💳 Payer avec Carte</button>
+                    <button class="btn" onclick="payerAbonnementBNPL('${nom}', ${prix})">💳 Payer en 3x/4x (BNPL)</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function payerAbonnement(nom, prix, moyen) {
+            if (moyen === 'Wallet' && state.wallet >= prix) {
+                state.wallet -= prix;
+                updateSoldes();
+                alert(`✅ Abonnement "${nom}" activé !\n\nPaiement: ${prix.toFixed(2)} € avec Wallet\n\nVotre abonnement est actif immédiatement.`);
+                closeModal();
+            } else if (moyen === 'Carte' && state.carte >= prix) {
+                state.carte -= prix;
+                updateSoldes();
+                alert(`✅ Abonnement "${nom}" activé !\n\nPaiement: ${prix.toFixed(2)} € avec Carte\n\nVotre abonnement est actif immédiatement.`);
+                closeModal();
+            } else {
+                alert('❌ Solde insuffisant');
+            }
+        }
+
+        function payerAbonnementBNPL(nom, prix) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = `💳 ${nom} - BNPL`;
+            body.innerHTML = `
+                <div>
+                    <p style="margin-bottom: 20px;">Prix: <strong>${prix.toFixed(2)} €</strong></p>
+                    <div style="display: grid; gap: 10px;">
+                        <div onclick="confirmerAbonnementBNPL('${nom}', ${prix}, 3)" style="background: linear-gradient(135deg, #10b981, #059669); padding: 15px; border-radius: 10px; cursor: pointer;">
+                            <div style="font-weight: bold;">3x SANS FRAIS</div>
+                            <div style="font-size: 20px; margin-top: 5px;">${(prix / 3).toFixed(2)} €/mois</div>
+                        </div>
+                        <div onclick="confirmerAbonnementBNPL('${nom}', ${prix}, 4)" style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 15px; border-radius: 10px; cursor: pointer;">
+                            <div style="font-weight: bold;">4x avec 1.5% frais</div>
+                            <div style="font-size: 20px; margin-top: 5px;">${((prix * 1.015) / 4).toFixed(2)} €/mois</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 15px;">Annuler</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function confirmerAbonnementBNPL(nom, prix, fois) {
+            alert(`✅ Abonnement "${nom}" activé avec BNPL ${fois}x !\n\n⚠️ IMPORTANT:\nSi vous ne payez pas, votre abonnement sera bloqué et revendu à un autre fan.\n\nMensualité: ${(prix / fois).toFixed(2)} €`);
+            closeModal();
+        }
+
+        // MENU PARTENAIRE
+        function ouvrirMenuPartenaire(partenaire, cashbackPct) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            const menu = partenaire === "McDonald's" ? menuMcDonalds : [];
+            let selection = [];
+            let total = 0;
+
+            title.textContent = `🍔 Menu ${partenaire} (${cashbackPct}% cashback)`;
+            body.innerHTML = `
+                <div>
+                    <div class="product-grid" id="menu-grid">
+                        ${menu.map(item => `
+                            <div class="product-card" onclick="toggleMenuItem(${item.id}, ${item.prix}, '${item.nom}')" id="menu-item-${item.id}">
+                                <div class="product-img">${item.emoji}</div>
+                                <div class="product-name">${item.nom}</div>
+                                <div class="product-price">${item.prix.toFixed(2)} €</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.2); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total:</span>
+                            <strong id="totalMenu" style="color: #4ade80; font-size: 20px;">0.00 €</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                            <span>Cashback ${cashbackPct}%:</span>
+                            <strong id="cashbackMenu" style="color: #4ade80;">0.00 €</strong>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="payerMenuPartenaire('${partenaire}', ${cashbackPct})" style="margin-top: 15px;">💳 Payer en 1 Clic</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                </div>
+            `;
+            
+            window.menuSelection = [];
+            window.partenaireCashback = cashbackPct;
+            
+            modal.classList.add('active');
+        }
+
+        function toggleMenuItem(id, prix, nom) {
+            const element = document.getElementById(`menu-item-${id}`);
+            const index = window.menuSelection.findIndex(item => item.id === id);
+            
+            if (index > -1) {
+                window.menuSelection.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                window.menuSelection.push({ id, prix, nom });
+                element.classList.add('selected');
+            }
+            
+            const total = window.menuSelection.reduce((sum, item) => sum + item.prix, 0);
+            const cashback = total * (window.partenaireCashback / 100);
+            
+            document.getElementById('totalMenu').textContent = total.toFixed(2) + ' €';
+            document.getElementById('cashbackMenu').textContent = cashback.toFixed(2) + ' €';
+        }
+
+        function payerMenuPartenaire(partenaire, cashbackPct) {
+            if (window.menuSelection.length === 0) {
+                alert('❌ Veuillez sélectionner au moins un produit');
+                return;
+            }
+            
+            const total = window.menuSelection.reduce((sum, item) => sum + item.prix, 0);
+            const cashback = total * (cashbackPct / 100);
+            
+            if (state.wallet >= total) {
+                state.wallet -= total;
+                state.cashback += cashback;
+                updateSoldes();
+                
+                const produits = window.menuSelection.map(item => item.nom).join(', ');
+                alert(`✅ Paiement 1 Clic réussi chez ${partenaire} !\n\nProduits: ${produits}\nTotal: ${total.toFixed(2)} €\nCashback: +${cashback.toFixed(2)} €\n\nLe cashback sera crédité dans 24-48h`);
+                closeModal();
+            } else {
+                alert('❌ Solde Wallet insuffisant');
+            }
+        }
+
+        // ===== RECHERCHE AUTO EN TEMPS RÉEL =====
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
+
+        // Écouter la frappe clavier (recherche auto)
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                
+                // Afficher/masquer le bouton X
+                if (query.length > 0) {
+                    searchClear.style.display = 'flex';
+                } else {
+                    searchClear.style.display = 'none';
+                    searchResults.classList.remove('active');
+                    return;
+                }
+                
+                // Recherche auto avec délai (300ms)
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            // Masquer les résultats si on clique ailleurs
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+        }
+
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchResults.classList.remove('active');
+            searchInput.focus();
+        }
+
+        function performSearch(query) {
+            if (!query) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            let results = [];
+
+            // 1. Chercher dans les LÉGENDES
+            const currentClubSlug = getCurrentClub();
+            let legends = [];
+            if (typeof getLegendsForClub === 'function') {
+                legends = getLegendsForClub(currentClubSlug);
+            }
+
+            legends.forEach(legend => {
+                if (legend.name.toLowerCase().includes(lowerQuery) || 
+                    legend.role.toLowerCase().includes(lowerQuery) ||
+                    legend.achievements.toLowerCase().includes(lowerQuery)) {
+                    
+                    const clubCoin = getClubStablecoin();
+                    results.push({
+                        type: 'legend',
+                        icon: '⭐',
+                        title: legend.name,
+                        desc: `${legend.role} • ${legend.period}`,
+                        price: legend.nft && legend.nft.available ? `${legend.nft.price} ${clubCoin.code}` : null,
+                        action: () => {
+                            showSection('legendes');
+                            searchResults.classList.remove('active');
+                            searchInput.value = '';
+                            searchClear.style.display = 'none';
+                        }
+                    });
+                }
+            });
+
+            // 2. Chercher dans les PRODUITS BOUTIQUE
+            if (Array.isArray(produitsBoutique)) {
+                produitsBoutique.forEach(produit => {
+                    if (produit.nom.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'product',
+                            icon: produit.emoji || '🛍️',
+                            title: produit.nom,
+                            desc: 'Boutique Officielle',
+                            price: `${produit.prix.toFixed(2)} €`,
+                            action: () => {
+                                showSection('boutique');
+                                searchResults.classList.remove('active');
+                                searchInput.value = '';
+                                searchClear.style.display = 'none';
+                                // Sélectionner le produit
+                                setTimeout(() => {
+                                    const card = document.getElementById(`product-${produit.id}`);
+                                    if (card) {
+                                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        card.style.animation = 'pulse 1s ease-in-out';
+                                    }
+                                }, 300);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 3. Chercher dans les PRODUITS WOOCOMMERCE (cache)
+            if (Array.isArray(wooProductsCache) && wooProductsCache.length > 0) {
+                wooProductsCache.forEach(product => {
+                    if (product.name.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'product',
+                            icon: '🛍️',
+                            title: product.name,
+                            desc: 'Boutique WooCommerce',
+                            price: `${parseFloat(product.price).toFixed(2)} €`,
+                            action: () => {
+                                showSection('boutique');
+                                searchResults.classList.remove('active');
+                                searchInput.value = '';
+                                searchClear.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 4. Chercher dans les CLUBS DE BASE (hardcodés pour rétrocompatibilité)
+            const clubNames = {
+                'olympique-de-marseille': { name: 'Olympique de Marseille', alias: ['OM', 'Marseille'], icon: '⚪🔵' },
+                'paris-saint-germain': { name: 'Paris Saint-Germain', alias: ['PSG', 'Paris'], icon: '🔴🔵' },
+                'olympique-lyonnais': { name: 'Olympique Lyonnais', alias: ['OL', 'Lyon'], icon: '🔴🔵' },
+                'as-monaco': { name: 'AS Monaco', alias: ['Monaco', 'ASM'], icon: '🔴⚪' },
+                'losc-lille': { name: 'LOSC Lille', alias: ['Lille', 'LOSC'], icon: '🔴⚪' },
+                'rc-lens': { name: 'RC Lens', alias: ['Lens', 'Racing'], icon: '🟡🔴' },
+                'sco-angers': { name: 'SCO Angers', alias: ['Angers', 'SCO'], icon: '⚪⚫' },
+                'stade-rennais': { name: 'Stade Rennais', alias: ['Rennes', 'Stade'], icon: '🔴⚫' },
+                'ogc-nice': { name: 'OGC Nice', alias: ['Nice', 'OGC'], icon: '🔴⚫' },
+                'arsenal': { name: 'Arsenal FC', alias: ['Arsenal', 'Gunners'], icon: '🔴⚪' },
+                'liverpool': { name: 'Liverpool FC', alias: ['Liverpool', 'Reds', 'LFC'], icon: '🔴' },
+                'manchester-city': { name: 'Manchester City', alias: ['Man City', 'City', 'Citizens'], icon: '💙' },
+                'bayern-munich': { name: 'Bayern Munich', alias: ['Bayern', 'Munich'], icon: '🔴⚪' },
+                'real-madrid': { name: 'Real Madrid', alias: ['Real', 'Madrid', 'Merengues'], icon: '⚪' },
+                'galatasaray': { name: 'Galatasaray SK', alias: ['Galatasaray', 'Gala', 'Cimbom'], icon: '🟡🔴' },
+                'fenerbahce': { name: 'Fenerbahçe SK', alias: ['Fenerbahçe', 'Fener', 'Fenerbahce'], icon: '🟡🔵' },
+                'besiktas': { name: 'Beşiktaş JK', alias: ['Beşiktaş', 'Besiktas', 'BJK'], icon: '⚫⚪' }
+            };
+
+            Object.entries(clubNames).forEach(([slug, data]) => {
+                // Chercher dans le nom ET dans les alias
+                const matchName = data.name.toLowerCase().includes(lowerQuery);
+                const matchAlias = data.alias && data.alias.some(alias => alias.toLowerCase().includes(lowerQuery));
+                
+                if (matchName || matchAlias) {
+                    results.push({
+                        type: 'club',
+                        icon: data.icon,
+                        title: data.name,
+                        desc: 'Changer de club',
+                        price: null,
+                        action: () => {
+                            window.location.href = `app-universal-simple.html?club=${slug}`;
+                        }
+                    });
+                }
+            });
+
+            // 5. Chercher dans TOUTES LES FÉDÉRATIONS FIFA (211 fédérations)
+            if (typeof toutesLesFederationsFIFA !== 'undefined' && Array.isArray(toutesLesFederationsFIFA)) {
+                toutesLesFederationsFIFA.forEach(fed => {
+                    if (fed.name && fed.name.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'federation',
+                            icon: fed.logo || '🌍',
+                            title: fed.name,
+                            desc: `FIFA - ${fed.code || ''}`,
+                            price: null,
+                            action: () => {
+                                window.location.href = fed.path;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 6. Chercher dans COUPE DU MONDE 2026 (48 équipes)
+            if (typeof coupeDuMonde2026 !== 'undefined' && Array.isArray(coupeDuMonde2026)) {
+                coupeDuMonde2026.forEach(team => {
+                    if (team.name && team.name.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'competition',
+                            icon: team.flag || '⚽',
+                            title: team.name,
+                            desc: `🏆 Coupe du Monde 2026${team.host ? ' 🏠' : ''}`,
+                            price: null,
+                            action: () => {
+                                window.location.href = team.path;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 7. Chercher dans CAN 2025 (24 équipes)
+            if (typeof can2025 !== 'undefined' && Array.isArray(can2025)) {
+                can2025.forEach(team => {
+                    if (team.name && team.name.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'competition',
+                            icon: team.flag || '🏆',
+                            title: team.name,
+                            desc: `🌍 CAN 2025${team.host ? ' 🏠' : ''}`,
+                            price: null,
+                            action: () => {
+                                window.location.href = team.path;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 8. Chercher dans JOJ 2026 DAKAR (18 équipes U18)
+            if (typeof joj2026Dakar !== 'undefined' && Array.isArray(joj2026Dakar)) {
+                joj2026Dakar.forEach(team => {
+                    if (team.name && team.name.toLowerCase().includes(lowerQuery)) {
+                        results.push({
+                            type: 'competition',
+                            icon: team.flag || '🥇',
+                            title: team.name,
+                            desc: `🏅 JOJ 2026 Dakar${team.host ? ' 🏠' : ''}`,
+                            price: null,
+                            action: () => {
+                                window.location.href = team.path;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 9. Chercher dans CLUBS PROFESSIONNELS (Ligue 1, Ligue 2, National)
+            const allProfessionalClubs = [];
+            if (typeof ligue1Clubs !== 'undefined') allProfessionalClubs.push(...ligue1Clubs);
+            if (typeof ligue2Clubs !== 'undefined') allProfessionalClubs.push(...ligue2Clubs);
+            if (typeof nationalClubs !== 'undefined') allProfessionalClubs.push(...nationalClubs);
+            if (typeof national2GroupeA !== 'undefined') allProfessionalClubs.push(...national2GroupeA);
+            if (typeof national2GroupeB !== 'undefined') allProfessionalClubs.push(...national2GroupeB);
+            if (typeof national2GroupeC !== 'undefined') allProfessionalClubs.push(...national2GroupeC);
+            if (typeof national2GroupeD !== 'undefined') allProfessionalClubs.push(...national2GroupeD);
+
+            allProfessionalClubs.forEach(club => {
+                if (club.name && club.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'club_pro',
+                        icon: club.logo || '⚽',
+                        title: club.name,
+                        desc: club.league || 'Club Professionnel',
+                        price: null,
+                        action: () => {
+                            window.location.href = club.path;
+                        }
+                    });
+                }
+            });
+
+            // 10. Chercher dans BASKETBALL (Clubs + Fédérations)
+            const allBasketballClubs = [];
+            if (typeof betclicEliteHommes !== 'undefined') allBasketballClubs.push(...betclicEliteHommes);
+            if (typeof lfbFemmes !== 'undefined') allBasketballClubs.push(...lfbFemmes);
+            if (typeof basketFederations !== 'undefined') allBasketballClubs.push(...basketFederations);
+
+            allBasketballClubs.forEach(club => {
+                if (club.name && club.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'basketball',
+                        icon: '🏀',
+                        title: club.name,
+                        desc: `Basketball ${club.gender ? '- ' + club.gender : ''}`,
+                        price: null,
+                        action: () => {
+                            window.location.href = club.path;
+                        }
+                    });
+                }
+            });
+
+            // 11. Chercher dans HANDBALL (Clubs + Fédérations)
+            const allHandballClubs = [];
+            if (typeof starligueMasculine !== 'undefined') allHandballClubs.push(...starligueMasculine);
+            if (typeof d1fFeminine !== 'undefined') allHandballClubs.push(...d1fFeminine);
+            if (typeof handballFederations !== 'undefined') allHandballClubs.push(...handballFederations);
+
+            allHandballClubs.forEach(club => {
+                if (club.name && club.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'handball',
+                        icon: '🤾',
+                        title: club.name,
+                        desc: `Handball ${club.gender ? '- ' + club.gender : ''}`,
+                        price: null,
+                        action: () => {
+                            window.location.href = club.path;
+                        }
+                    });
+                }
+            });
+
+            // 12. Chercher dans RUGBY (Clubs + Fédérations)
+            const allRugbyClubs = [];
+            if (typeof top14Rugby !== 'undefined') allRugbyClubs.push(...top14Rugby);
+            if (typeof elite1RugbyFeminin !== 'undefined') allRugbyClubs.push(...elite1RugbyFeminin);
+            if (typeof rugbyFederations !== 'undefined') allRugbyClubs.push(...rugbyFederations);
+
+            allRugbyClubs.forEach(club => {
+                if (club.name && club.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'rugby',
+                        icon: '🏉',
+                        title: club.name,
+                        desc: `Rugby ${club.gender ? '- ' + club.gender : ''}`,
+                        price: null,
+                        action: () => {
+                            window.location.href = club.path;
+                        }
+                    });
+                }
+            });
+
+            // 13. Chercher dans VOLLEYBALL (Clubs + Fédérations)
+            const allVolleyballClubs = [];
+            if (typeof ligueAVolleyHommes !== 'undefined') allVolleyballClubs.push(...ligueAVolleyHommes);
+            if (typeof ligueAVolleyFemmes !== 'undefined') allVolleyballClubs.push(...ligueAVolleyFemmes);
+            if (typeof volleyballFederations !== 'undefined') allVolleyballClubs.push(...volleyballFederations);
+
+            allVolleyballClubs.forEach(club => {
+                if (club.name && club.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'volleyball',
+                        icon: '🏐',
+                        title: club.name,
+                        desc: `Volleyball ${club.gender ? '- ' + club.gender : ''}`,
+                        price: null,
+                        action: () => {
+                            window.location.href = club.path;
+                        }
+                    });
+                }
+            });
+
+            // Afficher les résultats
+            displaySearchResults(results, query);
+        }
+
+        function displaySearchResults(results, query) {
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-no-results">
+                        <div style="font-size: 50px; margin-bottom: 10px;">🔍</div>
+                        <div style="font-size: 15px; font-weight: bold; margin-bottom: 5px;">Aucun résultat</div>
+                        <div style="font-size: 13px;">Essayez "Drogba", "Maillot", "Monaco", etc.</div>
+                    </div>
+                `;
+                searchResults.classList.add('active');
+                return;
+            }
+
+            // Limiter à 8 résultats
+            const limitedResults = results.slice(0, 8);
+            
+            searchResults.innerHTML = `
+                <div style="padding: 10px 20px; background: rgba(96, 165, 250, 0.1); border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 12px; font-weight: bold; color: #60a5fa;">
+                    ${results.length} résultat${results.length > 1 ? 's' : ''} pour "${query}"
+                </div>
+                ${limitedResults.map((result, index) => `
+                    <div class="search-result-item" data-result-index="${index}">
+                        <div class="search-result-icon">${result.icon}</div>
+                        <div class="search-result-info">
+                            <div class="search-result-title">${result.title}</div>
+                            <div class="search-result-desc">${result.desc}</div>
+                        </div>
+                        ${result.price ? `<div class="search-result-price">${result.price}</div>` : ''}
+                    </div>
+                `).join('')}
+                ${results.length > 8 ? `
+                    <div style="padding: 15px 20px; text-align: center; font-size: 12px; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.1);">
+                        ... et ${results.length - 8} autre${results.length - 8 > 1 ? 's' : ''} résultat${results.length - 8 > 1 ? 's' : ''}
+                    </div>
+                ` : ''}
+            `;
+            
+            searchResults.classList.add('active');
+            
+            // Ajouter les event listeners après création du HTML
+            setTimeout(() => {
+                limitedResults.forEach((result, index) => {
+                    const element = searchResults.querySelector(`[data-result-index="${index}"]`);
+                    if (element) {
+                        element.addEventListener('click', result.action);
+                    }
+                });
+            }, 0);
+        }
+
+        // ===== CHARGEMENT DYNAMIQUE DU CLUB =====
+        // Variables globales pour le club
+        let clubName, clubLogo, clubSport;
+        
+        (function() {
+            // Récupérer les paramètres URL
+            const urlParams = new URLSearchParams(window.location.search);
+            clubName = urlParams.get('club') || localStorage.getItem('selectedClub') || 'Mon Club';
+            clubLogo = urlParams.get('logo') || localStorage.getItem('clubLogo') || '⚽';
+            clubSport = urlParams.get('sport') || localStorage.getItem('clubSport') || 'Football';
+            
+            // Mettre à jour le header
+            document.getElementById('clubNameHeader').textContent = clubName;
+            document.getElementById('clubLogoHeaderContainer').textContent = clubLogo;
+            document.getElementById('welcomeMessage').textContent = `👋 Bienvenue chez ${clubName} !`;
+            
+            // Mettre à jour le titre de la page
+            document.title = `PaieCashFan - ${clubName}`;
+            
+            // Mettre à jour le wallet et ticket avec le club dynamique
+            const walletClubDisplay = document.getElementById('walletClubDisplay');
+            const ticketClubDisplay = document.getElementById('ticketClubDisplay');
+            
+            // Créer un affichage court pour le club (ex: "PSG", "OM", "OL")
+            let clubShortName = clubName;
+            if (clubName.toLowerCase().includes('paris-saint-germain') || clubName.toLowerCase().includes('psg')) {
+                clubShortName = 'PSG';
+            } else if (clubName.toLowerCase().includes('olympique') && clubName.toLowerCase().includes('marseille')) {
+                clubShortName = 'OM';
+            } else if (clubName.toLowerCase().includes('olympique') && clubName.toLowerCase().includes('lyon')) {
+                clubShortName = 'OL';
+            } else if (clubName.toLowerCase().includes('monaco')) {
+                clubShortName = 'ASM';
+            } else if (clubName.toLowerCase().includes('lille')) {
+                clubShortName = 'LOSC';
+            } else if (clubName.toLowerCase().includes('lens')) {
+                clubShortName = 'RC Lens';
+            } else if (clubName.toLowerCase().includes('rennes')) {
+                clubShortName = 'Stade Rennais';
+            } else if (clubName.toLowerCase().includes('nice')) {
+                clubShortName = 'OGC Nice';
+            } else {
+                // Prendre les 3 premières lettres en majuscules si pas de correspondance
+                clubShortName = clubName.replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase() || 'CLUB';
+            }
+            
+            if (walletClubDisplay) {
+                walletClubDisplay.textContent = `${clubLogo} ${clubShortName}`;
+            }
+            if (ticketClubDisplay) {
+                ticketClubDisplay.textContent = `${clubLogo} ${clubName}`;
+            }
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('selectedClub', clubName);
+            localStorage.setItem('clubLogo', clubLogo);
+            localStorage.setItem('clubSport', clubSport);
+            
+            console.log('✅ Club chargé:', clubName, '|', clubSport, clubLogo);
+        })();
+
+        // ========== FONCTION AFFICHAGE LÉGENDES DYNAMIQUES ==========
+        function displayLegends() {
+            const container = document.getElementById('legendes-container');
+            if (!container) return;
+            
+            // Récupérer le slug du club depuis l'URL ou localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            let clubSlug = urlParams.get('club') || localStorage.getItem('clubSlug') || 'olympique-marseille';
+            
+            // Normaliser le slug
+            clubSlug = clubSlug.toLowerCase().replace(/\+/g, '-').replace(/\s+/g, '-');
+            
+            // Récupérer le stablecoin du club actif
+            const clubCoin = getClubStablecoin();
+            const coinCode = clubCoin.code;
+            
+            // Récupérer les légendes pour ce club
+            let legends = [];
+            if (typeof getLegendsForClub === 'function') {
+                legends = getLegendsForClub(clubSlug);
+            }
+            
+            // Si aucune légende trouvée, afficher un message
+            if (!legends || legends.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">⭐</div>
+                        <p style="font-size: 18px;">Aucune légende documentée pour ce club pour le moment.</p>
+                        <p style="font-size: 14px; margin-top: 10px; opacity: 0.8;">Les légendes seront ajoutées prochainement.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Afficher chaque légende avec son NFT
+            container.innerHTML = legends.map(legend => {
+                const rarityColors = {
+                    'LEGENDARY': 'gold',
+                    'EPIC': '#a855f7',
+                    'RARE': '#3b82f6',
+                    'COMMON': '#6b7280'
+                };
+                const rarityColor = rarityColors[legend.nft?.rarity] || '#6b7280';
+                
+                return `
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; border: 3px solid ${rarityColor}; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: start;">
+                            <!-- Photo Légende -->
+                            <div style="position: relative;">
+                                <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, ${rarityColor}, rgba(255,255,255,0.1)); display: flex; align-items: center; justify-content: center; font-size: 60px; border: 4px solid ${rarityColor};">
+                                    ${legend.photo ? `<img src="${legend.photo}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />` : ''}
+                                    <span style="${legend.photo ? 'display:none;' : ''}">⭐</span>
+                                </div>
+                                ${legend.nft && legend.nft.available ? `
+                                    <div style="position: absolute; top: -10px; right: -10px; background: ${rarityColor}; color: ${legend.nft.rarity === 'LEGENDARY' ? '#1a1a2e' : 'white'}; padding: 5px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                                        ${legend.nft.rarity}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Infos Légende -->
+                            <div>
+                                <h3 style="font-size: 24px; margin-bottom: 8px; color: ${rarityColor};">${legend.name}</h3>
+                                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">
+                                    <strong>${legend.role}</strong> • ${legend.period}
+                                </div>
+                                <div style="font-size: 13px; opacity: 0.85; line-height: 1.5; margin-bottom: 12px;">
+                                    ${legend.achievements}
+                                </div>
+                                
+                                <!-- Première équipe -->
+                                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                    <strong>🏁 Première équipe professionnelle :</strong> ${legend.firstClub} (${legend.firstClubPeriod})
+                                    ${legend.note ? `<br><em style="opacity: 0.7;">${legend.note}</em>` : ''}
+                                </div>
+                                
+                                ${legend.association || legend.activite ? `
+                                    <!-- Association/Activité -->
+                                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1)); padding: 12px; border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 12px;">
+                                        <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #10b981;">
+                                            💚 ${legend.association ? 'Association' : 'Activité'}
+                                        </div>
+                                        <div style="font-size: 12px; opacity: 0.9;">
+                                            ${legend.association || legend.activite}
+                                        </div>
+                                        <div style="font-size: 11px; margin-top: 8px; opacity: 0.8; font-style: italic;">
+                                            💡 En achetant le NFT de ${legend.name.split(' ')[0]}, vous soutenez cette cause !
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+                                    <div style="font-size: 12px; opacity: 0.7;">
+                                        👥 ${legend.followers.toLocaleString('fr-FR')} followers
+                                    </div>
+                                    
+                                    ${legend.nft && legend.nft.available ? `
+                                        <div style="display: flex; align-items: center; gap: 15px;">
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 24px; font-weight: bold; color: ${rarityColor};">${legend.nft.price} ${coinCode}</div>
+                                                <div style="font-size: 11px; opacity: 0.7;">Édition ${legend.nft.edition}</div>
+                                            </div>
+                                            <button class="btn" style="padding: 10px 20px; font-size: 14px; margin: 0;" onclick="acheterNFT('${legend.name}', ${legend.nft.price})">
+                                                🎨 Acheter NFT
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            console.log(`✅ ${legends.length} légende(s) chargée(s) pour ${clubSlug}`);
+        }
+    </script>
+</body>
+</html>

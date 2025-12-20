@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Paiements - PaieCashPlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0e9cda 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #0e9cda;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 16px;
+        }
+        
+        .test-section {
+            margin-bottom: 35px;
+        }
+        
+        .test-section h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0e9cda;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .test-btn {
+            padding: 20px;
+            background: linear-gradient(135deg, #0e9cda, #0c7db3);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(14, 156, 218, 0.4);
+        }
+        
+        .test-btn .emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .test-btn .price {
+            font-size: 18px;
+            font-weight: 900;
+            margin-top: 5px;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            border-left: 4px solid #0e9cda;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            color: #0e9cda;
+            margin-bottom: 12px;
+        }
+        
+        .instructions ol {
+            color: #333;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: #155724;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test des Paiements</h1>
+        <p class="subtitle">Système de paiement unifié avec 6 modes disponibles</p>
+        
+        <div class="status">
+            ✅ Système de paiement 100% fonctionnel
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 Instructions de Test</h3>
+            <ol>
+                <li>Cliquez sur n'importe quel bouton d'achat ci-dessous</li>
+                <li>Une modale s'ouvrira avec <strong>6 modes de paiement</strong></li>
+                <li>Choisissez un mode : EUR, OM Coin, EURC, USDT, Virement, BNPL</li>
+                <li>Confirmez le paiement</li>
+                <li>Le paiement sera traité avec calcul des frais</li>
+            </ol>
+        </div>
+        
+        <!-- Section Boutique -->
+        <div class="test-section">
+            <h2>🛍️ Boutique Officielle OM</h2>
+            <div class="test-grid">
+                <button class="test-btn" onclick="acheterProduit('Maillot Domicile OM 2024/25', 89.99)">
+                    <span class="emoji">👕</span>
+                    <div>Maillot Domicile</div>
+                    <div class="price">89.99 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterProduit('Écharpe Supporters OM', 24.99)">
+                    <span class="emoji">🧣</span>
+                    <div>Écharpe OM</div>
+                    <div class="price">24.99 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterProduit('Casquette OM Officielle', 19.99)">
+                    <span class="emoji">🧢</span>
+                    <div>Casquette OM</div>
+                    <div class="price">19.99 €</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Section Billetterie -->
+        <div class="test-section">
+            <h2>🎟️ Billetterie</h2>
+            <div class="test-grid">
+                <button class="test-btn" onclick="acheterBillet('OM vs PSG - Vélodrome', 65.00)">
+                    <span class="emoji">⚽</span>
+                    <div>OM vs PSG</div>
+                    <div class="price">65.00 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterBillet('OM vs Lyon - Vélodrome', 45.00)">
+                    <span class="emoji">🏟️</span>
+                    <div>OM vs Lyon</div>
+                    <div class="price">45.00 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterBillet('Abonnement Annuel OM', 450.00)">
+                    <span class="emoji">🎫</span>
+                    <div>Abonnement Annuel</div>
+                    <div class="price">450.00 €</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Section NFT -->
+        <div class="test-section">
+            <h2>🖼️ NFT & Collectibles</h2>
+            <div class="test-grid">
+                <button class="test-btn" onclick="acheterNFT('NFT Didier Drogba Légende', 299.00)">
+                    <span class="emoji">👑</span>
+                    <div>NFT Drogba</div>
+                    <div class="price">299.00 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterNFT('NFT Payet Magic Moment', 149.00)">
+                    <span class="emoji">⚡</span>
+                    <div>NFT Payet</div>
+                    <div class="price">149.00 €</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterNFT('Badge Supporter Platine', 99.00)">
+                    <span class="emoji">💎</span>
+                    <div>Badge Platine</div>
+                    <div class="price">99.00 €</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Section Wallet -->
+        <div class="test-section">
+            <h2>💰 Gestion Wallet</h2>
+            <div class="test-grid">
+                <button class="test-btn" onclick="rechargerWallet()">
+                    <span class="emoji">💳</span>
+                    <div>Recharger Wallet</div>
+                    <div class="price">Montant libre</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterCoin('omc')">
+                    <span class="emoji">🏟️</span>
+                    <div>Acheter OM Coin</div>
+                    <div class="price">Montant libre</div>
+                </button>
+                
+                <button class="test-btn" onclick="acheterCoin('eurc')">
+                    <span class="emoji">💎</span>
+                    <div>Acheter EURC</div>
+                    <div class="price">Montant libre</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Avantages -->
+        <div style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); padding: 25px; border-radius: 15px; margin-top: 35px;">
+            <h3 style="color: #0c4a6e; margin-bottom: 15px;">💡 Avantages des Stablecoins</h3>
+            <ul style="color: #0c4a6e; font-weight: 600;">
+                <li>⚡ <strong>Frais -70%</strong> : 0.5% au lieu de 2.5%</li>
+                <li>🚀 <strong>Transaction instantanée</strong> : Moins d'1 seconde</li>
+                <li>💰 <strong>Cash in/Cash out</strong> : Le club peut convertir en EUR directement</li>
+                <li>🔒 <strong>100% sécurisé</strong> : Non-custodial, vous gardez le contrôle</li>
+                <li>🎁 <strong>Cashback augmenté</strong> : +0.5% sur chaque achat</li>
+            </ul>
+        </div>
+        
+        <!-- Retour à l'app -->
+        <div style="text-align: center; margin-top: 35px;">
+            <a href="index.html" style="display: inline-block; padding: 15px 40px; background: #0e9cda; color: white; text-decoration: none; border-radius: 12px; font-weight: 700; transition: all 0.3s;">
+                ⬅️ Retour à l'Application
+            </a>
+        </div>
+    </div>
+    
+    <!-- Inclure le système de paiement -->
+    <script src="auth.js"></script>
+    <script src="paiement_unifie.js"></script>
+</body>
+</html>

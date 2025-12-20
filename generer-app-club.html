@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Apps Clubs - PaieCashFan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #1a202c;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #667eea;
+        }
+
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .output {
+            margin-top: 40px;
+            padding: 25px;
+            background: #f7fafc;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .output h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .output pre {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .copy-btn:hover {
+            background: #38a169;
+        }
+
+        .instructions {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f59e0b;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #78350f;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Générateur d'Apps Clubs</h1>
+
+        <div class="instructions">
+            <h3>✅ Comment ça marche ?</h3>
+            <ol>
+                <li>Remplissez le formulaire avec les infos du club</li>
+                <li>Cliquez sur "Générer l'App"</li>
+                <li>Copiez le code HTML généré</li>
+                <li>Créez un fichier <code>app-NOM-CLUB.html</code></li>
+                <li>Collez le code et sauvegardez</li>
+            </ol>
+        </div>
+
+        <form id="clubForm">
+            <div class="form-group">
+                <label>Nom du Club *</label>
+                <input type="text" id="clubName" placeholder="ex: Paris FC" required>
+            </div>
+
+            <div class="form-group">
+                <label>Nom Court *</label>
+                <input type="text" id="clubShort" placeholder="ex: PFC" required>
+            </div>
+
+            <div class="form-group">
+                <label>URL du Logo</label>
+                <input type="url" id="clubLogo" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label>Couleur Principale (Gradient Début)</label>
+                <div class="color-inputs">
+                    <input type="color" id="color1" value="#1e3c72">
+                    <input type="text" id="color1Text" value="#1e3c72">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Couleur Secondaire (Gradient Fin)</label>
+                <div class="color-inputs">
+                    <input type="color" id="color2" value="#2a5298">
+                    <input type="text" id="color2Text" value="#2a5298">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Stade (pour Agent PaieCash)</label>
+                <input type="text" id="stade" placeholder="ex: Stade Charléty">
+            </div>
+
+            <div class="form-group">
+                <label>Nom du Coin (Crypto du Club)</label>
+                <input type="text" id="coinName" placeholder="ex: PFC Coin">
+            </div>
+
+            <button type="submit" class="btn">🚀 Générer l'App</button>
+        </form>
+
+        <div class="output" id="output">
+            <h2>✅ Code HTML Généré</h2>
+            <button class="copy-btn" onclick="copyCode()">📋 Copier le Code</button>
+            <pre id="generatedCode"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Sync color inputs
+        document.getElementById('color1').addEventListener('input', (e) => {
+            document.getElementById('color1Text').value = e.target.value;
+        });
+        document.getElementById('color1Text').addEventListener('input', (e) => {
+            document.getElementById('color1').value = e.target.value;
+        });
+        document.getElementById('color2').addEventListener('input', (e) => {
+            document.getElementById('color2Text').value = e.target.value;
+        });
+        document.getElementById('color2Text').addEventListener('input', (e) => {
+            document.getElementById('color2').value = e.target.value;
+        });
+
+        document.getElementById('clubForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clubName = document.getElementById('clubName').value;
+            const clubShort = document.getElementById('clubShort').value;
+            const clubLogo = document.getElementById('clubLogo').value || 'https://via.placeholder.com/150?text=' + clubShort;
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+            const stade = document.getElementById('stade').value || 'Stade Municipal';
+            const coinName = document.getElementById('coinName').value || clubShort + ' Coin';
+
+            const htmlCode = generateClubApp(clubName, clubShort, clubLogo, color1, color2, stade, coinName);
+
+            document.getElementById('generatedCode').textContent = htmlCode;
+            document.getElementById('output').style.display = 'block';
+            document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function generateClubApp(clubName, clubShort, clubLogo, color1, color2, stade, coinName) {
+            return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - ${clubName}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .club-logo-header { width: 50px; height: 50px; border-radius: 50%; background: white; }
+        .header-info h2 { font-size: 18px; }
+        .header-info p { font-size: 14px; opacity: 0.8; }
+        .menu {
+            display: flex;
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            gap: 10px;
+        }
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .menu-btn.active { background: white; color: ${color1}; }
+        .section { display: none; padding: 20px; }
+        .section.active { display: block; }
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+        .wallet-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .wallet-balance { font-size: 36px; font-weight: 700; }
+        .wallet-id { font-size: 14px; opacity: 0.9; margin-top: 10px; }
+        .transactions { margin-top: 20px; }
+        .transaction-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .transaction-item:hover { background: rgba(255, 255, 255, 0.2); }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .action-btn {
+            background: white;
+            color: ${color1};
+            padding: 20px;
+            border-radius: 15px;
+            border: none;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .action-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="${clubLogo}" class="club-logo-header" alt="${clubName}">
+            <div class="header-info">
+                <h2>${clubName}</h2>
+                <p>PaieCashFan</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <div style="text-align: right; font-size: 14px;">
+                <div>ETOT Constantin</div>
+                <div style="opacity: 0.8;">Platine 💎</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu">
+        <button class="menu-btn active" onclick="showSection('accueil')">🏠 Accueil</button>
+        <button class="menu-btn" onclick="showSection('fidelite')">🎖️ Fidélité</button>
+        <button class="menu-btn" onclick="showSection('legendes')">🌟 Légendes</button>
+        <button class="menu-btn" onclick="showSection('billetterie')">🎫 Billetterie NFT</button>
+        <button class="menu-btn" onclick="showSection('boutique')">🛍️ Boutique</button>
+        <button class="menu-btn" onclick="showSection('paiement')">💳 Paiement</button>
+        <button class="menu-btn" onclick="showSection('profil')">👤 Profil</button>
+    </div>
+
+    <!-- ACCUEIL -->
+    <div id="accueil" class="section active">
+        <h1 style="font-size: 28px; margin-bottom: 20px;">Bienvenue sur ${clubName}!</h1>
+        
+        <div class="wallet-card">
+            <div class="wallet-header">
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9;">Solde Total</div>
+                    <div class="wallet-balance">1 247,50 €</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; opacity: 0.8;">PaieCash Wallet</div>
+                    <div style="font-size: 14px; margin-top: 5px;">💳 Mastercard</div>
+                </div>
+            </div>
+            <div class="wallet-id">
+                N° 5234 8765 1234 5678<br>
+                Titulaire: ETOT CONSTANTIN<br>
+                Exp: 12/34
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 15px;">📊 Dernières Transactions</h3>
+        <div class="transactions">
+            <div class="transaction-item">
+                <div>
+                    <div style="font-weight: 600;">🍔 McDonald's Prado</div>
+                    <div style="font-size: 13px; opacity: 0.8;">Hier 14:32</div>
+                </div>
+                <div style="font-weight: 700; color: #ef4444;">-9,50 €</div>
+            </div>
+            <div class="transaction-item">
+                <div>
+                    <div style="font-weight: 600;">💵 Recharge Wallet</div>
+                    <div style="font-size: 13px; opacity: 0.8;">05/12 10:15</div>
+                </div>
+                <div style="font-weight: 700; color: #22c55e;">+50,00 €</div>
+            </div>
+            <div class="transaction-item">
+                <div>
+                    <div style="font-weight: 600;">👕 Boutique ${clubShort}</div>
+                    <div style="font-size: 13px; opacity: 0.8;">03/12 16:48</div>
+                </div>
+                <div style="font-weight: 700; color: #ef4444;">-89,90 €</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="action-btn" onclick="showSection('paiement')">💳 Paiement</button>
+            <button class="action-btn" onclick="showSection('boutique')">🛍️ Boutique</button>
+        </div>
+    </div>
+
+    <!-- FIDÉLITÉ -->
+    <div id="fidelite" class="section">
+        <h1>🎖️ Programme Fidélité</h1>
+        <div class="wallet-card" style="margin-top: 20px;">
+            <h3>Niveau Platine 💎</h3>
+            <p style="margin-top: 10px;">4,250 / 10,000 points</p>
+        </div>
+    </div>
+
+    <!-- LÉGENDES -->
+    <div id="legendes" class="section">
+        <h1>🌟 Légendes ${clubName}</h1>
+        <p style="margin-top: 20px;">Rencontrez les légendes du club...</p>
+    </div>
+
+    <!-- BILLETTERIE NFT -->
+    <div id="billetterie" class="section">
+        <h1>🎫 Billetterie NFT</h1>
+        <p style="margin-top: 20px;">Achetez vos billets en NFT...</p>
+    </div>
+
+    <!-- BOUTIQUE -->
+    <div id="boutique" class="section">
+        <h1>🛍️ Boutique ${clubName}</h1>
+        <p style="margin-top: 20px;">Découvrez nos produits exclusifs...</p>
+    </div>
+
+    <!-- PAIEMENT -->
+    <div id="paiement" class="section">
+        <h1>💳 Paiement</h1>
+        <div class="wallet-card" style="margin-top: 20px;">
+            <h3>💰 Stablecoins</h3>
+            <p style="margin-top: 10px;">USDC, USDT, ${coinName}</p>
+        </div>
+        <div class="wallet-card">
+            <h3>💵 Agent PaieCash</h3>
+            <p style="margin-top: 10px;">📍 ${stade}</p>
+            <p style="margin-top: 5px;">Cash In / Cash Out disponible</p>
+        </div>
+    </div>
+
+    <!-- PROFIL -->
+    <div id="profil" class="section">
+        <h1>👤 Mon Profil</h1>
+        <div class="wallet-card" style="margin-top: 20px;">
+            <h3>ETOT Constantin Nicolas</h3>
+            <p style="margin-top: 10px;">Fan de ${clubName}</p>
+            <p style="margin-top: 5px;">Membre depuis: 2024</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>`;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('generatedCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copié ! Créez maintenant un fichier HTML et collez le code.');
+            });
+        }
+    </script>
+</body>
+</html>

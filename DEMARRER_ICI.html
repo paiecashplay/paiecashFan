@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PaieCashPlay - La Super App des Fans OM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0e9cda 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animation arrière-plan */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(14, 156, 218, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(14, 156, 218, 0.2) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, -20px); }
+        }
+        
+        .landing-container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 35px;
+            padding: 50px 35px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-hero {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .logo-hero img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logo-hero h1 {
+            font-size: 32px;
+            color: #0e9cda;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+        
+        .logo-hero p {
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .features-list {
+            margin: 35px 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .features-list li {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .features-list li:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        }
+        
+        .features-list li span {
+            font-size: 20px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0e9cda 0%, #0c7db3 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(14, 156, 218, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(14, 156, 218, 0.6);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0e9cda;
+            border: 3px solid #0e9cda;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f9ff;
+            transform: translateY(-3px);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+        }
+        
+        .divider::before {
+            left: 0;
+        }
+        
+        .divider::after {
+            right: 0;
+        }
+        
+        .info-badge {
+            text-align: center;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+        
+        .info-badge p {
+            font-size: 13px;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        
+        .info-badge strong {
+            color: #1b5e20;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .landing-container {
+                padding: 35px 25px;
+            }
+            
+            .logo-hero h1 {
+                font-size: 28px;
+            }
+            
+            .features-list li {
+                font-size: 14px;
+            }
+            
+            .btn {
+                font-size: 16px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <div class="logo-hero">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM">
+            <h1>PaieCashPlay</h1>
+            <p>La Super App des Fans OM</p>
+        </div>
+        
+        <ul class="features-list">
+            <li><span>⚽</span> Réseau social des supporters</li>
+            <li><span>🎟️</span> Billetterie & Réservations</li>
+            <li><span>🛍️</span> Boutique officielle + Fan-to-Fan</li>
+            <li><span>💰</span> Wallet multi-devises (EUR, OM Coin, EURC, USDT)</li>
+            <li><span>💳</span> Paiement 100% PaieCash + BNPL</li>
+            <li><span>🏆</span> Programme de fidélité & Badges</li>
+            <li><span>🎁</span> Missions & Cashback</li>
+            <li><span>📱</span> Transfert P2P instantané</li>
+        </ul>
+        
+        <div class="cta-buttons">
+            <a href="inscription.html" class="btn btn-primary">
+                ✨ Créer mon compte
+            </a>
+            
+            <div class="divider">ou</div>
+            
+            <a href="connexion.html" class="btn btn-secondary">
+                🔓 Se connecter
+            </a>
+        </div>
+        
+        <div class="info-badge">
+            <p>🎁 <strong>100 points de bienvenue</strong> offerts à l'inscription !</p>
+        </div>
+    </div>
+    
+    <script>
+        // Vérifier si l'utilisateur est déjà connecté
+        window.addEventListener('load', function() {
+            const utilisateurConnecte = localStorage.getItem('utilisateurConnecte');
+            if (utilisateurConnecte) {
+                const utilisateur = JSON.parse(utilisateurConnecte);
+                if (confirm(`👋 Bonjour ${utilisateur.prenom} !\n\nVous êtes déjà connecté.\nVoulez-vous accéder à l'application ?`)) {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

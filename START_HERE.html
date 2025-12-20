@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 PaieCashFan V12.6 - Démarrage Rapide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .header .version {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .card-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .card-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+        }
+        .btn-purple {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+        }
+        .btn-purple:hover {
+            box-shadow: 0 12px 30px rgba(168, 85, 247, 0.4);
+        }
+        .highlight {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        .highlight h3 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PaieCashFan V12.6</h1>
+            <div class="version">15 Transactions de Démonstration Automatiques</div>
+        </div>
+        
+        <div class="cards">
+            <div class="card" onclick="window.location.href='OUVRIR_APP_TRANSACTIONS_V12.6.html'">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">Démarrage Rapide</div>
+                <div class="card-description">
+                    Ouvrez directement l'app avec les 15 transactions de démonstration déjà générées. 
+                    Redirection automatique en 3 secondes.
+                </div>
+                <button class="btn">🚀 Ouvrir l'App (Recommandé)</button>
+            </div>
+            
+            <div class="card" onclick="window.location.href='app-universal-simple.html?club=olympique-de-marseille'">
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Accès Direct</div>
+                <div class="card-description">
+                    Accédez directement à l'application sans page intermédiaire. 
+                    Les transactions se génèrent automatiquement.
+                </div>
+                <button class="btn btn-secondary">⚡ Accès Immédiat</button>
+            </div>
+            
+            <div class="card" onclick="window.location.href='index.html'">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">Sélection de Club</div>
+                <div class="card-description">
+                    Commencez par la page d'accueil pour choisir parmi 448+ clubs et équipes disponibles.
+                </div>
+                <button class="btn btn-purple">🏠 Page d'Accueil</button>
+            </div>
+        </div>
+        
+        <div class="highlight">
+            <h3>✨ Nouveau dans V12.6</h3>
+            <p style="margin-bottom: 15px;">
+                <strong>15 transactions de démonstration</strong> générées automatiquement au chargement :
+            </p>
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li>🛍️ <strong>7 achats en boutique</strong> (Maillots, Écharpe, Ballon, etc.)</li>
+                <li>💎 <strong>2 recharges Stablecoin</strong> (OMC, USDC)</li>
+                <li>🌐 <strong>2 paiements Crypto</strong> (BTC, ETH)</li>
+                <li>🇨🇳 <strong>2 paiements Alipay</strong></li>
+                <li>💬 <strong>1 paiement WeChat Pay</strong></li>
+                <li>💰 <strong>1 transfert Fan-to-Fan</strong></li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
+                📊 Total : ~740€ dépensé, 350€ rechargé, 32€ de cashback gagné sur 7 jours
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 30px; background: rgba(0, 0, 0, 0.2); border-radius: 15px;">
+            <h3 style="margin-bottom: 15px;">📚 Documentation</h3>
+            <p style="margin-bottom: 20px; opacity: 0.9;">
+                Consultez la documentation complète pour plus d'informations
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn" style="width: auto;" onclick="window.open('README.md')">📖 README</button>
+                <button class="btn btn-secondary" style="width: auto;" onclick="alert('Fichiers de documentation :\n\n• 📄_AJOUT_TRANSACTIONS_DEMO_V12.6.md\n• ⚡_RÉSUMÉ_V12.6.md\n• 🎉_MISSION_ACCOMPLIE_V12.6.md\n• 🎊_SYNTHÈSE_FINALE_V12.6.md')">📄 Documentation Technique</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

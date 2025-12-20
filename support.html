@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>Support & Aide - PaieCashPlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --accent: #ff3366;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0a0e1a;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1e293b 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .support-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .support-header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .support-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+        }
+
+        .support-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .support-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        /* Contact Methods */
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.2);
+        }
+
+        .contact-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+        }
+
+        .contact-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .contact-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            font-size: 15px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin: 60px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .faq-category-btn {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .faq-category-btn:hover,
+        .faq-category-btn.active {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--secondary);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .faq-question h4 {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .faq-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 25px 25px 25px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* Ticket Form */
+        .ticket-section {
+            max-width: 700px;
+            margin: 60px auto;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ticket-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .ticket-section p {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message i {
+            font-size: 50px;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+
+        .success-message h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        .quick-link-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quick-link-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        .quick-link-card i {
+            font-size: 28px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .quick-link-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .support-header {
+                padding: 40px 20px 30px;
+            }
+
+            .support-header h1 {
+                font-size: 28px;
+            }
+
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .ticket-section {
+                padding: 30px 20px;
+            }
+
+            .back-button {
+                left: 10px;
+                top: 10px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .faq-categories {
+                gap: 10px;
+            }
+
+            .faq-category-btn {
+                font-size: 13px;
+                padding: 10px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="support-container">
+        
+        <button class="back-button" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour</span>
+        </button>
+
+        <!-- Header -->
+        <div class="support-header">
+            <div class="support-logo">💬</div>
+            <h1>Support & Aide</h1>
+            <p>Nous sommes là pour vous aider 24/7</p>
+        </div>
+
+        <!-- Contact Methods -->
+        <div class="contact-methods">
+            <div class="contact-card" onclick="openChat()">
+                <div class="contact-icon">💬</div>
+                <h3>Chat en direct</h3>
+                <p>Réponse immédiate par notre équipe</p>
+                <div class="contact-info">Démarrer le chat</div>
+                <span class="status-badge">● En ligne</span>
+            </div>
+
+            <div class="contact-card" onclick="openEmail()">
+                <div class="contact-icon">📧</div>
+                <h3>Email</h3>
+                <p>Réponse sous 2h en moyenne</p>
+                <div class="contact-info">support@paiecashplay.com</div>
+                <span class="status-badge">● Disponible</span>
+            </div>
+
+            <div class="contact-card" onclick="openPhone()">
+                <div class="contact-icon">📞</div>
+                <h3>Téléphone</h3>
+                <p>Service client 24/7</p>
+                <div class="contact-info">+33 1 84 80 12 34</div>
+                <span class="status-badge">● Ouvert</span>
+            </div>
+
+            <div class="contact-card" onclick="openWhatsApp()">
+                <div class="contact-icon">💚</div>
+                <h3>WhatsApp</h3>
+                <p>Support rapide sur mobile</p>
+                <div class="contact-info">Envoyer un message</div>
+                <span class="status-badge">● Actif</span>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <div class="quick-link-card" onclick="scrollToFAQ('wallet')">
+                <i class="fas fa-wallet"></i>
+                <h4>Aide Wallet</h4>
+            </div>
+            <div class="quick-link-card" onclick="scrollToFAQ('tickets')">
+                <i class="fas fa-ticket-alt"></i>
+                <h4>Aide Billets</h4>
+            </div>
+            <div class="quick-link-card" onclick="scrollToFAQ('security')">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Sécurité</h4>
+            </div>
+            <div class="quick-link-card" onclick="scrollToFAQ('payment')">
+                <i class="fas fa-credit-card"></i>
+                <h4>Paiements</h4>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section" id="faqSection">
+            <h2 class="section-title">Questions Fréquentes (FAQ)</h2>
+            
+            <div class="faq-categories">
+                <button class="faq-category-btn active" onclick="filterFAQ('all')">Toutes</button>
+                <button class="faq-category-btn" onclick="filterFAQ('wallet')">Wallet</button>
+                <button class="faq-category-btn" onclick="filterFAQ('tickets')">Billets NFT</button>
+                <button class="faq-category-btn" onclick="filterFAQ('payment')">Paiements</button>
+                <button class="faq-category-btn" onclick="filterFAQ('security')">Sécurité</button>
+                <button class="faq-category-btn" onclick="filterFAQ('account')">Compte</button>
+            </div>
+
+            <div class="faq-list" id="faqList">
+                <!-- Wallet FAQs -->
+                <div class="faq-item" data-category="wallet">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment recharger mon wallet PaieCashPlay ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Vous pouvez recharger votre wallet de 3 façons :</p>
+                            <p><strong>1. Carte bancaire :</strong> Allez dans Paiement > Recharger > Sélectionnez le montant > Entrez vos coordonnées bancaires.</p>
+                            <p><strong>2. Virement bancaire :</strong> Utilisez l'IBAN fourni dans votre profil et mentionnez votre ID utilisateur.</p>
+                            <p><strong>3. Crypto-monnaie :</strong> Sélectionnez votre crypto (BTC, ETH, USDT...) > Copiez l'adresse de dépôt > Envoyez depuis votre wallet externe.</p>
+                            <p>Les fonds sont disponibles instantanément pour carte bancaire, sous 24-48h pour crypto, et 2-5 jours pour virement bancaire.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="wallet">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Quels sont les frais de transaction ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Paiements en PFC Coin :</strong> 0% de frais</p>
+                            <p><strong>Paiements par carte :</strong> 0% de frais</p>
+                            <p><strong>Paiements crypto :</strong> Frais réseau blockchain uniquement (variables selon la crypto)</p>
+                            <p><strong>Retraits :</strong></p>
+                            <p>- Virement bancaire : 2€</p>
+                            <p>- Crypto : Frais réseau uniquement</p>
+                            <p><strong>Bonus :</strong> Cashback de 10-15% sur tous vos achats !</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="wallet">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment retirer mon argent ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Pour retirer vos fonds :</p>
+                            <p><strong>Virement bancaire :</strong> Wallet > Retirer > Virement > Entrez le montant > Confirmez (2-5 jours ouvrés)</p>
+                            <p><strong>Crypto :</strong> Wallet > Retirer > Crypto > Choisissez la devise > Entrez l'adresse de destination > Confirmez (24-48h)</p>
+                            <p><strong>Limites :</strong></p>
+                            <p>- Sans KYC : 1 000€ max/mois</p>
+                            <p>- Avec KYC : 50 000€ max/mois</p>
+                            <p>Les retraits sont traités sous 24-48h.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tickets FAQs -->
+                <div class="faq-item" data-category="tickets">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment fonctionnent les NFT Tickets ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Les NFT Tickets sont des billets de match sécurisés par blockchain :</p>
+                            <p><strong>Avantages :</strong></p>
+                            <p>• Impossible à falsifier (blockchain)</p>
+                            <p>• QR Code unique pour l'entrée</p>
+                            <p>• Transférable à vos amis via l'app</p>
+                            <p>• Garde mémoire de tous vos matchs</p>
+                            <p>• Valeur de collection</p>
+                            <p><strong>Utilisation :</strong> Présentez simplement le QR Code à l'entrée du stade depuis votre app. Le code s'active 1h avant le match.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="tickets">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Puis-je me faire rembourser mon billet ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Remboursement possible dans ces cas :</strong></p>
+                            <p>• Match annulé ou reporté : Remboursement automatique à 100%</p>
+                            <p>• Blessure/urgence médicale : Sur justificatif (- 10% de frais)</p>
+                            <p>• Changement de date incompatible : Remboursement à 80%</p>
+                            <p><strong>Non remboursable :</strong></p>
+                            <p>• Simple changement d'avis</p>
+                            <p>• Demande dans les 24h avant le match</p>
+                            <p><strong>Alternative :</strong> Vous pouvez revendre ou transférer votre billet à un autre utilisateur gratuitement via l'app.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment FAQs -->
+                <div class="faq-item" data-category="payment">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Quelles cryptomonnaies sont acceptées ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>PaieCashPlay accepte 8 cryptomonnaies majeures :</p>
+                            <p>• <strong>Bitcoin (BTC)</strong> - La plus populaire</p>
+                            <p>• <strong>Ethereum (ETH)</strong> - Rapide et sûr</p>
+                            <p>• <strong>Tether (USDT)</strong> - Stablecoin 1:1 avec USD</p>
+                            <p>• <strong>USD Coin (USDC)</strong> - Stablecoin régulé</p>
+                            <p>• <strong>Binance Coin (BNB)</strong> - Frais réseau bas</p>
+                            <p>• <strong>Litecoin (LTC)</strong> - Transactions ultra-rapides</p>
+                            <p>• <strong>DAI</strong> - Stablecoin décentralisé</p>
+                            <p>• <strong>BUSD</strong> - Stablecoin Binance</p>
+                            <p>Conversion automatique en temps réel vers Euro ou PFC Coin.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="payment">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment fonctionne le paiement NFC sans contact ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Utilisez votre smartphone comme carte bancaire :</p>
+                            <p><strong>Activation :</strong></p>
+                            <p>1. Allez dans Paiement > NFC</p>
+                            <p>2. Activez le paiement sans contact</p>
+                            <p>3. Configurez votre code PIN</p>
+                            <p><strong>Utilisation :</strong></p>
+                            <p>• Au stade : Approchez votre téléphone du terminal</p>
+                            <p>• En boutique officielle : Paiement instantané</p>
+                            <p>• Limite sans PIN : 50€</p>
+                            <p>• Au-delà : Entrez votre code PIN ou validez par biométrie</p>
+                            <p><strong>Sécurité :</strong> Cryptage de bout en bout + authentification biométrique.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security FAQs -->
+                <div class="faq-item" data-category="security">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment mes cryptos sont-elles sécurisées ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Protection multi-niveaux :</strong></p>
+                            <p>• <strong>Cold Wallet :</strong> 95% des cryptos stockées hors ligne</p>
+                            <p>• <strong>Cryptage SSL 256-bit :</strong> Norme bancaire mondiale</p>
+                            <p>• <strong>Authentification 2FA :</strong> Double vérification obligatoire</p>
+                            <p>• <strong>Biométrie :</strong> Face ID / Touch ID</p>
+                            <p>• <strong>Sauvegarde sécurisée :</strong> Clés privées récupérables</p>
+                            <p>• <strong>KYC / AML :</strong> Vérification d'identité pour gros montants</p>
+                            <p>• <strong>Assurance :</strong> Protection contre fraude et piratage</p>
+                            <p><strong>Certifications :</strong> PCI DSS Level 1, ISO 27001, SOC 2 Type II</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="security">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Que faire si je perds mon téléphone ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Procédure d'urgence :</strong></p>
+                            <p>1. <strong>Bloquez immédiatement votre compte</strong> depuis un autre appareil ou en appelant le +33 1 84 80 12 34</p>
+                            <p>2. <strong>Changez votre mot de passe</strong> via l'email de récupération</p>
+                            <p>3. <strong>Révoquez l'accès</strong> de l'appareil perdu dans vos paramètres</p>
+                            <p><strong>Récupération :</strong></p>
+                            <p>• Vos fonds sont sécurisés par mot de passe + 2FA</p>
+                            <p>• Impossible d'accéder sans biométrie ou code PIN</p>
+                            <p>• Réinstallez l'app sur nouveau téléphone</p>
+                            <p>• Reconnectez-vous avec vos identifiants</p>
+                            <p>• Tous vos fonds et données sont restaurés</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account FAQs -->
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Comment parrainer mes amis ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Gagnez 15€ par ami inscrit :</strong></p>
+                            <p>1. Allez dans Profil > Parrainage</p>
+                            <p>2. Copiez votre code de parrainage unique</p>
+                            <p>3. Partagez par WhatsApp, SMS ou réseaux sociaux</p>
+                            <p>4. Votre ami s'inscrit avec votre code</p>
+                            <p>5. Il effectue sa 1ère recharge (minimum 20€)</p>
+                            <p>6. Vous recevez tous les deux 15€ de bonus</p>
+                            <p><strong>Bonus supplémentaire :</strong></p>
+                            <p>• 5% de commission sur tous ses gains à vie</p>
+                            <p>• Pas de limite au nombre de parrainages</p>
+                            <p>• Retraits instantanés des gains de parrainage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h4>Qu'est-ce que le système de niveaux ?</h4>
+                        <div class="faq-icon">▼</div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>5 niveaux avec avantages exclusifs :</strong></p>
+                            <p>🥉 <strong>Bronze</strong> (0-500 points) : Cashback 10%</p>
+                            <p>🥈 <strong>Argent</strong> (501-1500 points) : Cashback 12% + 1 billet prioritaire/mois</p>
+                            <p>🥇 <strong>Or</strong> (1501-3000 points) : Cashback 13% + 2 billets prioritaires + Invitations événements</p>
+                            <p>💎 <strong>Platine</strong> (3001-5000 points) : Cashback 14% + Billets VIP + Meet & Greet joueurs</p>
+                            <p>👑 <strong>Légende</strong> (5000+ points) : Cashback 15% + All Access + Voyages officiels</p>
+                            <p><strong>Gagnez des points :</strong> 1 point = 1€ dépensé + missions quotidiennes + parrainages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Form -->
+        <div class="ticket-section" id="ticketSection">
+            <h2>Créer un ticket de support</h2>
+            <p>Notre équipe vous répondra dans les 2 heures</p>
+            
+            <form id="supportForm" onsubmit="submitTicket(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">Prénom *</label>
+                        <input type="text" id="firstName" required placeholder="Jean">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Nom *</label>
+                        <input type="text" id="lastName" required placeholder="Dupont">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required placeholder="jean.dupont@example.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Catégorie *</label>
+                        <select id="category" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            <option value="wallet">Wallet & Paiements</option>
+                            <option value="tickets">Billets NFT</option>
+                            <option value="account">Mon Compte</option>
+                            <option value="security">Sécurité</option>
+                            <option value="technical">Problème Technique</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priorité *</label>
+                        <select id="priority" required>
+                            <option value="">Sélectionnez une priorité</option>
+                            <option value="low">Basse</option>
+                            <option value="medium">Moyenne</option>
+                            <option value="high">Haute</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Sujet *</label>
+                    <input type="text" id="subject" required placeholder="Décrivez brièvement votre problème">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message détaillé *</label>
+                    <textarea id="message" required placeholder="Décrivez votre problème en détail. Plus vous donnez d'informations, plus nous pourrons vous aider rapidement."></textarea>
+                </div>
+
+                <button type="submit" class="submit-button" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Envoyer le ticket
+                </button>
+            </form>
+
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <h3>Ticket créé avec succès !</h3>
+                <p>Votre ticket #<span id="ticketNumber"></span> a été créé. Nous vous répondrons sous 2h par email.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle FAQ
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            allItems.forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            faqItem.classList.toggle('active');
+        }
+
+        // Filter FAQ
+        function filterFAQ(category) {
+            const buttons = document.querySelectorAll('.faq-category-btn');
+            const items = document.querySelectorAll('.faq-item');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+                item.classList.remove('active');
+            });
+        }
+
+        // Scroll to FAQ
+        function scrollToFAQ(category) {
+            document.getElementById('faqSection').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => filterFAQ(category), 500);
+        }
+
+        // Submit Ticket
+        function submitTicket(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                const ticketNumber = Math.floor(100000 + Math.random() * 900000);
+                document.getElementById('ticketNumber').textContent = ticketNumber;
+                document.getElementById('successMessage').classList.add('show');
+                document.getElementById('supportForm').reset();
+                
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer le ticket';
+                
+                // Scroll to success message
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+
+        // Contact methods
+        function openChat() {
+            alert('Fonctionnalité de chat en direct à venir. Pour l\'instant, utilisez le formulaire de ticket ci-dessous.');
+        }
+
+        function openEmail() {
+            window.location.href = 'mailto:support@paiecashplay.com?subject=Demande de support';
+        }
+
+        function openPhone() {
+            window.location.href = 'tel:+33184801234';
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/33184801234?text=Bonjour, j\'ai besoin d\'aide avec PaieCashPlay', '_blank');
+        }
+    </script>
+</body>
+</html>

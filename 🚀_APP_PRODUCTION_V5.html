@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Clubs Professionnels & Amateurs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .header .season {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-top: 10px;
+        }
+
+        .search-filter {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: border 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .clubs-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-badge {
+            background: rgba(255,255,255,0.3);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .club-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .club-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .club-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .club-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-size: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .club-logo img {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+        }
+
+        .club-name {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .club-info {
+            text-align: center;
+            font-size: 15px;
+            color: #718096;
+            margin-bottom: 12px;
+        }
+
+        .club-status {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-ligue1 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-ligue2 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-nouveau {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-releve {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .info-banner h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .info-banner p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .header .season {
+                font-size: 20px;
+            }
+            
+            .clubs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .club-card {
+                padding: 20px;
+            }
+
+            .club-logo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .club-logo img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .club-name {
+                font-size: 16px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚽ PaieCashFan</h1>
+            <p>Tous les clubs professionnels français</p>
+            <div class="season">🏆 Saison 2025/2026</div>
+        </div>
+
+        <div class="info-banner">
+            <h3>🌍 Vision Globale PaieCashFan</h3>
+            <p>📍 Clubs Professionnels (Ligue 1 & Ligue 2) + 🏘️ Clubs Amateurs FFF + 🌐 Toutes les Fédérations</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">36</div>
+                <div class="stat-label">Clubs Pros</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18</div>
+                <div class="stat-label">Ligue 1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18</div>
+                <div class="stat-label">Ligue 2</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">13,000+</div>
+                <div class="stat-label">Clubs Amateurs FFF</div>
+            </div>
+        </div>
+
+        <div class="search-filter">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Rechercher un club (ex: PSG, Marseille, Paris FC...)">
+            <div class="filter-tabs">
+                <button class="filter-btn active" onclick="filterClubs('all')">Tous les Clubs</button>
+                <button class="filter-btn" onclick="filterClubs('ligue1')">🏆 Ligue 1</button>
+                <button class="filter-btn" onclick="filterClubs('ligue2')">⚡ Ligue 2</button>
+            </div>
+        </div>
+
+        <div class="clubs-section" id="ligue1Section">
+            <h2 class="section-title">
+                <span>🏆 Ligue 1 McDonald's 2025/2026</span>
+                <span class="section-badge">18 clubs</span>
+            </h2>
+            <div class="clubs-grid" id="ligue1Grid"></div>
+        </div>
+
+        <div class="clubs-section" id="ligue2Section">
+            <h2 class="section-title">
+                <span>⚡ Ligue 2 BKT 2025/2026</span>
+                <span class="section-badge">18 clubs</span>
+            </h2>
+            <div class="clubs-grid" id="ligue2Grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // DONNÉES EXACTES SAISON 2025-2026
+        // Basé sur les résultats 2024-2025 (mise à jour: Décembre 2025)
+        
+        const clubsLigue1 = [
+            { name: 'Paris Saint-Germain', short: 'PSG', emoji: '🔴🔵', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg', status: 'Champion 24/25' },
+            { name: 'Olympique de Marseille', short: 'OM', emoji: '⚪🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg', status: 'App Disponible ✅' },
+            { name: 'AS Monaco', short: 'Monaco', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/Logo_AS_Monaco.svg', status: '' },
+            { name: 'Olympique Lyonnais', short: 'OL', emoji: '🔵⚪🔴', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Olympique_Lyonnais_logo.svg', status: '' },
+            { name: 'Lille OSC', short: 'LOSC', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/35/Lille_OSC_logo.svg', status: '' },
+            { name: 'RC Lens', short: 'Lens', emoji: '🟡🔴', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/55/Racing_Club_de_Lens_logo.svg', status: '' },
+            { name: 'OGC Nice', short: 'Nice', emoji: '🔴⚫', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/OGC_Nice_logo.svg', status: '' },
+            { name: 'Stade Rennais', short: 'Rennes', emoji: '🔴⚫', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Stade_Rennais_FC_logo.svg', status: '' },
+            { name: 'RC Strasbourg', short: 'Strasbourg', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Racing_Club_de_Strasbourg_logo.svg', status: '' },
+            { name: 'Toulouse FC', short: 'Toulouse', emoji: '🟣⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/55/Toulouse_FC_logo.svg', status: '' },
+            { name: 'Montpellier HSC', short: 'Montpellier', emoji: '🔵🟠', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Montpellier_HSC_logo.svg', status: '' },
+            { name: 'FC Nantes', short: 'Nantes', emoji: '🟡🟢', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/66/FC_Nantes_logo.svg', status: '' },
+            { name: 'Stade Brestois', short: 'Brest', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Stade_Brestois_29_logo.svg', status: '' },
+            { name: 'Stade de Reims', short: 'Reims', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/60/Stade_de_Reims_logo.svg', status: '' },
+            { name: 'Le Havre AC', short: 'Le Havre', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Le_Havre_AC_logo.svg', status: '' },
+            { name: 'AJ Auxerre', short: 'Auxerre', emoji: '⚪🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/62/AJ_Auxerre_logo.svg', status: '' },
+            { name: 'Angers SCO', short: 'Angers', emoji: '⚫⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Angers_SCO_logo.svg', status: '' },
+            { name: 'Paris FC', short: 'Paris FC', emoji: '🔵⚪🔴', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Paris_FC_logo_%282020%29.svg', status: 'App Disponible ✅', nouveau: true }
+        ];
+
+        const clubsLigue2 = [
+            { name: 'FC Lorient', short: 'Lorient', emoji: '🟠⚫', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/FC_Lorient_logo.svg' },
+            { name: 'ESTAC Troyes', short: 'Troyes', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/ESTAC_Troyes_logo.svg' },
+            { name: 'Clermont Foot', short: 'Clermont', emoji: '🔴🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/39/Clermont_Foot_63_logo.svg' },
+            { name: 'AC Ajaccio', short: 'Ajaccio', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/AC_Ajaccio_logo.svg' },
+            { name: 'EA Guingamp', short: 'Guingamp', emoji: '🔴⚫', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/73/En_Avant_Guingamp_logo.svg' },
+            { name: 'Grenoble Foot 38', short: 'Grenoble', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Grenoble_Foot_38_logo.svg' },
+            { name: 'Rodez AF', short: 'Rodez', emoji: '🔴🟡', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Rodez_AF_logo.svg' },
+            { name: 'Pau FC', short: 'Pau', emoji: '🟡🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Pau_FC_logo.svg' },
+            { name: 'USL Dunkerque', short: 'Dunkerque', emoji: '⚪🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/58/USL_Dunkerque_logo.svg' },
+            { name: 'SM Caen', short: 'Caen', emoji: '🔴🔵', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/SM_Caen_logo.svg' },
+            { name: 'Amiens SC', short: 'Amiens', emoji: '⚪⚫', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Amiens_SC_logo.svg' },
+            { name: 'SC Bastia', short: 'Bastia', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/SC_Bastia_logo.svg' },
+            { name: 'Stade Lavallois', short: 'Laval', emoji: '🟠⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/37/Stade_Lavallois_logo.svg' },
+            { name: 'FC Annecy', short: 'Annecy', emoji: '🔴⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/48/FC_Annecy_logo.svg' },
+            { name: 'FC Martigues', short: 'Martigues', emoji: '🔵⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/FC_Martigues_logo.svg' },
+            { name: 'Red Star FC', short: 'Red Star', emoji: '🟢⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Red_Star_FC_logo.svg' },
+            { name: 'FC Metz', short: 'Metz', emoji: '🔴🟡', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/FC_Metz_logo.svg', releve: true },
+            { name: 'AS Saint-Étienne', short: 'ASSE', emoji: '🟢⚪', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/62/AS_Saint-%C3%89tienne_logo.svg', releve: true }
+        ];
+
+        // AFFICHAGE DES CLUBS
+        function displayClubs() {
+            const ligue1Grid = document.getElementById('ligue1Grid');
+            const ligue2Grid = document.getElementById('ligue2Grid');
+
+            ligue1Grid.innerHTML = clubsLigue1.map(club => createClubCard(club, 'ligue1')).join('');
+            ligue2Grid.innerHTML = clubsLigue2.map(club => createClubCard(club, 'ligue2')).join('');
+        }
+
+        function createClubCard(club, ligue) {
+            const nouveauBadge = club.nouveau ? '<span class="club-status status-nouveau">⬆️ PROMU 2025</span>' : '';
+            const releveBadge = club.releve ? '<span class="club-status status-releve">⬇️ RELÉGUÉ 2025</span>' : '';
+            const statusClass = ligue === 'ligue1' ? 'status-ligue1' : 'status-ligue2';
+            const ligueLabel = ligue === 'ligue1' ? 'LIGUE 1' : 'LIGUE 2';
+
+            return `
+                <div class="club-card" data-ligue="${ligue}" data-name="${club.name.toLowerCase()}" onclick="selectClub('${club.short}', '${club.name}')">
+                    <div class="club-logo">
+                        <img src="${club.logo}" alt="${club.name}" onerror="this.parentElement.innerHTML='${club.emoji}'">
+                    </div>
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-info">${club.short}${club.status ? ' • ' + club.status : ''}</div>
+                    <span class="club-status ${statusClass}">${ligueLabel}</span>
+                    ${nouveauBadge}
+                    ${releveBadge}
+                </div>
+            `;
+        }
+
+        // RECHERCHE
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const search = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.club-card');
+            
+            cards.forEach(card => {
+                const name = card.dataset.name;
+                card.style.display = name.includes(search) ? 'block' : 'none';
+            });
+        });
+
+        // FILTRES
+        function filterClubs(filter) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const ligue1Section = document.getElementById('ligue1Section');
+            const ligue2Section = document.getElementById('ligue2Section');
+
+            if (filter === 'all') {
+                ligue1Section.classList.remove('hidden');
+                ligue2Section.classList.remove('hidden');
+            } else if (filter === 'ligue1') {
+                ligue1Section.classList.remove('hidden');
+                ligue2Section.classList.add('hidden');
+            } else if (filter === 'ligue2') {
+                ligue1Section.classList.add('hidden');
+                ligue2Section.classList.remove('hidden');
+            }
+        }
+
+        // SÉLECTION CLUB
+        function selectClub(short, name) {
+            // Redirection vers l'app du club
+            if (short === 'OM') {
+                window.location.href = 'app-om-COMPLET.html';
+            } else if (short === 'Paris FC') {
+                window.location.href = 'app-paris-fc-COMPLET.html';
+            } else {
+                alert(`🚀 ${name} - PaieCashFan\n\n✅ Apps Disponibles:\n• Olympique de Marseille (OM)\n• Paris FC\n\n🔜 ${name} arrive bientôt!\n\n🌍 Vision: 36 clubs pros + 13,000+ clubs amateurs FFF`);
+            }
+        }
+
+        // INITIALISATION
+        displayClubs();
+    </script>
+</body>
+</html>

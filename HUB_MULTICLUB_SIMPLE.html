@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Associations Sportives</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #60a5fa;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            color: #94a3b8;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(96, 165, 250, 0.1);
+            padding: 20px 40px;
+            border-radius: 10px;
+            border: 2px solid #3b82f6;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin: 50px 0 30px;
+            text-align: center;
+            color: #60a5fa;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .club-card:hover {
+            transform: translateY(-10px);
+            border-color: #60a5fa;
+            box-shadow: 0 10px 30px rgba(96, 165, 250, 0.3);
+        }
+
+        .club-card.active {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .club-card.coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .club-card.coming-soon:hover {
+            transform: none;
+        }
+
+        .club-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+
+        .club-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .club-stadium {
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .club-status {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-coming {
+            background: #64748b;
+            color: white;
+        }
+
+        .features {
+            background: rgba(96, 165, 250, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 50px;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #60a5fa;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏆 PaieCashFan 🏆</h1>
+            <p>Associations Sportives Disponibles</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Clubs Actifs</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">À Venir</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Championnats</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clubs Actifs -->
+        <h2 class="section-title">⭐ Clubs Disponibles</h2>
+        
+        <div class="clubs-grid">
+            <!-- Olympique de Marseille -->
+            <div class="club-card active" onclick="goToClub('om')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" 
+                     alt="OM" class="club-logo">
+                <div class="club-name">Olympique de Marseille</div>
+                <div class="club-stadium">🏟️ Stade Vélodrome</div>
+                <div class="club-stadium">👥 67,000 places</div>
+                <div class="club-status status-active">✅ Opérationnel</div>
+            </div>
+
+            <!-- Paris FC -->
+            <div class="club-card active" onclick="goToClub('paris-fc')">
+                <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/2/22/Paris_FC_logo_2020.svg/1200px-Paris_FC_logo_2020.svg.png" 
+                     alt="Paris FC" class="club-logo">
+                <div class="club-name">Paris FC</div>
+                <div class="club-stadium">🏟️ Stade Jean Bouin</div>
+                <div class="club-stadium">👥 20,000 places</div>
+                <div class="club-status status-active">✅ Opérationnel - NOUVEAU !</div>
+            </div>
+        </div>
+
+        <!-- Clubs à Venir -->
+        <h2 class="section-title">⏳ Prochainement</h2>
+        
+        <div class="clubs-grid">
+            <!-- PSG -->
+            <div class="club-card coming-soon">
+                <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/c/c7/Logo_Paris_Saint-Germain_2023.svg/1200px-Logo_Paris_Saint-Germain_2023.svg.png" 
+                     alt="PSG" class="club-logo">
+                <div class="club-name">Paris Saint-Germain</div>
+                <div class="club-stadium">🏟️ Parc des Princes</div>
+                <div class="club-status status-coming">⏳ Bientôt</div>
+            </div>
+
+            <!-- OL -->
+            <div class="club-card coming-soon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Olympique_lyonnais_%28logo%29.svg/1200px-Olympique_lyonnais_%28logo%29.svg.png" 
+                     alt="OL" class="club-logo">
+                <div class="club-name">Olympique Lyonnais</div>
+                <div class="club-stadium">🏟️ Groupama Stadium</div>
+                <div class="club-status status-coming">⏳ Bientôt</div>
+            </div>
+
+            <!-- Monaco -->
+            <div class="club-card coming-soon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/AS_Monaco_FC.svg/1200px-AS_Monaco_FC.svg.png" 
+                     alt="Monaco" class="club-logo">
+                <div class="club-name">AS Monaco</div>
+                <div class="club-stadium">🏟️ Stade Louis II</div>
+                <div class="club-status status-coming">⏳ Bientôt</div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <h2>🌍 Paiements Globaux Disponibles</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🇨🇳</div>
+                    <div class="feature-title">Alipay</div>
+                    <div class="feature-desc">Paiement en Yuan (CNY)<br>1B+ utilisateurs</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">💎</div>
+                    <div class="feature-title">Stablecoin</div>
+                    <div class="feature-desc">USDC/USDT<br>Cashback 5%</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🌍</div>
+                    <div class="feature-title">Mobile Money</div>
+                    <div class="feature-desc">Orange, M-Pesa, MTN<br>400M+ users Afrique</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">💳</div>
+                    <div class="feature-title">Carte Bancaire</div>
+                    <div class="feature-desc">Visa, Mastercard<br>Paiement classique</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('✅ Hub MultiClub chargé avec succès !');
+        console.log('📊 2 clubs opérationnels : OM + Paris FC');
+        
+        function goToClub(clubId) {
+            console.log('🎯 Navigation vers club :', clubId);
+            
+            if (clubId === 'om') {
+                alert('🔵⚪ Olympique de Marseille\n\n✅ Redirection vers l\'application OM...');
+                window.location.href = 'app.html';
+            } else if (clubId === 'paris-fc') {
+                alert('🔵⚪ Paris FC\n\n✅ Redirection vers l\'application Paris FC...');
+                window.location.href = 'parisfc.html';
+            }
+        }
+
+        // Notification au chargement
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                alert('🎉 Bienvenue sur le Hub MultiClub PaieCashPlay !\n\n✅ 2 clubs opérationnels :\n• Olympique de Marseille\n• Paris FC (NOUVEAU !)\n\nCliquez sur un club pour accéder à son application.');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

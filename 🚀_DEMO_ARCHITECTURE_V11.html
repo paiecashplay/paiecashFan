@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 DEMO Architecture Modulaire V11.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .module-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-success {
+            background: #10b981;
+        }
+
+        .status-error {
+            background: #ef4444;
+        }
+
+        .status-loading {
+            background: #f59e0b;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-section h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .console-output {
+            background: #1a1a1a;
+            color: #10b981;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .console-line {
+            margin-bottom: 0.5rem;
+        }
+
+        .test-result {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .test-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+        }
+
+        .test-error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Architecture Modulaire V11.0</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Démonstration de l'architecture qui SURVIT aux upgrades</p>
+        </div>
+
+        <div class="status-grid">
+            <div class="module-card">
+                <h3>⚙️ Core System</h3>
+                <p id="coreStatus" class="status status-loading">Chargement...</p>
+                <p style="margin-top: 1rem; opacity: 0.8;">Version: <span id="coreVersion">-</span></p>
+            </div>
+
+            <div class="module-card">
+                <h3>🔐 Authentification</h3>
+                <p id="authStatus" class="status status-loading">Chargement...</p>
+                <p style="margin-top: 1rem; opacity: 0.8;">Utilisateur: <span id="authUser">Non connecté</span></p>
+            </div>
+
+            <div class="module-card">
+                <h3>🧭 Navigation</h3>
+                <p id="navStatus" class="status status-loading">Chargement...</p>
+                <p style="margin-top: 1rem; opacity: 0.8;">Équipes: <span id="navTeams">0</span></p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🧪 Tests de l'Architecture</h2>
+            <button class="btn" onclick="testAuth()">🔐 Tester Authentification</button>
+            <button class="btn" onclick="testNavigation()">🧭 Tester Navigation</button>
+            <button class="btn btn-secondary" onclick="testPersistence()">💾 Tester Persistance</button>
+            <button class="btn btn-secondary" onclick="runAllTests()">✅ Lancer Tous les Tests</button>
+
+            <div id="testResults"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Console Système</h2>
+            <div id="console" class="console-output">
+                <div class="console-line">🚀 Initialisation...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARGEMENT DES MODULES -->
+    <script src="modules/core-system.js"></script>
+    <script src="modules/auth-persistent.module.js"></script>
+    <script src="modules/navigation-hierarchy.module.js"></script>
+
+    <!-- Charger les données d'équipes (simulé pour la démo) -->
+    <script>
+        // Simuler les données d'équipes
+        window.teamsData = [
+            { name: 'Olympique de Marseille', slug: 'om', emoji: '⚪🔵', league: 'Ligue 1', country: 'france', sport: 'football', fans: '2.5M' },
+            { name: 'Paris Saint-Germain', slug: 'psg', emoji: '🔴🔵', league: 'Ligue 1', country: 'france', sport: 'football', fans: '8.5M' },
+            { name: 'Lyon ASVEL', slug: 'asvel', emoji: '🏀', league: 'Betclic Élite', country: 'france', sport: 'basketball', fans: '500K' },
+            { name: 'France Femmes Basketball', slug: 'france-f-basket', emoji: '🇫🇷🏀', league: 'FIBA', country: 'france', sport: 'basketball', fans: '1M', gender: 'Femmes' }
+        ];
+    </script>
+
+    <script>
+        const core = PaieCashFan.core;
+        const consoleEl = document.getElementById('console');
+
+        // Logger custom
+        function log(message, type = 'info') {
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.style.color = colors[type] || colors.info;
+            line.textContent = `${new Date().toLocaleTimeString()} | ${message}`;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Initialiser les modules
+        async function initModules() {
+            log('🚀 Initialisation des modules...', 'info');
+            
+            try {
+                await core.initAllModules();
+                
+                // Mettre à jour les statuts
+                updateModuleStatus('core', 'success', core.version);
+                
+                const auth = core.getModule('AuthPersistent');
+                const nav = core.getModule('NavigationHierarchy');
+                
+                if (auth && auth.initialized) {
+                    updateModuleStatus('auth', 'success');
+                    if (auth.isLoggedIn()) {
+                        document.getElementById('authUser').textContent = auth.getCurrentUser().email;
+                    }
+                    log('✅ Module Auth chargé', 'success');
+                }
+                
+                if (nav && nav.initialized) {
+                    updateModuleStatus('nav', 'success');
+                    document.getElementById('navTeams').textContent = nav.allTeams.length;
+                    log('✅ Module Navigation chargé', 'success');
+                }
+                
+                log('🎉 Tous les modules initialisés !', 'success');
+            } catch (error) {
+                log('❌ Erreur initialisation: ' + error.message, 'error');
+            }
+        }
+
+        function updateModuleStatus(module, status, version = null) {
+            const statusEl = document.getElementById(`${module}Status`);
+            statusEl.className = `status status-${status}`;
+            statusEl.textContent = status === 'success' ? '✅ Chargé' : '❌ Erreur';
+            
+            if (version && module === 'core') {
+                document.getElementById('coreVersion').textContent = version;
+            }
+        }
+
+        // TESTS
+        async function testAuth() {
+            log('🧪 Test Authentification...', 'info');
+            const results = document.getElementById('testResults');
+            
+            try {
+                const auth = core.getModule('AuthPersistent');
+                
+                // Test inscription
+                log('📝 Test inscription...', 'info');
+                const registerResult = await auth.register({
+                    email: 'test@paiecashfan.com',
+                    nom: 'Test',
+                    prenom: 'User',
+                    motDePasse: 'test123',
+                    type: 'fan'
+                });
+                
+                results.innerHTML += `<div class="test-result test-success">✅ Inscription réussie: ${registerResult.user.email}</div>`;
+                log('✅ Inscription OK', 'success');
+                
+                // Test déconnexion
+                await auth.logout();
+                results.innerHTML += `<div class="test-result test-success">✅ Déconnexion réussie</div>`;
+                log('✅ Déconnexion OK', 'success');
+                
+                // Test connexion
+                const loginResult = await auth.login('test@paiecashfan.com', 'test123');
+                results.innerHTML += `<div class="test-result test-success">✅ Connexion réussie: ${loginResult.user.email}</div>`;
+                log('✅ Connexion OK', 'success');
+                
+                document.getElementById('authUser').textContent = auth.getCurrentUser().email;
+                
+            } catch (error) {
+                results.innerHTML += `<div class="test-result test-error">❌ Erreur: ${error.message}</div>`;
+                log('❌ Test Auth échoué: ' + error.message, 'error');
+            }
+        }
+
+        function testNavigation() {
+            log('🧪 Test Navigation...', 'info');
+            const results = document.getElementById('testResults');
+            
+            try {
+                const nav = core.getModule('NavigationHierarchy');
+                results.innerHTML += `<div class="test-result test-success">✅ ${nav.allTeams.length} équipes chargées</div>`;
+                results.innerHTML += `<div class="test-result test-success">✅ ${nav.hierarchy.countries.size} pays disponibles</div>`;
+                results.innerHTML += `<div class="test-result test-success">✅ ${nav.hierarchy.sports.size} sports disponibles</div>`;
+                log('✅ Navigation OK', 'success');
+            } catch (error) {
+                results.innerHTML += `<div class="test-result test-error">❌ Erreur: ${error.message}</div>`;
+                log('❌ Test Navigation échoué: ' + error.message, 'error');
+            }
+        }
+
+        function testPersistence() {
+            log('🧪 Test Persistance...', 'info');
+            const results = document.getElementById('testResults');
+            
+            try {
+                // Test storage
+                core.storage.set('test_key', 'test_value', 'demo');
+                const value = core.storage.get('test_key', 'demo');
+                
+                if (value === 'test_value') {
+                    results.innerHTML += `<div class="test-result test-success">✅ LocalStorage fonctionne</div>`;
+                    log('✅ Persistance OK', 'success');
+                } else {
+                    throw new Error('Storage test failed');
+                }
+                
+                // Test auth persistence
+                const auth = core.getModule('AuthPersistent');
+                if (auth.isLoggedIn()) {
+                    results.innerHTML += `<div class="test-result test-success">✅ Session persistée: ${auth.getCurrentUser().email}</div>`;
+                    log('✅ Session persistée', 'success');
+                    results.innerHTML += `<div class="test-result test-success">💡 Rafraîchissez la page - la session survivra !</div>`;
+                }
+                
+                core.storage.remove('test_key', 'demo');
+            } catch (error) {
+                results.innerHTML += `<div class="test-result test-error">❌ Erreur: ${error.message}</div>`;
+                log('❌ Test Persistance échoué: ' + error.message, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('testResults').innerHTML = '<h3>🧪 Exécution de tous les tests...</h3>';
+            await testAuth();
+            testNavigation();
+            testPersistence();
+            log('🎉 Tous les tests terminés !', 'success');
+        }
+
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            initModules();
+        });
+    </script>
+</body>
+</html>

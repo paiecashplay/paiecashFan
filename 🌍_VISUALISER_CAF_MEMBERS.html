@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAF - 54 Associations Membres avec Logos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00A651 0%, #FFC627 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #00A651;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #00A651;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .caf-logo {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .filter-section {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 25px;
+            border: 2px solid #00A651;
+            background: white;
+            color: #00A651;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #00A651;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+        }
+
+        .federations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .federation-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .federation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: #00A651;
+        }
+
+        .federation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .federation-flag {
+            font-size: 3em;
+        }
+
+        .federation-logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f8f8;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .federation-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .federation-info {
+            flex: 1;
+        }
+
+        .federation-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .federation-code {
+            font-size: 0.9em;
+            color: #00A651;
+            font-weight: 600;
+        }
+
+        .federation-details {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .region-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #FFC627 0%, #FF9800 100%);
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        .app-link {
+            display: block;
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .app-link:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .federations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="caf-logo">🌍</div>
+            <h1>CAF - CONFÉDÉRATION AFRICAINE DE FOOTBALL</h1>
+            <p class="subtitle">54 Associations Membres avec Logos Officiels</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">54</div>
+                    <div class="stat-label">Fédérations</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Régions</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">1957</div>
+                    <div class="stat-label">Fondation</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="filter-section">
+            <button class="filter-btn active" onclick="filterRegion('all')">Toutes les régions</button>
+            <button class="filter-btn" onclick="filterRegion('Afrique du Nord')">Afrique du Nord</button>
+            <button class="filter-btn" onclick="filterRegion('Afrique de l\'Ouest')">Afrique de l'Ouest</button>
+            <button class="filter-btn" onclick="filterRegion('Afrique Centrale')">Afrique Centrale</button>
+            <button class="filter-btn" onclick="filterRegion('Afrique de l\'Est')">Afrique de l'Est</button>
+            <button class="filter-btn" onclick="filterRegion('Afrique Australe')">Afrique Australe</button>
+        </div>
+
+        <div class="federations-grid" id="federationsGrid">
+            <!-- Les cartes seront générées ici par JavaScript -->
+        </div>
+
+        <div class="footer">
+            <p><strong>Source :</strong> <a href="https://www.cafonline.com/fr/a-propos-de-la-caf/associations-membres/" target="_blank">CAF Online - Associations Membres</a></p>
+            <p style="margin-top: 10px;">Logos officiels via Wikimedia Commons</p>
+            <p style="margin-top: 10px; color: #00A651; font-weight: 600;">PaieCashFan V7.0 - FIFA Global Integration</p>
+        </div>
+    </div>
+
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    <script>
+        let currentFilter = 'all';
+
+        function renderFederations(filter = 'all') {
+            const grid = document.getElementById('federationsGrid');
+            const filteredFederations = filter === 'all' 
+                ? cafMembersWithLogos 
+                : cafMembersWithLogos.filter(fed => fed.region === filter);
+
+            grid.innerHTML = filteredFederations.map(fed => `
+                <div class="federation-card" data-region="${fed.region}">
+                    <span class="region-badge">${fed.region}</span>
+                    <div class="federation-header">
+                        <div class="federation-flag">${fed.flag}</div>
+                        <div class="federation-logo-container">
+                            <img src="${fed.logo}" alt="${fed.name} Logo" class="federation-logo" 
+                                 onerror="this.style.display='none'">
+                        </div>
+                        <div class="federation-info">
+                            <div class="federation-name">${fed.name}</div>
+                            <div class="federation-code">${fed.code}</div>
+                        </div>
+                    </div>
+                    <div class="federation-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Fédération:</span>
+                            <span>${fed.federation.split('-')[0].trim()}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Site Web:</span>
+                            <span>${fed.site}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Président:</span>
+                            <span>${fed.president}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Fondation:</span>
+                            <span>${fed.founded}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Membre FIFA:</span>
+                            <span>${fed.fifaMember}</span>
+                        </div>
+                    </div>
+                    <a href="${fed.path}" class="app-link" target="_blank">
+                        🚀 Voir l'application
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        function filterRegion(region) {
+            currentFilter = region;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Render filtered federations
+            renderFederations(region);
+        }
+
+        // Initial render
+        renderFederations();
+    </script>
+</body>
+</html>

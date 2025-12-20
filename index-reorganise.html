@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Connectez-vous à votre équipe préférée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #8b5cf6 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #10b981;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            border-color: #10b981;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .subsection {
+            margin: 40px 0;
+        }
+
+        .subsection-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            border-color: #10b981;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .club-logo {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .club-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .club-league {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 60px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .tabs {
+                padding: 15px 10px;
+            }
+
+            .tab-button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .clubs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PaieCashFan</h1>
+        <p class="subtitle">Connectez-vous à votre équipe préférée</p>
+        <p>💰 Wallet Crypto • 🎟️ NFT Tickets • 🤖 IA Vocale • 450+ Clubs</p>
+        
+        <div class="nav-buttons">
+            <a href="onboarding.html" class="nav-btn">📚 Guide de démarrage</a>
+            <a href="support.html" class="nav-btn">💬 Support & Aide</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('football')">⚽ Football</button>
+            <button class="tab-button" onclick="showTab('basket')">🏀 Basketball</button>
+            <button class="tab-button" onclick="showTab('handball')">🤾 Handball</button>
+            <button class="tab-button" onclick="showTab('rugby')">🏉 Rugby</button>
+            <button class="tab-button" onclick="showTab('volley')">🏐 Volleyball</button>
+            <button class="tab-button" onclick="showTab('federations')">🌍 Fédérations</button>
+            <button class="tab-button" onclick="showTab('competitions')">🏆 Compétitions</button>
+        </div>
+
+        <!-- Tab: Football -->
+        <div id="football" class="tab-content active">
+            <h2 class="section-title">⚽ Football Français</h2>
+            <p class="section-subtitle">228 clubs • Ligue 1 → National 3</p>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Ligue 1</h3>
+                <div class="clubs-grid" id="ligue1Grid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Ligue 2</h3>
+                <div class="clubs-grid" id="ligue2Grid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">National</h3>
+                <div class="clubs-grid" id="nationalGrid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">National 2</h3>
+                <div class="clubs-grid" id="national2Grid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">National 3</h3>
+                <div class="clubs-grid" id="national3Grid"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Basketball -->
+        <div id="basket" class="tab-content">
+            <h2 class="section-title">🏀 Basketball</h2>
+            <p class="section-subtitle">16 clubs • Betclic Élite</p>
+            <div class="clubs-grid" id="basketballGrid"></div>
+        </div>
+
+        <!-- Tab: Handball -->
+        <div id="handball" class="tab-content">
+            <h2 class="section-title">🤾 Handball</h2>
+            <p class="section-subtitle">16 clubs • Liqui Moly StarLigue</p>
+            <div class="clubs-grid" id="handballGrid"></div>
+        </div>
+
+        <!-- Tab: Rugby -->
+        <div id="rugby" class="tab-content">
+            <h2 class="section-title">🏉 Rugby</h2>
+            <p class="section-subtitle">14 clubs • Top 14</p>
+            <div class="clubs-grid" id="rugbyGrid"></div>
+        </div>
+
+        <!-- Tab: Volleyball -->
+        <div id="volley" class="tab-content">
+            <h2 class="section-title">🏐 Volleyball</h2>
+            <p class="section-subtitle">14 clubs • Ligue A Masculine</p>
+            <div class="clubs-grid" id="volleyballGrid"></div>
+        </div>
+
+        <!-- Tab: Fédérations -->
+        <div id="federations" class="tab-content">
+            <h2 class="section-title">🌍 Fédérations Internationales</h2>
+            <p class="section-subtitle">6 fédérations</p>
+            <div class="clubs-grid" id="federationsGrid"></div>
+        </div>
+
+        <!-- Tab: Compétitions -->
+        <div id="competitions" class="tab-content">
+            <h2 class="section-title">🏆 Compétitions Internationales</h2>
+            <p class="section-subtitle">Équipes nationales et compétitions majeures</p>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🌍 Coupe du Monde 2026</h3>
+                <div class="clubs-grid" id="coupeMonde2026Grid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">🦁 CAN 2026</h3>
+                <div class="clubs-grid" id="can2026Grid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">🏆 Copa América</h3>
+                <div class="clubs-grid" id="copaAmericaGrid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">🌏 Coupe d'Asie</h3>
+                <div class="clubs-grid" id="coupeAsieGrid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">🏆 Gold Cup</h3>
+                <div class="clubs-grid" id="goldCupGrid"></div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">⚽ UEFA Champions League</h3>
+                <div class="clubs-grid" id="championsLeagueGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>PaieCashFan</strong> • 450+ Clubs & Équipes</p>
+        <p style="margin-top: 10px;">Wallet Crypto • NFT Tickets • IA Vocale</p>
+        <p style="margin-top: 20px;">© 2025 PaieCashFan. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Chargement des données -->
+    <script src="clubs-football-complet.js"></script>
+    <script src="clubs-national-3-data.js"></script>
+    <script src="equipes-nationales-internationales.js"></script>
+    <script src="autres-sports-data.js"></script>
+
+    <script>
+        // Fonction pour changer de tab
+        function showTab(tabName) {
+            // Masquer tous les contenus
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Désactiver tous les boutons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Afficher le contenu sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer le bouton sélectionné
+            event.target.classList.add('active');
+        }
+
+        // Fonction de rendu des clubs
+        function renderClubs(clubs, gridId) {
+            const grid = document.getElementById(gridId);
+            if (!grid) {
+                console.error(`Grid ${gridId} not found`);
+                return;
+            }
+
+            if (!clubs || clubs.length === 0) {
+                grid.innerHTML = '<div class="loading">Aucun club disponible</div>';
+                return;
+            }
+
+            grid.innerHTML = clubs.map(club => {
+                // Encoder correctement les URL avec les apostrophes
+                const encodedPath = club.path.replace(/'/g, '%27');
+                return `
+                    <div class="club-card" onclick="window.location.href='${encodedPath}'">
+                        <div class="club-logo">${club.logo}</div>
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-league">${club.league}</div>
+                    </div>
+                `;
+            }).join('');
+
+            console.log(`✅ ${clubs.length} clubs affichés dans ${gridId}`);
+        }
+
+        // Attendre que le DOM soit chargé
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 PaieCashFan - Chargement des clubs...');
+
+            // Football
+            if (typeof ligue1Clubs !== 'undefined') {
+                renderClubs(ligue1Clubs, 'ligue1Grid');
+                renderClubs(ligue2Clubs, 'ligue2Grid');
+                renderClubs(nationalClubs, 'nationalGrid');
+                
+                // National 2
+                const allNational2 = [
+                    ...(national2GroupeA || []),
+                    ...(national2GroupeB || []),
+                    ...(national2GroupeC || [])
+                ];
+                renderClubs(allNational2, 'national2Grid');
+
+                // National 3
+                const allNational3 = [
+                    ...(national3GroupeA || []),
+                    ...(national3GroupeB || []),
+                    ...(national3GroupeC || []),
+                    ...(national3GroupeD || []),
+                    ...(national3GroupeE || []),
+                    ...(national3GroupeF || []),
+                    ...(national3GroupeG || []),
+                    ...(national3GroupeH || [])
+                ];
+                renderClubs(allNational3, 'national3Grid');
+
+                console.log('⚽ Football chargé:', 
+                    ligue1Clubs.length + ligue2Clubs.length + nationalClubs.length + 
+                    allNational2.length + allNational3.length
+                );
+            }
+
+            // Autres sports
+            if (typeof basketballClubs !== 'undefined') {
+                renderClubs(basketballClubs, 'basketballGrid');
+                console.log('🏀 Basketball chargé:', basketballClubs.length);
+            }
+
+            if (typeof handballClubs !== 'undefined') {
+                renderClubs(handballClubs, 'handballGrid');
+                console.log('🤾 Handball chargé:', handballClubs.length);
+            }
+
+            if (typeof rugbyClubs !== 'undefined') {
+                renderClubs(rugbyClubs, 'rugbyGrid');
+                console.log('🏉 Rugby chargé:', rugbyClubs.length);
+            }
+
+            if (typeof volleyballClubs !== 'undefined') {
+                renderClubs(volleyballClubs, 'volleyballGrid');
+                console.log('🏐 Volleyball chargé:', volleyballClubs.length);
+            }
+
+            // Fédérations
+            if (typeof federations !== 'undefined') {
+                renderClubs(federations, 'federationsGrid');
+                console.log('🌍 Fédérations chargées:', federations.length);
+            }
+
+            // Compétitions
+            if (typeof coupeMondeUEFA !== 'undefined') {
+                // Coupe du Monde 2026 - toutes les confédérations
+                const coupeMonde2026 = [
+                    ...(coupeMondeUEFA || []),
+                    ...(coupeMondeConmebol || []),
+                    ...(coupeMondeAFC || []),
+                    ...(coupeMondeCaf || []),
+                    ...(coupeMondeConcacaf || []),
+                    ...(coupeMondeOFC || [])
+                ];
+                renderClubs(coupeMonde2026, 'coupeMonde2026Grid');
+
+                renderClubs(can2026Equipes || [], 'can2026Grid');
+                renderClubs(copaAmericaEquipes || [], 'copaAmericaGrid');
+                renderClubs(coupeAsieEquipes || [], 'coupeAsieGrid');
+                renderClubs(goldCupEquipes || [], 'goldCupGrid');
+                renderClubs(championsLeagueEquipes || [], 'championsLeagueGrid');
+
+                console.log('🏆 Compétitions chargées');
+            }
+
+            console.log('✅ Tous les contenus chargés avec succès');
+        });
+    </script>
+</body>
+</html>

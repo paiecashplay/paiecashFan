@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Wallet Corrigé - PaieCashFan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 18px 40px;
+            margin: 10px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 30px;
+            animation: bounce 1s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-10px); }
+        }
+
+        .features {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .feature:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        .countdown {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="success-icon">✅</div>
+        
+        <h1>🎉</h1>
+        <h2>Wallet Corrigé !</h2>
+        
+        <p>
+            Le problème de blocage "Chargement des soldes..." a été résolu !<br>
+            Une nouvelle version du wallet est disponible, <strong>sans blocage</strong>.
+        </p>
+
+        <div class="features">
+            <h3 style="margin-bottom: 15px; color: #333;">✨ Nouveautés :</h3>
+            <div class="feature">Affichage instantané (pas de blocage)</div>
+            <div class="feature">Mode démonstration fonctionnel</div>
+            <div class="feature">Vos soldes cryptos visibles</div>
+            <div class="feature">Collection NFT accessible</div>
+            <div class="feature">Historique des transactions</div>
+            <div class="feature">Option connexion wallet réel (MetaMask)</div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <a href="wallet-nft-simple.html" class="btn btn-primary">
+                💳 Ouvrir Mon Wallet
+            </a>
+            <a href="index.html" class="btn btn-secondary">
+                🏠 Retour Accueil
+            </a>
+        </div>
+
+        <div class="countdown">
+            Redirection automatique vers le wallet dans <span id="countdown">10</span> secondes...
+        </div>
+    </div>
+
+    <script>
+        // Compte à rebours
+        let seconds = 10;
+        const countdownEl = document.getElementById('countdown');
+        
+        const interval = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = 'wallet-nft-simple.html';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

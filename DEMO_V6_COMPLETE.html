@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 DÉMO V6.0 - PaieCashFan Agentic Commerce</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .demo-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .demo-result {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .chat-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 50px;
+        }
+
+        .message.ai {
+            background: white;
+            color: #333;
+            margin-right: 50px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .input-group {
+            margin-top: 20px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .product-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .product-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #10b981;
+            margin: 10px 0;
+        }
+
+        .price.sale {
+            color: #ef4444;
+        }
+
+        .qr-code {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .qr-code img {
+            max-width: 300px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 DÉMO V6.0 - Agentic Commerce</h1>
+        <p class="subtitle">Toutes les fonctionnalités V6.0 en action !</p>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value" id="modulesLoaded">0/5</span>
+                <span>Modules Chargés</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="testsRun">0</span>
+                <span>Tests Effectués</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="successRate">0%</span>
+                <span>Taux de Réussite</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Test 1: IA Commerce -->
+            <div class="card">
+                <h2>🤖 Agent IA Commerce</h2>
+                <p>Testez l'agent conversationnel pour le shopping</p>
+                <div class="input-group">
+                    <input type="text" id="aiQuestion" placeholder="Ex: Je veux un maillot de l'OM" value="Je veux un maillot de l'OM">
+                    <button class="btn" onclick="testAICommerce()">💬 Demander à l'IA</button>
+                </div>
+                <div id="aiResult" class="demo-result" style="display:none;"></div>
+            </div>
+
+            <!-- Test 2: Recherche Produits -->
+            <div class="card">
+                <h2>🛍️ Recherche Produits</h2>
+                <p>Rechercher dans le catalogue WooCommerce</p>
+                <div class="input-group">
+                    <input type="text" id="searchQuery" placeholder="maillot, écharpe..." value="maillot">
+                    <button class="btn" onclick="testProductSearch()">🔍 Rechercher</button>
+                </div>
+                <div id="searchResult" class="demo-result" style="display:none;"></div>
+            </div>
+
+            <!-- Test 3: Panier -->
+            <div class="card">
+                <h2>🛒 Gestion Panier</h2>
+                <p>Ajouter des produits et voir le panier</p>
+                <button class="btn" onclick="testAddToCart()">➕ Ajouter Produit Test</button>
+                <button class="btn btn-secondary" onclick="testViewCart()">👀 Voir Panier</button>
+                <button class="btn btn-secondary" onclick="testClearCart()">🗑️ Vider</button>
+                <div id="cartResult" class="demo-result" style="display:none;"></div>
+            </div>
+
+            <!-- Test 4: QR Code -->
+            <div class="card">
+                <h2>📱 Paiement QR Code</h2>
+                <p>Générer un QR Code de paiement</p>
+                <div class="input-group">
+                    <input type="number" id="qrAmount" placeholder="Montant en €" value="89.99">
+                    <button class="btn" onclick="testQRCode()">📱 Générer QR</button>
+                </div>
+                <div id="qrResult" class="demo-result" style="display:none;"></div>
+            </div>
+
+            <!-- Test 5: Données Club -->
+            <div class="card">
+                <h2>⚽ Données Club</h2>
+                <p>Résultats, classements, promotions</p>
+                <div class="input-group">
+                    <select id="clubSelect">
+                        <option value="olympique-marseille">Olympique de Marseille</option>
+                        <option value="paris-saint-germain">Paris Saint-Germain</option>
+                        <option value="olympique-lyonnais">Olympique Lyonnais</option>
+                        <option value="paris-fc">Paris FC</option>
+                    </select>
+                    <button class="btn" onclick="testClubData()">📊 Charger Données</button>
+                </div>
+                <div id="clubResult" class="demo-result" style="display:none;"></div>
+            </div>
+
+            <!-- Test 6: Checkout -->
+            <div class="card">
+                <h2>💳 Checkout Complet</h2>
+                <p>Simuler un achat complet</p>
+                <button class="btn" onclick="testCheckout()">🛒 Simuler Achat</button>
+                <div id="checkoutResult" class="demo-result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- Chat IA Démo -->
+        <div class="demo-area">
+            <h2>💬 Conversation avec l'IA Commerce</h2>
+            <p style="color: #666; margin-bottom: 20px;">Essayez ces questions pour voir l'IA en action :</p>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-secondary" onclick="askAI('Je veux un maillot')">Je veux un maillot</button>
+                <button class="btn btn-secondary" onclick="askAI('Des promos ?')">Des promos ?</button>
+                <button class="btn btn-secondary" onclick="askAI('Dernier résultat OM ?')">Dernier résultat OM ?</button>
+                <button class="btn btn-secondary" onclick="askAI('Commander')">Commander</button>
+            </div>
+            <div id="chatContainer" class="chat-container"></div>
+        </div>
+
+        <!-- Warning -->
+        <div class="warning">
+            <h3 style="margin-bottom: 10px;">⚠️ Note Importante</h3>
+            <p style="margin: 0;">
+                Cette démo fonctionne en <strong>mode simulation</strong>. Pour utiliser les vraies données WooCommerce et API Football, 
+                configurez les clés API dans les fichiers JS correspondants. Voir la documentation 
+                <a href="🎉_VERSION_6.0_AGENTIC_COMMERCE.md" style="color: #667eea; font-weight: bold;">ici</a>.
+            </p>
+        </div>
+
+        <!-- Navigation -->
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="btn btn-secondary">🏠 Retour Accueil</a>
+            <a href="🧪_TEST_V6.0_AGENTIC_COMMERCE.html" class="btn btn-secondary">🧪 Tests Techniques</a>
+            <a href="🎉_VERSION_6.0_AGENTIC_COMMERCE.md" class="btn btn-secondary">📖 Documentation</a>
+        </div>
+    </div>
+
+    <!-- Charger tous les modules V6.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="js/woocommerce-connector.js"></script>
+    <script src="js/qr-payment.js"></script>
+    <script src="js/agentic-commerce.js"></script>
+    <script src="js/club-data-connector.js"></script>
+    <script src="js/ai-agent.js"></script>
+    <script src="js/ai-agent-commerce.js"></script>
+
+    <script>
+        let testsRun = 0;
+        let testsSuccess = 0;
+
+        // Vérifier les modules au chargement
+        window.addEventListener('load', () => {
+            setTimeout(checkModules, 500);
+        });
+
+        function checkModules() {
+            let loaded = 0;
+            const modules = [
+                typeof WooCommerceConnector !== 'undefined',
+                typeof window.qrPayment !== 'undefined',
+                typeof window.agenticCommerce !== 'undefined',
+                typeof window.clubDataConnector !== 'undefined',
+                typeof window.aiAgent !== 'undefined'
+            ];
+
+            loaded = modules.filter(m => m).length;
+            document.getElementById('modulesLoaded').textContent = `${loaded}/5`;
+
+            if (loaded === 5) {
+                // Initialiser l'IA avec un club
+                window.aiAgent.setCurrentClub('olympique-marseille', 'Olympique de Marseille');
+                showMessage('ai', '👋 Bonjour ! Je suis votre assistant shopping PaieCashFan. Comment puis-je vous aider ?');
+            }
+        }
+
+        function updateStats() {
+            testsRun++;
+            document.getElementById('testsRun').textContent = testsRun;
+            const rate = testsRun > 0 ? Math.round((testsSuccess / testsRun) * 100) : 0;
+            document.getElementById('successRate').textContent = rate + '%';
+        }
+
+        function showResult(elementId, data, success = true) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            if (success) testsSuccess++;
+            updateStats();
+        }
+
+        function showMessage(type, text) {
+            const chat = document.getElementById('chatContainer');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = text.replace(/\n/g, '<br>');
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function askAI(question) {
+            showMessage('user', question);
+            try {
+                const response = await window.aiAgent.getResponse(question);
+                showMessage('ai', response.answer);
+            } catch (error) {
+                showMessage('ai', '❌ Erreur: ' + error.message);
+            }
+        }
+
+        async function testAICommerce() {
+            const question = document.getElementById('aiQuestion').value;
+            try {
+                const response = await window.aiAgent.getResponse(question);
+                showResult('aiResult', {
+                    question: question,
+                    answer: response.answer,
+                    confidence: response.confidence
+                }, true);
+                showMessage('user', question);
+                showMessage('ai', response.answer);
+            } catch (error) {
+                showResult('aiResult', { error: error.message }, false);
+            }
+        }
+
+        async function testProductSearch() {
+            const query = document.getElementById('searchQuery').value;
+            try {
+                const products = await window.agenticCommerce.searchProducts(query);
+                const result = document.getElementById('searchResult');
+                result.style.display = 'block';
+                result.innerHTML = `<h3>🛍️ ${products.length} produit(s) trouvé(s)</h3>`;
+                products.slice(0, 3).forEach(p => {
+                    result.innerHTML += `
+                        <div class="product-card">
+                            <h4>${p.name}</h4>
+                            <div class="price ${p.on_sale ? 'sale' : ''}">${p.on_sale ? p.sale_price : p.price}€</div>
+                            ${p.on_sale ? `<small>Prix normal: ${p.price}€</small>` : ''}
+                        </div>
+                    `;
+                });
+                testsSuccess++;
+                updateStats();
+            } catch (error) {
+                showResult('searchResult', { error: error.message }, false);
+            }
+        }
+
+        function testAddToCart() {
+            try {
+                window.agenticCommerce.addToCart({
+                    id: Date.now(),
+                    name: 'Maillot Test OM',
+                    price: '89.99'
+                }, 1, { taille: 'L' });
+                testViewCart();
+            } catch (error) {
+                showResult('cartResult', { error: error.message }, false);
+            }
+        }
+
+        function testViewCart() {
+            try {
+                const cart = window.agenticCommerce.getCartSummary();
+                showResult('cartResult', cart, true);
+            } catch (error) {
+                showResult('cartResult', { error: error.message }, false);
+            }
+        }
+
+        function testClearCart() {
+            try {
+                window.agenticCommerce.clearCart();
+                testViewCart();
+            } catch (error) {
+                showResult('cartResult', { error: error.message }, false);
+            }
+        }
+
+        async function testQRCode() {
+            const amount = document.getElementById('qrAmount').value;
+            try {
+                const qrData = await window.qrPayment.generate({
+                    amount: parseFloat(amount),
+                    orderId: Math.floor(Math.random() * 10000),
+                    description: 'Test Paiement QR'
+                });
+                
+                const result = document.getElementById('qrResult');
+                result.style.display = 'block';
+                result.innerHTML = `
+                    <div class="qr-code">
+                        <h3>📱 QR Code Généré</h3>
+                        <img src="${qrData.qrCode}" alt="QR Code">
+                        <p style="margin-top: 15px; color: #667eea; font-weight: bold;">Montant: ${qrData.amount} ${qrData.currency}</p>
+                        <p style="color: #999;">Expire dans ${qrData.expiresIn} secondes</p>
+                    </div>
+                `;
+                testsSuccess++;
+                updateStats();
+            } catch (error) {
+                showResult('qrResult', { error: error.message }, false);
+            }
+        }
+
+        async function testClubData() {
+            const club = document.getElementById('clubSelect').value;
+            try {
+                const data = await window.clubDataConnector.getClubData(club);
+                showResult('clubResult', data, true);
+            } catch (error) {
+                showResult('clubResult', { error: error.message }, false);
+            }
+        }
+
+        async function testCheckout() {
+            try {
+                // Ajouter un produit au panier
+                window.agenticCommerce.addToCart({
+                    id: 999,
+                    name: 'Maillot OM Domicile',
+                    price: '89.99'
+                }, 1, { taille: 'L' });
+
+                showMessage('ai', '✅ Produit ajouté au panier!\n💰 Total: 89.99€\n\n💳 Choisissez votre mode de paiement:\n📱 SMS (max 50€)\n📱 QR Code\n💎 Crypto (USDT/USDC)\n💳 Carte bancaire');
+                
+                showResult('checkoutResult', {
+                    message: 'Simulation checkout',
+                    cart: window.agenticCommerce.getCartSummary(),
+                    nextStep: 'Choisir mode de paiement'
+                }, true);
+            } catch (error) {
+                showResult('checkoutResult', { error: error.message }, false);
+            }
+        }
+    </script>
+</body>
+</html>

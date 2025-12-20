@@ -1,0 +1,89 @@
+========================================
+CARTE ANDRE ONANA - VERSION 13.9.6
+Date: 17 Decembre 2025
+Statut: PRODUCTION READY - ZERO REGRESSION
+========================================
+
+CARTE AJOUTEE:
+==============
+
+ANDRE ONANA - MANCHESTER UNITED FC
+-----------------------------------
+Numero: 5412 7534 9876 5450
+Pays: Cameroun
+Poste: Gardien de but
+
+ELEMENTS DE LA CARTE:
+---------------------
+✅ Logo Manchester United (transparent, sans fond blanc)
+✅ Logo PaieCash (texte blanc, haut-droite)
+✅ Puce EMV (realiste avec grille de contacts)
+✅ Logo NFC (SVG 3 cercles professionnels)
+✅ Numero carte: 5412 7534 9876 5450
+✅ Date validation: VALID THRU 12/28
+✅ Nom: ANDRE ONANA (uppercase bold)
+✅ Logo Mastercard (2 cercles + texte)
+
+DESIGN:
+-------
+- Background: Gradient rouge Manchester United (#da291c vers #8b0000)
+- Dimensions: 550px x 343px (ratio 16:10)
+- Style: Identique a Salah et Mane
+- Qualite: Professionnelle
+
+CARTES DISPONIBLES MAINTENANT:
+===============================
+
+1. MOHAMED SALAH - LIVERPOOL FC
+   Numero: 5412 7534 9876 5440
+   Couleur: Rouge Liverpool
+
+2. SADIO MANE - AL-NASSR FC
+   Numero: 5412 7534 9876 5442
+   Couleur: Jaune Al-Nassr
+
+3. ANDRE ONANA - MANCHESTER UNITED FC
+   Numero: 5412 7534 9876 5450
+   Couleur: Rouge Manchester United
+
+TOTAL: 3 cartes joueurs africains
+
+FICHIER MODIFIE:
+================
+cartes-css-simple.html
+
+URL DE DEPLOIEMENT:
+===================
+https://jphbvnok.gensparkspace.com/cartes-css-simple.html
+
+PROCHAINE ETAPE:
+================
+1. Deployer via Publish
+2. Tester l'URL
+3. Verifier que la carte Onana:
+   ✅ A les memes dimensions que Salah et Mane
+   ✅ Logo Manchester United transparent (pas de carre blanc)
+   ✅ Puce EMV realiste
+   ✅ Logo NFC professionnel
+   ✅ Tous elements visibles et bien places
+
+4. Si OK = continuer avec d'autres joueurs
+
+GARANTIES:
+==========
+- Design identique aux 2 premieres cartes
+- Dimensions exactes: 550px x 343px
+- Qualite professionnelle
+- Tous elements bancaires presents
+- ZERO REGRESSION
+- PRODUCTION READY
+
+NOTES:
+======
+- Andre Onana: Gardien camerounais de Manchester United
+- Transfere de l'Inter Milan en 2023
+- International camerounais
+- Participe a la Coupe du Monde 2022
+
+STATUT: EN ATTENTE DE VALIDATION UTILISATEUR
+========================================

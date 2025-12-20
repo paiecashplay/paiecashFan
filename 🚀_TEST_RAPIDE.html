@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rapide - PaieCashFan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .test-btn {
+            display: block;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .test-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .test-btn .icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .test-btn .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border: none;
+        }
+
+        .primary-btn:hover {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .alert {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alert h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .solution {
+            background: rgba(74, 222, 128, 0.2);
+            border: 2px solid #4ade80;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .solution h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .diagnostic-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .diagnostic-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test Rapide</h1>
+        <p class="subtitle">Testez directement les applications</p>
+
+        <div class="alert">
+            <h3>⚠️ Problème Identifié</h3>
+            <p>Si vous voyez "Erreur de chargement", cela peut être dû à :</p>
+            <ul>
+                <li>Fichier ouvert directement sans serveur HTTP (protocole file://)</li>
+                <li>Restrictions de sécurité CORS du navigateur</li>
+                <li>Problème de chargement du fichier clubs-data.json</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Diagnostic Complet</h2>
+            <p style="text-align: center; margin-bottom: 20px;">
+                Cliquez ici pour diagnostiquer le problème
+            </p>
+            <div style="text-align: center;">
+                <a href="test-chargement.html" class="diagnostic-btn">🧪 Lancer le Diagnostic</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>⚽ Test Direct des Clubs</h2>
+            <p style="text-align: center; margin-bottom: 20px;">
+                Cliquez sur un club pour tester l'application
+            </p>
+            <div class="test-grid">
+                <a href="app.html#olympique-marseille" class="test-btn primary-btn">
+                    <span class="icon">⚽</span>
+                    <strong>Olympique de Marseille</strong>
+                    <div class="label">Ligue 1</div>
+                </a>
+                <a href="app.html#paris-fc" class="test-btn primary-btn">
+                    <span class="icon">⚽</span>
+                    <strong>Paris FC</strong>
+                    <div class="label">Ligue 1</div>
+                </a>
+                <a href="app.html#olympique-lyonnais" class="test-btn">
+                    <span class="icon">⚽</span>
+                    <strong>Olympique Lyonnais</strong>
+                    <div class="label">Ligue 1</div>
+                </a>
+                <a href="app.html#paris-saint-germain" class="test-btn">
+                    <span class="icon">⚽</span>
+                    <strong>Paris Saint-Germain</strong>
+                    <div class="label">Ligue 1</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🏆 Test des Fédérations</h2>
+            <p style="text-align: center; margin-bottom: 20px;">
+                Cliquez sur une fédération pour tester
+            </p>
+            <div class="test-grid">
+                <a href="app-federation.html#france" class="test-btn primary-btn">
+                    <span class="icon">🇫🇷</span>
+                    <strong>France</strong>
+                    <div class="label">Europe</div>
+                </a>
+                <a href="app-federation.html#bresil" class="test-btn primary-btn">
+                    <span class="icon">🇧🇷</span>
+                    <strong>Brésil</strong>
+                    <div class="label">Amérique du Sud</div>
+                </a>
+                <a href="app-federation.html#espagne" class="test-btn">
+                    <span class="icon">🇪🇸</span>
+                    <strong>Espagne</strong>
+                    <div class="label">Europe</div>
+                </a>
+                <a href="app-federation.html#argentine" class="test-btn">
+                    <span class="icon">🇦🇷</span>
+                    <strong>Argentine</strong>
+                    <div class="label">Amérique du Sud</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="solution">
+            <h3>✅ Solution Recommandée</h3>
+            <p><strong>Si l'application ne s'ouvre pas :</strong></p>
+            <ol style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                <li><strong>Option 1 (Recommandée) :</strong> Utiliser l'onglet <strong>Publish</strong> pour déployer l'application en ligne</li>
+                <li><strong>Option 2 :</strong> Démarrer un serveur HTTP local :
+                    <ul style="margin-top: 5px;">
+                        <li>Python : <code>python -m http.server 8000</code></li>
+                        <li>Node.js : <code>npx http-server</code></li>
+                        <li>VS Code : Utiliser l'extension "Live Server"</li>
+                    </ul>
+                </li>
+                <li><strong>Option 3 :</strong> Ouvrir le fichier de diagnostic pour identifier le problème exact</li>
+            </ol>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <h2>📚 Autres Ressources</h2>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                <a href="index.html" class="diagnostic-btn" style="background: rgba(255,255,255,0.2);">← Retour Accueil</a>
+                <a href="README.md" class="diagnostic-btn" style="background: rgba(255,255,255,0.2);">📖 Documentation</a>
+                <a href="🎉_VERSION_3.0_COMPLETE.md" class="diagnostic-btn" style="background: rgba(255,255,255,0.2);">📋 Version 3.0</a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; opacity: 0.8;">
+            <p>🔧 Si le problème persiste après avoir suivi ces étapes,</p>
+            <p>vérifiez la console du navigateur (F12) pour plus de détails</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - PaieCashPlay Paris FC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .club-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .club-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            color: #1e3a8a;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #334155;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #475569;
+        }
+
+        .forgot-password {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .social-login {
+            display: grid;
+            gap: 12px;
+        }
+
+        .btn-social {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-social:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .btn-social i {
+            font-size: 1.2em;
+        }
+
+        .btn-google { color: #DB4437; }
+        .btn-facebook { color: #1877F2; }
+        .btn-apple { color: #000000; }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+        }
+
+        .signup-link a {
+            color: #3b82f6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="club-header">
+            <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/2/22/Paris_FC_logo_2020.svg/1200px-Paris_FC_logo_2020.svg.png" alt="Paris FC" class="club-logo">
+            <h1>Connexion</h1>
+            <p class="subtitle">PaieCashPlay Paris FC</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" name="email" required placeholder="votre@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Mot de passe</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <div class="remember-forgot">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span>Se souvenir</span>
+                </label>
+                <a href="#" class="forgot-password" onclick="motDePasseOublie(event)">Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Se Connecter
+            </button>
+        </form>
+
+        <div class="divider">OU</div>
+
+        <div class="social-login">
+            <button class="btn-social btn-google" onclick="socialLogin('google')">
+                <i class="fab fa-google"></i> Continuer avec Google
+            </button>
+            <button class="btn-social btn-facebook" onclick="socialLogin('facebook')">
+                <i class="fab fa-facebook"></i> Continuer avec Facebook
+            </button>
+            <button class="btn-social btn-apple" onclick="socialLogin('apple')">
+                <i class="fab fa-apple"></i> Continuer avec Apple
+            </button>
+        </div>
+
+        <div class="signup-link">
+            Pas encore de compte ? <a href="inscription.html">S'inscrire</a>
+        </div>
+    </div>
+
+    <script>
+        // Configuration du club Paris FC
+        const CLUB_CONFIG = {
+            id: 'paris-fc',
+            nom: 'Paris FC',
+            stade: 'Stade Jean Bouin',
+            couleurPrimaire: '#1e3a8a',
+            couleurSecondaire: '#3b82f6'
+        };
+
+        localStorage.setItem('clubActuel', JSON.stringify(CLUB_CONFIG));
+
+        // Gestion de la connexion
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            // Récupérer les utilisateurs depuis localStorage
+            const utilisateurs = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+            
+            // Vérifier les credentials
+            const utilisateur = utilisateurs.find(u => {
+                const storedPassword = u.motdepasse ? atob(u.motdepasse) : u.motdepasse;
+                return u.email === email && storedPassword === password;
+            });
+
+            if (utilisateur) {
+                // Connexion réussie
+                localStorage.setItem('utilisateurConnecte', JSON.stringify(utilisateur));
+                
+                if (remember) {
+                    localStorage.setItem('rememberMe', 'true');
+                }
+
+                // Redirection vers l'app
+                window.location.href = 'index.html';
+            } else {
+                // Erreur de connexion
+                showError('Email ou mot de passe incorrect');
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function socialLogin(provider) {
+            // Simulation de connexion sociale
+            const mockUser = {
+                id: Date.now(),
+                email: `${provider}user@paiecash-parisfc.com`,
+                nom: `Utilisateur ${provider}`,
+                solde: 1000,
+                omcCoins: 1000,
+                club: 'paris-fc',
+                dateInscription: new Date().toISOString()
+            };
+
+            // Sauvegarder l'utilisateur
+            const utilisateurs = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+            utilisateurs.push(mockUser);
+            localStorage.setItem('utilisateurs', JSON.stringify(utilisateurs));
+            localStorage.setItem('utilisateurConnecte', JSON.stringify(mockUser));
+
+            // Redirection
+            window.location.href = 'index.html';
+        }
+
+        function motDePasseOublie(e) {
+            e.preventDefault();
+            const email = prompt('Entrez votre email :');
+            
+            if (email) {
+                alert(`Un code de réinitialisation a été envoyé à ${email}`);
+                // Implémentation réelle avec auth_ameliore.js
+            }
+        }
+
+        function creerCompte(e) {
+            e.preventDefault();
+            
+            const email = prompt('Entrez votre email :');
+            const password = prompt('Choisissez un mot de passe :');
+            
+            if (email && password) {
+                const utilisateurs = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+                
+                // Vérifier si l'email existe déjà
+                if (utilisateurs.some(u => u.email === email)) {
+                    alert('Cet email est déjà utilisé');
+                    return;
+                }
+
+                const nouvelUtilisateur = {
+                    id: Date.now(),
+                    email: email,
+                    motdepasse: btoa(password),
+                    solde: 0,
+                    omcCoins: 0,
+                    club: 'paris-fc',
+                    dateInscription: new Date().toISOString()
+                };
+
+                utilisateurs.push(nouvelUtilisateur);
+                localStorage.setItem('utilisateurs', JSON.stringify(utilisateurs));
+                localStorage.setItem('utilisateurConnecte', JSON.stringify(nouvelUtilisateur));
+
+                alert('Compte créé avec succès !');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+    
+    <script src="../../auth_ameliore.js"></script>
+</body>
+</html>

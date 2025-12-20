@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👉 Nouveau Design Disponible !</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 60px 40px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 100px;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .feature-list {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-list h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            color: #555;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #667eea;
+            font-weight: 900;
+            font-size: 1.3em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ff4444;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎮</div>
+        <h1>Nouveau Design TikTok Disponible !</h1>
+        <p>
+            Le nouveau design style TikTok avec gamification et monétisation est prêt.<br>
+            <strong>Cliquez ci-dessous pour le découvrir :</strong>
+        </p>
+
+        <a href="app-tiktok-gamification.html" class="btn">
+            🚀 Voir le Nouveau Design
+            <span class="badge">NOUVEAU</span>
+        </a>
+
+        <div class="feature-list">
+            <h3>Ce que vous allez voir :</h3>
+            <ul>
+                <li>Scroll vertical style TikTok</li>
+                <li>Design immersif plein écran</li>
+                <li>Gamification (points, badges, niveaux)</li>
+                <li>FOMO (countdown, urgence)</li>
+                <li>Monétisation (gagnez de l'argent)</li>
+                <li>Chat IA e-commerce intégré</li>
+                <li>Sidebar actions (like, comment)</li>
+            </ul>
+        </div>
+
+        <p style="font-size: 0.9em; color: #999;">
+            💡 <strong>Note :</strong> Le nouveau design est dans un fichier séparé pour que vous puissiez comparer.<br>
+            Une fois validé, nous l'intégrerons dans app.html pour tous les clubs.
+        </p>
+
+        <a href="app-tiktok-gamification.html" class="btn btn-secondary">
+            🎮 Tester Maintenant
+        </a>
+
+        <br><br>
+
+        <a href="app.html#olympique-marseille" style="color: #999; text-decoration: none; font-size: 0.9em;">
+            ← Retour à l'app classique
+        </a>
+    </div>
+</body>
+</html>

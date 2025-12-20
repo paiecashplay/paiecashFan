@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Ligue 1 & Ligue 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .league-section {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .league-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .club-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .club-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .club-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .club-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .club-city {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .badge-ligue1 {
+            background: #ff6b6b;
+        }
+
+        .badge-ligue2 {
+            background: #4ecdc4;
+        }
+
+        @media (max-width: 768px) {
+            .clubs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚽ PaieCashFan - Football Français</h1>
+        <p>Choisissez votre club de Ligue 1 ou Ligue 2</p>
+    </div>
+
+    <!-- LIGUE 1 -->
+    <div class="league-section">
+        <div class="league-title">🏆 LIGUE 1</div>
+        <div class="clubs-grid">
+            <div class="club-card" onclick="window.location.href='app-om.html'">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM">
+                </div>
+                <div class="club-name">Olympique de Marseille</div>
+                <div class="club-city">Marseille</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="window.location.href='app-paris-fc.html'">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Paris_FC_logo_%282020%29.svg" alt="Paris FC">
+                </div>
+                <div class="club-name">Paris FC</div>
+                <div class="club-city">Paris</div>
+                <div class="badge badge-ligue2">LIGUE 2</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application PSG à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/fr/8/86/Paris_Saint-Germain_Logo.svg" alt="PSG">
+                </div>
+                <div class="club-name">Paris Saint-Germain</div>
+                <div class="club-city">Paris</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application OL à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Olympique_Lyonnais_logo.svg" alt="OL">
+                </div>
+                <div class="club-name">Olympique Lyonnais</div>
+                <div class="club-city">Lyon</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Monaco à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c0/AS_Monaco_logo_%282021%29.svg" alt="Monaco">
+                </div>
+                <div class="club-name">AS Monaco</div>
+                <div class="club-city">Monaco</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application LOSC à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Lille_OSC_logo.svg" alt="LOSC">
+                </div>
+                <div class="club-name">LOSC Lille</div>
+                <div class="club-city">Lille</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Lens à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/RC_Lens_logo_%282017%29.svg" alt="Lens">
+                </div>
+                <div class="club-name">RC Lens</div>
+                <div class="club-city">Lens</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Rennes à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/fr/2/22/Stade_rennais_2019_logo.svg" alt="Rennes">
+                </div>
+                <div class="club-name">Stade Rennais</div>
+                <div class="club-city">Rennes</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Nice à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/OGC_Nice_logo.svg" alt="Nice">
+                </div>
+                <div class="club-name">OGC Nice</div>
+                <div class="club-city">Nice</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Strasbourg à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/RC_Strasbourg_Alsace_logo.svg" alt="Strasbourg">
+                </div>
+                <div class="club-name">RC Strasbourg</div>
+                <div class="club-city">Strasbourg</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Nantes à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/FC_Nantes_logo.svg" alt="Nantes">
+                </div>
+                <div class="club-name">FC Nantes</div>
+                <div class="club-city">Nantes</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Montpellier à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Montpellier_HSC_logo.svg" alt="Montpellier">
+                </div>
+                <div class="club-name">Montpellier HSC</div>
+                <div class="club-city">Montpellier</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Reims à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b6/Stade_de_Reims_logo_%282019%29.svg" alt="Reims">
+                </div>
+                <div class="club-name">Stade de Reims</div>
+                <div class="club-city">Reims</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Toulouse à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/52/Toulouse_FC_logo.svg" alt="Toulouse">
+                </div>
+                <div class="club-name">Toulouse FC</div>
+                <div class="club-city">Toulouse</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Brest à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/fr/3/3b/Stade_brestois_29_logo_2018.svg" alt="Brest">
+                </div>
+                <div class="club-name">Stade Brestois</div>
+                <div class="club-city">Brest</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Le Havre à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Le_Havre_AC_logo.svg" alt="Le Havre">
+                </div>
+                <div class="club-name">Le Havre AC</div>
+                <div class="club-city">Le Havre</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Angers à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Angers_SCO_logo.svg" alt="Angers">
+                </div>
+                <div class="club-name">Angers SCO</div>
+                <div class="club-city">Angers</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+
+            <div class="club-card" onclick="alert('Application Auxerre à venir')">
+                <div class="club-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/AJ_Auxerre_Logo.svg" alt="Auxerre">
+                </div>
+                <div class="club-name">AJ Auxerre</div>
+                <div class="club-city">Auxerre</div>
+                <div class="badge badge-ligue1">LIGUE 1</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 40px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px; max-width: 600px; margin: 40px auto;">
+        <p style="font-size: 14px; opacity: 0.9;">✅ OM et Paris FC : Applications complètes disponibles</p>
+        <p style="font-size: 14px; opacity: 0.9; margin-top: 10px;">⏳ Autres clubs : En développement</p>
+        <button onclick="window.location.href='accueil-clubs.html'" style="margin-top: 20px; padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold;">
+            🌍 Voir tous les clubs européens
+        </button>
+    </div>
+</body>
+</html>

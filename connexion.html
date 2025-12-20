@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Connexion - PaieCashFan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-section h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .logo-section p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .signup-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #ffe0e0;
+            border-left: 4px solid #ff3366;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .error-message p {
+            color: #cc0000;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message p {
+            color: #155724;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo-section">
+            <h1>🔓 Connexion</h1>
+            <p>PaieCashFan - Supporte ton Équipe</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            <p id="errorText"></p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <p id="successText"></p>
+        </div>
+        
+        <form id="connexionForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="exemple@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="motdepasse" placeholder="Votre mot de passe" required>
+            </div>
+            
+            <div class="forgot-password">
+                <a href="#">Mot de passe oublié ?</a>
+            </div>
+            
+            <button type="submit" class="btn-primary">🔓 Se connecter</button>
+        </form>
+        
+        <div class="signup-link">
+            Pas encore de compte ? <a href="inscription.html">S'inscrire</a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('connexionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const motdepasse = document.getElementById('motdepasse').value;
+            
+            // Récupérer l'utilisateur depuis localStorage
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (!user) {
+                showError('Aucun compte trouvé. Veuillez vous inscrire d\'abord.');
+                return;
+            }
+            
+            // Vérification simple (dans un vrai système, cela devrait être fait côté serveur)
+            if (user.email === email) {
+                showSuccess('✅ Connexion réussie ! Redirection...');
+                
+                // Rediriger vers l'app du club de l'utilisateur
+                setTimeout(() => {
+                    if (user.club.startsWith('fed-')) {
+                        window.location.href = `app-federation.html#${user.club}`;
+                    } else {
+                        window.location.href = `app.html#${user.club}`;
+                    }
+                }, 1500);
+            } else {
+                showError('Email ou mot de passe incorrect');
+            }
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            successText.textContent = message;
+            successDiv.classList.add('show');
+        }
+    </script>
+</body>
+</html>

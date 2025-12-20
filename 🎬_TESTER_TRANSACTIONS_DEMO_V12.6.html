@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Transactions de Démonstration - V12.6</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .stats {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .stats h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #fbbf24;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        .features {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .features h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #60a5fa;
+        }
+        .feature-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .icon {
+            font-size: 24px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+        .note {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .note strong {
+            color: #fbbf24;
+        }
+        .countdown {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Transactions de Démonstration V12.6</h1>
+        <p class="subtitle">15 transactions réalistes générées automatiquement</p>
+        
+        <div class="stats">
+            <h2>📊 Statistiques</h2>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Transactions générées</div>
+                    <div class="stat-value">15</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Types de paiement</div>
+                    <div class="stat-value">6</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Période</div>
+                    <div class="stat-value">7 jours</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Animation</div>
+                    <div class="stat-value">100ms</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>🎯 Fonctionnalités Ajoutées</h2>
+            <div class="feature-item">
+                <span class="icon">🎬</span>
+                <div>
+                    <strong>Génération automatique au chargement</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">15 transactions créées lors de l'ouverture de l'app</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🛍️</span>
+                <div>
+                    <strong>6 types de transactions</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">Boutique, Wallet, Crypto, Alipay, WeChat, Stablecoin</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">📅</span>
+                <div>
+                    <strong>Dates échelonnées sur 7 jours</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">Transactions réparties sur la semaine avec heures aléatoires</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">💾</span>
+                <div>
+                    <strong>Sauvegarde automatique</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">Les transactions sont enregistrées dans localStorage</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🔄</span>
+                <div>
+                    <strong>Protection contre les doublons</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">Ne génère pas de nouvelles transactions si déjà existantes</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="icon">✨</span>
+                <div>
+                    <strong>Animation progressive</strong><br>
+                    <span style="font-size: 13px; opacity: 0.8;">Affichage avec délai de 100ms entre chaque transaction</span>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="ouvrirApp()">🚀 Ouvrir l'App avec Transactions DEMO</button>
+        <button class="btn btn-secondary" onclick="effacerEtRegenerer()">🔄 Effacer et Régénérer</button>
+        
+        <div class="note">
+            <strong>📝 Note :</strong> Si vous avez déjà des transactions enregistrées, elles ne seront pas écrasées. 
+            Pour régénérer les transactions de démonstration, cliquez sur <strong>"Effacer et Régénérer"</strong> ci-dessus.
+        </div>
+        
+        <div class="countdown">Redirection automatique dans <strong id="countdown">10</strong> secondes...</div>
+    </div>
+    
+    <script>
+        function ouvrirApp() {
+            window.location.href = 'app-universal-simple.html?club=olympique-de-marseille';
+        }
+        
+        function effacerEtRegenerer() {
+            // Effacer les transactions du localStorage
+            localStorage.removeItem('transactions');
+            alert('✅ Transactions effacées !\n\nVous allez être redirigé vers l\'app.\nDe nouvelles transactions de démonstration seront générées.');
+            ouvrirApp();
+        }
+        
+        // Compte à rebours
+        let seconds = 10;
+        const countdownElement = document.getElementById('countdown');
+        
+        const interval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(interval);
+                ouvrirApp();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

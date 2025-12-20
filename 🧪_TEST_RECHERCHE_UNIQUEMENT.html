@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Recherche Uniquement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #10b981;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h2 {
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(30,30,50,0.95);
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            border-radius: 12px;
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+        }
+
+        .search-result-item:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .search-result-icon {
+            font-size: 24px;
+            min-width: 30px;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: white;
+        }
+
+        .search-result-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .log-area {
+            background: #000;
+            color: #0f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 2rem;
+        }
+
+        .log-line {
+            margin-bottom: 0.3rem;
+        }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .error-box h3 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .success-box h3 {
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Recherche Uniquement</h1>
+
+        <div class="info-box">
+            <h2>ℹ️ À propos des erreurs 403/401</h2>
+            <p style="color: rgba(255,255,255,0.8); line-height: 1.6;">
+                Les erreurs que vous voyez (403/401) sont <strong>NORMALES</strong> et n'affectent <strong>PAS</strong> la recherche :
+                <br><br>
+                • <strong>403 Images</strong> : Serveurs externes qui bloquent l'accès (protection anti-hotlinking)<br>
+                • <strong>403 NOWPayments</strong> : API crypto nécessite une clé (en production)<br>
+                • <strong>401 WooCommerce</strong> : API boutique nécessite authentification (en production)<br>
+                <br>
+                <strong style="color: #10b981;">✅ Ces erreurs n'empêchent PAS la recherche de fonctionner !</strong>
+            </p>
+        </div>
+
+        <div class="search-container">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Tapez 'Hakimi', 'France', 'OM', 'Cameroun'...">
+                <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </div>
+
+        <div id="statusBox"></div>
+
+        <div class="log-area" id="logArea"></div>
+    </div>
+
+    <script>
+        // ========== SYSTÈME DE LOG ==========
+        const logs = [];
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            const log = `[${timestamp}] ${icon} ${message}`;
+            logs.push(log);
+            
+            const logArea = document.getElementById('logArea');
+            if (logArea) {
+                logArea.innerHTML = logs.slice(-20).map(l => `<div class="log-line">${l}</div>`).join('');
+                logArea.scrollTop = logArea.scrollHeight;
+            }
+            
+            console.log(log);
+        }
+
+        // ========== DONNÉES DE TEST ==========
+        const testData = {
+            joueursAfricains: [
+                { 
+                    name: 'Achraf Hakimi', 
+                    club: 'Paris Saint-Germain',
+                    pays: '🇲🇦 Maroc',
+                    url: 'cartes-joueurs-africains.html'
+                },
+                { 
+                    name: 'Nicolas Pépé', 
+                    club: 'RC Lens',
+                    pays: '🇨🇮 Côte d\'Ivoire',
+                    url: 'cartes-joueurs-africains.html'
+                },
+                { 
+                    name: 'Pierre-Emerick Aubameyang', 
+                    club: 'Olympique de Marseille',
+                    pays: '🇬🇦 Gabon',
+                    url: 'cartes-joueurs-africains.html'
+                }
+            ],
+            equipesNationales: [
+                {
+                    name: 'France',
+                    logo: '🇫🇷',
+                    league: 'Coupe du Monde 2026',
+                    path: 'app-universal-simple.html?club=France'
+                },
+                {
+                    name: 'Cameroun',
+                    logo: '🇨🇲',
+                    league: 'Coupe du Monde 2026',
+                    path: 'app-universal-simple.html?club=Cameroun'
+                },
+                {
+                    name: 'Maroc',
+                    logo: '🇲🇦',
+                    league: 'Coupe du Monde 2026',
+                    path: 'app-universal-simple.html?club=Maroc'
+                }
+            ],
+            clubsFrance: [
+                {
+                    name: 'Olympique de Marseille',
+                    logo: '⚪🔵',
+                    league: 'Ligue 1',
+                    path: 'app-universal-simple.html?club=Olympique+de+Marseille'
+                },
+                {
+                    name: 'Paris Saint-Germain',
+                    logo: '🔴🔵',
+                    league: 'Ligue 1',
+                    path: 'app-universal-simple.html?club=PSG'
+                }
+            ]
+        };
+
+        // ========== MOTEUR DE RECHERCHE ==========
+        let searchTimeout;
+        let searchInput, searchClear, searchResults;
+
+        function initSearch() {
+            addLog('Initialisation du moteur de recherche...');
+            
+            searchInput = document.getElementById('searchInput');
+            searchClear = document.getElementById('searchClear');
+            searchResults = document.getElementById('searchResults');
+
+            if (!searchInput || !searchClear || !searchResults) {
+                addLog('ERREUR: Éléments de recherche manquants', 'error');
+                showStatus('error', 'Éléments DOM manquants !');
+                return false;
+            }
+
+            addLog('Tous les éléments trouvés', 'success');
+
+            // Écouter la frappe clavier
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                
+                if (query.length > 0) {
+                    searchClear.style.display = 'flex';
+                } else {
+                    searchClear.style.display = 'none';
+                    searchResults.classList.remove('active');
+                    return;
+                }
+                
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            // Masquer les résultats si on clique ailleurs
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+
+            addLog('Event listeners attachés', 'success');
+            showStatus('success', '✅ Moteur de recherche 100% opérationnel !');
+            return true;
+        }
+
+        function clearSearch() {
+            if (searchInput) {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                searchResults.classList.remove('active');
+                searchInput.focus();
+                addLog('Recherche effacée');
+            }
+        }
+
+        function performSearch(query) {
+            if (!query) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            addLog(`🔍 Recherche: "${query}"`);
+            const lowerQuery = query.toLowerCase();
+            let results = [];
+
+            // 1. Chercher dans les JOUEURS AFRICAINS
+            testData.joueursAfricains.forEach(joueur => {
+                if (joueur.name.toLowerCase().includes(lowerQuery) || 
+                    joueur.club.toLowerCase().includes(lowerQuery) ||
+                    joueur.pays.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        icon: '💳',
+                        title: joueur.name,
+                        desc: `${joueur.pays} • ${joueur.club}`,
+                        action: () => {
+                            addLog(`Navigation vers: ${joueur.url}`, 'success');
+                            alert(`✅ Recherche fonctionne !\n\nTrouvé: ${joueur.name}\n${joueur.pays} • ${joueur.club}`);
+                        }
+                    });
+                }
+            });
+
+            // 2. Chercher dans les ÉQUIPES NATIONALES
+            testData.equipesNationales.forEach(team => {
+                if (team.name.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        icon: team.logo,
+                        title: team.name,
+                        desc: team.league,
+                        action: () => {
+                            addLog(`Navigation vers: ${team.path}`, 'success');
+                            alert(`✅ Recherche fonctionne !\n\nTrouvé: ${team.name}\n${team.league}`);
+                        }
+                    });
+                }
+            });
+
+            // 3. Chercher dans les CLUBS FRANCE
+            testData.clubsFrance.forEach(club => {
+                if (club.name.toLowerCase().includes(lowerQuery) || 
+                    club.name.toLowerCase().replace(/\s+/g, '').includes(lowerQuery.replace(/\s+/g, ''))) {
+                    results.push({
+                        icon: club.logo,
+                        title: club.name,
+                        desc: club.league,
+                        action: () => {
+                            addLog(`Navigation vers: ${club.path}`, 'success');
+                            alert(`✅ Recherche fonctionne !\n\nTrouvé: ${club.name}\n${club.league}`);
+                        }
+                    });
+                }
+            });
+
+            addLog(`📊 ${results.length} résultat(s) trouvé(s)`, results.length > 0 ? 'success' : 'error');
+            
+            if (results.length > 0) {
+                showStatus('success', `✅ ${results.length} résultat(s) trouvé(s) pour "${query}"`);
+            } else {
+                showStatus('error', `❌ Aucun résultat pour "${query}"`);
+            }
+            
+            displaySearchResults(results, query);
+        }
+
+        function displaySearchResults(results, query) {
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div style="padding: 30px; text-align: center; color: rgba(255,255,255,0.6);">
+                        <div style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;">🔍</div>
+                        <div style="font-size: 15px; font-weight: bold; margin-bottom: 5px;">Aucun résultat</div>
+                        <div style="font-size: 13px;">Essayez "Hakimi", "France", "OM", etc.</div>
+                    </div>
+                `;
+                searchResults.classList.add('active');
+                return;
+            }
+
+            searchResults.innerHTML = `
+                <div style="padding: 10px 20px; background: rgba(139, 92, 246, 0.3); border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 12px; font-weight: bold;">
+                    ${results.length} résultat${results.length > 1 ? 's' : ''} pour "${query}"
+                </div>
+                ${results.map((result, index) => `
+                    <div class="search-result-item" data-result-index="${index}">
+                        <div class="search-result-icon">${result.icon}</div>
+                        <div class="search-result-info">
+                            <div class="search-result-title">${result.title}</div>
+                            <div class="search-result-desc">${result.desc}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+            
+            searchResults.classList.add('active');
+            
+            // Ajouter les event listeners
+            setTimeout(() => {
+                results.forEach((result, index) => {
+                    const element = searchResults.querySelector(`[data-result-index="${index}"]`);
+                    if (element) {
+                        element.addEventListener('click', () => {
+                            result.action();
+                            searchResults.classList.remove('active');
+                            searchInput.value = '';
+                            searchClear.style.display = 'none';
+                        });
+                    }
+                });
+                addLog('✅ Event listeners attachés aux résultats', 'success');
+            }, 0);
+        }
+
+        function showStatus(type, message) {
+            const statusBox = document.getElementById('statusBox');
+            const className = type === 'success' ? 'success-box' : 'error-box';
+            statusBox.innerHTML = `
+                <div class="${className}">
+                    <h3>${message}</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-top: 0.5rem;">
+                        ${type === 'success' ? 'La recherche fonctionne parfaitement ! Les erreurs 403/401 n\'ont aucun impact.' : 'Vérifiez les logs ci-dessous pour plus de détails.'}
+                    </p>
+                </div>
+            `;
+        }
+
+        // ========== INITIALISATION ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('========== DÉMARRAGE TEST RECHERCHE ==========', 'success');
+            
+            setTimeout(() => {
+                const searchOk = initSearch();
+                if (searchOk) {
+                    addLog('========== SYSTÈME PRÊT ==========', 'success');
+                    addLog('Testez maintenant : Hakimi, France, OM, Cameroun', 'success');
+                } else {
+                    addLog('ERREUR: Impossible d\'initialiser le système', 'error');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎴 Cartes OM FAN & VIP x PaieCash - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .card-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-label {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card {
+            position: relative;
+            width: 380px;
+            height: 240px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        
+        .card-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 15%;
+        }
+        
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card-content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .logo-om {
+            background: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .logo-paiecash {
+            background: white;
+            padding: 5px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .logo-paiecash-text {
+            color: #0052a5;
+            font-weight: bold;
+            font-size: 15px;
+            font-style: italic;
+            letter-spacing: -0.5px;
+        }
+        
+        .card-title-wrapper {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .card-title-box {
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(12px);
+            padding: 12px 28px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 2px solid rgba(255,255,255,0.35);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+            letter-spacing: 1.5px;
+        }
+        
+        .card-subtitle {
+            font-size: 12px;
+            color: white;
+            opacity: 0.95;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .chip {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            width: 48px;
+            height: 36px;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+        }
+        
+        .nfc-icon {
+            font-size: 26px;
+            opacity: 0.9;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+        }
+        
+        .price-info {
+            flex: 1;
+        }
+        
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            margin-bottom: 4px;
+        }
+        
+        .benefit {
+            font-size: 11px;
+            color: white;
+            opacity: 0.95;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+            margin-top: 2px;
+        }
+        
+        .logo-mastercard {
+            background: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+        }
+        
+        .mastercard-circles {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+        
+        .circle-red {
+            width: 20px;
+            height: 20px;
+            background: #EB001B;
+            border-radius: 50%;
+        }
+        
+        .circle-orange {
+            width: 20px;
+            height: 20px;
+            background: #F79E1B;
+            border-radius: 50%;
+            margin-left: -10px;
+        }
+        
+        .redirect-info {
+            text-align: center;
+            margin-top: 50px;
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+        }
+        
+        .redirect-info h2 {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .redirect-info p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                width: 100%;
+                max-width: 380px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎴 Cartes OM x PaieCash</h1>
+        <p>Cartes co-brandées officielles OM Africa</p>
+    </div>
+    
+    <div class="cards-container">
+        <!-- Carte OM FAN x PaieCash -->
+        <div class="card-wrapper">
+            <div class="card-label">💳 CARTE GRATUITE</div>
+            <div class="card">
+                <img src="https://www.genspark.ai/api/files/s/mRvbluWz" 
+                     alt="Pierre-Emerick Aubameyang" 
+                     class="card-bg">
+                <div class="card-overlay" style="background: linear-gradient(135deg, rgba(0, 82, 165, 0.78), rgba(0, 180, 216, 0.78));"></div>
+                
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="logo-om">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" fill="#0052a5"/>
+                                <circle cx="12" cy="12" r="7" fill="white"/>
+                            </svg>
+                            <div style="color: #0052a5; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">OM</div>
+                        </div>
+                        <div class="logo-paiecash">
+                            <div class="logo-paiecash-text">PaieCash</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-title-wrapper">
+                        <div class="card-title-box">
+                            <div class="card-title">Carte OM FAN</div>
+                            <div class="card-subtitle">x PaieCash</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="card-row">
+                            <div class="chip"></div>
+                            <div class="nfc-icon">📡</div>
+                        </div>
+                        <div class="card-row">
+                            <div class="price-info">
+                                <div class="price" style="color: #4ade80;">GRATUITE</div>
+                                <div class="benefit">✅ +2% cashback OM</div>
+                            </div>
+                            <div class="logo-mastercard">
+                                <div class="mastercard-circles">
+                                    <div class="circle-red"></div>
+                                    <div class="circle-orange"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Carte OM VIP x PaieCash -->
+        <div class="card-wrapper">
+            <div class="card-label">💎 CARTE PREMIUM</div>
+            <div class="card">
+                <img src="https://www.genspark.ai/api/files/s/mRvbluWz" 
+                     alt="Pierre-Emerick Aubameyang" 
+                     class="card-bg">
+                <div class="card-overlay" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.45), rgba(0, 82, 165, 0.80));"></div>
+                
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="logo-om">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" fill="#0052a5"/>
+                                <circle cx="12" cy="12" r="7" fill="white"/>
+                            </svg>
+                            <div style="color: #0052a5; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">OM</div>
+                        </div>
+                        <div class="logo-paiecash">
+                            <div class="logo-paiecash-text">PaieCash</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-title-wrapper">
+                        <div class="card-title-box">
+                            <div class="card-title">Carte OM VIP</div>
+                            <div class="card-subtitle">x PaieCash</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="card-row">
+                            <div class="chip"></div>
+                            <div class="nfc-icon">📡</div>
+                        </div>
+                        <div class="card-row">
+                            <div class="price-info">
+                                <div class="price" style="color: #FFD700;">1,970 FCFA</div>
+                                <div class="benefit">✅ +5% cashback OM</div>
+                                <div class="benefit">✅ Priorité billetterie</div>
+                            </div>
+                            <div class="logo-mastercard">
+                                <div class="mastercard-circles">
+                                    <div class="circle-red"></div>
+                                    <div class="circle-orange"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="redirect-info">
+        <h2>🚀 Voir dans l'application complète</h2>
+        <p>Ces cartes sont intégrées dans la section OM Afrique de PaieCashFan. Cliquez ci-dessous pour accéder à l'application complète avec toutes les fonctionnalités.</p>
+        <a href="app-universal-simple.html?club=olympique-de-marseille" class="btn">
+            Ouvrir PaieCashFan OM Afrique
+        </a>
+    </div>
+    
+    <script>
+        // Auto-redirect après 10 secondes
+        setTimeout(() => {
+            console.log('🚀 Redirection automatique vers OM Afrique...');
+            window.location.href = 'app-universal-simple.html?club=olympique-de-marseille';
+        }, 10000);
+        
+        // Log pour debug
+        console.log('🎴 Preview des Cartes OM FAN & VIP x PaieCash');
+        console.log('✅ Logo OM: haut gauche');
+        console.log('✅ Logo PaieCash: haut droit');
+        console.log('✅ Logo Mastercard: bas droit');
+        console.log('✅ Photo Aubameyang: tête complète visible');
+    </script>
+</body>
+</html>

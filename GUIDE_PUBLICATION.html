@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📤 Guide de Publication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #00B0E0, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .alert {
+            background: rgba(255,193,7,0.2);
+            border: 3px solid #ffc107;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .alert h2 {
+            color: #ffc107;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        .alert p {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        
+        .steps {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .steps h3 {
+            color: #00ff88;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            background: rgba(0,176,224,0.15);
+            border-left: 4px solid #00B0E0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #00B0E0, #00ff88);
+            color: #1a1a2e;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .step-content {
+            display: inline-block;
+            vertical-align: middle;
+            width: calc(100% - 60px);
+        }
+        
+        .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .step-desc {
+            font-size: 16px;
+            color: rgba(255,255,255,0.85);
+        }
+        
+        .highlight {
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: #00ff88;
+            font-weight: 700;
+        }
+        
+        .info-box {
+            background: rgba(0,176,224,0.2);
+            border: 2px solid #00B0E0;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .info-box h4 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .btn-publish {
+            background: linear-gradient(135deg, #00B0E0, #00ff88);
+            color: #1a1a2e;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            font-weight: 900;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 15px auto;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(0,255,136,0.5);
+            text-transform: uppercase;
+        }
+        
+        .btn-publish:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(0,255,136,0.7);
+        }
+        
+        .visual-guide {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .visual-guide h4 {
+            color: #00B0E0;
+            margin-bottom: 15px;
+        }
+        
+        code {
+            background: rgba(0,0,0,0.5);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 Guide de Publication</h1>
+            <p style="font-size: 20px; color: rgba(255,255,255,0.8);">
+                Comment accéder à votre application
+            </p>
+        </div>
+        
+        <div class="alert">
+            <h2>🎯 Le Problème Actuel</h2>
+            <p>
+                Vous voyez <strong>"404 Page not found: /index.html"</strong>
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>Pourquoi ?</strong> Les fichiers existent bien sur le système, 
+                mais ils ne sont pas encore <strong>publiés/déployés</strong> sur le serveur web.
+            </p>
+        </div>
+        
+        <div class="steps">
+            <h3>✅ Solution : Publier l'Application</h3>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                    <div class="step-title">Trouvez l'onglet "Publish" (Publier)</div>
+                    <div class="step-desc">
+                        Dans votre interface, cherchez un onglet ou bouton nommé :
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><span class="highlight">Publish</span> (Publier)</li>
+                            <li><span class="highlight">Deploy</span> (Déployer)</li>
+                            <li><span class="highlight">Go Live</span> (Mettre en ligne)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                    <div class="step-title">Cliquez sur "Publish"</div>
+                    <div class="step-desc">
+                        Cela va déployer tous vos fichiers (index.html, script.js, style.css, etc.) 
+                        sur le serveur web pour qu'ils soient accessibles via l'URL.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                    <div class="step-title">Attendez le déploiement</div>
+                    <div class="step-desc">
+                        Le système va copier tous les fichiers. Cela prend généralement 10-30 secondes.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <div class="step-content">
+                    <div class="step-title">Ouvrez l'URL fournie</div>
+                    <div class="step-desc">
+                        Une fois publié, le système vous donnera une URL (comme <code>https://votre-projet.example.com</code>).
+                        Cliquez dessus pour accéder à votre application !
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h4>💡 Où Trouver l'Onglet "Publish" ?</h4>
+            <p style="margin-bottom: 15px;">Selon votre environnement, l'onglet peut être :</p>
+            <ul style="margin-left: 20px;">
+                <li>📍 <strong>En haut de l'interface</strong> (barre de menu)</li>
+                <li>📍 <strong>Dans le panneau latéral gauche</strong></li>
+                <li>📍 <strong>Dans le menu "File" ou "Project"</strong></li>
+                <li>📍 <strong>Icône fusée 🚀 ou nuage ☁️</strong></li>
+            </ul>
+        </div>
+        
+        <div class="visual-guide">
+            <h4>🔍 Ce Qu'Il Faut Chercher</h4>
+            <p style="margin-bottom: 15px;">Mots-clés à rechercher dans l'interface :</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
+                <div style="background: rgba(0,176,224,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+                    <strong>Publish</strong>
+                </div>
+                <div style="background: rgba(0,176,224,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+                    <strong>Deploy</strong>
+                </div>
+                <div style="background: rgba(0,176,224,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+                    <strong>Go Live</strong>
+                </div>
+                <div style="background: rgba(0,176,224,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+                    <strong>Preview</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box" style="background: rgba(0,255,136,0.2); border-color: #00ff88;">
+            <h4>✅ Après Publication</h4>
+            <p style="margin-bottom: 15px;">Une fois publié, vous pourrez :</p>
+            <ul style="margin-left: 20px;">
+                <li>✅ Accéder à <code>index.html</code> via l'URL fournie</li>
+                <li>✅ Voir toutes les 11 légendes OM avec leurs photos</li>
+                <li>✅ Explorer les 10 NFTs collectors</li>
+                <li>✅ Utiliser le Wallet Multi-Club (6 stablecoins)</li>
+                <li>✅ Tester toutes les 80+ fonctionnalités</li>
+            </ul>
+        </div>
+        
+        <div class="steps">
+            <h3>🔄 Alternative : Preview URL</h3>
+            
+            <div class="step">
+                <span class="step-number">💡</span>
+                <div class="step-content">
+                    <div class="step-title">Cherchez une "Preview URL"</div>
+                    <div class="step-desc">
+                        Certains environnements fournissent une URL de prévisualisation automatique.
+                        Cherchez dans l'interface une section "Preview", "Live Server", ou "Dev Server".
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert" style="background: rgba(255,0,0,0.15); border-color: #ff6b6b;">
+            <h2>🆘 Toujours Bloqué ?</h2>
+            <p style="margin-bottom: 15px;">
+                Si vous ne trouvez pas l'onglet "Publish" ou si ça ne fonctionne pas :
+            </p>
+            <p style="font-size: 20px; font-weight: 700; color: #00ff88; margin-top: 20px;">
+                📞 Contactez-moi :<br>
+                📧 etot@paiecash.com<br>
+                📱 +33 7 67 12 96 52
+            </p>
+            <p style="margin-top: 20px; font-size: 16px;">
+                Je vous aiderai à publier l'application et vous fournirai directement l'URL accessible !
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+            <h3 style="color: #00ff88; margin-bottom: 20px;">🎯 Résumé en 1 Phrase</h3>
+            <p style="font-size: 22px; line-height: 1.8;">
+                <strong>Cherchez l'onglet "Publish" ou "Deploy" et cliquez dessus</strong><br>
+                pour que vos fichiers soient accessibles via l'URL ! 🚀
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: rgba(255,255,255,0.5); font-size: 14px;">
+            <p>Version 2.4.1 - 5 décembre 2024</p>
+            <p style="margin-top: 10px; font-size: 18px;">💙⚪ <strong>Allez l'OM !</strong> 🏟️</p>
+        </div>
+    </div>
+</body>
+</html>

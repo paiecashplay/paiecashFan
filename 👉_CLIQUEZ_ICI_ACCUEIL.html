@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👉 Cliquez ici - Accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 50px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to right, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 22px 55px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 40px;
+            font-weight: 900;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            border: 3px solid #FFD700;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .highlight h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .highlight p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .arrow-down {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: bounce 1.5s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                padding: 18px 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-badge">✅ INTÉGRATION COMPLÈTE</div>
+        
+        <div class="icon">🏠</div>
+        
+        <h1>ACCUEIL</h1>
+        <div class="subtitle">
+            Tous les clubs et fédérations sont maintenant disponibles !<br>
+            <strong>143 entités</strong> : 38 clubs français + 105 fédérations mondiales
+        </div>
+
+        <div class="arrow-down">👇</div>
+
+        <div class="btn-container">
+            <a href="index.html" class="btn">🚀 VOIR L'ACCUEIL</a>
+            <a href="app.html" class="btn btn-secondary">⚽ OUVRIR L'APP</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">18</div>
+                <div class="stat-label">🇫🇷 Clubs Ligue 1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">20</div>
+                <div class="stat-label">🇫🇷 Clubs Ligue 2</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">🌍 Confédérations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">105</div>
+                <div class="stat-label">🏆 Fédérations</div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🇫🇷</div>
+                <div class="feature-text">
+                    <strong>Ligue 1 & 2</strong><br>
+                    38 clubs français professionnels
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌍</div>
+                <div class="feature-text">
+                    <strong>FIFA</strong><br>
+                    Coupe du Monde 2026
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🇪🇺</div>
+                <div class="feature-text">
+                    <strong>UEFA</strong><br>
+                    20 nations européennes
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌍</div>
+                <div class="feature-text">
+                    <strong>CAF</strong><br>
+                    14 nations africaines
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌎</div>
+                <div class="feature-text">
+                    <strong>CONMEBOL</strong><br>
+                    11 nations sud-américaines
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌏</div>
+                <div class="feature-text">
+                    <strong>AFC</strong><br>
+                    11 nations asiatiques
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌎</div>
+                <div class="feature-text">
+                    <strong>CONCACAF</strong><br>
+                    9 nations nord-américaines
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-text">
+                    <strong>Recherche</strong><br>
+                    Trouvez votre club instantanément
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h2>🎯 COMMENT ÇA MARCHE</h2>
+            <p><strong>1️⃣</strong> Cliquez sur "VOIR L'ACCUEIL" ci-dessus</p>
+            <p><strong>2️⃣</strong> Choisissez une catégorie (Ligue 1, UEFA, FIFA...)</p>
+            <p><strong>3️⃣</strong> Recherchez votre club avec la barre de recherche</p>
+            <p><strong>4️⃣</strong> Cliquez sur le club de votre choix</p>
+            <p><strong>5️⃣</strong> L'application se charge avec votre club personnalisé</p>
+            <p><strong>6️⃣</strong> Profitez des 10 onglets avec design TikTok !</p>
+        </div>
+
+        <div style="margin-top: 50px; padding: 25px; background: rgba(255, 255, 255, 0.08); border-radius: 15px;">
+            <h3 style="font-size: 24px; margin-bottom: 15px;">📋 CLUBS DISPONIBLES (Exemples)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; text-align: left;">
+                <div>
+                    <strong>🇫🇷 Ligue 1:</strong><br>
+                    PSG, OM, OL, Monaco, Lille, Nice, Lens, Rennes...
+                </div>
+                <div>
+                    <strong>🇫🇷 Ligue 2:</strong><br>
+                    Metz, Saint-Étienne, Clermont, Guingamp, Caen...
+                </div>
+                <div>
+                    <strong>🇪🇺 UEFA:</strong><br>
+                    France, Allemagne, Espagne, Italie, Angleterre...
+                </div>
+                <div>
+                    <strong>🌍 Afrique:</strong><br>
+                    Sénégal, Maroc, Égypte, Nigeria, Cameroun...
+                </div>
+                <div>
+                    <strong>🌎 Amérique:</strong><br>
+                    Brésil, Argentine, USA, Mexique, Uruguay...
+                </div>
+                <div>
+                    <strong>🌏 Asie:</strong><br>
+                    Japon, Corée du Sud, Iran, Arabie Saoudite...
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(74, 222, 128, 0.2); border: 2px solid #4ade80; border-radius: 15px;">
+            <h3 style="font-size: 20px; margin-bottom: 10px;">✅ TOUT EST FONCTIONNEL</h3>
+            <p style="font-size: 16px; line-height: 1.8;">
+                ✅ 143 clubs et fédérations intégrés<br>
+                ✅ Recherche instantanée<br>
+                ✅ Navigation par onglets<br>
+                ✅ Sauvegarde du choix (LocalStorage)<br>
+                ✅ Personnalisation de l'app<br>
+                ✅ Design moderne et responsive
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; font-size: 14px; opacity: 0.7;">
+            <p>📅 Version 6.0 - 11 Décembre 2025</p>
+            <p>⚽ PaieCashFan - Application Complète</p>
+        </div>
+    </div>
+</body>
+</html>

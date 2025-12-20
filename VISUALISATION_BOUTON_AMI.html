@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisation Bouton ➕ Ami</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0e9cda 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #0e9cda;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 36px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .version {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #e0e0e0;
+        }
+        .version h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .version.new {
+            border-color: #00ff88;
+            background: linear-gradient(135deg, #e0ffe8, #f0fff4);
+        }
+        .version.old {
+            border-color: #ff3366;
+            background: linear-gradient(135deg, #ffe0e8, #fff0f4);
+        }
+        .mockup {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .stories-bar {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .story-circle {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .story-circle:hover {
+            transform: scale(1.05);
+        }
+        .story-circle img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .story-circle.add-btn {
+            background: linear-gradient(135deg, #0e9cda, #0c7db3);
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(14, 156, 218, 0.4);
+        }
+        .story-name {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .floating-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0e9cda, #0c7db3);
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(14, 156, 218, 0.4);
+            border: none;
+            cursor: pointer;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 48px;
+            color: #0e9cda;
+            margin: 20px 0;
+        }
+        .features {
+            background: #e3f2fd;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        .features h3 {
+            color: #1565C0;
+            margin-bottom: 15px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        .features li {
+            padding: 10px 0;
+            color: #333;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .features li::before {
+            content: '✅';
+            font-size: 20px;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #0e9cda, #0c7db3);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(14, 156, 218, 0.4);
+        }
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👥 Bouton ➕ Ami Déplacé</h1>
+        <p class="subtitle">Le bouton est maintenant à côté d'Emma Leroy dans les stories</p>
+        
+        <div class="comparison">
+            <!-- AVANT -->
+            <div class="version old">
+                <h2>❌ AVANT</h2>
+                <div class="mockup" style="position: relative;">
+                    <button class="floating-btn">➕</button>
+                    <div class="stories-bar">
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=45" alt="Emma">
+                            </div>
+                            <div class="story-name">Emma</div>
+                        </div>
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=32" alt="Sophie">
+                            </div>
+                            <div class="story-name">Sophie</div>
+                        </div>
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=15" alt="Thomas">
+                            </div>
+                            <div class="story-name">Thomas</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #cc0044; font-weight: 600;">
+                    Bouton flottant séparé
+                </p>
+            </div>
+            
+            <!-- APRÈS -->
+            <div class="version new">
+                <h2>✅ APRÈS</h2>
+                <div class="mockup">
+                    <div class="stories-bar">
+                        <div>
+                            <div class="story-circle add-btn">
+                                ➕
+                            </div>
+                            <div class="story-name">Ajouter</div>
+                        </div>
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=45" alt="Emma">
+                            </div>
+                            <div class="story-name">Emma</div>
+                        </div>
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=32" alt="Sophie">
+                            </div>
+                            <div class="story-name">Sophie</div>
+                        </div>
+                        <div>
+                            <div class="story-circle">
+                                <img src="https://i.pravatar.cc/100?img=15" alt="Thomas">
+                            </div>
+                            <div class="story-name">Thomas</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #00c851; font-weight: 600;">
+                    Bouton intégré dans les stories
+                </p>
+            </div>
+        </div>
+        
+        <div class="arrow">⬇️</div>
+        
+        <div class="features">
+            <h3>✨ Avantages du Nouveau Design</h3>
+            <ul>
+                <li>Intégré naturellement dans la barre des stories</li>
+                <li>Positionné juste à côté d'Emma Leroy</li>
+                <li>Ne cache plus le contenu de la page</li>
+                <li>Design cohérent avec les autres éléments</li>
+                <li>Facilement accessible et visible</li>
+                <li>Logique : "Ajoutez des amis pour voir leurs stories"</li>
+            </ul>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #fff3cd, #ffe69c); padding: 25px; border-radius: 15px; margin-top: 30px; text-align: center;">
+            <h3 style="color: #856404; margin-bottom: 15px;">📍 Position Exacte</h3>
+            <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block;">
+                <code style="font-size: 16px; color: #333; font-weight: 600;">
+                    [➕] → [Emma] → [Sophie] → [Thomas] → [Marie] → ...
+                </code>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <a href="index.html" class="btn">📱 Voir dans l'Application</a>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
+            <p><strong>Version :</strong> 2.7.3</p>
+            <p><strong>Date :</strong> 2025-12-05</p>
+            <p><strong>Statut :</strong> ✅ Modifié avec succès</p>
+        </div>
+    </div>
+</body>
+</html>

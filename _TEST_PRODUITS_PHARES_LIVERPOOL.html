@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 TEST : Produits Phares Liverpool + Bug Fix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 30px;
+        }
+        
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .test-section h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #10b981;
+        }
+        
+        .boutique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .product-card.selected {
+            border: 3px solid #10b981;
+            background: rgba(16,185,129,0.2);
+            transform: scale(1.05);
+        }
+        
+        .panier-info {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(16,185,129,0.5);
+            min-width: 300px;
+        }
+        
+        .panier-info h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .panier-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+        }
+        
+        .console-output {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #0f0;
+        }
+        
+        .console-output .log {
+            margin-bottom: 5px;
+        }
+        
+        .console-output .error {
+            color: #ff4444;
+        }
+        
+        .console-output .success {
+            color: #00ff00;
+        }
+        
+        .console-output .info {
+            color: #4499ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 TEST PRODUITS PHARES LIVERPOOL + BUG FIX</h1>
+        
+        <!-- Section 1 : Produits Phares -->
+        <div class="test-section">
+            <h2>🏆 Produits Phares Liverpool FC</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Ces produits doivent s'afficher en premier dans toutes les boutiques.</p>
+            <div class="boutique-grid" id="produits-phares-container"></div>
+        </div>
+        
+        <!-- Section 2 : Produits Classiques -->
+        <div class="test-section">
+            <h2>📦 Produits Classiques (Simulation)</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Produits statiques de démonstration.</p>
+            <div class="boutique-grid" id="produits-classiques-container"></div>
+        </div>
+        
+        <!-- Section 3 : Console Logs -->
+        <div class="test-section">
+            <h2>🖥️ Console de Debug</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Logs de sélection/désélection de produits.</p>
+            <div class="console-output" id="console-output">
+                <div class="log info">🚀 Application de test démarrée...</div>
+                <div class="log info">📦 Chargement des produits phares pour Liverpool FC...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panier Flottant -->
+    <div class="panier-info">
+        <h3>🛒 Panier</h3>
+        <div id="panier-items">
+            <p style="opacity: 0.7; font-size: 14px;">Aucun produit sélectionné</p>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.3); margin-top: 15px; padding-top: 15px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Nombre :</span>
+                <strong id="panier-count">0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 700;">
+                <span>Total :</span>
+                <strong id="panier-total">0.00 €</strong>
+            </div>
+        </div>
+        <button class="btn" onclick="testPaiement()">💳 TESTER PAIEMENT</button>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="🏆_PRODUITS_PHARES_CLUBS.js"></script>
+    <script>
+        // État global simplifié
+        let state = {
+            produitsSelectionnes: []
+        };
+        
+        // Produits classiques de démo
+        const produitsClassiques = [
+            { id: 1, nom: "Maillot Domicile 2024", prix: 89.99, emoji: "👕" },
+            { id: 2, nom: "Écharpe Liverpool FC", prix: 19.99, emoji: "🧣" },
+            { id: 3, nom: "Casquette LFC", prix: 24.99, emoji: "🧢" },
+            { id: 4, nom: "Ballon Officiel", prix: 29.99, emoji: "⚽" }
+        ];
+        
+        // Fonction pour afficher les logs
+        function addLog(message, type = 'info') {
+            const consoleDiv = document.getElementById('console-output');
+            const log = document.createElement('div');
+            log.className = `log ${type}`;
+            log.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(log);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            
+            // Aussi dans la vraie console
+            if (type === 'error') {
+                window.console.error(message);
+            } else if (type === 'success') {
+                window.console.log(`✅ ${message}`);
+            } else {
+                window.console.log(message);
+            }
+        }
+        
+        // Fonction pour mettre à jour le panier
+        function updatePanier() {
+            const count = state.produitsSelectionnes.length;
+            const total = state.produitsSelectionnes.reduce((sum, p) => sum + p.prix, 0);
+            
+            document.getElementById('panier-count').textContent = count;
+            document.getElementById('panier-total').textContent = total.toFixed(2) + ' €';
+            
+            const itemsContainer = document.getElementById('panier-items');
+            if (count === 0) {
+                itemsContainer.innerHTML = '<p style="opacity: 0.7; font-size: 14px;">Aucun produit sélectionné</p>';
+            } else {
+                itemsContainer.innerHTML = state.produitsSelectionnes.map(p => `
+                    <div class="panier-item">
+                        ${p.nom} - <strong>${p.prix.toFixed(2)} €</strong>
+                    </div>
+                `).join('');
+            }
+            
+            addLog(`📦 Panier mis à jour : ${count} produit(s), Total: ${total.toFixed(2)} €`, 'info');
+        }
+        
+        // Fonction pour toggle un produit phare
+        function toggleProduitPhare(productId) {
+            const produitsPhares = window.PRODUITS_PHARES.getProduitsPharesClub('liverpool');
+            const produit = produitsPhares.find(p => p.id === productId);
+            
+            if (!produit) {
+                addLog(`❌ Produit phare introuvable : ${productId}`, 'error');
+                return;
+            }
+            
+            const index = state.produitsSelectionnes.findIndex(p => p.id === productId);
+            const card = document.getElementById(`product-${productId}`);
+            
+            if (index > -1) {
+                // Désélection
+                state.produitsSelectionnes.splice(index, 1);
+                if (card) {
+                    card.classList.remove('selected');
+                }
+                addLog(`➖ Produit phare retiré : ${produit.nom}`, 'info');
+            } else {
+                // Sélection
+                state.produitsSelectionnes.push({
+                    id: produit.id,
+                    nom: produit.nom,
+                    prix: produit.prix,
+                    type: produit.type
+                });
+                if (card) {
+                    card.classList.add('selected');
+                }
+                addLog(`✅ Produit phare ajouté : ${produit.nom} (${produit.prix.toFixed(2)} €)`, 'success');
+            }
+            
+            updatePanier();
+        }
+        
+        // Fonction pour toggle un produit classique
+        function toggleProduitClassique(id) {
+            const produit = produitsClassiques.find(p => p.id === id);
+            
+            if (!produit) {
+                addLog(`❌ Produit classique introuvable : ${id}`, 'error');
+                return;
+            }
+            
+            const index = state.produitsSelectionnes.findIndex(p => p.id === id);
+            const card = document.getElementById(`product-classic-${id}`);
+            
+            if (index > -1) {
+                // Désélection
+                state.produitsSelectionnes.splice(index, 1);
+                if (card) {
+                    card.classList.remove('selected');
+                }
+                addLog(`➖ Produit classique retiré : ${produit.nom}`, 'info');
+            } else {
+                // Sélection
+                state.produitsSelectionnes.push({
+                    id: produit.id,
+                    nom: produit.nom,
+                    prix: produit.prix
+                });
+                if (card) {
+                    card.classList.add('selected');
+                }
+                addLog(`✅ Produit classique ajouté : ${produit.nom} (${produit.prix.toFixed(2)} €)`, 'success');
+            }
+            
+            updatePanier();
+        }
+        
+        // Fonction de test du paiement
+        function testPaiement() {
+            if (state.produitsSelectionnes.length === 0) {
+                addLog('❌ ERREUR : Veuillez sélectionner au moins un produit', 'error');
+                alert('❌ Veuillez sélectionner au moins un produit');
+                return;
+            }
+            
+            const total = state.produitsSelectionnes.reduce((sum, p) => sum + p.prix, 0);
+            addLog(`✅ TEST PAIEMENT RÉUSSI : ${state.produitsSelectionnes.length} produit(s), Total: ${total.toFixed(2)} €`, 'success');
+            alert(`✅ TEST PAIEMENT RÉUSSI !\n\n` +
+                  `Produits : ${state.produitsSelectionnes.length}\n` +
+                  `Total : ${total.toFixed(2)} €\n\n` +
+                  `Détails :\n${state.produitsSelectionnes.map(p => `• ${p.nom} - ${p.prix.toFixed(2)} €`).join('\n')}`);
+        }
+        
+        // Initialisation de la page
+        window.onload = function() {
+            addLog('🚀 Initialisation de la page...', 'info');
+            
+            // 1. Charger les produits phares
+            if (window.PRODUITS_PHARES) {
+                addLog('✅ Module PRODUITS_PHARES chargé', 'success');
+                const produitsPhares = window.PRODUITS_PHARES.getProduitsPharesClub('liverpool');
+                addLog(`📦 ${produitsPhares.length} produits phares trouvés pour Liverpool`, 'success');
+                
+                const containerPhares = document.getElementById('produits-phares-container');
+                containerPhares.innerHTML = produitsPhares.map(p => `
+                    <div class="product-card" onclick="toggleProduitPhare('${p.id}')" id="product-${p.id}">
+                        <div style="font-size: 60px; text-align: center; margin-bottom: 15px;">${p.emoji}</div>
+                        <div style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 10px;">${p.nom}</div>
+                        <div style="font-size: 13px; opacity: 0.8; text-align: center; margin-bottom: 15px;">${p.description.substring(0, 80)}...</div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+                            ${p.prixBarré > p.prix ? `<span style="text-decoration: line-through; opacity: 0.5;">${p.prixBarré.toFixed(2)} €</span>` : ''}
+                            <div style="color: #10b981; font-size: 24px; font-weight: 900;">
+                                ${p.prix === 0 ? 'GRATUIT' : p.prix.toFixed(2) + ' €'}
+                            </div>
+                        </div>
+                        ${p.badges.map(badge => `<div style="background: rgba(16,185,129,0.2); padding: 8px; border-radius: 8px; text-align: center; font-size: 11px; font-weight: 700;">${badge}</div>`).join('')}
+                    </div>
+                `).join('');
+                
+                addLog('✅ Produits phares affichés', 'success');
+            } else {
+                addLog('❌ ERREUR : Module PRODUITS_PHARES non chargé', 'error');
+            }
+            
+            // 2. Charger les produits classiques
+            const containerClassiques = document.getElementById('produits-classiques-container');
+            containerClassiques.innerHTML = produitsClassiques.map(p => `
+                <div class="product-card" onclick="toggleProduitClassique(${p.id})" id="product-classic-${p.id}">
+                    <div style="font-size: 60px; text-align: center; margin-bottom: 15px;">${p.emoji}</div>
+                    <div style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 10px;">${p.nom}</div>
+                    <div style="color: #fff; font-size: 24px; font-weight: 900; text-align: center;">
+                        ${p.prix.toFixed(2)} €
+                    </div>
+                </div>
+            `).join('');
+            
+            addLog(`✅ ${produitsClassiques.length} produits classiques affichés`, 'success');
+            addLog('🎉 Initialisation terminée avec succès !', 'success');
+            addLog('👉 Sélectionnez des produits pour tester le panier', 'info');
+        };
+    </script>
+</body>
+</html>

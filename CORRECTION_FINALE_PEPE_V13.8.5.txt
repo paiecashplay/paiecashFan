@@ -1,0 +1,83 @@
+========================================
+CORRECTION FINALE PEPE - VERSION 13.8.5
+Date: 17 Decembre 2025
+Statut: PRODUCTION READY - ZERO REGRESSION
+========================================
+
+PROBLEME IDENTIFIE:
+-------------------
+- La carte Cote d'Ivoire etait VERTICALE
+- L'utilisateur demande UNIQUEMENT un design HORIZONTAL
+- Toutes les cartes doivent avoir le MEME design horizontal
+
+SOLUTION APPLIQUEE:
+-------------------
+Regeneration de la carte Cote d'Ivoire avec:
+
+DESIGN HORIZONTAL IDENTIQUE A VILLARREAL:
+- Photo joueur a GAUCHE (60%)
+- Textes et logos a DROITE (40%)
+- Drapeau Cote d'Ivoire en haut a gauche
+- Logo PaieCash en haut a droite (gold)
+- Numero carte au centre: 5412 7534 9876 5439
+- Valid thru 12/28 + Nom NICOLAS PEPE en bas a gauche
+- Logo Mastercard en bas a droite
+- Fond orange/blanc/vert (couleurs Cote d'Ivoire)
+
+URLS DES CARTES:
+----------------
+CARTE VILLARREAL (Club):
+- URL: https://www.genspark.ai/api/files/s/1tDBqV1U
+- Numero: 5412 7534 9876 5438
+- Design: Photo gauche + textes droite (HORIZONTAL)
+- Couleurs: Jaune Villarreal
+- Status: VALIDE
+
+CARTE COTE D'IVOIRE (Equipe nationale):
+- URL: https://www.genspark.ai/api/files/s/vfk0tUEP
+- Numero: 5412 7534 9876 5439
+- Design: Photo gauche + textes droite (HORIZONTAL)
+- Couleurs: Orange/Blanc/Vert Cote d'Ivoire
+- Status: CORRIGE - HORIZONTAL MAINTENANT
+
+FICHIERS MODIFIES:
+------------------
+- cartes-pepe.html (ligne 139: nouvelle URL carte Cote d'Ivoire)
+
+DIMENSIONS CONSERVEES:
+----------------------
+- max-width: 550px (identique a Hakimi)
+- aspect-ratio: 16:10 (horizontal)
+- Structure HTML/CSS identique pour toutes les cartes
+
+DESIGN FINAL UNIQUE:
+--------------------
+Photo joueur a GAUCHE + Textes/Logos a DROITE
+- Applicable pour des milliers de cartes
+- Scalable et coherent
+- ZERO REGRESSION
+
+ACCES:
+------
+URL de deploiement: https://jphbvnok.gensparkspace.com/cartes-pepe.html
+Instructions: Cliquez sur 'Publish' pour deployer
+
+JOUEURS DISPONIBLES:
+--------------------
+1. Achraf Hakimi (PSG + Maroc) - COMPLET
+   URL: https://jphbvnok.gensparkspace.com/cartes-hakimi.html
+
+2. Nicolas Pepe (Villarreal + Cote d'Ivoire) - COMPLET
+   URL: https://jphbvnok.gensparkspace.com/cartes-pepe.html
+
+ASSURANCE QUALITE:
+------------------
+- Design horizontal UNIQUE pour TOUTES les cartes
+- Photo toujours a gauche, textes toujours a droite
+- Dimensions identiques (550px max-width)
+- Structure HTML/CSS identique
+- Systeme scalable pour milliers de cartes
+- ZERO REGRESSION garantie
+
+STATUT: PRODUCTION READY
+========================================

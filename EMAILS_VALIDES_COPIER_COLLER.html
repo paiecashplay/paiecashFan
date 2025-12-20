@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📧 Emails Valides - Copier/Coller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0066B2 0%, #003D6D 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #0066B2;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .alert-box h2 {
+            color: #856404;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .alert-box p {
+            color: #856404;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .user-card:hover {
+            border-color: #0066B2;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,102,178,0.2);
+        }
+
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .user-card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #0066B2;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-badge {
+            background: #0066B2;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .email-box {
+            background: #f8f9fa;
+            border: 2px solid #0066B2;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .email-text {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #0066B2;
+            font-weight: 700;
+            flex: 1;
+            user-select: all;
+        }
+
+        .copy-btn {
+            background: #0066B2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #004A87;
+            transform: scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: #28a745;
+        }
+
+        .extra-info {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .points {
+            color: #0066B2;
+            font-weight: 600;
+        }
+
+        .instructions {
+            background: #d1ecf1;
+            border: 2px solid #0c5460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .instructions h3 {
+            color: #0c5460;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #0c5460;
+            line-height: 2;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .user-card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .email-box {
+                flex-direction: column;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-message" id="successMessage">
+        ✅ Email copié dans le presse-papiers !
+    </div>
+
+    <div class="container">
+        <h1>📧 Emails Valides</h1>
+        <p class="subtitle">Cliquez sur "Copier" puis collez dans l'application</p>
+
+        <div class="alert-box">
+            <h2>⚠️ Utilisez UNIQUEMENT ces emails</h2>
+            <p>Ces 5 utilisateurs existent dans la base de données.<br>
+            Tout autre email affichera : <strong>"❌ Aucun utilisateur trouvé"</strong></p>
+        </div>
+
+        <!-- Cameron -->
+        <div class="user-card" onclick="copyEmail('cameron@paiecash.com', 0)">
+            <div class="user-card-header">
+                <img src="https://i.pravatar.cc/100?img=12" alt="Cameron">
+                <div class="user-info">
+                    <div class="user-name">Cameron</div>
+                    <div class="user-status">
+                        <span class="status-badge">Fan OM</span>
+                        <span>🟢 En ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="email-box">
+                <div class="email-text" id="email-0">cameron@paiecash.com</div>
+                <button class="copy-btn" id="btn-0">📋 Copier</button>
+            </div>
+            <div class="extra-info">
+                <span>📱 +33 6 11 22 33 44</span>
+                <span class="points">🏆 3200 points</span>
+            </div>
+        </div>
+
+        <!-- Sophie Martin -->
+        <div class="user-card" onclick="copyEmail('sophie.martin@paiecash.com', 1)">
+            <div class="user-card-header">
+                <img src="https://i.pravatar.cc/100?img=45" alt="Sophie Martin">
+                <div class="user-info">
+                    <div class="user-name">Sophie Martin</div>
+                    <div class="user-status">
+                        <span class="status-badge">Fan OM</span>
+                        <span>⚪ Hors ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="email-box">
+                <div class="email-text" id="email-1">sophie.martin@paiecash.com</div>
+                <button class="copy-btn" id="btn-1">📋 Copier</button>
+            </div>
+            <div class="extra-info">
+                <span>📱 +33 6 22 33 44 55</span>
+                <span class="points">🏆 4100 points</span>
+            </div>
+        </div>
+
+        <!-- Thomas Dupont -->
+        <div class="user-card" onclick="copyEmail('thomas.dupont@paiecash.com', 2)">
+            <div class="user-card-header">
+                <img src="https://i.pravatar.cc/100?img=15" alt="Thomas Dupont">
+                <div class="user-info">
+                    <div class="user-name">Thomas Dupont</div>
+                    <div class="user-status">
+                        <span class="status-badge" style="background: #ff6600;">Licencié PFC</span>
+                        <span>🟢 En ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="email-box">
+                <div class="email-text" id="email-2">thomas.dupont@paiecash.com</div>
+                <button class="copy-btn" id="btn-2">📋 Copier</button>
+            </div>
+            <div class="extra-info">
+                <span>📱 +33 6 33 44 55 66</span>
+                <span class="points">🏆 5200 points</span>
+            </div>
+        </div>
+
+        <!-- Marie Laurent -->
+        <div class="user-card" onclick="copyEmail('marie.laurent@paiecash.com', 3)">
+            <div class="user-card-header">
+                <img src="https://i.pravatar.cc/100?img=32" alt="Marie Laurent">
+                <div class="user-info">
+                    <div class="user-name">Marie Laurent</div>
+                    <div class="user-status">
+                        <span class="status-badge">Fan OM</span>
+                        <span>⚪ Hors ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="email-box">
+                <div class="email-text" id="email-3">marie.laurent@paiecash.com</div>
+                <button class="copy-btn" id="btn-3">📋 Copier</button>
+            </div>
+            <div class="extra-info">
+                <span>📱 +33 6 44 55 66 77</span>
+                <span class="points">🏆 2800 points</span>
+            </div>
+        </div>
+
+        <!-- Lucas Bernard -->
+        <div class="user-card" onclick="copyEmail('lucas.bernard@paiecash.com', 4)">
+            <div class="user-card-header">
+                <img src="https://i.pravatar.cc/100?img=8" alt="Lucas Bernard">
+                <div class="user-info">
+                    <div class="user-name">Lucas Bernard</div>
+                    <div class="user-status">
+                        <span class="status-badge">Fan OM</span>
+                        <span>🟢 En ligne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="email-box">
+                <div class="email-text" id="email-4">lucas.bernard@paiecash.com</div>
+                <button class="copy-btn" id="btn-4">📋 Copier</button>
+            </div>
+            <div class="extra-info">
+                <span>📱 +33 6 55 66 77 88</span>
+                <span class="points">🏆 3900 points</span>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>📝 Comment ajouter un ami ?</h3>
+            <ol>
+                <li>Cliquez sur <strong>"📋 Copier"</strong> à côté de l'email</li>
+                <li>Ouvrez <strong>index.html</strong> et connectez-vous</li>
+                <li>Cliquez sur le bouton <strong>"+"</strong> dans la barre stories</li>
+                <li>Collez l'email avec <strong>Ctrl+V</strong> (ou Cmd+V sur Mac)</li>
+                <li>Cliquez sur <strong>"Ajouter"</strong></li>
+                <li>✅ <strong>Succès !</strong> Votre ami apparaît dans "Mes Amis"</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function copyEmail(email, index) {
+            // Copier dans le presse-papiers
+            navigator.clipboard.writeText(email).then(() => {
+                // Changer le bouton
+                const btn = document.getElementById('btn-' + index);
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copié !';
+                btn.classList.add('copied');
+
+                // Afficher le message de succès
+                const successMsg = document.getElementById('successMessage');
+                successMsg.classList.add('show');
+
+                // Réinitialiser après 2 secondes
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                    successMsg.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                alert('Erreur de copie. Sélectionnez et copiez manuellement (Ctrl+C)');
+            });
+        }
+    </script>
+</body>
+</html>

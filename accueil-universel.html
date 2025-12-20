@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PaieCashFan - Tous les Clubs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 16px 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-header {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-signup {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-section h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, white, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-section p {
+            font-size: 20px;
+            opacity: 0.8;
+            margin-bottom: 32px;
+        }
+
+        /* ========== SEARCH BAR ========== */
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-bar {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 24px 18px 56px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        /* ========== STORIES DE TOUS LES CLUBS ========== */
+        .stories-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stories-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 12px 0;
+            scrollbar-width: none;
+        }
+
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            flex: 0 0 auto;
+            width: 140px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .story-item:hover {
+            transform: scale(1.05);
+        }
+
+        .story-image {
+            width: 140px;
+            height: 200px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .story-item.has-story .story-image {
+            border-color: #3b82f6;
+        }
+
+        .story-club-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .story-club-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .story-content {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-name {
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ========== CLUBS GRID ========== */
+        .clubs-section {
+            margin-bottom: 40px;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .club-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .club-card:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.3);
+        }
+
+        .club-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .club-logo {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .club-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .club-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .club-league {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .club-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .btn-choose {
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-choose:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        /* ========== FILTERS ========== */
+        .filters-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .welcome-section h1 {
+                font-size: 32px;
+            }
+            .welcome-section p {
+                font-size: 16px;
+            }
+            .story-item {
+                width: 100px;
+            }
+            .story-image {
+                width: 100px;
+                height: 140px;
+            }
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">⚽ PaieCashFan</div>
+            <div class="header-actions">
+                <button class="btn-header btn-login" onclick="window.location.href='connexion.html'">
+                    🔓 Connexion
+                </button>
+                <button class="btn-header btn-signup" onclick="window.location.href='inscription.html'">
+                    ✨ S'inscrire
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- WELCOME SECTION -->
+        <div class="welcome-section">
+            <h1>Tous les Clubs de Football</h1>
+            <p>Suivez vos équipes favorites et connectez-vous avec des millions de fans</p>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="search-section">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Rechercher un club, une ligue, un championnat..."
+                    oninput="filterClubs()"
+                >
+            </div>
+        </div>
+
+        <!-- STORIES DE TOUS LES CLUBS -->
+        <div class="stories-section">
+            <div class="section-title">
+                <span>📱</span>
+                <span>Stories des Clubs</span>
+            </div>
+            <div class="stories-container" id="storiesContainer">
+                <!-- Stories injectées dynamiquement -->
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters-container">
+            <button class="filter-btn active" onclick="filterByLeague('all')">Tous</button>
+            <button class="filter-btn" onclick="filterByLeague('ligue1')">Ligue 1</button>
+            <button class="filter-btn" onclick="filterByLeague('ligue2')">Ligue 2</button>
+            <button class="filter-btn" onclick="filterByLeague('premier')">Premier League</button>
+            <button class="filter-btn" onclick="filterByLeague('laliga')">La Liga</button>
+            <button class="filter-btn" onclick="filterByLeague('bundesliga')">Bundesliga</button>
+            <button class="filter-btn" onclick="filterByLeague('seriea')">Serie A</button>
+        </div>
+
+        <!-- CLUBS GRID -->
+        <div class="clubs-section">
+            <div class="section-title">
+                <span>⚽</span>
+                <span id="sectionTitle">Tous les Clubs</span>
+            </div>
+            <div class="clubs-grid" id="clubsGrid">
+                <!-- Clubs injectés dynamiquement -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ========================================
+        // BASE DE DONNÉES DES CLUBS
+        // ========================================
+        const clubsDatabase = [
+            // LIGUE 1
+            {
+                id: 'om',
+                name: 'Olympique de Marseille',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg',
+                fans: 12500000,
+                stories: 1247,
+                active: true,
+                appUrl: 'app-om-v4-FINAL.html',
+                color: '#2FAEE0'
+            },
+            {
+                id: 'psg',
+                name: 'Paris Saint-Germain',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
+                fans: 45000000,
+                stories: 3521,
+                active: false,
+                color: '#004170'
+            },
+            {
+                id: 'ol',
+                name: 'Olympique Lyonnais',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/e/e9/Olympique_lyonnais_%28logo%29.svg',
+                fans: 8500000,
+                stories: 892,
+                active: false,
+                color: '#C80B22'
+            },
+            {
+                id: 'parisfc',
+                name: 'Paris Football Club',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/thumb/2/22/Paris_FC_logo_2020.svg/1200px-Paris_FC_logo_2020.svg.png',
+                fans: 850000,
+                stories: 234,
+                active: true,
+                appUrl: 'app-paris-fc-v4-FINAL.html',
+                color: '#2563eb'
+            },
+            {
+                id: 'monaco',
+                name: 'AS Monaco',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/4/47/Logo_AS_Monaco.svg',
+                fans: 5200000,
+                stories: 567,
+                active: false,
+                color: '#E30613'
+            },
+            {
+                id: 'nice',
+                name: 'OGC Nice',
+                league: 'Ligue 1',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/5/52/OGC_Nice_%28logo%2C_2013%29.svg',
+                fans: 3800000,
+                stories: 423,
+                active: false,
+                color: '#E2001A'
+            },
+
+            // LIGUE 2
+            {
+                id: 'metz',
+                name: 'FC Metz',
+                league: 'Ligue 2',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/6/6d/Logo_FC_Metz.svg',
+                fans: 1200000,
+                stories: 156,
+                active: false,
+                color: '#8B0304'
+            },
+            {
+                id: 'auxerre',
+                name: 'AJ Auxerre',
+                league: 'Ligue 2',
+                country: 'France',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/3/31/AJ_Auxerre_Logo.svg',
+                fans: 980000,
+                stories: 134,
+                active: false,
+                color: '#0054A6'
+            },
+
+            // PREMIER LEAGUE
+            {
+                id: 'mancity',
+                name: 'Manchester City',
+                league: 'Premier League',
+                country: 'England',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/b/bd/Logo_Manchester_City.svg',
+                fans: 35000000,
+                stories: 2890,
+                active: false,
+                color: '#6CABDD'
+            },
+            {
+                id: 'liverpool',
+                name: 'Liverpool FC',
+                league: 'Premier League',
+                country: 'England',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/5/54/Logo_FC_Liverpool.svg',
+                fans: 42000000,
+                stories: 3124,
+                active: false,
+                color: '#C8102E'
+            },
+
+            // LA LIGA
+            {
+                id: 'realmadrid',
+                name: 'Real Madrid',
+                league: 'La Liga',
+                country: 'Spain',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/c/c7/Logo_Real_Madrid.svg',
+                fans: 85000000,
+                stories: 5678,
+                active: false,
+                color: '#FFFFFF'
+            },
+            {
+                id: 'barcelona',
+                name: 'FC Barcelona',
+                league: 'La Liga',
+                country: 'Spain',
+                logo: 'https://upload.wikimedia.org/wikipedia/fr/7/79/FC_Barcelona_%28crest%29.svg',
+                fans: 90000000,
+                stories: 6234,
+                active: false,
+                color: '#A50044'
+            }
+        ];
+
+        // ========================================
+        // STORIES DÉMO
+        // ========================================
+        const storiesData = [
+            { clubId: 'om', userName: 'Sophie Martin', image: 'https://via.placeholder.com/140x200/2FAEE0/ffffff?text=OM+Story', hasStory: true },
+            { clubId: 'psg', userName: 'Thomas Dubois', image: 'https://via.placeholder.com/140x200/004170/ffffff?text=PSG+Story', hasStory: true },
+            { clubId: 'parisfc', userName: 'Julie Bernard', image: 'https://via.placeholder.com/140x200/2563eb/ffffff?text=PFC+Story', hasStory: true },
+            { clubId: 'ol', userName: 'Marc Rousseau', image: 'https://via.placeholder.com/140x200/C80B22/ffffff?text=OL+Story', hasStory: true },
+            { clubId: 'monaco', userName: 'Laura Petit', image: 'https://via.placeholder.com/140x200/E30613/ffffff?text=Monaco', hasStory: false },
+            { clubId: 'nice', userName: 'David Lopez', image: 'https://via.placeholder.com/140x200/E2001A/ffffff?text=Nice', hasStory: false },
+            { clubId: 'realmadrid', userName: 'Carlos Garcia', image: 'https://via.placeholder.com/140x200/FFFFFF/000000?text=Real+Madrid', hasStory: true },
+            { clubId: 'barcelona', userName: 'Maria Santos', image: 'https://via.placeholder.com/140x200/A50044/ffffff?text=Barça', hasStory: true }
+        ];
+
+        // ========================================
+        // RENDU DES STORIES
+        // ========================================
+        function renderStories() {
+            const container = document.getElementById('storiesContainer');
+            container.innerHTML = storiesData.map(story => {
+                const club = clubsDatabase.find(c => c.id === story.clubId);
+                return `
+                    <div class="story-item ${story.hasStory ? 'has-story' : ''}" onclick="viewStory('${story.clubId}', '${story.userName}')">
+                        <div class="story-image">
+                            <div class="story-club-badge">
+                                <img src="${club.logo}" alt="${club.name}">
+                            </div>
+                            <img src="${story.image}" class="story-content" alt="${story.userName}">
+                        </div>
+                        <div class="story-name">${story.userName} • ${club.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========================================
+        // RENDU DES CLUBS
+        // ========================================
+        function renderClubs(clubs = clubsDatabase) {
+            const grid = document.getElementById('clubsGrid');
+            grid.innerHTML = clubs.map(club => `
+                <div class="club-card" onclick="selectClub('${club.id}')">
+                    <div class="club-header">
+                        <div class="club-logo">
+                            <img src="${club.logo}" alt="${club.name}">
+                        </div>
+                        <div class="club-info">
+                            <h3>${club.name}</h3>
+                            <div class="club-league">${club.league} • ${club.country}</div>
+                        </div>
+                    </div>
+                    <div class="club-stats">
+                        <div class="stat">
+                            <div class="stat-value">${formatNumber(club.fans)}</div>
+                            <div class="stat-label">Fans</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${club.stories}</div>
+                            <div class="stat-label">Stories</div>
+                        </div>
+                    </div>
+                    ${club.active ? 
+                        `<button class="btn-choose" onclick="event.stopPropagation(); goToApp('${club.appUrl}')">
+                            ✨ Rejoindre
+                        </button>` :
+                        `<button class="btn-choose" style="background: rgba(255,255,255,0.1); cursor: not-allowed;">
+                            🔒 Bientôt disponible
+                        </button>`
+                    }
+                </div>
+            `).join('');
+        }
+
+        // ========================================
+        // FONCTIONS DE FILTRAGE
+        // ========================================
+        let currentLeague = 'all';
+
+        function filterByLeague(league) {
+            currentLeague = league;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter clubs
+            if (league === 'all') {
+                renderClubs(clubsDatabase);
+                document.getElementById('sectionTitle').textContent = 'Tous les Clubs';
+            } else {
+                const leagueNames = {
+                    ligue1: 'Ligue 1',
+                    ligue2: 'Ligue 2',
+                    premier: 'Premier League',
+                    laliga: 'La Liga',
+                    bundesliga: 'Bundesliga',
+                    seriea: 'Serie A'
+                };
+                const filtered = clubsDatabase.filter(c => 
+                    c.league.toLowerCase().includes(leagueNames[league].toLowerCase())
+                );
+                renderClubs(filtered);
+                document.getElementById('sectionTitle').textContent = leagueNames[league];
+            }
+        }
+
+        function filterClubs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = clubsDatabase;
+            
+            if (currentLeague !== 'all') {
+                const leagueNames = {
+                    ligue1: 'Ligue 1',
+                    ligue2: 'Ligue 2',
+                    premier: 'Premier League',
+                    laliga: 'La Liga',
+                    bundesliga: 'Bundesliga',
+                    seriea: 'Serie A'
+                };
+                filtered = filtered.filter(c => 
+                    c.league.toLowerCase().includes(leagueNames[currentLeague].toLowerCase())
+                );
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(c => 
+                    c.name.toLowerCase().includes(searchTerm) ||
+                    c.league.toLowerCase().includes(searchTerm) ||
+                    c.country.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderClubs(filtered);
+        }
+
+        // ========================================
+        // ACTIONS
+        // ========================================
+        function selectClub(clubId) {
+            const club = clubsDatabase.find(c => c.id === clubId);
+            if (club.active && club.appUrl) {
+                goToApp(club.appUrl);
+            } else {
+                alert(`Le club ${club.name} sera bientôt disponible ! 🚀`);
+            }
+        }
+
+        function goToApp(appUrl) {
+            window.location.href = appUrl;
+        }
+
+        function viewStory(clubId, userName) {
+            const club = clubsDatabase.find(c => c.id === clubId);
+            alert(`📱 Story de ${userName}\nClub: ${club.name}\n\n(Fonctionnalité en développement)`);
+        }
+
+        // ========================================
+        // UTILITAIRES
+        // ========================================
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
+            }
+            return num.toString();
+        }
+
+        // ========================================
+        // INITIALISATION
+        // ========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStories();
+            renderClubs();
+        });
+    </script>
+</body>
+</html>

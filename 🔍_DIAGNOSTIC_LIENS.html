@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Diagnostic des Liens</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h2 {
+            color: #10b981;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .test-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin: 5px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        .error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostic des Liens PaieCashPlay</h1>
+
+        <div class="section">
+            <h2>📊 État des Fichiers JavaScript</h2>
+            <div id="statusFiles"></div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Tests de Liens Directs</h2>
+            <div class="info">
+                ℹ️ Cliquez sur ces liens pour tester s'ils fonctionnent correctement
+            </div>
+            <div class="grid">
+                <a href="app-universal-simple.html?club=Olympique+de+Marseille&logo=⚽&sport=Football&league=Ligue+1" class="test-link">⚽ Olympique de Marseille</a>
+                <a href="app-universal-simple.html?club=Paris+FC&logo=⚽&sport=Football&league=Ligue+2" class="test-link">⚽ Paris FC</a>
+                <a href="app-universal-simple.html?club=France&logo=🇫🇷&sport=Football+National&league=Coupe+du+Monde+2026" class="test-link">🇫🇷 Équipe de France</a>
+                <a href="app-universal-simple.html?club=Agde&logo=⚽&sport=Football&league=National+3+A" class="test-link">⚽ Agde (National 3)</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Vérification des Données Chargées</h2>
+            <div id="dataCheck"></div>
+        </div>
+
+        <div class="section">
+            <h2>🚨 Problèmes Détectés</h2>
+            <div id="problems"></div>
+        </div>
+
+        <div class="section">
+            <h2>✅ Solutions Recommandées</h2>
+            <div id="solutions"></div>
+        </div>
+    </div>
+
+    <script src="clubs-football-complet.js"></script>
+    <script src="clubs-national-3-data.js"></script>
+    <script src="equipes-nationales-internationales.js"></script>
+
+    <script>
+        // Vérifier l'état des fichiers
+        const statusFiles = document.getElementById('statusFiles');
+        let status = '';
+
+        // Test clubs-football-complet.js
+        if (typeof ligue1Clubs !== 'undefined') {
+            status += `<div class="success">✅ clubs-football-complet.js chargé (${ligue1Clubs.length} clubs Ligue 1)</div>`;
+        } else {
+            status += `<div class="error">❌ clubs-football-complet.js NON chargé</div>`;
+        }
+
+        // Test clubs-national-3-data.js
+        if (typeof national3GroupeA !== 'undefined') {
+            status += `<div class="success">✅ clubs-national-3-data.js chargé (${national3GroupeA.length} clubs National 3 Groupe A)</div>`;
+        } else {
+            status += `<div class="error">❌ clubs-national-3-data.js NON chargé</div>`;
+        }
+
+        // Test equipes-nationales-internationales.js
+        if (typeof coupeMondeUEFA !== 'undefined') {
+            status += `<div class="success">✅ equipes-nationales-internationales.js chargé (${coupeMondeUEFA.length} équipes UEFA)</div>`;
+        } else {
+            status += `<div class="error">❌ equipes-nationales-internationales.js NON chargé</div>`;
+        }
+
+        statusFiles.innerHTML = status;
+
+        // Vérification des données
+        const dataCheck = document.getElementById('dataCheck');
+        let dataInfo = '';
+
+        if (typeof ligue1Clubs !== 'undefined' && ligue1Clubs.length > 0) {
+            const sampleClub = ligue1Clubs[0];
+            dataInfo += `<div class="info"><strong>Exemple de club (Ligue 1) :</strong><pre>${JSON.stringify(sampleClub, null, 2)}</pre></div>`;
+        }
+
+        if (typeof national3GroupeA !== 'undefined' && national3GroupeA.length > 0) {
+            const sampleClub = national3GroupeA[0];
+            dataInfo += `<div class="info"><strong>Exemple de club (National 3) :</strong><pre>${JSON.stringify(sampleClub, null, 2)}</pre></div>`;
+        }
+
+        if (typeof coupeMondeUEFA !== 'undefined' && coupeMondeUEFA.length > 0) {
+            const sampleTeam = coupeMondeUEFA[0];
+            dataInfo += `<div class="info"><strong>Exemple d'équipe nationale :</strong><pre>${JSON.stringify(sampleTeam, null, 2)}</pre></div>`;
+        }
+
+        dataCheck.innerHTML = dataInfo;
+
+        // Détecter les problèmes
+        const problems = document.getElementById('problems');
+        let problemsList = '';
+
+        if (typeof ligue1Clubs === 'undefined' || ligue1Clubs.length === 0) {
+            problemsList += `<div class="error">❌ Aucun club de Ligue 1 n'est chargé</div>`;
+        }
+
+        if (typeof national3GroupeA === 'undefined' || national3GroupeA.length === 0) {
+            problemsList += `<div class="error">❌ Aucun club de National 3 n'est chargé</div>`;
+        }
+
+        if (typeof coupeMondeUEFA === 'undefined' || coupeMondeUEFA.length === 0) {
+            problemsList += `<div class="error">❌ Aucune équipe nationale n'est chargée</div>`;
+        }
+
+        // Vérifier si app-universal-simple.html existe
+        fetch('app-universal-simple.html')
+            .then(response => {
+                if (response.ok) {
+                    problemsList += `<div class="success">✅ app-universal-simple.html existe</div>`;
+                } else {
+                    problemsList += `<div class="error">❌ app-universal-simple.html n'existe pas (erreur ${response.status})</div>`;
+                }
+                problems.innerHTML = problemsList || '<div class="success">✅ Aucun problème détecté</div>';
+            })
+            .catch(err => {
+                problemsList += `<div class="error">❌ Erreur lors de la vérification de app-universal-simple.html: ${err}</div>`;
+                problems.innerHTML = problemsList;
+            });
+
+        // Solutions
+        const solutions = document.getElementById('solutions');
+        solutions.innerHTML = `
+            <div class="info">
+                <h3 style="margin-bottom: 10px;">🔧 Si les liens ne fonctionnent pas dans index.html :</h3>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Vérifiez que les fichiers JS sont bien importés</strong> dans index.html :
+                        <pre>&lt;script src="clubs-football-complet.js"&gt;&lt;/script&gt;
+&lt;script src="clubs-national-3-data.js"&gt;&lt;/script&gt;
+&lt;script src="equipes-nationales-internationales.js"&gt;&lt;/script&gt;</pre>
+                    </li>
+                    <li><strong>Vérifiez la console du navigateur</strong> pour voir les erreurs JavaScript</li>
+                    <li><strong>Testez les liens directs ci-dessus</strong> - s'ils fonctionnent, le problème vient de index.html</li>
+                    <li><strong>Ouvrez index.html dans un navigateur</strong> et appuyez sur F12 pour voir la console</li>
+                </ol>
+            </div>
+            <div class="info" style="margin-top: 15px;">
+                <h3 style="margin-bottom: 10px;">📌 Liens de test qui devraient fonctionner :</h3>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li><a href="app-universal-simple.html?club=Test&logo=⚽&sport=Football&league=Test" style="color: #10b981;">app-universal-simple.html?club=Test&logo=⚽&sport=Football&league=Test</a></li>
+                    <li><a href="index.html" style="color: #10b981;">index.html (page principale)</a></li>
+                </ul>
+            </div>
+        `;
+    </script>
+</body>
+</html>

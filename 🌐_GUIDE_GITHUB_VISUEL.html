@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Guide GitHub - PaieCashFan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+        .methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .method-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .method-card h2 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .badge.recommend {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .badge.easy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .step {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        .step h3 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .step code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: block;
+            margin-top: 0.5rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            margin: 0.5rem;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16,185,129,0.4);
+        }
+        .btn.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn.outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        .btn.outline:hover {
+            background: white;
+            color: #1e3c72;
+        }
+        .btns {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .resources {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .resources h2 {
+            color: #1e3c72;
+            margin-bottom: 1.5rem;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .resource {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .resource i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .resource h3 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+        }
+        .resource a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .resource a:hover {
+            text-decoration: underline;
+        }
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        .warning h3 {
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .methods { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Mettre PaieCashFan sur GitHub</h1>
+        <div class="subtitle">Guide visuel interactif - Choisissez votre méthode</div>
+
+        <div class="methods">
+            <!-- Méthode 1 : Ligne de commande -->
+            <div class="method-card">
+                <h2>
+                    <i class="fas fa-terminal"></i>
+                    Méthode 1 : Ligne de commande
+                    <span class="badge recommend">RECOMMANDÉ</span>
+                </h2>
+
+                <div class="step">
+                    <h3>📦 Étape 1 : Installer Git</h3>
+                    <p>Télécharger et installer Git</p>
+                    <a href="https://git-scm.com/downloads" target="_blank" class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-download"></i> Télécharger Git
+                    </a>
+                </div>
+
+                <div class="step">
+                    <h3>🔐 Étape 2 : Créer un compte GitHub</h3>
+                    <p>Si vous n'en avez pas déjà un</p>
+                    <a href="https://github.com/signup" target="_blank" class="btn" style="margin-top: 1rem;">
+                        <i class="fab fa-github"></i> S'inscrire sur GitHub
+                    </a>
+                </div>
+
+                <div class="step">
+                    <h3>📁 Étape 3 : Créer un repository</h3>
+                    <p>Sur GitHub, cliquer sur "New" et créer "paiecashfan"</p>
+                    <a href="https://github.com/new" target="_blank" class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Nouveau Repository
+                    </a>
+                </div>
+
+                <div class="step">
+                    <h3>💻 Étape 4 : Utiliser le script automatique</h3>
+                    <p>Double-cliquez sur le fichier selon votre système :</p>
+                    <ul style="margin: 1rem 0; padding-left: 2rem;">
+                        <li><strong>Mac/Linux</strong> : <code>push-to-github.sh</code></li>
+                        <li><strong>Windows</strong> : <code>push-to-github.bat</code></li>
+                    </ul>
+                    <p>Le script vous guidera automatiquement !</p>
+                </div>
+
+                <div class="btns">
+                    <a href="📘_GUIDE_GITHUB_COMPLET.md" class="btn secondary">
+                        <i class="fas fa-book"></i> Guide Détaillé
+                    </a>
+                </div>
+            </div>
+
+            <!-- Méthode 2 : GitHub Desktop -->
+            <div class="method-card">
+                <h2>
+                    <i class="fas fa-window-maximize"></i>
+                    Méthode 2 : GitHub Desktop
+                    <span class="badge easy">FACILE</span>
+                </h2>
+
+                <div class="step">
+                    <h3>📦 Étape 1 : Télécharger GitHub Desktop</h3>
+                    <p>Application graphique officielle de GitHub</p>
+                    <a href="https://desktop.github.com/" target="_blank" class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-download"></i> Télécharger GitHub Desktop
+                    </a>
+                </div>
+
+                <div class="step">
+                    <h3>🔐 Étape 2 : Se connecter</h3>
+                    <p>Ouvrir GitHub Desktop et se connecter avec votre compte GitHub</p>
+                </div>
+
+                <div class="step">
+                    <h3>➕ Étape 3 : Ajouter votre projet</h3>
+                    <p>File → Add Local Repository → Sélectionner le dossier "paiecashfan"</p>
+                </div>
+
+                <div class="step">
+                    <h3>📤 Étape 4 : Publier</h3>
+                    <p>Cliquer sur "Publish repository"</p>
+                    <ul style="margin: 1rem 0; padding-left: 2rem;">
+                        <li>Name : <code>paiecashfan</code></li>
+                        <li>Description : <code>Plateforme multi-sport Web3</code></li>
+                        <li>Décocher "Keep this code private" si vous voulez un repo public</li>
+                    </ul>
+                </div>
+
+                <div class="btns">
+                    <a href="https://docs.github.com/fr/desktop" target="_blank" class="btn secondary">
+                        <i class="fas fa-book"></i> Docs GitHub Desktop
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning sur les clés API -->
+        <div class="warning">
+            <h3>⚠️ IMPORTANT : Sécurité des clés API</h3>
+            <p><strong>Ne commitez JAMAIS vos vraies clés API sur GitHub !</strong></p>
+            <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                <li>Les clés API NowPayments doivent rester privées</li>
+                <li>Les clés WooCommerce doivent rester privées</li>
+                <li>Utilisez des variables d'environnement (.env) pour les clés</li>
+                <li>Le fichier <code>.gitignore</code> est déjà configuré pour protéger vos secrets</li>
+            </ul>
+        </div>
+
+        <!-- Ressources -->
+        <div class="resources">
+            <h2>📚 Ressources utiles</h2>
+            <div class="resource-grid">
+                <div class="resource">
+                    <i class="fab fa-github"></i>
+                    <h3>Documentation Git</h3>
+                    <a href="https://git-scm.com/doc" target="_blank">git-scm.com/doc</a>
+                </div>
+                <div class="resource">
+                    <i class="fas fa-book"></i>
+                    <h3>GitHub Docs</h3>
+                    <a href="https://docs.github.com" target="_blank">docs.github.com</a>
+                </div>
+                <div class="resource">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>GitHub Learning</h3>
+                    <a href="https://lab.github.com" target="_blank">lab.github.com</a>
+                </div>
+                <div class="resource">
+                    <i class="fas fa-key"></i>
+                    <h3>Personal Tokens</h3>
+                    <a href="https://github.com/settings/tokens" target="_blank">Créer un token</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="btns" style="margin-top: 3rem;">
+            <a href="📘_GUIDE_GITHUB_COMPLET.md" class="btn">
+                <i class="fas fa-file-alt"></i> Guide Complet (Texte)
+            </a>
+            <a href="README_GITHUB.md" class="btn secondary">
+                <i class="fas fa-readme"></i> README pour GitHub
+            </a>
+            <a href="index.html" class="btn outline">
+                <i class="fas fa-home"></i> Retour à l'Accueil
+            </a>
+        </div>
+    </div>
+</body>
+</html>

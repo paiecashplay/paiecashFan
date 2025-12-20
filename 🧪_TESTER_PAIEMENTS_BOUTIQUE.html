@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Paiements Boutique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        .status {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .method {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+        }
+        .method .icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        .method.working {
+            border-left: 4px solid #10b981;
+        }
+        .method.config {
+            border-left: 4px solid #f59e0b;
+        }
+        .test-btn {
+            display: block;
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16,185,129,0.4);
+        }
+        .test-btn.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .steps {
+            background: #374151;
+            padding: 2rem;
+            border-radius: 15px;
+            color: white;
+        }
+        .steps h3 {
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+        .step {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #4b5563;
+            border-radius: 10px;
+        }
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TEST PAIEMENTS BOUTIQUE</h1>
+
+        <div class="status">
+            <i class="fas fa-check-circle"></i> V11.3.1 - PAIEMENTS CORRIGÉS ET FONCTIONNELS
+        </div>
+
+        <div class="grid">
+            <!-- Méthodes fonctionnelles -->
+            <div class="card">
+                <h2>✅ Méthodes Fonctionnelles</h2>
+                <div class="method working">
+                    <div class="icon">💰</div>
+                    <div>
+                        <strong>Wallet</strong><br>
+                        <small>Paiement instantané + 2% cashback</small>
+                    </div>
+                </div>
+                <div class="method working">
+                    <div class="icon">💳</div>
+                    <div>
+                        <strong>Carte bancaire</strong><br>
+                        <small>Paiement instantané</small>
+                    </div>
+                </div>
+                <div class="method working">
+                    <div class="icon">💎</div>
+                    <div>
+                        <strong>Stablecoin club</strong><br>
+                        <small>OMC, PSC, OLC... + 3% cashback</small>
+                    </div>
+                </div>
+                <div class="method working">
+                    <div class="icon">🌍</div>
+                    <div>
+                        <strong>Mode Touriste</strong><br>
+                        <small>Paiement alternatif</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Méthodes nécessitant config -->
+            <div class="card">
+                <h2>⚙️ Configuration Nécessaire</h2>
+                <div class="method config">
+                    <div class="icon">🌐</div>
+                    <div>
+                        <strong>Crypto (NowPayments)</strong><br>
+                        <small>300+ cryptos - Clé API requise</small>
+                    </div>
+                </div>
+                <div class="method config">
+                    <div class="icon">🛒</div>
+                    <div>
+                        <strong>WooCommerce</strong><br>
+                        <small>CORS + Clés API requises</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clubs disponibles -->
+            <div class="card">
+                <h2>⚽ Clubs Disponibles</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">
+                    Chaque club a son propre stablecoin avec cashback :
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇫🇷 OM (OMC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇫🇷 PSG (PSC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇫🇷 OL (OLC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Arsenal (AFC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Liverpool (LFC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇩🇪 Bayern (BMC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇪🇸 Real Madrid (RMC)</span>
+                    <span style="background: #eff6ff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🇹🇷 Galatasaray (GSC)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="steps">
+            <h3>📋 Instructions de Test</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Ouvrir la boutique d'un club</strong><br>
+                    Cliquez sur un des boutons ci-dessous pour tester
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Aller dans l'onglet "Boutique"</strong><br>
+                    Vous verrez les produits disponibles (maillots, accessoires, etc.)
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Sélectionner des produits</strong><br>
+                    Cliquez sur les produits pour les ajouter au panier
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Cliquer sur "Payer"</strong><br>
+                    Un modal s'ouvre avec 5 méthodes de paiement
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Choisir une méthode</strong><br>
+                    Testez Wallet, Carte, ou Stablecoin pour voir le paiement fonctionner
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" style="margin-top: 2rem;">
+            <a href="app-universal-simple.html?club=olympique-de-marseille" class="test-btn" target="_blank">
+                <i class="fas fa-rocket"></i> Tester OM (OMC - 3% cashback)
+            </a>
+            <a href="app-universal-simple.html?club=paris-saint-germain" class="test-btn" target="_blank">
+                <i class="fas fa-rocket"></i> Tester PSG (PSC - 3% cashback)
+            </a>
+            <a href="app-universal-simple.html?club=arsenal-fc" class="test-btn" target="_blank">
+                <i class="fas fa-rocket"></i> Tester Arsenal (AFC - 3% cashback)
+            </a>
+        </div>
+
+        <div class="grid" style="margin-top: 2rem;">
+            <a href="✅_CORRECTION_PAIEMENTS_V11.3.1.md" class="test-btn secondary" target="_blank">
+                <i class="fas fa-file-alt"></i> Lire la Documentation
+            </a>
+            <a href="index.html" class="test-btn secondary" target="_blank">
+                <i class="fas fa-home"></i> Retour à l'Accueil
+            </a>
+        </div>
+    </div>
+</body>
+</html>

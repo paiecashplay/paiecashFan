@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Tests à Effectuer - PaieCashPlay FAN v2.4.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0E9CDA 0%, #1a5490 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #0E9CDA;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .big-link {
+            display: block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            text-decoration: none;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .big-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5);
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #0E9CDA;
+        }
+        
+        .test-section h2 {
+            color: #0E9CDA;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+            transition: all 0.2s;
+        }
+        
+        .test-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-number {
+            display: inline-block;
+            background: #0E9CDA;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .success-box h3 {
+            color: #155724;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 2;
+        }
+        
+        .feature-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ TESTS À EFFECTUER</h1>
+        <div class="subtitle">PaieCashPlay FAN - Version 2.4.2 Professional Edition</div>
+        
+        <a href="index.html" class="big-link">
+            🚀 OUVRIR L'APPLICATION POUR TESTER
+        </a>
+        
+        <div class="warning-box">
+            <h3>⚠️ MODE MOBILE OBLIGATOIRE</h3>
+            <ol>
+                <li><strong>F12</strong> → Ouvrir les DevTools</li>
+                <li><strong>Ctrl + Shift + M</strong> → Activer le mode responsive</li>
+                <li><strong>Sélectionner "iPhone 12 Pro"</strong> dans le menu déroulant</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎨 1. HEADER & PROFIL UTILISATEUR <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Vérifier le profil utilisateur</strong> en haut à droite du header
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Nom affiché :</strong> "Eric TOT"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Email affiché :</strong> "etot@paiecash.com"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Vérifier</strong> que le bouton IA 🤖 a été supprimé
+                </li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 2. STORIES AMIS (MODE COMPACT) <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Vérifier le mode horizontal compact</strong> des stories
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Avatars réduits</strong> à 48px (plus petits qu'avant)
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Noms supprimés</strong> pour gagner de l'espace
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Scroll horizontal fluide</strong> sur les avatars
+                </li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>⭐ 3. ONGLET LÉGENDES - INTERACTIONS <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur l'onglet "⭐ Légendes"</strong> en bas
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Chercher "Stéphane Mbia"</strong> et vérifier :
+                    <br>→ Section "🎯 École Stéphane Mbia"
+                    <br>→ Barre de progression : 45 000€ / 100 000€
+                    <br>→ Bouton "💝 Soutenir ce projet"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur "💝 Soutenir ce projet"</strong>
+                    <br>→ Entrer un montant (ex: 50€)
+                    <br>→ Vérifier le message "✅ Paiement effectué par PaieCash"
+                    <br>→ Vérifier "🏦 Traitement par Lyf Pay"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur "🎨 Acheter NFT"</strong>
+                    <br>→ Vérifier le prix en OMC (299-599)
+                    <br>→ Confirmer l'achat
+                    <br>→ Vérifier le message "✅ Paiement effectué par PaieCash"
+                </li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎫 4. ONGLET BILLETTERIE - ACHATS <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur l'onglet "🎟️ Billets"</strong>
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Descendre jusqu'à "Marketplace Fan-to-Fan"</strong>
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur "Acheter"</strong> sur un billet
+                    <br>→ Vérifier les détails : match, date, prix, vendeur
+                    <br>→ Confirmer l'achat
+                    <br>→ Vérifier "✅ Paiement effectué par PaieCash"
+                    <br>→ Vérifier "🏦 Transaction validée par Lyf Pay"
+                </li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🛍️ 5. ONGLET BOUTIQUE - ACHATS <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur l'onglet "🛍️ Boutique"</strong>
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Onglet "Club" :</strong> Cliquer sur "Ajouter au panier"
+                    <br>→ Confirmer l'achat
+                    <br>→ Vérifier "✅ Paiement effectué par PaieCash"
+                    <br>→ Vérifier "🏦 Transaction validée par Lyf Pay"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Onglet "Fan" :</strong> Cliquer sur "Acheter" produit d'occasion
+                    <br>→ Vérifier vendeur, note, état, prix
+                    <br>→ Confirmer l'achat
+                    <br>→ Vérifier "✅ Paiement effectué par PaieCash"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Onglet "NFT" :</strong> Cliquer sur "Acheter" un NFT
+                    <br>→ Vérifier prix en OMC
+                    <br>→ Confirmer l'achat
+                    <br>→ Vérifier "✅ Paiement effectué par PaieCash"
+                </li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>💰 6. ONGLET PAIEMENT - COINS CLIQUABLES <span class="feature-tag">NOUVEAU</span></h2>
+            <ul class="test-list">
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur l'onglet "💳 Paiement"</strong>
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Descendre jusqu'à "Wallet Écosystème Sport"</strong>
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Vérifier le texte</strong> "👉 Cliquez pour acheter/échanger" sur chaque coin
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Cliquer sur "OM Coin (OMC)"</strong>
+                    <br>→ Vérifier le menu : 1. Acheter | 2. Échanger | 3. Envoyer
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Tester "1" (Acheter) :</strong>
+                    <br>→ Entrer un montant (ex: 100€)
+                    <br>→ Confirmer
+                    <br>→ Vérifier "✅ Paiement effectué par PaieCash"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Tester "2" (Échanger) :</strong>
+                    <br>→ Entrer un montant
+                    <br>→ Choisir un autre coin (ex: PSG Coin)
+                    <br>→ Vérifier "✅ Échange effectué par PaieCash"
+                    <br>→ Vérifier "💡 Parité 1:1 entre tous les stablecoins"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Tester "3" (Envoyer) :</strong>
+                    <br>→ Entrer un destinataire
+                    <br>→ Entrer un montant
+                    <br>→ Vérifier "✅ Envoi effectué par PaieCash"
+                </li>
+                <li class="test-item">
+                    <span class="test-number">✓</span>
+                    <strong>Répéter pour les autres coins :</strong> PSG, OL, Monaco, LOSC, Lens
+                </li>
+            </ul>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 CHECKLIST COMPLÈTE</h3>
+            <ol>
+                <li>✅ Profil utilisateur visible dans le header</li>
+                <li>✅ IA Triviat supprimée</li>
+                <li>✅ Stories amis en mode compact horizontal</li>
+                <li>✅ Légendes avec associations et NFTs</li>
+                <li>✅ Achat billetterie avec Lyf Pay</li>
+                <li>✅ Achat boutique avec Lyf Pay</li>
+                <li>✅ Coins cliquables avec 3 actions</li>
+                <li>✅ Tous les paiements affichent "PaieCash" et "Lyf Pay"</li>
+            </ol>
+        </div>
+        
+        <div class="success-box">
+            <h3>🎉 TOUTES LES MODIFICATIONS SONT ACTIVES !</h3>
+            <p style="font-size: 1.2em; margin-top: 15px;">
+                Si tous les tests passent, l'application est prête pour la production ! 🚀
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: #666;">
+            <p><strong>Contact :</strong></p>
+            <p>Eric TOT | etot@paiecash.com | +33 7 67 12 96 52</p>
+        </div>
+    </div>
+</body>
+</html>

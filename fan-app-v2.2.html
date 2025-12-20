@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>PaieCashPlay - Super App Fan v2.2</title>
+    <link rel="stylesheet" href="fan-app-v2.2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader" class="loader">
+        <div class="loader-logo"></div>
+        <div class="loader-text">PaieCashPlay</div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="app-container" style="display: none;">
+        
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="club-logo-header" id="currentClubLogo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM">
+                    </div>
+                    <div class="header-title">
+                        <h1 id="headerClubName">Olympique de Marseille</h1>
+                        <span id="headerLevel">Platine 💎</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="btn-icon" id="btnSearch">
+                        <span>🔍</span>
+                    </button>
+                    <button class="btn-icon notification-btn" id="btnNotifications">
+                        <span>🔔</span>
+                        <span class="badge">5</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- AI ASSISTANT BAR (EN HAUT) -->
+        <div class="ai-assistant-bar">
+            <div class="ai-assistant-content" id="aiAssistantBar">
+                <div class="ai-avatar-mini">🤖</div>
+                <div class="ai-message-preview">
+                    <span class="ai-typing">L'IA est prête à t'aider...</span>
+                </div>
+                <button class="btn-expand-ai" id="btnExpandAI">›</button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="app-main" id="mainContent">
+            
+            <!-- SECTION: FEED SOCIAL -->
+            <section id="feedSection" class="section active">
+                <!-- Stories Bar -->
+                <div class="stories-bar">
+                    <div class="stories-scroll" id="storiesScroll">
+                        <div class="story-item add-story">
+                            <div class="story-avatar">
+                                <div class="story-add-icon">+</div>
+                            </div>
+                            <span class="story-username">Ajouter</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="feed-filters">
+                    <button class="filter-btn active" data-filter="all">Tous</button>
+                    <button class="filter-btn" data-filter="clubs">Clubs</button>
+                    <button class="filter-btn" data-filter="ambassadors">Ambassadeurs</button>
+                    <button class="filter-btn" data-filter="friends">Amis</button>
+                </div>
+
+                <!-- Posts -->
+                <div id="postsContainer" class="posts-container">
+                    <!-- Posts injectés dynamiquement -->
+                </div>
+            </section>
+
+            <!-- SECTION: BILLETTERIE -->
+            <section id="billetterieSection" class="section">
+                <div class="section-header">
+                    <h2>🎫 Billetterie</h2>
+                    <span class="section-subtitle">Matchs & Événements</span>
+                </div>
+
+                <!-- Prochains Matchs -->
+                <div class="matches-container">
+                    <h3>Prochains Matchs</h3>
+                    <div id="matchesGrid" class="matches-grid">
+                        <!-- Matchs injectés -->
+                    </div>
+                </div>
+
+                <!-- Mes Billets -->
+                <div class="my-tickets-container">
+                    <h3>Mes Billets NFT</h3>
+                    <div id="myTicketsGrid" class="my-tickets-grid">
+                        <!-- Billets injectés -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: BOUTIQUE -->
+            <section id="boutiqueSection" class="section">
+                <div class="section-header">
+                    <h2>🛍️ Boutique</h2>
+                    <span class="section-subtitle">Produits Officiels</span>
+                </div>
+
+                <!-- Catégories -->
+                <div class="shop-categories">
+                    <button class="category-btn active" data-category="all">Tous</button>
+                    <button class="category-btn" data-category="maillots">Maillots</button>
+                    <button class="category-btn" data-category="accessories">Accessoires</button>
+                    <button class="category-btn" data-category="nft">NFT</button>
+                </div>
+
+                <!-- Produits -->
+                <div id="productsGrid" class="products-grid">
+                    <!-- Produits injectés -->
+                </div>
+
+                <!-- Panier Floating -->
+                <button class="btn-cart-floating" id="btnCart">
+                    <span>🛒</span>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+            </section>
+
+            <!-- SECTION: WALLET -->
+            <section id="walletSection" class="section">
+                <div class="section-header">
+                    <h2>💰 Mon Wallet</h2>
+                    <span class="section-subtitle">Multi-devises & Carte</span>
+                </div>
+
+                <!-- CARTE BANCAIRE -->
+                <div class="card-container-3d">
+                    <h3>💳 Ma Carte ConnectPay</h3>
+                    <div class="card-3d-wrapper" id="card3DWrapper">
+                        <div class="card-3d" id="bankCard3D">
+                            <div class="card-face card-front">
+                                <div class="card-chip"></div>
+                                <div class="card-logo-paiecash">
+                                    <svg width="60" height="30" viewBox="0 0 60 30">
+                                        <text x="5" y="20" fill="white" font-family="Inter" font-weight="700" font-size="16">PaieCash</text>
+                                    </svg>
+                                </div>
+                                <div class="card-logo-mastercard">
+                                    <svg width="50" height="40" viewBox="0 0 50 40">
+                                        <circle cx="18" cy="20" r="12" fill="#EB001B"/>
+                                        <circle cx="32" cy="20" r="12" fill="#F79E1B"/>
+                                    </svg>
+                                </div>
+                                <div class="card-logo-club-watermark" id="cardClubWatermark">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="Club">
+                                </div>
+                                <div class="card-number" id="cardNumber">•••• •••• •••• 4567</div>
+                                <div class="card-holder">
+                                    <div class="card-label">Titulaire</div>
+                                    <div class="card-value" id="cardHolder">MAXIME DUPONT</div>
+                                </div>
+                                <div class="card-expiry">
+                                    <div class="card-label">Expire fin</div>
+                                    <div class="card-value" id="cardExpiry">12/28</div>
+                                </div>
+                                <div class="card-hologram"></div>
+                            </div>
+                            <div class="card-face card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-cvv-box">
+                                    <div class="card-label-small">CVV</div>
+                                    <div class="card-cvv" id="cardCVV">•••</div>
+                                </div>
+                                <div class="card-bank-info">
+                                    <p>ConnectPay EMI License #24</p>
+                                    <p>Powered by PaieCash</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Solde Carte avec Masquer/Afficher -->
+                    <div class="card-balance-section">
+                        <div class="balance-header">
+                            <span class="balance-label">Solde carte</span>
+                            <button class="btn-toggle-visibility" id="btnToggleCardBalance">
+                                <span id="iconCardBalance">👁️</span>
+                            </button>
+                        </div>
+                        <div class="balance-value-large" id="cardBalanceValue">1 247,50 €</div>
+                        <div class="balance-secondary">
+                            <span>Cashback ce mois : <strong class="green">+37,20 €</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-secondary" id="btnShowCardNumber">Afficher numéro</button>
+                        <button class="btn-secondary" id="btnBlockCard">Bloquer</button>
+                        <button class="btn-secondary" id="btnCardLimits">Limites</button>
+                    </div>
+                </div>
+
+                <!-- Transferts Wallet <-> Carte -->
+                <div class="transfer-card-wallet">
+                    <h3>🔄 Transferts rapides</h3>
+                    <div class="transfer-buttons">
+                        <button class="btn-transfer" id="btnToCard">
+                            <span>💰 → 💳</span>
+                            <span>Vers Carte</span>
+                        </button>
+                        <button class="btn-transfer" id="btnFromCard">
+                            <span>💳 → 💰</span>
+                            <span>Depuis Carte</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WALLETS AVEC ADRESSE -->
+                <div class="wallets-container">
+                    <h3>💼 Mes Wallets</h3>
+                    <div id="walletsGrid" class="wallets-grid">
+                        <!-- Wallets injectés avec adresses -->
+                    </div>
+                </div>
+
+                <!-- STABLECOIN CLUB -->
+                <div class="club-stablecoin-section">
+                    <h3>🪙 OM Coin - Stablecoin Officiel</h3>
+                    <div class="stablecoin-card">
+                        <div class="stablecoin-icon">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM Coin">
+                        </div>
+                        <div class="stablecoin-info">
+                            <h4>OM Coin (OMC)</h4>
+                            <p>Parité 1 OMC = 1 EUR</p>
+                            <div class="stablecoin-balance">
+                                <span class="balance-label">Solde</span>
+                                <div class="balance-value">
+                                    <span id="omcBalance">2 450.00 OMC</span>
+                                    <button class="btn-toggle-visibility" id="btnToggleOMC">
+                                        <span id="iconOMCBalance">👁️</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-primary-small" id="btnBuyOMC">Acheter OMC</button>
+                    </div>
+                    <div class="stablecoin-benefits">
+                        <div class="benefit-item">✓ Achats boutique -5%</div>
+                        <div class="benefit-item">✓ Billets prioritaires</div>
+                        <div class="benefit-item">✓ Cashback +2%</div>
+                    </div>
+                </div>
+
+                <!-- RECHERCHE P2P -->
+                <div class="p2p-search-container">
+                    <h3>👥 Envoyer de l'argent</h3>
+                    <div class="search-p2p-bar">
+                        <input type="text" id="p2pSearchInput" placeholder="Adresse wallet ou numéro de téléphone">
+                        <button class="btn-search-p2p" id="btnSearchP2P">🔍</button>
+                    </div>
+                    <div class="search-results" id="p2pSearchResults">
+                        <!-- Résultats recherche -->
+                    </div>
+                </div>
+
+                <!-- Contacts P2P Rapides -->
+                <div class="p2p-container">
+                    <h3>⚡ Contacts Rapides</h3>
+                    <div class="contacts-carousel" id="contactsCarousel">
+                        <!-- Contacts avec photos -->
+                    </div>
+                </div>
+
+                <!-- Historique -->
+                <div class="transactions-container">
+                    <h3>📜 Historique</h3>
+                    <div id="transactionsList" class="transactions-list">
+                        <!-- Transactions -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: PROFIL -->
+            <section id="profileSection" class="section">
+                <div class="profile-header">
+                    <div class="profile-banner"></div>
+                    <div class="profile-info">
+                        <div class="profile-avatar-large">
+                            <img src="https://i.pravatar.cc/150?img=12" alt="Maxime">
+                        </div>
+                        <h2 class="profile-name">Maxime Dupont</h2>
+                        <p class="profile-username">@maxime_om</p>
+                        <p class="profile-bio">Superfan OM 💙 | Collector NFT ⚡ | Platine</p>
+                        <div class="profile-stats-row">
+                            <div class="profile-stat">
+                                <span class="stat-value">2.4k</span>
+                                <span class="stat-label">Abonnés</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">847</span>
+                                <span class="stat-label">Abonnements</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">142</span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Engagement -->
+                <div class="engagement-container">
+                    <h3>🏆 Ton Engagement</h3>
+                    <div class="engagement-level">
+                        <div class="level-badge">💎</div>
+                        <div class="level-info">
+                            <span class="level-name">Platine</span>
+                            <span class="level-points" id="userPoints">8720 points</span>
+                        </div>
+                    </div>
+                    <div class="level-progress">
+                        <div class="progress-bar-large">
+                            <div class="progress-fill-large" id="levelProgressBar" style="width: 67%"></div>
+                        </div>
+                        <span class="progress-label">
+                            <span id="pointsToNext">1280 points</span> pour Diamond
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Réseaux Sociaux -->
+                <div class="social-connect-container">
+                    <h3>📱 Connecte tes réseaux</h3>
+                    <div id="socialNetworks" class="social-networks-grid">
+                        <!-- Réseaux sociaux -->
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="badges-container">
+                    <h3>🎖️ Badges (<span id="badgesCount">12</span>/50)</h3>
+                    <div id="badgesGrid" class="badges-grid">
+                        <!-- Badges injectés -->
+                    </div>
+                </div>
+
+                <!-- Paramètres -->
+                <div class="settings-container">
+                    <h3>⚙️ Paramètres</h3>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <span class="setting-icon">👤</span>
+                            <span class="setting-label">Compte</span>
+                            <span class="setting-arrow">›</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-icon">🔒</span>
+                            <span class="setting-label">Sécurité & Mot de passe</span>
+                            <span class="setting-arrow">›</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-icon">🔔</span>
+                            <span class="setting-label">Notifications</span>
+                            <span class="setting-arrow">›</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-icon">🌙</span>
+                            <span class="setting-label">Mode Sombre</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkModeToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-logout">Déconnexion</button>
+            </section>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION (4 TABS) -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-section="feedSection">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Feed</span>
+            </button>
+            <button class="nav-btn" data-section="billetterieSection">
+                <span class="nav-icon">🎫</span>
+                <span class="nav-label">Billetterie</span>
+            </button>
+            <button class="nav-btn" data-section="boutiqueSection">
+                <span class="nav-icon">🛍️</span>
+                <span class="nav-label">Boutique</span>
+            </button>
+            <button class="nav-btn" data-section="walletSection">
+                <span class="nav-icon">💰</span>
+                <span class="nav-label">Wallet</span>
+            </button>
+            <button class="nav-btn" data-section="profileSection">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profil</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- MODAL: AI CHAT FULLSCREEN -->
+    <div id="aiChatModal" class="modal-fullscreen">
+        <div class="modal-header">
+            <button class="btn-back" id="btnCloseAIChat">‹</button>
+            <div class="modal-header-info">
+                <div class="ai-avatar-small">🤖</div>
+                <div>
+                    <h3>PaieCash Assistant IA</h3>
+                    <span class="status-online">En ligne</span>
+                </div>
+            </div>
+            <button class="btn-icon" id="btnVoiceSettings">🎤</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages du chat -->
+        </div>
+        <div class="chat-input-container">
+            <div class="quick-replies" id="quickReplies">
+                <!-- Quick replies -->
+            </div>
+            <div class="chat-input-wrapper">
+                <input type="text" id="chatInput" placeholder="Tape ton message...">
+                <button class="btn-mic" id="btnMic">🎤</button>
+                <button class="btn-send" id="btnSend">➤</button>
+            </div>
+            <div class="voice-recording" id="voiceRecording" style="display: none;">
+                <div class="recording-animation"></div>
+                <span class="recording-text">Enregistrement...</span>
+                <button class="btn-stop-recording" id="btnStopRecording">■</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: P2P TRANSFER WITH PASSWORD -->
+    <div id="p2pModal" class="modal-bottom-sheet">
+        <div class="modal-sheet-header">
+            <div class="modal-handle"></div>
+            <h3>Envoyer de l'argent</h3>
+            <button class="btn-close" id="btnCloseP2P">✕</button>
+        </div>
+        <div class="modal-sheet-content">
+            <div class="p2p-contact-selected" id="p2pContactSelected">
+                <!-- Contact sélectionné -->
+            </div>
+            <div class="p2p-amount-input">
+                <input type="number" id="p2pAmount" placeholder="Montant">
+                <select id="p2pCurrency">
+                    <option value="EUR">EUR</option>
+                    <option value="OMC">OM Coin</option>
+                    <option value="PAIE">PaieCash</option>
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+            <textarea id="p2pMessage" placeholder="Message (optionnel)"></textarea>
+            
+            <!-- MOT DE PASSE CONFIRMATION -->
+            <div class="password-confirmation">
+                <label>🔒 Confirme avec ton mot de passe</label>
+                <input type="password" id="p2pPassword" placeholder="Mot de passe">
+            </div>
+            
+            <button class="btn-primary" id="btnConfirmP2P">Confirmer l'envoi</button>
+        </div>
+    </div>
+
+    <!-- MODAL: PANIER -->
+    <div id="cartModal" class="modal-fullscreen">
+        <div class="modal-header">
+            <button class="btn-back" id="btnCloseCart">‹</button>
+            <h3>Mon Panier</h3>
+            <button class="btn-icon" id="btnClearCart">🗑️</button>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <!-- Items panier -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cartTotalPrice">0.00 €</span>
+            </div>
+            <button class="btn-primary" id="btnCheckout">Commander avec OM Coin 🪙</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="fan-app-v2.2.js"></script>
+</body>
+</html>

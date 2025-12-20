@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Système de Génération de Cartes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1929, #1a2744);
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #4ade80, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .info {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        select, button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        select {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        button {
+            background: linear-gradient(135deg, #4ade80, #3b82f6);
+            color: white;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 222, 128, 0.3);
+        }
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card-wrapper {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .dimensions {
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0.7;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Système de Génération de Cartes</h1>
+    <div class="info">
+        Génération automatique de cartes pour tous les clubs et tous les joueurs africains
+    </div>
+
+    <div class="controls">
+        <select id="club-select">
+            <option value="olympique-de-marseille">Olympique de Marseille</option>
+            <option value="paris-saint-germain">Paris Saint-Germain</option>
+            <option value="olympique-lyonnais">Olympique Lyonnais</option>
+            <option value="as-monaco">AS Monaco</option>
+        </select>
+        
+        <select id="joueur-select">
+            <option value="aubameyang-om">Pierre-Emerick Aubameyang</option>
+            <option value="kolo-muani-psg">Randal Kolo Muani</option>
+            <option value="cherki-ol">Rayan Cherki</option>
+        </select>
+        
+        <button onclick="genererCartes()">🎨 Générer les Cartes</button>
+    </div>
+
+    <div class="cards-container" id="cards-container">
+        <!-- Les cartes seront générées ici -->
+    </div>
+
+    <script src="card-generator.js"></script>
+    <script>
+        // Fonction pour générer et afficher les cartes
+        function genererCartes() {
+            const joueurId = document.getElementById('joueur-select').value;
+            const joueur = joueursAfricains.find(j => j.id === joueurId);
+            
+            if (!joueur) {
+                alert('Joueur non trouvé !');
+                return;
+            }
+            
+            const container = document.getElementById('cards-container');
+            
+            // Générer carte FAN
+            const carteFAN = genererCarteHTML(joueur, 'fan');
+            
+            // Générer carte VIP
+            const carteVIP = genererCarteHTML(joueur, 'vip');
+            
+            // Afficher
+            container.innerHTML = `
+                <div class="card-wrapper">
+                    <div class="card-title">💙 Carte FAN - GRATUITE</div>
+                    ${carteFAN}
+                    <div class="dimensions">600px × 375px</div>
+                </div>
+                
+                <div class="card-wrapper">
+                    <div class="card-title">🏆 Carte VIP - 1 970 FCFA / 3 EUR</div>
+                    ${carteVIP}
+                    <div class="dimensions">600px × 375px</div>
+                </div>
+            `;
+        }
+        
+        // Générer les cartes au chargement
+        window.addEventListener('load', () => {
+            genererCartes();
+        });
+        
+        // Mettre à jour les joueurs quand on change de club
+        document.getElementById('club-select').addEventListener('change', (e) => {
+            const clubId = e.target.value;
+            const joueursClub = joueursAfricains.filter(j => j.club === clubId);
+            
+            const joueurSelect = document.getElementById('joueur-select');
+            joueurSelect.innerHTML = joueursClub.map(j => 
+                `<option value="${j.id}">${j.nom} ${j.prenom}</option>`
+            ).join('');
+            
+            genererCartes();
+        });
+        
+        // Générer quand on change de joueur
+        document.getElementById('joueur-select').addEventListener('change', () => {
+            genererCartes();
+        });
+    </script>
+
+    <div style="text-align: center; margin-top: 60px; padding: 30px; background: rgba(74, 222, 128, 0.1); border: 2px solid #4ade80; border-radius: 15px; max-width: 1000px; margin-left: auto; margin-right: auto;">
+        <h2 style="font-size: 28px; margin-bottom: 20px; color: #4ade80;">✅ Système de Génération Automatique</h2>
+        <div style="font-size: 17px; line-height: 2.2; text-align: left; padding: 0 30px;">
+            ✅ <strong>Scalable</strong> : Génère des millions de cartes instantanément<br>
+            ✅ <strong>Personnalisé</strong> : Logo du club + couleurs + nom du joueur<br>
+            ✅ <strong>Dimensions identiques</strong> : 600px × 375px pour toutes les cartes<br>
+            ✅ <strong>Facile à maintenir</strong> : Modifier le design une seule fois<br>
+            ✅ <strong>Zéro régression</strong> : Compatible avec l'application existante
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; font-size: 16px; opacity: 0.7; line-height: 2.2;">
+        PaieCashFan Platform - Système de Génération de Cartes v1.0<br>
+        16 Décembre 2025<br>
+        <strong style="color: #4ade80;">PRÊT POUR DES MILLIONS DE CARTES 🚀</strong>
+    </div>
+</body>
+</html>

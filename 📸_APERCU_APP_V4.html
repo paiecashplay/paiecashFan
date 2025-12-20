@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📸 Aperçu PaieCashFan V4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .phone-mockup {
+            background: white;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 400px;
+            margin: 0 auto 60px;
+            position: relative;
+        }
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        .phone-screen {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        .app-header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .club-info h3 {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .club-info p {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: #ff6b6b;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .menu {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 5px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 11px;
+        }
+        .menu-btn {
+            padding: 8px 10px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .menu-btn.active {
+            background: white;
+            color: #1e3c72;
+        }
+        .content {
+            padding: 20px;
+        }
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .welcome-card h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .welcome-card p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .wallet-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        .wallet-balance {
+            margin-bottom: 15px;
+        }
+        .wallet-balance-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        .wallet-balance-amount {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .wallet-details {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        .wallet-id {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .wallet-id-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+        .wallet-id-number {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .wallet-btn {
+            background: white;
+            color: #667eea;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .transactions-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .transactions-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .transaction-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .transaction-details {
+            flex: 1;
+        }
+        .transaction-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .transaction-date {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        .transaction-amount {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        .transaction-amount.positive {
+            color: #90EE90;
+        }
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+        .screenshot-label {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .cta-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 50px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: white;
+            color: #1e3c72;
+            padding: 20px 50px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .cta-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📸 Aperçu de l'Application PaieCashFan V4</h1>
+        <p>Découvrez les nouvelles fonctionnalités</p>
+    </div>
+
+    <div class="container">
+        <!-- APERÇU 1 : PAGE ACCUEIL -->
+        <div class="screenshots-grid">
+            <div>
+                <div class="screenshot-label">🏠 Page Accueil - Olympique de Marseille</div>
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <!-- Header -->
+                        <div class="app-header">
+                            <div class="app-header-left">
+                                <div class="logo">⚪🔵</div>
+                                <div class="club-info">
+                                    <h3>Olympique de Marseille</h3>
+                                    <p>Platine 💎</p>
+                                </div>
+                            </div>
+                            <div class="user-avatar">
+                                👤
+                                <div class="notif-badge">5</div>
+                            </div>
+                        </div>
+
+                        <!-- Menu -->
+                        <div class="menu">
+                            <div class="menu-btn active">🏠</div>
+                            <div class="menu-btn">💎</div>
+                            <div class="menu-btn">⭐</div>
+                            <div class="menu-btn">🎫</div>
+                            <div class="menu-btn">🛍️</div>
+                            <div class="menu-btn">💳</div>
+                            <div class="menu-btn">👤</div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="content">
+                            <!-- Welcome -->
+                            <div class="welcome-card">
+                                <h2>👋 Bienvenue chez l'OM !</h2>
+                                <p><strong>ETOT Constantin Nicolas</strong></p>
+                                <p style="margin-top: 5px;">Niveau : Platine 💎 | 4,250 points</p>
+                            </div>
+
+                            <!-- Wallet -->
+                            <div class="wallet-card">
+                                <div class="wallet-header">
+                                    <div style="font-weight: bold; letter-spacing: 2px;">PAIECASH</div>
+                                    <div>⚪🔵 OM</div>
+                                </div>
+                                
+                                <div class="wallet-balance">
+                                    <div class="wallet-balance-label">SOLDE TOTAL</div>
+                                    <div class="wallet-balance-amount">1247.50 €</div>
+                                    <div class="wallet-details">
+                                        <span>💵 Wallet : 625.00€</span> | 
+                                        <span>💳 Carte : 622.50€</span>
+                                    </div>
+                                    <div style="color: #90EE90; margin-top: 5px;">+ 37.20€ cashback</div>
+                                </div>
+
+                                <div class="wallet-id">
+                                    <div class="wallet-id-label">N° Identification</div>
+                                    <div class="wallet-id-number">5234 8765 1234 5678</div>
+                                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px;">
+                                        <div>ETOT CONSTANTIN</div>
+                                        <div>12/34</div>
+                                    </div>
+                                </div>
+
+                                <div class="wallet-btn">💳 Gérer Wallet & Paiements</div>
+                            </div>
+
+                            <!-- Transactions -->
+                            <div class="transactions-card">
+                                <div class="transactions-title">📊 Transactions Récentes</div>
+                                
+                                <div class="transaction-item">
+                                    <div class="transaction-icon">🍔</div>
+                                    <div class="transaction-details">
+                                        <div class="transaction-name">McDonald's Prado</div>
+                                        <div class="transaction-date">15 janvier 2025 - 14:23</div>
+                                    </div>
+                                    <div class="transaction-amount">-9.50 EUR</div>
+                                </div>
+
+                                <div class="transaction-item">
+                                    <div class="transaction-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">💵</div>
+                                    <div class="transaction-details">
+                                        <div class="transaction-name">Recharge Wallet</div>
+                                        <div class="transaction-date">15 janvier 2025 - 10:15</div>
+                                    </div>
+                                    <div class="transaction-amount positive">+50.00 EUR</div>
+                                </div>
+
+                                <div class="transaction-item">
+                                    <div class="transaction-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">👕</div>
+                                    <div class="transaction-details">
+                                        <div class="transaction-name">Boutique OM - Maillot</div>
+                                        <div class="transaction-date">14 janvier 2025 - 16:45</div>
+                                    </div>
+                                    <div class="transaction-amount">-89.90 EUR</div>
+                                </div>
+
+                                <div style="margin-top: 12px; text-align: center; font-size: 12px; opacity: 0.9;">
+                                    Voir toutes les transactions →
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APERÇU 2 : SÉLECTION CLUBS -->
+            <div>
+                <div class="screenshot-label">🌍 Tous les Clubs (42)</div>
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div style="padding: 20px;">
+                            <h1 style="font-size: 32px; text-align: center; margin-bottom: 10px;">🏆 PaieCashFan</h1>
+                            <p style="text-align: center; font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Choisis ton club et supporte-le !</p>
+
+                            <!-- Search Bar -->
+                            <div style="background: white; padding: 12px; border-radius: 25px; margin-bottom: 15px; color: #666; font-size: 13px;">
+                                🔍 Rechercher un club...
+                            </div>
+
+                            <!-- Filters -->
+                            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; font-size: 11px;">
+                                <div style="background: white; color: #1e3c72; padding: 8px 15px; border-radius: 20px; font-weight: bold;">Tous</div>
+                                <div style="background: rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 20px;">⚽ Ligue 1</div>
+                                <div style="background: rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 20px;">⚽ Ligue 2</div>
+                                <div style="background: rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 20px;">🌍 Europe</div>
+                            </div>
+
+                            <!-- Section Title -->
+                            <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; text-align: center;">⚽ Ligue 1 - France</div>
+
+                            <!-- Clubs Grid -->
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                <!-- OM Card -->
+                                <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; text-align: center; border: 2px solid white;">
+                                    <div style="width: 50px; height: 50px; margin: 0 auto 10px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">⚪🔵</div>
+                                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Olympique de Marseille</div>
+                                    <div style="font-size: 10px; opacity: 0.8; margin-bottom: 8px;">Ligue 1 Uber Eats</div>
+                                    <div style="background: #FFD700; color: #333; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; display: inline-block;">✅ Disponible</div>
+                                </div>
+
+                                <!-- Paris FC Card -->
+                                <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; text-align: center; border: 2px solid white;">
+                                    <div style="width: 50px; height: 50px; margin: 0 auto 10px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">🔵⚪</div>
+                                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Paris FC</div>
+                                    <div style="font-size: 10px; opacity: 0.8; margin-bottom: 8px;">Ligue 2 BKT</div>
+                                    <div style="background: #FFD700; color: #333; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; display: inline-block;">✅ Disponible</div>
+                                </div>
+
+                                <!-- PSG Card -->
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; text-align: center; opacity: 0.6;">
+                                    <div style="width: 50px; height: 50px; margin: 0 auto 10px; background: rgba(255,255,255,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">🔴🔵</div>
+                                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Paris Saint-Germain</div>
+                                    <div style="font-size: 10px; opacity: 0.8; margin-bottom: 8px;">Ligue 1 Uber Eats</div>
+                                    <div style="background: #999; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; display: inline-block;">🔄 Bientôt</div>
+                                </div>
+
+                                <!-- Lyon Card -->
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; text-align: center; opacity: 0.6;">
+                                    <div style="width: 50px; height: 50px; margin: 0 auto 10px; background: rgba(255,255,255,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px;">🔴🔵</div>
+                                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Olympique Lyonnais</div>
+                                    <div style="font-size: 10px; opacity: 0.8; margin-bottom: 8px;">Ligue 1 Uber Eats</div>
+                                    <div style="background: #999; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; display: inline-block;">🔄 Bientôt</div>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 20px; font-size: 12px; opacity: 0.9;">
+                                + 38 autres clubs disponibles
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA SECTION -->
+        <div class="cta-section">
+            <h2>🚀 Prêt à tester l'application ?</h2>
+            <p style="font-size: 18px; margin-bottom: 30px; opacity: 0.9;">Toutes les fonctionnalités sont opérationnelles !</p>
+            
+            <a href="app-om-COMPLET.html" class="cta-btn" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white;">
+                ⚪🔵 Tester OM
+            </a>
+            
+            <a href="app-paris-fc-COMPLET.html" class="cta-btn" style="background: linear-gradient(135deg, #003f87 0%, #0066cc 100%); color: white;">
+                🔵⚪🔴 Tester Paris FC
+            </a>
+            
+            <a href="accueil-clubs-complet.html" class="cta-btn">
+                🌍 Voir les 42 clubs
+            </a>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid rgba(255,255,255,0.3);">
+                <h3 style="font-size: 24px; margin-bottom: 20px;">✨ Nouveautés V4</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: left; font-size: 14px;">
+                    <div>
+                        <div style="font-size: 32px; margin-bottom: 10px;">💳</div>
+                        <strong>Wallet sur Accueil</strong><br>
+                        Solde visible + N° Identification
+                    </div>
+                    <div>
+                        <div style="font-size: 32px; margin-bottom: 10px;">📊</div>
+                        <strong>Transactions Cliquables</strong><br>
+                        3 dernières + tickets détaillés
+                    </div>
+                    <div>
+                        <div style="font-size: 32px; margin-bottom: 10px;">🔄</div>
+                        <strong>Sync Temps Réel</strong><br>
+                        6 affichages synchronisés
+                    </div>
+                    <div>
+                        <div style="font-size: 32px; margin-bottom: 10px;">🌍</div>
+                        <strong>42 Clubs</strong><br>
+                        Ligue 1, Ligue 2, Europe
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

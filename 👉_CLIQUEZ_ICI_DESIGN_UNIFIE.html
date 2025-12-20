@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 C'est la MÊME App Maintenant !</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(30px);
+            border: 3px solid rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-big {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .explanation {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+            line-height: 1.8;
+            font-size: 18px;
+        }
+
+        .explanation strong {
+            color: #FFD700;
+        }
+
+        .btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: 900;
+            text-decoration: none;
+            margin: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .check-list {
+            list-style: none;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .check-list li {
+            padding: 12px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .check-icon {
+            color: #38ef7d;
+            font-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 36px;
+            }
+            .subtitle {
+                font-size: 20px;
+            }
+            .btn {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-big">🎉</div>
+        
+        <h1>OUI, c'est la MÊME App !</h1>
+        
+        <p class="subtitle">
+            Le design TikTok est maintenant intégré dans <strong>app.html</strong> et <strong>app-federation.html</strong>
+        </p>
+
+        <div class="explanation">
+            <p style="margin-bottom: 20px;">
+                <strong>✅ VOUS AVIEZ RAISON DE DEMANDER !</strong>
+            </p>
+            <p style="margin-bottom: 20px;">
+                Avant, il y avait plusieurs fichiers séparés. Maintenant, tout est <strong>UNIFIÉ</strong> dans une seule application.
+            </p>
+            <p>
+                <strong>Le nouveau design TikTok</strong> (avec gamification, monétisation, IA commerce) est maintenant directement dans <code>app.html</code> !
+            </p>
+        </div>
+
+        <ul class="check-list">
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>Design TikTok immersif (scroll vertical)</span>
+            </li>
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>Gamification : niveaux, badges, points</span>
+            </li>
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>Monétisation : gagne de l'argent réel</span>
+            </li>
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>IA Commerce : achète via chat</span>
+            </li>
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>FOMO : countdown en temps réel</span>
+            </li>
+            <li>
+                <i class="fas fa-check-circle check-icon"></i>
+                <span>126 clubs + toutes fédérations</span>
+            </li>
+        </ul>
+
+        <div style="margin: 40px 0;">
+            <a href="app.html#olympique-marseille" class="btn">
+                <i class="fas fa-rocket"></i>
+                VOIR LE NOUVEAU DESIGN
+            </a>
+            <a href="🎯_NOUVEAU_DESIGN_UNIFIE.html" class="btn btn-secondary">
+                <i class="fas fa-info-circle"></i>
+                Plus de détails
+            </a>
+        </div>
+
+        <div style="margin-top: 40px; font-size: 16px; opacity: 0.8;">
+            <p>💡 Astuce : Utilisez <code>app.html#[id-du-club]</code> pour accéder directement à n'importe quel club</p>
+        </div>
+    </div>
+
+    <script>
+        // Redirection automatique après 8 secondes
+        let countdown = 8;
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown === 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'app.html#olympique-marseille';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

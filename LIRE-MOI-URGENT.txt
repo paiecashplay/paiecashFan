@@ -1,0 +1,132 @@
+========================================
+  PAIECASHPLAY V6.0 - MULTI-SPORTS
+  GUIDE D'ACCÈS RAPIDE
+========================================
+
+PROBLÈME : Vous ne voyez pas les modifications ?
+SOLUTION : Accédez directement aux bonnes URLs !
+
+========================================
+URLS À UTILISER (après publication)
+========================================
+
+1. INDEX MULTI-SPORTS (275+ clubs, 5 sports)
+   https://jphbvnok.gensparkspace.com/index-multi-sports.html
+
+2. INSCRIPTION DE CLUB (petits et grands clubs)
+   https://jphbvnok.gensparkspace.com/inscription-club.html
+
+3. FOOTBALL COMPLET (215+ clubs)
+   https://jphbvnok.gensparkspace.com/index.html
+
+4. GUIDE COMPLET (documentation)
+   https://jphbvnok.gensparkspace.com/GUIDE-COMPLET.html
+
+5. PAGE D'ACCUEIL AVEC LIENS
+   https://jphbvnok.gensparkspace.com/OUVRIR-ICI.html
+
+========================================
+CE QUI A ÉTÉ AJOUTÉ
+========================================
+
+✅ BASKETBALL - 16 clubs (Betclic Elite)
+   Boulazac, Bourg, Chalon, CHOLET, Dijon, Gravelines,
+   Le Mans, Le Portel, Limoges, ASVEL, Monaco, Nancy,
+   Nanterre, Paris, Saint-Quentin, Strasbourg
+
+✅ HANDBALL - 16 clubs (Starligue)
+   Cesson-Rennes, Chambéry, Chartres, Dijon, Dunkerque,
+   Istres, Limoges, Montpellier, Nantes, PSG, Aix,
+   Saint-Raphaël, Sélestat, Toulouse, Tremblay, Nîmes
+
+✅ RUGBY - 14 clubs (Top 14)
+   Bayonne, Bordeaux, Castres, Clermont, La Rochelle,
+   Lyon, Montauban, Montpellier, Pau, Perpignan,
+   Racing 92, Stade Français, Toulon, Toulouse
+
+✅ VOLLEYBALL - 14 clubs (Ligue A)
+   Cannes, Chaumont, Ajaccio, Montpellier, Narbonne,
+   Monaco, Paris, Plessis-Robinson, Poitiers, Sète,
+   Saint-Nazaire, Toulouse, Tourcoing, Tours
+
+✅ INSCRIPTION DE CLUBS
+   - Formulaire complet
+   - Pour tous les clubs (petits et grands)
+   - Accès sponsors locaux et internationaux
+   - Même visibilité pour tous
+
+========================================
+STATISTIQUES
+========================================
+
+TOTAL CLUBS : 275+
+- Football : 215+ clubs
+- Basketball : 16 clubs
+- Handball : 16 clubs
+- Rugby : 14 clubs
+- Volleyball : 14 clubs
+
+FÉDÉRATIONS : 6
+- FIFA, UEFA, CAF, CONMEBOL, AFC, CONCACAF
+
+SPORTS : 5
+- Football, Basketball, Handball, Rugby, Volleyball
+
+========================================
+MODIFICATIONS SUR INDEX.HTML
+========================================
+
+✅ BANDEAU VERT EN HAUT ajouté avec :
+   - Lien "Voir Tous les Sports"
+   - Lien "Inscrire Mon Club"
+   - Lien "Guide Complet"
+
+Ce bandeau apparaît maintenant sur index.html !
+
+========================================
+FICHIERS SANS ÉMOJIS (pas de 404)
+========================================
+
+✅ OUVRIR-ICI.html
+✅ GUIDE-COMPLET.html
+✅ START-MULTI-SPORTS.html
+✅ INSCRIPTION-CLUB.html (redirection)
+✅ index-multi-sports.html
+✅ inscription-club.html
+
+========================================
+POUR REPUBLIER
+========================================
+
+1. Allez dans l'onglet "Publish" de GenSpark
+2. Cliquez sur "Re-Publish"
+3. Attendez la fin de la publication
+4. Ouvrez : https://jphbvnok.gensparkspace.com/
+5. Vous verrez le BANDEAU VERT en haut
+6. Cliquez sur les boutons du bandeau
+
+========================================
+CONFIRMATION
+========================================
+
+✅ Multi-Sports : CRÉÉ
+✅ Inscription Clubs : CRÉÉ
+✅ Bandeau sur index.html : AJOUTÉ
+✅ 275+ clubs disponibles
+✅ 5 sports intégrés
+✅ Formulaire inscription fonctionnel
+
+========================================
+BESOIN D'AIDE ?
+========================================
+
+Ouvrez ces fichiers localement :
+- OUVRIR-ICI.html (avec tous les liens)
+- GUIDE-COMPLET.html (documentation)
+- README-SIMPLE.md (texte)
+
+========================================
+Date : 2025-12-11
+Version : V6.0 Multi-Sports
+Statut : PRÊT POUR PUBLICATION
+========================================

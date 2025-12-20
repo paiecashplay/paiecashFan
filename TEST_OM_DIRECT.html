@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OM Direct</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0052a5, #00b4d8);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #ff6347;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #ff8c00;
+        }
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: block;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🌍 Test OM Afrique</h1>
+        <p>Cliquez sur un des liens ci-dessous pour tester :</p>
+        
+        <h3>Option 1 : Avec tirets (recommandé)</h3>
+        <a href="app-universal-simple.html?club=olympique-de-marseille" class="btn">
+            🔵 Olympique de Marseille (tirets)
+        </a>
+        <code>?club=olympique-de-marseille</code>
+        
+        <h3>Option 2 : Votre URL actuelle</h3>
+        <a href="app-universal-simple.html?club=Olympique+de+Marseille&logo=⚽&sport=Football&league=Ligue+1" class="btn">
+            🔵 Olympique de Marseille (espaces)
+        </a>
+        <code>?club=Olympique+de+Marseille</code>
+        
+        <h3>Option 3 : Simple "OM"</h3>
+        <a href="app-universal-simple.html?club=om" class="btn">
+            🔵 OM
+        </a>
+        <code>?club=om</code>
+        
+        <hr style="margin: 30px 0; opacity: 0.3;">
+        
+        <h3>Instructions</h3>
+        <p style="text-align: left; font-size: 14px;">
+            1. Cliquez sur un des boutons ci-dessus<br>
+            2. La page va charger<br>
+            3. Cherchez le bouton <strong>"🌍 Afrique"</strong> en haut de la page<br>
+            4. Si vous le voyez, cliquez dessus !<br>
+            5. Si vous ne le voyez pas, ouvrez la console (F12) et cherchez les logs
+        </p>
+    </div>
+    
+    <script>
+        console.log('✅ Page de test chargée');
+        console.log('🌍 Testez les différentes URLs pour voir le bouton Afrique');
+    </script>
+</body>
+</html>

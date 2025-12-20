@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Démarrer avec NOWPayments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 25px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 52px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 22px;
+            opacity: 0.9;
+            margin-bottom: 50px;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            font-size: 30px;
+            margin-bottom: 25px;
+            color: #fbbf24;
+        }
+        
+        .step {
+            background: rgba(0,0,0,0.3);
+            border-left: 5px solid #fbbf24;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .step h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(251,191,36,0.4);
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(251,191,36,0.6);
+        }
+        
+        .code {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .info-box {
+            background: rgba(59,130,246,0.2);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box {
+            background: rgba(239,68,68,0.2);
+            border: 2px solid #ef4444;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .success-box {
+            background: rgba(16,185,129,0.2);
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        ul {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+        
+        ul li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .buttons-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 NOWPayments</h1>
+        <div class="subtitle">Acceptez 300+ Cryptomonnaies en 5 Minutes</div>
+        
+        <!-- Section 1 : Récupérer la clé API -->
+        <div class="section">
+            <h2>Étape 1️⃣ : Récupérer Votre Clé API</h2>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">1</span>
+                    Connexion au Dashboard
+                </h3>
+                
+                <div class="info-box">
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 15px;">
+                        🔐 Informations de Connexion
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>URL :</strong> 
+                        <a href="https://account.nowpayments.io/fr/dashboard" target="_blank" style="color: #fbbf24; text-decoration: underline;">
+                            https://account.nowpayments.io/fr/dashboard
+                        </a>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>Login :</strong> 
+                        <span style="background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 8px; font-family: monospace;">
+                            etot@paiecash.com
+                        </span>
+                    </div>
+                    <div>
+                        <strong>Password :</strong> 
+                        <span style="background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 8px; font-family: monospace;">
+                            pmC2Mt-Y6hh$Sqa
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="buttons-center">
+                    <a href="https://account.nowpayments.io/fr/dashboard" target="_blank" class="button">
+                        🔓 Ouvrir le Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">2</span>
+                    Récupérer la Clé API
+                </h3>
+                <p style="margin-bottom: 15px;">Une fois connecté :</p>
+                <ul>
+                    <li>Allez dans <strong>Settings</strong> → <strong>API Keys</strong></li>
+                    <li>Cliquez sur <strong>"Generate new API key"</strong> (ou copiez une clé existante)</li>
+                    <li>Copiez la clé API (format : <code style="background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 5px;">XXXXX-XXXXX-XXXXX-XXXXX</code>)</li>
+                </ul>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Important :</strong> Gardez cette clé secrète ! Ne la partagez jamais publiquement.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2 : Configurer le module -->
+        <div class="section">
+            <h2>Étape 2️⃣ : Configurer le Module</h2>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">1</span>
+                    Ouvrir le Fichier de Configuration
+                </h3>
+                <p style="margin-bottom: 15px;">
+                    Ouvrez le fichier : <strong>`💰_nowpayments-integration.js`</strong>
+                </p>
+            </div>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">2</span>
+                    Modifier la Configuration
+                </h3>
+                <p style="margin-bottom: 15px;">Trouvez cette section (ligne ~20) :</p>
+                
+                <div class="code">const NOWPAYMENTS_CONFIG = {
+    apiBaseURL: 'https://api.nowpayments.io/v1',
+    apiKey: 'VOTRE_CLE_API_ICI', // ← COLLEZ VOTRE CLÉ ICI
+    production: false, // ← Mettre à true en production
+    ipnCallbackURL: 'https://votre-domaine.com/api/nowpayments/callback',
+    defaultFiatCurrency: 'EUR'
+};</div>
+                
+                <p style="margin-bottom: 15px;"><strong>Remplacez :</strong></p>
+                <ul>
+                    <li><code>VOTRE_CLE_API_ICI</code> → Votre vraie clé API</li>
+                    <li><code>production: false</code> → <code>production: true</code> (pour la production)</li>
+                </ul>
+                
+                <div class="success-box">
+                    <strong>✅ Exemple Complet :</strong>
+                    <div class="code" style="margin-top: 15px; background: rgba(0,0,0,0.5);">apiKey: 'ABC123-DEF456-GHI789-JKL012',
+production: true,</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3 : Tester -->
+        <div class="section">
+            <h2>Étape 3️⃣ : Tester l'Intégration</h2>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">1</span>
+                    Test Technique
+                </h3>
+                <p style="margin-bottom: 15px;">Ouvrez la page de test interactive :</p>
+                
+                <div class="buttons-center">
+                    <a href="🧪_TEST_NOWPAYMENTS.html" class="button">
+                        🧪 Ouvrir la Page de Test
+                    </a>
+                </div>
+                
+                <p style="margin-top: 20px; margin-bottom: 15px;">Dans la page de test :</p>
+                <ul>
+                    <li>Collez votre clé API</li>
+                    <li>Sélectionnez le mode (Sandbox ou Production)</li>
+                    <li>Testez les 3 fonctions :
+                        <ul style="margin-top: 10px;">
+                            <li>🪙 Récupérer les cryptos disponibles</li>
+                            <li>💰 Estimer un prix (100 EUR → BTC)</li>
+                            <li>💳 Créer un paiement test</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">2</span>
+                    Test dans l'Application
+                </h3>
+                <p style="margin-bottom: 15px;">Testez le paiement crypto dans l'application réelle :</p>
+                
+                <div class="buttons-center">
+                    <a href="app-universal-simple.html?club=liverpool" class="button">
+                        🔴 Tester avec Liverpool FC
+                    </a>
+                </div>
+                
+                <p style="margin-top: 20px; margin-bottom: 15px;"><strong>Procédure de test :</strong></p>
+                <ol style="padding-left: 25px;">
+                    <li style="margin: 10px 0;">Allez dans <strong>Boutique</strong> → <strong>Boutique Officielle</strong></li>
+                    <li style="margin: 10px 0;">Sélectionnez 2-3 produits</li>
+                    <li style="margin: 10px 0;">Cliquez sur <strong>"PAYER MAINTENANT"</strong></li>
+                    <li style="margin: 10px 0;">Cliquez sur <strong>"🌐 Payer en Crypto (BTC, ETH, USDT...)"</strong></li>
+                    <li style="margin: 10px 0;">Choisissez une cryptomonnaie (ex: Bitcoin)</li>
+                    <li style="margin: 10px 0;">Vérifiez le modal de paiement :
+                        <ul style="margin-top: 10px;">
+                            <li>✅ QR Code affiché</li>
+                            <li>✅ Adresse de paiement copiable</li>
+                            <li>✅ Montant exact en crypto</li>
+                            <li>✅ Instructions claires</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Section 4 : Documentation -->
+        <div class="section">
+            <h2>📚 Documentation Complète</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 25px;">
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 25px;">
+                    <div style="font-size: 48px; text-align: center; margin-bottom: 15px;">📘</div>
+                    <h3 style="font-size: 20px; margin-bottom: 15px; text-align: center;">Guide Complet</h3>
+                    <p style="text-align: center; opacity: 0.9; margin-bottom: 20px;">
+                        Configuration, webhooks, troubleshooting
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="📘_GUIDE_INTEGRATION_NOWPAYMENTS.md" class="button" style="font-size: 14px; padding: 12px 25px;">
+                            Lire le Guide
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 25px;">
+                    <div style="font-size: 48px; text-align: center; margin-bottom: 15px;">✅</div>
+                    <h3 style="font-size: 20px; margin-bottom: 15px; text-align: center;">Mission Complète</h3>
+                    <p style="text-align: center; opacity: 0.9; margin-bottom: 20px;">
+                        Documentation technique V8.14
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="✅_INTEGRATION_NOWPAYMENTS_V8.14_COMPLETE.md" class="button" style="font-size: 14px; padding: 12px 25px;">
+                            Voir les Détails
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 25px;">
+                    <div style="font-size: 48px; text-align: center; margin-bottom: 15px;">🧪</div>
+                    <h3 style="font-size: 20px; margin-bottom: 15px; text-align: center;">Page de Test</h3>
+                    <p style="text-align: center; opacity: 0.9; margin-bottom: 20px;">
+                        Tests API interactifs
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="🧪_TEST_NOWPAYMENTS.html" class="button" style="font-size: 14px; padding: 12px 25px;">
+                            Ouvrir les Tests
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 5 : Ce qui fonctionne -->
+        <div class="section">
+            <h2>✅ Ce Qui Fonctionne Maintenant</h2>
+            
+            <div class="success-box">
+                <ul style="padding-left: 0; list-style: none;">
+                    <li style="font-size: 18px; margin: 15px 0;">✅ Accepter <strong>300+ cryptomonnaies</strong> (BTC, ETH, USDT, USDC, BNB, etc.)</li>
+                    <li style="font-size: 18px; margin: 15px 0;">✅ Estimation de prix <strong>en temps réel</strong></li>
+                    <li style="font-size: 18px; margin: 15px 0;">✅ QR Code de paiement <strong>automatique</strong></li>
+                    <li style="font-size: 18px; margin: 15px 0;">✅ Suivi du statut <strong>en direct</strong> (waiting → confirming → finished)</li>
+                    <li style="font-size: 18px; margin: 15px 0;">✅ Frais très faibles (<strong>0.5%</strong>)</li>
+                    <li style="font-size: 18px; margin: 15px 0;">✅ Interface utilisateur <strong>intuitive</strong></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Section 6 : Support -->
+        <div class="section">
+            <h2>💬 Besoin d'Aide ?</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">📖</div>
+                    <strong>Documentation NOWPayments</strong>
+                    <div style="margin-top: 15px;">
+                        <a href="https://documenter.getpostman.com/view/7907941/S1a32n38" target="_blank" style="color: #fbbf24; text-decoration: underline;">
+                            API Docs
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">✉️</div>
+                    <strong>Email Support</strong>
+                    <div style="margin-top: 15px;">
+                        <a href="mailto:support@nowpayments.io" style="color: #fbbf24; text-decoration: underline;">
+                            support@nowpayments.io
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">💬</div>
+                    <strong>Telegram</strong>
+                    <div style="margin-top: 15px;">
+                        <a href="https://t.me/NOWPayments_support" target="_blank" style="color: #fbbf24; text-decoration: underline;">
+                            @NOWPayments_support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); opacity: 0.7;">
+            <p style="font-size: 16px;">
+                Version 8.14 - NOWPayments Integration<br>
+                Créée le 12 décembre 2024
+            </p>
+        </div>
+    </div>
+</body>
+</html>

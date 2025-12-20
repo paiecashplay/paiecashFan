@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide de Test - PaieCashFan V3.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #4ade80;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .check {
+            color: #4ade80;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #4ade80;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .highlight {
+            background: rgba(255, 215, 0, 0.3);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .test-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Guide de Test - Version 3.0</h1>
+        <p class="subtitle">Testez toutes les nouvelles fonctionnalités de PaieCashFan</p>
+
+        <div class="card">
+            <h2>🚀 DÉMARRAGE RAPIDE</h2>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Ouvrir l'application</strong> : Cliquez sur <span class="highlight">index.html</span>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Choisir une entité</strong> : Sélectionnez un club (ex: Olympique de Marseille) ou une fédération (ex: France)
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Explorer les sections</strong> : Naviguez dans les 7 sections avec le menu horizontal
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💳 TESTER LA SECTION PAIEMENT</h2>
+            <p style="margin-bottom: 15px;">Inspirée de Binance avec 5 fonctionnalités avancées</p>
+            
+            <div class="section-title">1. 💰 Portefeuille Crypto</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Visualiser USDC (450.50)</div>
+                <div class="feature-item"><span class="check">✓</span> Visualiser USDT (320.75)</div>
+                <div class="feature-item"><span class="check">✓</span> Visualiser Ethereum (0.25 ETH)</div>
+                <div class="feature-item"><span class="check">✓</span> Voir Club Coin (1,250 points)</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "+ Recharger"</div>
+            </div>
+
+            <div class="section-title">2. 💳 Carte Mastercard Interactive</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Voir le numéro de carte (5234 8765 1234 5678)</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "🔒 Bloquer"</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "👁️ Voir PIN"</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "⚡ Limites"</div>
+            </div>
+
+            <div class="section-title">3. 💵 Agent Cash In/Out</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Voir le stade et la ville dynamiques</div>
+                <div class="feature-item"><span class="check">✓</span> Voir les horaires d'ouverture</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "📍 Localiser l'agent"</div>
+            </div>
+
+            <div class="section-title">4. 🤝 Partenaires Cashback</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> McDonald's - Badge 5%</div>
+                <div class="feature-item"><span class="check">✓</span> Carrefour - Badge 3%</div>
+                <div class="feature-item"><span class="check">✓</span> Uber Eats - Badge 4%</div>
+                <div class="feature-item"><span class="check">✓</span> Décathlon - Badge 6%</div>
+            </div>
+
+            <div class="section-title">5. 💸 BNPL - Buy Now Pay Later</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Voir les avantages (3 ou 4 fois sans frais)</div>
+                <div class="feature-item"><span class="check">✓</span> Cliquer sur "En savoir plus"</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>👤 TESTER LA SECTION PROFIL</h2>
+            <p style="margin-bottom: 15px;">8 nouvelles fonctionnalités pour personnaliser votre expérience</p>
+            
+            <div class="section-title">1. ⚽ Statut de Fan</div>
+            <div class="step">
+                <span class="check">✓</span> Sélectionner "🎉 Fan" (supporter occasionnel)
+            </div>
+            <div class="step">
+                <span class="check">✓</span> Sélectionner "🎖️ Licencié" (membre officiel avec carte)
+            </div>
+
+            <div class="section-title">2. 🔐 Code Secret de Paiement</div>
+            <div class="step">
+                <span class="check">✓</span> Entrer un code à 6 chiffres (ex: 123456)
+            </div>
+            <div class="step">
+                <span class="check">✓</span> Cliquer sur "💾 Enregistrer le code"
+            </div>
+
+            <div class="section-title">3. 🔔 Préférences des Notifications</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Activer/Désactiver Résultats des matchs</div>
+                <div class="feature-item"><span class="check">✓</span> Activer/Désactiver Promotions partenaires</div>
+                <div class="feature-item"><span class="check">✓</span> Activer/Désactiver Actualités du club</div>
+                <div class="feature-item"><span class="check">✓</span> Activer/Désactiver Alertes cashback</div>
+                <div class="feature-item"><span class="check">✓</span> Activer/Désactiver Offres géolocalisées</div>
+            </div>
+
+            <div class="section-title">4-6. Notifications Incluses</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> 📍 Promotions Géolocalisées</div>
+                <div class="feature-item"><span class="check">✓</span> 📰 Actualités du Club</div>
+                <div class="feature-item"><span class="check">✓</span> 💸 Alertes Cashback</div>
+            </div>
+
+            <div class="section-title">7. 🎁 Parrainage</div>
+            <div class="step">
+                <span class="check">✓</span> Voir votre code de parrainage (ex: <span class="highlight">ETOT2024</span>)
+            </div>
+            <div class="step">
+                <span class="check">✓</span> Cliquer sur "📤 Partager mon code"
+            </div>
+            <div class="step">
+                <span class="check">✓</span> Gagner 500 points par filleul inscrit
+            </div>
+
+            <div class="section-title">8. 📢 Partager l'App</div>
+            <div class="feature-list">
+                <div class="feature-item"><span class="check">✓</span> Partager par SMS (📱)</div>
+                <div class="feature-item"><span class="check">✓</span> Partager sur Social (💬)</div>
+                <div class="feature-item"><span class="check">✓</span> Partager par Email (✉️)</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🚪 TESTER LA DÉCONNEXION</h2>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Trouver le bouton</strong> : Coin supérieur droit du header (🚪 Déconnexion)
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Cliquer</strong> : Une confirmation apparaît
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Confirmer</strong> : Redirection automatique vers <span class="highlight">index.html</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 SCÉNARIOS DE TEST COMPLETS</h2>
+            
+            <div class="section-title">Scénario 1 : Nouveau Fan</div>
+            <div class="step">1. Ouvrir index.html → Choisir "Olympique de Marseille"</div>
+            <div class="step">2. Profil → Sélectionner "🎉 Fan"</div>
+            <div class="step">3. Profil → Créer un code secret (123456)</div>
+            <div class="step">4. Profil → Activer toutes les notifications</div>
+            <div class="step">5. Profil → Copier le code de parrainage ETOT2024</div>
+            <div class="step">6. Paiement → Voir le portefeuille crypto</div>
+            <div class="step">7. Déconnexion → Confirmer</div>
+
+            <div class="section-title">Scénario 2 : Supporter d'une Fédération</div>
+            <div class="step">1. Ouvrir index.html → Aller dans "🏆 Coupe du Monde 2026"</div>
+            <div class="step">2. Choisir "Europe" → Sélectionner "France"</div>
+            <div class="step">3. Profil → Sélectionner "🎖️ Licencié"</div>
+            <div class="step">4. Paiement → Cliquer sur "Recharger" le portefeuille</div>
+            <div class="step">5. Paiement → Voir la carte Mastercard → Cliquer sur "Bloquer"</div>
+            <div class="step">6. Profil → Partager l'app par WhatsApp</div>
+            <div class="step">7. Déconnexion</div>
+
+            <div class="section-title">Scénario 3 : Test de Géolocalisation</div>
+            <div class="step">1. Choisir n'importe quel club</div>
+            <div class="step">2. Paiement → Agent Cash In/Out → "📍 Localiser l'agent"</div>
+            <div class="step">3. Profil → Activer "📍 Offres géolocalisées"</div>
+            <div class="step">4. Vérifier que le stade et la ville sont dynamiques</div>
+        </div>
+
+        <div class="card" style="background: rgba(74, 222, 128, 0.2);">
+            <h2>✅ CHECKLIST COMPLÈTE</h2>
+            <div class="feature-list">
+                <div class="feature-item">☐ Bouton Déconnexion visible</div>
+                <div class="feature-item">☐ Portefeuille Crypto (4 actifs)</div>
+                <div class="feature-item">☐ Carte Mastercard interactive</div>
+                <div class="feature-item">☐ Agent Cash In/Out</div>
+                <div class="feature-item">☐ 4 Partenaires Cashback</div>
+                <div class="feature-item">☐ BNPL disponible</div>
+                <div class="feature-item">☐ Statut Fan/Licencié</div>
+                <div class="feature-item">☐ Code Secret de Paiement</div>
+                <div class="feature-item">☐ 5 Types de Notifications</div>
+                <div class="feature-item">☐ Parrainage (code unique)</div>
+                <div class="feature-item">☐ Partage Social (3 canaux)</div>
+                <div class="feature-item">☐ Déconnexion fonctionnelle</div>
+            </div>
+        </div>
+
+        <div class="test-actions">
+            <a href="index.html" class="btn">🚀 Commencer les Tests</a>
+            <a href="README.md" class="btn btn-secondary">📖 Lire la Documentation</a>
+            <a href="🎉_VERSION_3.0_COMPLETE.md" class="btn btn-secondary">📋 Récapitulatif V3.0</a>
+        </div>
+
+        <div class="card" style="margin-top: 30px; text-align: center;">
+            <h2>🎉 Version 3.0 - Améliorations Majeures</h2>
+            <p style="margin-top: 15px; font-size: 18px;">
+                <strong>126 entités</strong> × <strong>2 applications</strong> × <strong>28 fonctionnalités</strong>
+            </p>
+            <p style="margin-top: 10px; opacity: 0.9;">
+                ✅ Prêt pour le déploiement en production
+            </p>
+            <p style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
+                Date : 9 décembre 2025<br>
+                Statut : 100% IMPLÉMENTÉ
+            </p>
+        </div>
+    </div>
+</body>
+</html>

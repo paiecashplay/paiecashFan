@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test NOWPayments Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 25px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .section h2 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #10b981;
+        }
+        
+        .btn {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(16,185,129,0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(16,185,129,0.6);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            box-shadow: 0 8px 20px rgba(107,114,128,0.4);
+        }
+        
+        .status-box {
+            background: rgba(59,130,246,0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .success {
+            background: rgba(16,185,129,0.1);
+            border-color: #10b981;
+        }
+        
+        .error {
+            background: rgba(239,68,68,0.1);
+            border-color: #ef4444;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test NOWPayments</h1>
+        
+        <!-- Configuration -->
+        <div class="section">
+            <h2>⚙️ Configuration</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">🔑 Clé API</h3>
+                    <input type="password" id="apiKey" placeholder="Collez votre clé API ici">
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 10px;">
+                        Dashboard → Settings → API Keys
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">🌍 Mode</h3>
+                    <select id="modeSelect" style="width: 100%; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: white; font-size: 16px;">
+                        <option value="sandbox">🧪 Test (Sandbox)</option>
+                        <option value="production">🚀 Production</option>
+                    </select>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 10px;">
+                        Utilisez le sandbox pour les tests
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="saveConfig()" style="margin-top: 20px;">
+                ✅ Sauvegarder la configuration
+            </button>
+        </div>
+        
+        <!-- Test 1 : Vérifier les cryptos disponibles -->
+        <div class="section">
+            <h2>🪙 Test 1 : Cryptos Disponibles</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">
+                Vérifier que l'API fonctionne et récupérer la liste des cryptomonnaies disponibles.
+            </p>
+            <button class="btn" onclick="testGetCurrencies()">
+                🚀 Tester GET /currencies
+            </button>
+            <div id="currencies-result"></div>
+        </div>
+        
+        <!-- Test 2 : Estimer un prix -->
+        <div class="section">
+            <h2>💰 Test 2 : Estimation de Prix</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">
+                Estimer combien de crypto correspond à un montant en euros.
+            </p>
+            <div class="grid">
+                <input type="number" id="amountEUR" placeholder="Montant en EUR" value="100">
+                <select id="cryptoSelect" style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: white; font-size: 16px;">
+                    <option value="btc">Bitcoin (BTC)</option>
+                    <option value="eth">Ethereum (ETH)</option>
+                    <option value="usdt">Tether (USDT)</option>
+                    <option value="usdc">USD Coin (USDC)</option>
+                </select>
+            </div>
+            <button class="btn" onclick="testEstimatePrice()">
+                🚀 Tester Estimation
+            </button>
+            <div id="estimate-result"></div>
+        </div>
+        
+        <!-- Test 3 : Créer un paiement -->
+        <div class="section">
+            <h2>💳 Test 3 : Créer un Paiement</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">
+                Créer un vrai paiement NOWPayments (génère une adresse de paiement).
+            </p>
+            <button class="btn" onclick="testCreatePayment()">
+                🚀 Créer un Paiement Test
+            </button>
+            <div id="payment-result"></div>
+        </div>
+        
+        <!-- Logs Console -->
+        <div class="section">
+            <h2>🖥️ Console de Logs</h2>
+            <div id="console-logs" class="code-block">
+                <div>📊 Logs en temps réel...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="💰_nowpayments-integration.js"></script>
+    <script>
+        let testApiKey = '';
+        let testMode = 'sandbox';
+        
+        // Fonction pour ajouter des logs
+        function addLog(message, type = 'info') {
+            const console = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#3b82f6',
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b'
+            };
+            
+            const log = document.createElement('div');
+            log.style.color = colors[type] || colors.info;
+            log.style.marginBottom = '5px';
+            log.textContent = `[${timestamp}] ${message}`;
+            
+            console.appendChild(log);
+            console.scrollTop = console.scrollHeight;
+            
+            // Aussi dans la vraie console
+            console.log(message);
+        }
+        
+        // Sauvegarder la configuration
+        function saveConfig() {
+            testApiKey = document.getElementById('apiKey').value.trim();
+            testMode = document.getElementById('modeSelect').value;
+            
+            if (!testApiKey) {
+                alert('❌ Veuillez entrer une clé API');
+                return;
+            }
+            
+            // Mettre à jour la config du module
+            if (typeof NOWPAYMENTS_CONFIG !== 'undefined') {
+                NOWPAYMENTS_CONFIG.apiKey = testApiKey;
+                NOWPAYMENTS_CONFIG.production = (testMode === 'production');
+                
+                addLog(`✅ Configuration sauvegardée (Mode: ${testMode})`, 'success');
+                alert(`✅ Configuration sauvegardée !\n\nMode : ${testMode}\nClé API : ${testApiKey.substring(0, 10)}...`);
+            } else {
+                addLog('❌ Module NOWPAYMENTS_CONFIG non trouvé', 'error');
+            }
+        }
+        
+        // Test 1 : Récupérer les cryptos disponibles
+        async function testGetCurrencies() {
+            addLog('🚀 Test GET /currencies démarré...', 'info');
+            
+            const resultDiv = document.getElementById('currencies-result');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;">⏳ Chargement...</div>';
+            
+            try {
+                const currencies = await window.NOWPayments.getAvailableCurrencies();
+                
+                addLog(`✅ ${currencies.length} cryptos récupérées`, 'success');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box success">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">✅ Succès !</h3>
+                        <p style="margin-bottom: 15px;"><strong>${currencies.length}</strong> cryptomonnaies disponibles</p>
+                        <div class="code-block">
+                            <div>Premières cryptos : ${currencies.slice(0, 20).join(', ')}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`❌ Erreur : ${error.message}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box error">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">❌ Erreur</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Test 2 : Estimer un prix
+        async function testEstimatePrice() {
+            const amount = parseFloat(document.getElementById('amountEUR').value);
+            const crypto = document.getElementById('cryptoSelect').value;
+            
+            if (!amount || amount <= 0) {
+                alert('❌ Veuillez entrer un montant valide');
+                return;
+            }
+            
+            addLog(`🚀 Test Estimation : ${amount} EUR → ${crypto.toUpperCase()}`, 'info');
+            
+            const resultDiv = document.getElementById('estimate-result');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;">⏳ Calcul...</div>';
+            
+            try {
+                const estimation = await window.NOWPayments.estimatePrice(amount, crypto);
+                
+                addLog(`✅ Estimation : ${amount} EUR = ${estimation.estimated_amount} ${crypto.toUpperCase()}`, 'success');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box success">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">✅ Estimation réussie !</h3>
+                        <div style="font-size: 24px; font-weight: 900; margin: 20px 0;">
+                            ${amount} EUR = ${parseFloat(estimation.estimated_amount).toFixed(8)} ${crypto.toUpperCase()}
+                        </div>
+                        <div class="code-block">
+                            ${JSON.stringify(estimation, null, 2)}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`❌ Erreur estimation : ${error.message}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box error">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">❌ Erreur</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Test 3 : Créer un paiement
+        async function testCreatePayment() {
+            addLog('🚀 Test Création de paiement démarré...', 'info');
+            
+            const resultDiv = document.getElementById('payment-result');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;">⏳ Création du paiement...</div>';
+            
+            try {
+                const orderId = 'TEST-' + Date.now();
+                const paymentData = await window.NOWPayments.createPayment({
+                    priceAmount: 50.00,
+                    priceCurrency: 'EUR',
+                    payCurrency: 'btc',
+                    orderId: orderId,
+                    orderDescription: 'Test Payment - PaieCashPlay',
+                    successUrl: window.location.href + '?success=1',
+                    cancelUrl: window.location.href + '?cancel=1'
+                });
+                
+                addLog(`✅ Paiement créé : ${paymentData.payment_id}`, 'success');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box success">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">✅ Paiement créé !</h3>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">Payment ID</div>
+                            <div style="font-size: 18px; font-weight: 700;">${paymentData.payment_id}</div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">Montant à payer</div>
+                            <div style="font-size: 24px; font-weight: 900; color: #10b981;">${paymentData.pay_amount} ${paymentData.pay_currency.toUpperCase()}</div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">Adresse de paiement</div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; font-family: monospace; word-break: break-all; font-size: 12px;">${paymentData.pay_address}</div>
+                        </div>
+                        <div class="code-block">
+                            ${JSON.stringify(paymentData, null, 2)}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`❌ Erreur création paiement : ${error.message}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="status-box error">
+                        <h3 style="font-size: 18px; margin-bottom: 15px;">❌ Erreur</h3>
+                        <p>${error.message}</p>
+                        <div style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
+                            Vérifiez que votre clé API est correcte et que vous avez les permissions nécessaires.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialisation
+        window.onload = function() {
+            addLog('🚀 Page de test chargée', 'info');
+            addLog('👉 Configurez votre clé API pour commencer', 'warning');
+        };
+    </script>
+</body>
+</html>

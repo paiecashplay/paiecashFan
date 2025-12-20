@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Marketplace Multi-Clubs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* HEADER AVEC SÉLECTEUR DE LANGUE */
+        .top-bar {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            border: 2px solid white;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: white;
+            color: #1e3c72;
+        }
+
+        .lang-btn.active {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, rgba(16,185,129,0.95), rgba(5,150,105,0.95));
+            padding: 60px 40px;
+            border-radius: 25px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            opacity: 0.95;
+        }
+
+        /* FILTRES FÉDÉRATIONS */
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .filters h3 {
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 25px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #1f2937;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-color: #10b981;
+        }
+
+        /* GRILLE CLUBS */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .club-card {
+            background: linear-gradient(135deg, rgba(59,130,246,0.95), rgba(37,99,235,0.95));
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .club-card:hover::before {
+            top: -100%;
+            right: -100%;
+        }
+
+        .club-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+
+        .club-logo {
+            font-size: 5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        .club-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .club-league {
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .club-legends {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .club-legends h4 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .legends-list {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        /* STATISTIQUES */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .clubs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-selector {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR AVEC LANGUES -->
+    <div class="top-bar">
+        <div class="logo">⚽ PaieCashFan</div>
+        <div class="language-selector" id="language-selector">
+            <!-- Les langues seront chargées ici -->
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1 id="hero-title">🌍 Marketplace Multi-Clubs</h1>
+        <p id="hero-subtitle">Choisissez votre club préféré et accédez à sa boutique exclusive</p>
+        
+        <!-- STATS -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-clubs">353</div>
+                <div class="stat-label" data-i18n="stats-clubs">Clubs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10+</div>
+                <div class="stat-label" data-i18n="stats-languages">Langues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1000+</div>
+                <div class="stat-label" data-i18n="stats-products">Produits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50+</div>
+                <div class="stat-label" data-i18n="stats-legends">Légendes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="filters">
+        <h3 id="filters-title">🏆 Filtrer par Compétition</h3>
+        <div class="filter-buttons" id="filter-buttons">
+            <!-- Les filtres seront chargés ici -->
+        </div>
+    </div>
+
+    <!-- GRILLE CLUBS -->
+    <div class="clubs-grid" id="clubs-grid">
+        <!-- Les clubs seront chargés ici -->
+    </div>
+
+    <script>
+        // TRADUCTIONS MULTI-LANGUES (10 langues)
+        const translations = {
+            fr: {
+                'hero-title': '🌍 Marketplace Multi-Clubs',
+                'hero-subtitle': 'Choisissez votre club préféré et accédez à sa boutique exclusive',
+                'filters-title': '🏆 Filtrer par Compétition',
+                'stats-clubs': 'Clubs',
+                'stats-languages': 'Langues',
+                'stats-products': 'Produits',
+                'stats-legends': 'Légendes',
+                'legends': '⭐ Légendes'
+            },
+            en: {
+                'hero-title': '🌍 Multi-Club Marketplace',
+                'hero-subtitle': 'Choose your favorite club and access its exclusive store',
+                'filters-title': '🏆 Filter by Competition',
+                'stats-clubs': 'Clubs',
+                'stats-languages': 'Languages',
+                'stats-products': 'Products',
+                'stats-legends': 'Legends',
+                'legends': '⭐ Legends'
+            },
+            es: {
+                'hero-title': '🌍 Marketplace Multi-Clubes',
+                'hero-subtitle': 'Elige tu club favorito y accede a su tienda exclusiva',
+                'filters-title': '🏆 Filtrar por Competición',
+                'stats-clubs': 'Clubes',
+                'stats-languages': 'Idiomas',
+                'stats-products': 'Productos',
+                'stats-legends': 'Leyendas',
+                'legends': '⭐ Leyendas'
+            },
+            de: {
+                'hero-title': '🌍 Multi-Club-Marktplatz',
+                'hero-subtitle': 'Wählen Sie Ihren Lieblingsverein und greifen Sie auf seinen exklusiven Shop zu',
+                'filters-title': '🏆 Nach Wettbewerb filtern',
+                'stats-clubs': 'Vereine',
+                'stats-languages': 'Sprachen',
+                'stats-products': 'Produkte',
+                'stats-legends': 'Legenden',
+                'legends': '⭐ Legenden'
+            },
+            it: {
+                'hero-title': '🌍 Marketplace Multi-Club',
+                'hero-subtitle': 'Scegli il tuo club preferito e accedi al suo negozio esclusivo',
+                'filters-title': '🏆 Filtra per Competizione',
+                'stats-clubs': 'Club',
+                'stats-languages': 'Lingue',
+                'stats-products': 'Prodotti',
+                'stats-legends': 'Leggende',
+                'legends': '⭐ Leggende'
+            },
+            pt: {
+                'hero-title': '🌍 Marketplace Multi-Clubes',
+                'hero-subtitle': 'Escolha seu clube favorito e acesse sua loja exclusiva',
+                'filters-title': '🏆 Filtrar por Competição',
+                'stats-clubs': 'Clubes',
+                'stats-languages': 'Idiomas',
+                'stats-products': 'Produtos',
+                'stats-legends': 'Lendas',
+                'legends': '⭐ Lendas'
+            },
+            ar: {
+                'hero-title': '🌍 سوق متعدد الأندية',
+                'hero-subtitle': 'اختر ناديك المفضل وادخل إلى متجره الحصري',
+                'filters-title': '🏆 تصفية حسب المسابقة',
+                'stats-clubs': 'الأندية',
+                'stats-languages': 'اللغات',
+                'stats-products': 'المنتجات',
+                'stats-legends': 'الأساطير',
+                'legends': '⭐ الأساطير'
+            },
+            cn: {
+                'hero-title': '🌍 多俱乐部市场',
+                'hero-subtitle': '选择您最喜欢的俱乐部并访问其专属商店',
+                'filters-title': '🏆 按比赛筛选',
+                'stats-clubs': '俱乐部',
+                'stats-languages': '语言',
+                'stats-products': '产品',
+                'stats-legends': '传奇',
+                'legends': '⭐ 传奇'
+            },
+            ru: {
+                'hero-title': '🌍 Мульти-клубный маркетплейс',
+                'hero-subtitle': 'Выберите свой любимый клуб и получите доступ к его эксклюзивному магазину',
+                'filters-title': '🏆 Фильтр по соревнованию',
+                'stats-clubs': 'Клубы',
+                'stats-languages': 'Языки',
+                'stats-products': 'Продукты',
+                'stats-legends': 'Легенды',
+                'legends': '⭐ Легенды'
+            },
+            jp: {
+                'hero-title': '🌍 マルチクラブマーケットプレイス',
+                'hero-subtitle': 'お気に入りのクラブを選択して、専用ストアにアクセス',
+                'filters-title': '🏆 大会でフィルター',
+                'stats-clubs': 'クラブ',
+                'stats-languages': '言語',
+                'stats-products': '製品',
+                'stats-legends': 'レジェンド',
+                'legends': '⭐ レジェンド'
+            }
+        };
+
+        // LANGUES DISPONIBLES
+        const languages = [
+            { code: 'fr', name: 'Français', flag: '🇫🇷' },
+            { code: 'en', name: 'English', flag: '🇬🇧' },
+            { code: 'es', name: 'Español', flag: '🇪🇸' },
+            { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+            { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+            { code: 'pt', name: 'Português', flag: '🇵🇹' },
+            { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+            { code: 'cn', name: '中文', flag: '🇨🇳' },
+            { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+            { code: 'jp', name: '日本語', flag: '🇯🇵' }
+        ];
+
+        // CLUBS AVEC 1 SEUL MARSEILLE
+        const clubs = [
+            {
+                id: 'olympique-marseille',
+                name: 'Olympique de Marseille',
+                league: 'Ligue 1',
+                logo: '⚽',
+                competition: 'Ligue 1',
+                country: 'France',
+                legends: ['Didier Drogba', 'Jean-Pierre Papin', 'Basile Boli']
+            },
+            {
+                id: 'paris-saint-germain',
+                name: 'Paris Saint-Germain',
+                league: 'Ligue 1',
+                logo: '🔴',
+                competition: 'Ligue 1',
+                country: 'France',
+                legends: ['Ronaldinho', 'Zlatan Ibrahimović', 'Thiago Silva']
+            },
+            {
+                id: 'olympique-lyonnais',
+                name: 'Olympique Lyonnais',
+                league: 'Ligue 1',
+                logo: '🦁',
+                competition: 'Ligue 1',
+                country: 'France',
+                legends: ['Juninho', 'Karim Benzema', 'Alexandre Lacazette']
+            },
+            {
+                id: 'arsenal-fc',
+                name: 'Arsenal FC',
+                league: 'Premier League',
+                logo: '🔴',
+                competition: 'Premier League',
+                country: 'England',
+                legends: ['Thierry Henry', 'Patrick Vieira', 'Dennis Bergkamp']
+            },
+            {
+                id: 'real-madrid',
+                name: 'Real Madrid',
+                league: 'La Liga',
+                logo: '👑',
+                competition: 'La Liga',
+                country: 'Spain',
+                legends: ['Cristiano Ronaldo', 'Zinedine Zidane', 'Raúl']
+            },
+            {
+                id: 'bayern-munich',
+                name: 'Bayern Munich',
+                league: 'Bundesliga',
+                logo: '🔴',
+                competition: 'Bundesliga',
+                country: 'Germany',
+                legends: ['Franck Ribéry', 'Arjen Robben', 'Gerd Müller']
+            }
+        ];
+
+        // État global
+        let currentLanguage = 'fr';
+        let currentFilter = 'all';
+
+        // Charger le sélecteur de langues
+        function loadLanguageSelector() {
+            const selector = document.getElementById('language-selector');
+            selector.innerHTML = languages.map(lang => `
+                <button class="lang-btn ${lang.code === currentLanguage ? 'active' : ''}" 
+                        onclick="changeLanguage('${lang.code}')"
+                        title="${lang.name}">
+                    ${lang.flag}
+                </button>
+            `).join('');
+        }
+
+        // Changer la langue
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Traduire le contenu
+            translatePage();
+            
+            console.log('✅ Langue changée:', lang);
+        }
+
+        // Traduire la page
+        function translatePage() {
+            const trans = translations[currentLanguage] || translations['fr'];
+            
+            // Traduire les éléments avec ID
+            Object.keys(trans).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = trans[key];
+                }
+            });
+            
+            // Traduire les éléments avec data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (trans[key]) {
+                    element.textContent = trans[key];
+                }
+            });
+            
+            // RTL pour l'arabe
+            document.body.style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        // Charger les filtres
+        function loadFilters() {
+            const competitions = ['all', 'Ligue 1', 'Premier League', 'La Liga', 'Bundesliga'];
+            const container = document.getElementById('filter-buttons');
+            
+            container.innerHTML = competitions.map(comp => `
+                <button class="filter-btn ${comp === currentFilter ? 'active' : ''}"
+                        onclick="filterClubs('${comp}')">
+                    ${comp === 'all' ? '🌍 Tous' : comp}
+                </button>
+            `).join('');
+        }
+
+        // Filtrer les clubs
+        function filterClubs(competition) {
+            currentFilter = competition;
+            loadFilters();
+            loadClubs();
+        }
+
+        // Charger les clubs
+        function loadClubs() {
+            const container = document.getElementById('clubs-grid');
+            
+            const filteredClubs = currentFilter === 'all' 
+                ? clubs 
+                : clubs.filter(c => c.competition === currentFilter);
+            
+            container.innerHTML = filteredClubs.map(club => `
+                <div class="club-card" onclick="openClub('${club.id}')">
+                    <div class="club-logo">${club.logo}</div>
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-league">${club.league}</div>
+                    <div class="club-legends">
+                        <h4>${translations[currentLanguage]['legends']}</h4>
+                        <div class="legends-list">
+                            ${club.legends.map(l => `• ${l}`).join('<br>')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('✅', filteredClubs.length, 'clubs affichés');
+        }
+
+        // Ouvrir un club
+        function openClub(clubId) {
+            console.log('🚀 Ouverture du club:', clubId);
+            window.location.href = `paiecashfan-marketplace-CLEAN-2025.html?club=${clubId}`;
+        }
+
+        // Initialisation
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLanguageSelector();
+            loadFilters();
+            loadClubs();
+            translatePage();
+            
+            console.log('✅ PaieCashFan Marketplace Multi-Clubs initialisé');
+            console.log('🌍 Langue:', currentLanguage);
+            console.log('⚽ Clubs:', clubs.length);
+        });
+    </script>
+</body>
+</html>

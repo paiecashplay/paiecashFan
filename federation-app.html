@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">PaieCashPlay - Fédération</title>
+    <link rel="stylesheet" href="clubs/paris-fc/app.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========== DESIGN PREMIUM POUR TOUTES LES FÉDÉRATIONS ========== */
+        .fed-members-section {
+            margin-top: 30px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(139, 92, 246, 0.05));
+            border-radius: 20px;
+            padding: 30px 20px;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .fed-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .fed-header h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .fed-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .fed-stat-box {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            padding: 15px 25px;
+            text-align: center;
+        }
+
+        .fed-stat-box .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .fed-stat-box .stat-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .fed-members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .fed-member-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fed-member-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fed-member-card:hover::before {
+            opacity: 1;
+        }
+
+        .fed-member-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #10b981;
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .fed-member-flag {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .fed-member-card:hover .fed-member-flag {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .fed-member-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .fed-member-code {
+            font-size: 0.8rem;
+            color: #10b981;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 4px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* ========== SECTION PARRAINAGE (UX_CREDIBILITE_V7.3) ========== */
+        .parrainage-section {
+            background: linear-gradient(135deg, #ff3366 0%, #ff6b9d 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 25px 0;
+            color: white;
+            box-shadow: 0 8px 30px rgba(255, 51, 102, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parrainage-section::before {
+            content: '🎁';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+        }
+
+        .parrainage-section h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .parrainage-section p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .parrainage-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .parrainage-benefit {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .parrainage-benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .parrainage-benefit-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .parrainage-benefit-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .parrainage-cta {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            color: #ff3366;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .parrainage-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .fed-members-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .fed-member-flag {
+                font-size: 2.8rem;
+            }
+
+            .fed-stat-box {
+                padding: 12px 20px;
+            }
+
+            .parrainage-section {
+                padding: 20px;
+            }
+
+            .parrainage-benefits {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-logo"></div>
+        <div class="loader-text">PaieCashPlay</div>
+    </div>
+
+    <div id="app" class="app-container" style="display: none;">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="club-logo-header">
+                        <div id="fedLogo" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">🌍</div>
+                    </div>
+                    <div class="header-title">
+                        <h1 id="fedName">Fédération</h1>
+                        <span>International</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="btn-icon" onclick="window.location.href='support.html'">
+                        <span>💬</span>
+                    </button>
+                    <button class="btn-icon">
+                        <span>🤖</span>
+                    </button>
+                    <button class="btn-icon notification-btn">
+                        <span>🔔</span>
+                        <span class="badge">5</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main" id="mainContent">
+            <section id="accueilSection" class="section active">
+                <div class="section-header">
+                    <h2 id="fedTitle">🌍 Fédération Mondiale</h2>
+                    <p id="fedDescription">Compétitions internationales</p>
+                </div>
+
+                <div class="wallet-card" style="background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 25px; margin-bottom: 20px;">
+                    <h3>💰 Mon Wallet</h3>
+                    <div style="font-size: 28px; font-weight: 800; margin: 15px 0;">1 247,50 €</div>
+                    <div style="display: flex; gap: 15px;">
+                        <button style="flex: 1; padding: 12px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">➕ Recharger</button>
+                        <button style="flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">📤 Retirer</button>
+                    </div>
+                </div>
+
+                <!-- ========== SECTION PARRAINAGE (UX_CREDIBILITE_V7.3) ========== -->
+                <div class="parrainage-section">
+                    <h3>🎁 Programme de Parrainage</h3>
+                    <p>Invitez vos amis et gagnez des récompenses incroyables !</p>
+                    
+                    <div class="parrainage-benefits">
+                        <div class="parrainage-benefit">
+                            <div class="parrainage-benefit-icon">💰</div>
+                            <div class="parrainage-benefit-value">15€</div>
+                            <div class="parrainage-benefit-label">par ami parrainé</div>
+                        </div>
+                        <div class="parrainage-benefit">
+                            <div class="parrainage-benefit-icon">🔁</div>
+                            <div class="parrainage-benefit-value">5%</div>
+                            <div class="parrainage-benefit-label">de leurs gains à vie</div>
+                        </div>
+                        <div class="parrainage-benefit">
+                            <div class="parrainage-benefit-icon">♾️</div>
+                            <div class="parrainage-benefit-value">Illimité</div>
+                            <div class="parrainage-benefit-label">parrainages possibles</div>
+                        </div>
+                    </div>
+
+                    <button class="parrainage-cta" onclick="alert('🎉 Fonctionnalité parrainage : Partagez votre code unique via WhatsApp, email ou SMS. Vous recevrez 15€ + 5% à vie sur les gains de vos filleuls !')">
+                        🚀 Parrainer mes Amis
+                    </button>
+
+                    <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9; text-align: center;">
+                        ✨ Plus vous parrainez, plus vous gagnez ! Créez votre réseau passif.
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #10b981, #059669); border-radius: 15px; padding: 25px; color: white; margin: 20px 0;">
+                    <h3>🎟️ Billets Coupe du Monde 2026</h3>
+                    <p style="margin: 10px 0;">Réservez vos places dès maintenant</p>
+                    <button style="width: 100%; padding: 14px; background: white; color: #10b981; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px;">
+                        🏆 Réserver mes Billets
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                    <button onclick="window.location.href='onboarding.html'" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border: 2px solid #3b82f6; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                        📚 Guide
+                    </button>
+                    <button onclick="window.location.href='support.html'" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border: 2px solid #3b82f6; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                        💬 Support
+                    </button>
+                </div>
+
+                <!-- ========== SECTION FÉDÉRATIONS MEMBRES ========== -->
+                <div id="fedMembersSection" class="fed-members-section" style="display: none;">
+                    <div class="fed-header">
+                        <h3 id="fedSectionTitle">Fédérations Membres</h3>
+                        <p style="color: #94a3b8; font-size: 1rem;" id="fedSectionDesc">Toutes les associations membres officielles</p>
+                    </div>
+
+                    <div class="fed-stats" id="fedStatsContainer"></div>
+
+                    <div id="fedMembersList" class="fed-members-grid"></div>
+                </div>
+
+                <button onclick="window.location.href='index.html'" style="width: 100%; padding: 16px; margin-top: 20px; background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                    🏠 Retour Accueil
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <!-- ========== CHARGEMENT DES FÉDÉRATIONS ========== -->
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    <script src="🌍_TOUTES_FEDERATIONS_FIFA.js"></script>
+    
+    <script>
+        // ========== PARAMÈTRES URL ==========
+        const urlParams = new URLSearchParams(window.location.search);
+        const fedName = urlParams.get('fed') || localStorage.getItem('selectedClub') || 'FIFA';
+        
+        // ========== DONNÉES FÉDÉRATIONS ==========
+        const fedData = {
+            'FIFA': { 
+                logo: '🌍', 
+                title: 'Fédération Internationale de Football', 
+                desc: '211 Associations Membres • Coupe du Monde 2026',
+                members: 211
+            },
+            'UEFA': { 
+                logo: '🇪🇺', 
+                title: 'Union Européenne de Football', 
+                desc: '55 Associations Membres • Euro 2024',
+                members: 55,
+                data: typeof federationsUEFA !== 'undefined' ? federationsUEFA : []
+            },
+            'CAF': { 
+                logo: '🌍', 
+                title: 'Confédération Africaine de Football', 
+                desc: '54 Associations Membres • CAN 2025',
+                members: 54,
+                data: typeof cafMembersWithLogos !== 'undefined' ? cafMembersWithLogos : []
+            },
+            'CONMEBOL': { 
+                logo: '🌎', 
+                title: 'Confédération Sud-Américaine de Football', 
+                desc: '10 Associations Membres • Copa América',
+                members: 10,
+                data: typeof federationsCONMEBOL !== 'undefined' ? federationsCONMEBOL : []
+            },
+            'AFC': { 
+                logo: '🌏', 
+                title: 'Confédération Asiatique de Football', 
+                desc: '47 Associations Membres • Coupe d\'Asie',
+                members: 47,
+                data: typeof federationsAFC !== 'undefined' ? federationsAFC : []
+            },
+            'CONCACAF': { 
+                logo: '🌎', 
+                title: 'Confédération Amérique du Nord, Centrale et Caraïbes', 
+                desc: '41 Associations Membres • Gold Cup',
+                members: 41,
+                data: typeof federationsCONCACAF !== 'undefined' ? federationsCONCACAF : []
+            },
+            'OFC': { 
+                logo: '🌊', 
+                title: 'Confédération du Football d\'Océanie', 
+                desc: '11 Associations Membres • Coupe des Nations OFC',
+                members: 11,
+                data: typeof federationsOFC !== 'undefined' ? federationsOFC : []
+            }
+        };
+        
+        // ========== MISE À JOUR INTERFACE ==========
+        const data = fedData[fedName] || fedData['FIFA'];
+        
+        document.getElementById('pageTitle').textContent = `PaieCashPlay - ${fedName}`;
+        document.getElementById('fedName').textContent = fedName;
+        document.getElementById('fedLogo').textContent = data.logo;
+        document.getElementById('fedTitle').textContent = `${data.logo} ${data.title}`;
+        document.getElementById('fedDescription').textContent = data.desc;
+        
+        // ========== AFFICHAGE DES FÉDÉRATIONS MEMBRES ==========
+        if (fedName !== 'FIFA' && data.data && data.data.length > 0) {
+            const fedSection = document.getElementById('fedMembersSection');
+            fedSection.style.display = 'block';
+            
+            // Titre de section
+            document.getElementById('fedSectionTitle').textContent = `${data.logo} ${data.title}`;
+            document.getElementById('fedSectionDesc').textContent = `Toutes les associations membres officielles`;
+            
+            // Statistiques
+            const statsContainer = document.getElementById('fedStatsContainer');
+            statsContainer.innerHTML = `
+                <div class="fed-stat-box">
+                    <div class="stat-number">${data.members}</div>
+                    <div class="stat-label">Fédérations</div>
+                </div>
+                <div class="fed-stat-box">
+                    <div class="stat-number">${fedName}</div>
+                    <div class="stat-label">Confédération</div>
+                </div>
+            `;
+            
+            // Affichage des membres
+            displayFedMembers(data.data);
+            
+            console.log(`✅ ${fedName} : ${data.members} fédérations chargées et affichées`);
+        }
+
+        // ========== FONCTION AFFICHAGE FÉDÉRATIONS ==========
+        function displayFedMembers(members) {
+            const membersList = document.getElementById('fedMembersList');
+            membersList.innerHTML = '';
+            
+            members.forEach(fed => {
+                const card = document.createElement('div');
+                card.className = 'fed-member-card';
+                
+                card.innerHTML = `
+                    <div class="fed-member-flag">${fed.flag || fed.logo}</div>
+                    <div class="fed-member-name">${fed.name}</div>
+                    <div class="fed-member-code">${fed.code}</div>
+                `;
+                
+                card.onclick = () => {
+                    window.location.href = fed.path;
+                };
+                
+                membersList.appendChild(card);
+            });
+        }
+
+        // ========== CHARGEMENT INITIAL ==========
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }, 1500);
+    </script>
+</body>
+</html>

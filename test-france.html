@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Équipe de France</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #002395, #ED2939);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 { font-size: 48px; margin-bottom: 20px; }
+        .btn {
+            display: inline-block;
+            padding: 20px 40px;
+            background: white;
+            color: #002395;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 24px;
+            margin: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+        .info {
+            background: rgba(255,255,255,0.2);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+        .tests {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 700px;
+            margin: 30px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🇫🇷 Test Équipe de France</h1>
+    
+    <div class="info">
+        <h2>🔧 Correction Appliquée pour les Fédérations</h2>
+        <p style="font-size: 18px; line-height: 1.6;">
+            Le bug a été corrigé ! Les fédérations utilisent maintenant la clé JSON directe (ex: "fed-france") au lieu de générer un slug.
+        </p>
+    </div>
+    
+    <div class="tests">
+        <a href="app-federation.html#fed-france" class="btn">
+            🇫🇷 France
+        </a>
+        <a href="app-federation.html#fed-bresil" class="btn">
+            🇧🇷 Brésil
+        </a>
+        <a href="app-federation.html#fed-espagne" class="btn">
+            🇪🇸 Espagne
+        </a>
+        <a href="app-federation.html#fed-argentine" class="btn">
+            🇦🇷 Argentine
+        </a>
+    </div>
+    
+    <div style="margin-top: 50px;">
+        <a href="index.html" style="color: white; text-decoration: underline; font-size: 18px;">
+            ← Retour à l'accueil
+        </a>
+    </div>
+    
+    <div style="margin-top: 30px; font-size: 14px; opacity: 0.9;">
+        <p>✅ Version 3.0.3 - Fédérations corrigées</p>
+    </div>
+</body>
+</html>

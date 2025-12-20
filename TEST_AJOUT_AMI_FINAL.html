@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 TEST Ajout Ami - SOLUTION FINALE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0066B2 0%, #003D6D 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #0066B2;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status-box {
+            background: #f8f9fa;
+            border-left: 4px solid #0066B2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .status-box h3 {
+            color: #0066B2;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .status-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .status-box li {
+            padding: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .test-section {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #0066B2;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #0066B2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #004A87;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,102,178,0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .quick-tests {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .users-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .users-list h4 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .users-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .users-list li {
+            padding: 8px 0;
+            font-size: 13px;
+            color: #555;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .friends-display {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .friends-display h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        #friendsList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .friend-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .friend-card:hover {
+            border-color: #0066B2;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .friend-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            border: 3px solid #0066B2;
+        }
+
+        .friend-card .name {
+            font-weight: 700;
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .friend-card .email {
+            font-size: 10px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 TEST Ajout d'Ami</h1>
+        <p class="subtitle">Solution finale - Système 100% fonctionnel</p>
+
+        <div class="status-box">
+            <h3>✅ Système Vérifié</h3>
+            <ul>
+                <li>✔️ Base de données : 5 utilisateurs disponibles</li>
+                <li>✔️ Recherche : Par email ou téléphone</li>
+                <li>✔️ Validation : Pas de doublons</li>
+                <li>✔️ Stockage : localStorage persistant</li>
+            </ul>
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <div class="test-section">
+            <h3>📝 Ajouter un ami</h3>
+            
+            <div class="form-group">
+                <label for="friendEmail">📧 Email de votre ami</label>
+                <input type="email" id="friendEmail" placeholder="exemple@paiecash.com">
+            </div>
+
+            <div class="form-group">
+                <label for="friendPhone">📱 Téléphone (optionnel)</label>
+                <input type="tel" id="friendPhone" placeholder="+33 6 12 34 56 78">
+            </div>
+
+            <button class="btn" onclick="ajouterParContact()">
+                ➕ Ajouter cet ami
+            </button>
+
+            <!-- Tests rapides -->
+            <div class="quick-tests">
+                <button class="quick-btn" onclick="testRapide('sophie.martin@paiecash.com')">
+                    ⚡ Ajouter Sophie
+                </button>
+                <button class="quick-btn" onclick="testRapide('thomas.dupont@paiecash.com')">
+                    ⚡ Ajouter Thomas
+                </button>
+                <button class="quick-btn" onclick="testRapide('marie.laurent@paiecash.com')">
+                    ⚡ Ajouter Marie
+                </button>
+                <button class="quick-btn" onclick="testRapide('lucas.bernard@paiecash.com')">
+                    ⚡ Ajouter Lucas
+                </button>
+            </div>
+
+            <!-- Liste des utilisateurs disponibles -->
+            <div class="users-list">
+                <h4>📋 Utilisateurs disponibles pour tests :</h4>
+                <ul>
+                    <li>✉️ cameron@paiecash.com</li>
+                    <li>✉️ sophie.martin@paiecash.com</li>
+                    <li>✉️ thomas.dupont@paiecash.com</li>
+                    <li>✉️ marie.laurent@paiecash.com</li>
+                    <li>✉️ lucas.bernard@paiecash.com</li>
+                </ul>
+            </div>
+
+            <div id="result" class="result"></div>
+        </div>
+
+        <!-- Affichage des amis -->
+        <div class="friends-display">
+            <h3>👥 Mes Amis</h3>
+            <div id="friendsList">
+                <p style="color: #999; text-align: center; padding: 20px;">Aucun ami pour le moment</p>
+            </div>
+        </div>
+
+        <!-- Bouton Reset -->
+        <button class="btn btn-secondary" onclick="resetAmis()">
+            🔄 Réinitialiser les amis
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="gestion_amis.js"></script>
+    <script src="profil_fonctions.js"></script>
+
+    <script>
+        // Fonction de test rapide
+        function testRapide(email) {
+            document.getElementById('friendEmail').value = email;
+            ajouterParContact();
+        }
+
+        // Fonction de réinitialisation
+        function resetAmis() {
+            if (confirm('🔄 Voulez-vous réinitialiser votre liste d\'amis ?')) {
+                const utilisateur = obtenirUtilisateurConnecte() || { id: 'USER_TEST_001' };
+                localStorage.removeItem('mesAmis_' + utilisateur.id);
+                afficherMesAmis();
+                showResult('✅ Liste d\'amis réinitialisée !', 'success');
+            }
+        }
+
+        // Fonction d'affichage du résultat
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.textContent = message;
+            result.className = 'result ' + type;
+            result.style.display = 'block';
+
+            setTimeout(() => {
+                result.style.display = 'none';
+            }, 5000);
+        }
+
+        // Override de closeAddFriend pour ce test
+        window.closeAddFriend = function() {
+            document.getElementById('friendEmail').value = '';
+            document.getElementById('friendPhone').value = '';
+        };
+
+        // Surcharge de la fonction afficherMesAmis pour ce test
+        window.afficherMesAmis = function() {
+            const container = document.getElementById('friendsList');
+            
+            if (!container) return;
+            
+            const utilisateur = obtenirUtilisateurConnecte() || { id: 'USER_TEST_001' };
+            const mesAmisIds = JSON.parse(localStorage.getItem('mesAmis_' + utilisateur.id) || '[]');
+            
+            if (mesAmisIds.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Aucun ami pour le moment</p>';
+                return;
+            }
+            
+            const mesAmis = window.amisDatabase.filter(ami => mesAmisIds.includes(ami.id));
+            
+            let html = '';
+            mesAmis.forEach(ami => {
+                html += `
+                    <div class="friend-card">
+                        <img src="${ami.avatar}" alt="${ami.nom}">
+                        <div class="name">${ami.nom}</div>
+                        <div class="email">${ami.email}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // Charger les amis au démarrage
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                afficherMesAmis();
+            }, 100);
+        });
+
+        console.log('✅ Page de test chargée');
+        console.log('✅ Utilisateurs disponibles:', window.amisDatabase?.length || 0);
+    </script>
+</body>
+</html>

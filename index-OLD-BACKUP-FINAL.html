@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Connectez-vous à votre équipe préférée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f1729 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        .cta-banner {
+            background: linear-gradient(135deg, #10b981, #8b5cf6);
+            padding: 25px;
+            margin: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .cta-banner h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .cta-banner p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: white;
+            color: #10b981;
+            padding: 15px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .search-bar {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .search-bar input {
+            width: 100%;
+            max-width: 600px;
+            padding: 16px 50px 16px 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            color: #f8fafc;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .sports-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .sport-tab {
+            padding: 12px 25px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .sport-tab:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .sport-tab.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 25px 0 15px;
+            color: #3b82f6;
+            padding-left: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .club-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            border-color: #10b981;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .club-logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .club-league {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .sport-section {
+            display: none;
+        }
+
+        .sport-section.active {
+            display: block;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 900;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💚 PaieCashFan - Connectez-vous à votre équipe préférée 💜</h1>
+        <p>Connectez-vous à votre club préféré</p>
+    </div>
+
+    <div class="cta-banner">
+        <h2>🏆 Votre club n'est pas dans la liste ?</h2>
+        <p>Inscrivez-le gratuitement et bénéficiez de sponsors locaux et internationaux !</p>
+        <a href="inscription-club.html" class="cta-btn">➕ Inscrire mon club</a>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Rechercher un club..." />
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number" id="totalClubs">275+</div>
+                <div class="stat-label">Clubs Total</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Sports</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Fédérations</div>
+            </div>
+        </div>
+
+        <div class="sports-tabs">
+            <div class="sport-tab active" data-sport="all">🏅 Tous</div>
+            <div class="sport-tab" data-sport="football">⚽ Football Clubs</div>
+            <div class="sport-tab" data-sport="nationales">🌍 Équipes Nationales</div>
+            <div class="sport-tab" data-sport="basketball">🏀 Basket</div>
+            <div class="sport-tab" data-sport="handball">🤾 Handball</div>
+            <div class="sport-tab" data-sport="rugby">🏉 Rugby</div>
+            <div class="sport-tab" data-sport="volleyball">🏐 Volleyball</div>
+            <div class="sport-tab" data-sport="federations">🌍 Fédérations</div>
+        </div>
+
+        <!-- FOOTBALL -->
+        <div class="sport-section active" data-section="football">
+            <div class="section-title">⚽ Football Français</div>
+            
+            <!-- Ligue 1 -->
+            <div class="section-subtitle">🏆 Ligue 1</div>
+            <div class="clubs-grid" id="ligue1Grid"></div>
+            
+            <!-- Ligue 2 -->
+            <div class="section-subtitle">🥈 Ligue 2</div>
+            <div class="clubs-grid" id="ligue2Grid"></div>
+            
+            <!-- National -->
+            <div class="section-subtitle">🥉 National</div>
+            <div class="clubs-grid" id="nationalGrid"></div>
+            
+            <!-- National 2 -->
+            <div class="section-subtitle">📋 National 2 - Groupe A</div>
+            <div class="clubs-grid" id="national2AGrid"></div>
+            
+            <div class="section-subtitle">📋 National 2 - Groupe B</div>
+            <div class="clubs-grid" id="national2BGrid"></div>
+            
+            <div class="section-subtitle">📋 National 2 - Groupe C</div>
+            <div class="clubs-grid" id="national2CGrid"></div>
+            
+            <div class="section-subtitle">📋 National 2 - Groupe D</div>
+            <div class="clubs-grid" id="national2DGrid"></div>
+            
+            <!-- National 3 -->
+            <div class="section-subtitle">⚽ National 3 - Groupe A</div>
+            <div class="clubs-grid" id="national3AGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe B</div>
+            <div class="clubs-grid" id="national3BGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe C</div>
+            <div class="clubs-grid" id="national3CGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe D</div>
+            <div class="clubs-grid" id="national3DGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe E</div>
+            <div class="clubs-grid" id="national3EGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe F</div>
+            <div class="clubs-grid" id="national3FGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe G</div>
+            <div class="clubs-grid" id="national3GGrid"></div>
+            
+            <div class="section-subtitle">⚽ National 3 - Groupe H</div>
+            <div class="clubs-grid" id="national3HGrid"></div>
+        </div>
+
+        <!-- ÉQUIPES NATIONALES -->
+        <div class="sport-section active" data-section="nationales">
+            <div class="section-title">🌍 Équipes Nationales & Compétitions Internationales</div>
+            
+            <!-- Coupe du Monde 2026 -->
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - UEFA</div>
+            <div class="clubs-grid" id="coupeMondeUEFAGrid"></div>
+            
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - CONMEBOL</div>
+            <div class="clubs-grid" id="coupeMondeConmebolGrid"></div>
+            
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - AFC</div>
+            <div class="clubs-grid" id="coupeMondeAFCGrid"></div>
+            
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - CAF</div>
+            <div class="clubs-grid" id="coupeMondeCafGrid"></div>
+            
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - CONCACAF</div>
+            <div class="clubs-grid" id="coupeMondeConcacafGrid"></div>
+            
+            <div class="section-subtitle">🏆 Coupe du Monde 2026 - OFC</div>
+            <div class="clubs-grid" id="coupeMondeOFCGrid"></div>
+            
+            <!-- Champions League -->
+            <div class="section-subtitle">⭐ UEFA Champions League</div>
+            <div class="clubs-grid" id="championsLeagueGrid"></div>
+            
+            <!-- CAN 2026 -->
+            <div class="section-subtitle">🦁 CAN 2026 (Coupe d'Afrique des Nations)</div>
+            <div class="clubs-grid" id="can2026Grid"></div>
+            
+            <!-- Copa América -->
+            <div class="section-subtitle">🏆 Copa América</div>
+            <div class="clubs-grid" id="copaAmericaGrid"></div>
+            
+            <!-- Coupe d'Asie -->
+            <div class="section-subtitle">🌏 Coupe d'Asie</div>
+            <div class="clubs-grid" id="coupeAsieGrid"></div>
+            
+            <!-- Gold Cup -->
+            <div class="section-subtitle">🏆 Gold Cup</div>
+            <div class="clubs-grid" id="goldCupGrid"></div>
+        </div>
+
+        <!-- BASKETBALL -->
+        <div class="sport-section active" data-section="basketball">
+            <div class="section-title">🏀 Basketball - Betclic Elite</div>
+            <div class="clubs-grid" id="basketballGrid"></div>
+        </div>
+
+        <!-- HANDBALL -->
+        <div class="sport-section active" data-section="handball">
+            <div class="section-title">🤾 Handball - Starligue</div>
+            <div class="clubs-grid" id="handballGrid"></div>
+        </div>
+
+        <!-- RUGBY -->
+        <div class="sport-section active" data-section="rugby">
+            <div class="section-title">🏉 Rugby - Top 14</div>
+            <div class="clubs-grid" id="rugbyGrid"></div>
+        </div>
+
+        <!-- VOLLEYBALL -->
+        <div class="sport-section active" data-section="volleyball">
+            <div class="section-title">🏐 Volleyball - Ligue A Masculine</div>
+            <div class="clubs-grid" id="volleyballGrid"></div>
+        </div>
+
+        <!-- FEDERATIONS -->
+        <div class="sport-section active" data-section="federations">
+            <div class="section-title">🌍 Fédérations Internationales</div>
+            <div class="clubs-grid" id="federationsGrid"></div>
+        </div>
+    </div>
+
+    <script src="clubs-football-complet.js"></script>
+    <script src="clubs-national-3-data.js"></script>
+    <script src="equipes-nationales-internationales.js"></script>
+    <script>
+        // Basketball Clubs
+        const basketballClubs = [
+            { name: 'Boulazac', logo: '🏀', league: 'Betclic Elite', colors: ['#FF6B35', '#FFFFFF'], path: 'app-universal-simple.html?club=Boulazac&logo=🏀&sport=Basketball' },
+            { name: 'Bourg-en-Bresse', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Bourg-en-Bresse&logo=🏀&sport=Basketball' },
+            { name: 'Chalon-sur-Saône', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Chalon-sur-Saône&logo=🏀&sport=Basketball' },
+            { name: 'Cholet Basket', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Cholet+Basket&logo=🏀&sport=Basketball' },
+            { name: 'Dijon', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Dijon&logo=🏀&sport=Basketball' },
+            { name: 'Gravelines', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Gravelines&logo=🏀&sport=Basketball' },
+            { name: 'Le Mans', logo: '🏀', league: 'Betclic Elite', colors: ['#FFC20E', '#DA020E'], path: 'app-universal-simple.html?club=Le+Mans&logo=🏀&sport=Basketball' },
+            { name: 'Le Portel', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Le+Portel&logo=🏀&sport=Basketball' },
+            { name: 'Limoges CSP', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Limoges+CSP&logo=🏀&sport=Basketball' },
+            { name: 'ASVEL Lyon-Villeurbanne', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#0E2340'], path: 'app-universal-simple.html?club=ASVEL+Lyon-Villeurbanne&logo=🏀&sport=Basketball' },
+            { name: 'AS Monaco Basket', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=AS+Monaco+Basket&logo=🏀&sport=Basketball' },
+            { name: 'SLUC Nancy', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#DA020E'], path: 'app-universal-simple.html?club=SLUC+Nancy&logo=🏀&sport=Basketball' },
+            { name: 'Nanterre 92', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Nanterre+92&logo=🏀&sport=Basketball' },
+            { name: 'Paris Basketball', logo: '🏀', league: 'Betclic Elite', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Paris+Basketball&logo=🏀&sport=Basketball' },
+            { name: 'Saint-Quentin', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Saint-Quentin&logo=🏀&sport=Basketball' },
+            { name: 'SIG Strasbourg', logo: '🏀', league: 'Betclic Elite', colors: ['#0E2340', '#DA020E'], path: 'app-universal-simple.html?club=SIG+Strasbourg&logo=🏀&sport=Basketball' }
+        ];
+
+        // Handball Clubs
+        const handballClubs = [
+            { name: 'Cesson-Rennes', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Cesson-Rennes&logo=🤾&sport=Handball' },
+            { name: 'Chambéry Savoie', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Chambéry+Savoie&logo=🤾&sport=Handball' },
+            { name: 'Chartres', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Chartres&logo=🤾&sport=Handball' },
+            { name: 'Dijon', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Dijon&logo=🤾&sport=Handball' },
+            { name: 'Dunkerque', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Dunkerque&logo=🤾&sport=Handball' },
+            { name: 'Istres', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Istres&logo=🤾&sport=Handball' },
+            { name: 'Limoges', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Limoges&logo=🤾&sport=Handball' },
+            { name: 'Montpellier', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Montpellier&logo=🤾&sport=Handball' },
+            { name: 'HBC Nantes', logo: '🤾', league: 'Starligue', colors: ['#FFC20E', '#000000'], path: 'app-universal-simple.html?club=HBC+Nantes&logo=🤾&sport=Handball' },
+            { name: 'Paris SG Handball', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#0E2340'], path: 'app-universal-simple.html?club=Paris+SG+Handball&logo=🤾&sport=Handball' },
+            { name: 'Pays d\'Aix UC', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Pays+d\'Aix+UC&logo=🤾&sport=Handball' },
+            { name: 'Saint-Raphaël', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Saint-Raphaël&logo=🤾&sport=Handball' },
+            { name: 'Sélestat', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Sélestat&logo=🤾&sport=Handball' },
+            { name: 'Toulouse', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Toulouse&logo=🤾&sport=Handball' },
+            { name: 'Tremblay', logo: '🤾', league: 'Starligue', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Tremblay&logo=🤾&sport=Handball' },
+            { name: 'USAM Nîmes', logo: '🤾', league: 'Starligue', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=USAM+Nîmes&logo=🤾&sport=Handball' }
+        ];
+
+        // Rugby Clubs
+        const rugbyClubs = [
+            { name: 'Aviron Bayonnais', logo: '🏉', league: 'Top 14', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Aviron+Bayonnais&logo=🏉&sport=Rugby' },
+            { name: 'Bordeaux-Bègles', logo: '🏉', league: 'Top 14', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Bordeaux-Bègles&logo=🏉&sport=Rugby' },
+            { name: 'Castres Olympique', logo: '🏉', league: 'Top 14', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Castres+Olympique&logo=🏉&sport=Rugby' },
+            { name: 'ASM Clermont', logo: '🏉', league: 'Top 14', colors: ['#FFC20E', '#0E2340'], path: 'app-universal-simple.html?club=ASM+Clermont&logo=🏉&sport=Rugby' },
+            { name: 'Stade Rochelais', logo: '🏉', league: 'Top 14', colors: ['#FFC20E', '#000000'], path: 'app-universal-simple.html?club=Stade+Rochelais&logo=🏉&sport=Rugby' },
+            { name: 'Lyon Rugby', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#0E2340'], path: 'app-universal-simple.html?club=Lyon+Rugby&logo=🏉&sport=Rugby' },
+            { name: 'US Montauban', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=US+Montauban&logo=🏉&sport=Rugby' },
+            { name: 'Montpellier', logo: '🏉', league: 'Top 14', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Montpellier&logo=🏉&sport=Rugby' },
+            { name: 'Section Paloise', logo: '🏉', league: 'Top 14', colors: ['#FFC20E', '#10b981'], path: 'app-universal-simple.html?club=Section+Paloise&logo=🏉&sport=Rugby' },
+            { name: 'USA Perpignan', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#FFC20E'], path: 'app-universal-simple.html?club=USA+Perpignan&logo=🏉&sport=Rugby' },
+            { name: 'Racing 92', logo: '🏉', league: 'Top 14', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Racing+92&logo=🏉&sport=Rugby' },
+            { name: 'Stade Français', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#0E2340'], path: 'app-universal-simple.html?club=Stade+Français&logo=🏉&sport=Rugby' },
+            { name: 'RC Toulon', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#000000'], path: 'app-universal-simple.html?club=RC+Toulon&logo=🏉&sport=Rugby' },
+            { name: 'Stade Toulousain', logo: '🏉', league: 'Top 14', colors: ['#DA020E', '#000000'], path: 'app-universal-simple.html?club=Stade+Toulousain&logo=🏉&sport=Rugby' }
+        ];
+
+        // Volleyball Clubs
+        const volleyballClubs = [
+            { name: 'AS Cannes', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=AS+Cannes&logo=🏐&sport=Volleyball' },
+            { name: 'Chaumont VB 52', logo: '🏐', league: 'Ligue A Masculine', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Chaumont+VB+52&logo=🏐&sport=Volleyball' },
+            { name: 'Gazelec Ajaccio', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#DA020E'], path: 'app-universal-simple.html?club=Gazelec+Ajaccio&logo=🏐&sport=Volleyball' },
+            { name: 'Montpellier', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Montpellier&logo=🏐&sport=Volleyball' },
+            { name: 'Narbonne', logo: '🏐', league: 'Ligue A Masculine', colors: ['#FFC20E', '#000000'], path: 'app-universal-simple.html?club=Narbonne&logo=🏐&sport=Volleyball' },
+            { name: 'AS Monaco Volley', logo: '🏐', league: 'Ligue A Masculine', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=AS+Monaco+Volley&logo=🏐&sport=Volleyball' },
+            { name: 'Paris Volley', logo: '🏐', league: 'Ligue A Masculine', colors: ['#DA020E', '#0E2340'], path: 'app-universal-simple.html?club=Paris+Volley&logo=🏐&sport=Volleyball' },
+            { name: 'Plessis-Robinson', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Plessis-Robinson&logo=🏐&sport=Volleyball' },
+            { name: 'Poitiers', logo: '🏐', league: 'Ligue A Masculine', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Poitiers&logo=🏐&sport=Volleyball' },
+            { name: 'Sète', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFC20E'], path: 'app-universal-simple.html?club=Sète&logo=🏐&sport=Volleyball' },
+            { name: 'Saint-Nazaire', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Saint-Nazaire&logo=🏐&sport=Volleyball' },
+            { name: 'Toulouse', logo: '🏐', league: 'Ligue A Masculine', colors: ['#DA020E', '#FFFFFF'], path: 'app-universal-simple.html?club=Toulouse&logo=🏐&sport=Volleyball' },
+            { name: 'Tourcoing', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#DA020E'], path: 'app-universal-simple.html?club=Tourcoing&logo=🏐&sport=Volleyball' },
+            { name: 'Tours VB', logo: '🏐', league: 'Ligue A Masculine', colors: ['#0E2340', '#FFFFFF'], path: 'app-universal-simple.html?club=Tours+VB&logo=🏐&sport=Volleyball' }
+        ];
+
+        // Football clubs chargés depuis clubs-football-complet.js et clubs-national-3-data.js
+
+        // Federations
+        const federations = [
+            { name: 'FIFA', logo: '🌍', league: 'Fédération Mondiale', colors: ['#0E2340', '#3b82f6'], path: 'federation-app.html?fed=FIFA' },
+            { name: 'UEFA', logo: '🇪🇺', league: 'Fédération Européenne', colors: ['#0E2340', '#3b82f6'], path: 'federation-app.html?fed=UEFA' },
+            { name: 'CAF', logo: '🌍', league: 'Confédération Africaine', colors: ['#22c55e', '#fbbf24'], path: 'federation-app.html?fed=CAF' },
+            { name: 'CONMEBOL', logo: '🌎', league: 'Confédération Sud-Américaine', colors: ['#DA020E', '#FFC20E'], path: 'federation-app.html?fed=CONMEBOL' },
+            { name: 'AFC', logo: '🌏', league: 'Confédération Asiatique', colors: ['#3b82f6', '#FFFFFF'], path: 'federation-app.html?fed=AFC' },
+            { name: 'CONCACAF', logo: '🌎', league: 'Confédération Amérique du Nord', colors: ['#0E2340', '#DA020E'], path: 'federation-app.html?fed=CONCACAF' }
+        ];
+
+        // Render function
+        function renderClubs(clubs, gridId) {
+            const grid = document.getElementById(gridId);
+            if (!grid) {
+                console.warn('❌ Grid not found:', gridId);
+                return;
+            }
+            
+            if (!clubs || clubs.length === 0) {
+                console.warn('⚠️ No clubs data for:', gridId);
+                grid.innerHTML = '<p style="color: #f59e0b; padding: 20px; text-align: center;">Chargement des clubs...</p>';
+                return;
+            }
+            
+            grid.innerHTML = clubs.map(club => `
+                <div class="club-card" onclick="window.location.href='${club.path}'">
+                    <div class="club-logo">${club.logo}</div>
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-league">${club.league}</div>
+                </div>
+            `).join('');
+            
+            console.log(`✅ Rendered ${clubs.length} clubs to ${gridId}`);
+        }
+
+        // Vérifier que les données sont chargées avant de render
+        console.log('🔍 Checking data availability...');
+        console.log('ligue1Clubs:', typeof ligue1Clubs !== 'undefined' ? ligue1Clubs.length + ' clubs' : 'NOT LOADED');
+        console.log('national3GroupeA:', typeof national3GroupeA !== 'undefined' ? national3GroupeA.length + ' clubs' : 'NOT LOADED');
+        console.log('coupeMondeUEFA:', typeof coupeMondeUEFA !== 'undefined' ? coupeMondeUEFA.length + ' équipes' : 'NOT LOADED');
+
+        // Init - Football (toutes les ligues)
+        if (typeof ligue1Clubs !== 'undefined') {
+            renderClubs(ligue1Clubs, 'ligue1Grid');
+        }
+        if (typeof ligue2Clubs !== 'undefined') {
+            renderClubs(ligue2Clubs, 'ligue2Grid');
+        }
+        if (typeof nationalClubs !== 'undefined') {
+            renderClubs(nationalClubs, 'nationalGrid');
+        }
+        if (typeof national2GroupeA !== 'undefined') {
+            renderClubs(national2GroupeA, 'national2AGrid');
+        }
+        if (typeof national2GroupeB !== 'undefined') {
+            renderClubs(national2GroupeB, 'national2BGrid');
+        }
+        if (typeof national2GroupeC !== 'undefined') {
+            renderClubs(national2GroupeC, 'national2CGrid');
+        }
+        if (typeof national2GroupeD !== 'undefined') {
+            renderClubs(national2GroupeD, 'national2DGrid');
+        }
+        if (typeof national3GroupeA !== 'undefined') {
+            renderClubs(national3GroupeA, 'national3AGrid');
+        }
+        if (typeof national3GroupeB !== 'undefined') {
+            renderClubs(national3GroupeB, 'national3BGrid');
+        }
+        if (typeof national3GroupeC !== 'undefined') {
+            renderClubs(national3GroupeC, 'national3CGrid');
+        }
+        if (typeof national3GroupeD !== 'undefined') {
+            renderClubs(national3GroupeD, 'national3DGrid');
+        }
+        if (typeof national3GroupeE !== 'undefined') {
+            renderClubs(national3GroupeE, 'national3EGrid');
+        }
+        if (typeof national3GroupeF !== 'undefined') {
+            renderClubs(national3GroupeF, 'national3FGrid');
+        }
+        if (typeof national3GroupeG !== 'undefined') {
+            renderClubs(national3GroupeG, 'national3GGrid');
+        }
+        if (typeof national3GroupeH !== 'undefined') {
+            renderClubs(national3GroupeH, 'national3HGrid');
+        }
+        
+        // Init - Équipes Nationales & Internationales
+        if (typeof coupeMondeUEFA !== 'undefined') {
+            renderClubs(coupeMondeUEFA, 'coupeMondeUEFAGrid');
+        }
+        if (typeof coupeMondeConmebol !== 'undefined') {
+            renderClubs(coupeMondeConmebol, 'coupeMondeConmebolGrid');
+        }
+        if (typeof coupeMondeAFC !== 'undefined') {
+            renderClubs(coupeMondeAFC, 'coupeMondeAFCGrid');
+        }
+        if (typeof coupeMondeCaf !== 'undefined') {
+            renderClubs(coupeMondeCaf, 'coupeMondeCafGrid');
+        }
+        if (typeof coupeMondeConcacaf !== 'undefined') {
+            renderClubs(coupeMondeConcacaf, 'coupeMondeConcacafGrid');
+        }
+        if (typeof coupeMondeOFC !== 'undefined') {
+            renderClubs(coupeMondeOFC, 'coupeMondeOFCGrid');
+        }
+        if (typeof championsLeagueEquipes !== 'undefined') {
+            renderClubs(championsLeagueEquipes, 'championsLeagueGrid');
+        }
+        if (typeof can2026Equipes !== 'undefined') {
+            renderClubs(can2026Equipes, 'can2026Grid');
+        }
+        if (typeof copaAmericaEquipes !== 'undefined') {
+            renderClubs(copaAmericaEquipes, 'copaAmericaGrid');
+        }
+        if (typeof coupeAsieEquipes !== 'undefined') {
+            renderClubs(coupeAsieEquipes, 'coupeAsieGrid');
+        }
+        if (typeof goldCupEquipes !== 'undefined') {
+            renderClubs(goldCupEquipes, 'goldCupGrid');
+        }
+        
+        // Init - Autres sports
+        renderClubs(basketballClubs, 'basketballGrid');
+        renderClubs(handballClubs, 'handballGrid');
+        renderClubs(rugbyClubs, 'rugbyGrid');
+        renderClubs(volleyballClubs, 'volleyballGrid');
+        renderClubs(federations, 'federationsGrid');
+
+        // Tabs
+        const tabs = document.querySelectorAll('.sport-tab');
+        const sections = document.querySelectorAll('.sport-section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const sport = tab.dataset.sport;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (sport === 'all') {
+                    sections.forEach(s => s.classList.add('active'));
+                } else {
+                    sections.forEach(s => {
+                        if (s.dataset.section === sport) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Search
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const allCards = document.querySelectorAll('.club-card');
+            
+            allCards.forEach(card => {
+                const name = card.querySelector('.club-name').textContent.toLowerCase();
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        });
+
+        // Calculate total football clubs
+        const totalFootball = (typeof ligue1Clubs !== 'undefined' ? ligue1Clubs.length : 0) + 
+                              (typeof ligue2Clubs !== 'undefined' ? ligue2Clubs.length : 0) + 
+                              (typeof nationalClubs !== 'undefined' ? nationalClubs.length : 0) + 
+                              (typeof national2GroupeA !== 'undefined' ? national2GroupeA.length : 0) + 
+                              (typeof national2GroupeB !== 'undefined' ? national2GroupeB.length : 0) + 
+                              (typeof national2GroupeC !== 'undefined' ? national2GroupeC.length : 0) + 
+                              (typeof national2GroupeD !== 'undefined' ? national2GroupeD.length : 0) +
+                              (typeof national3GroupeA !== 'undefined' ? national3GroupeA.length : 0) + 
+                              (typeof national3GroupeB !== 'undefined' ? national3GroupeB.length : 0) + 
+                              (typeof national3GroupeC !== 'undefined' ? national3GroupeC.length : 0) + 
+                              (typeof national3GroupeD !== 'undefined' ? national3GroupeD.length : 0) +
+                              (typeof national3GroupeE !== 'undefined' ? national3GroupeE.length : 0) + 
+                              (typeof national3GroupeF !== 'undefined' ? national3GroupeF.length : 0) + 
+                              (typeof national3GroupeG !== 'undefined' ? national3GroupeG.length : 0) + 
+                              (typeof national3GroupeH !== 'undefined' ? national3GroupeH.length : 0);
+        
+        // Calculate total équipes nationales
+        const totalNationales = (typeof coupeMondeUEFA !== 'undefined' ? coupeMondeUEFA.length : 0) + 
+                                (typeof coupeMondeConmebol !== 'undefined' ? coupeMondeConmebol.length : 0) + 
+                                (typeof coupeMondeAFC !== 'undefined' ? coupeMondeAFC.length : 0) + 
+                                (typeof coupeMondeCaf !== 'undefined' ? coupeMondeCaf.length : 0) + 
+                                (typeof coupeMondeConcacaf !== 'undefined' ? coupeMondeConcacaf.length : 0) + 
+                                (typeof coupeMondeOFC !== 'undefined' ? coupeMondeOFC.length : 0) +
+                                (typeof championsLeagueEquipes !== 'undefined' ? championsLeagueEquipes.length : 0) + 
+                                (typeof can2026Equipes !== 'undefined' ? can2026Equipes.length : 0) + 
+                                (typeof copaAmericaEquipes !== 'undefined' ? copaAmericaEquipes.length : 0) +
+                                (typeof coupeAsieEquipes !== 'undefined' ? coupeAsieEquipes.length : 0) + 
+                                (typeof goldCupEquipes !== 'undefined' ? goldCupEquipes.length : 0);
+        
+        const totalClubs = totalFootball + totalNationales + basketballClubs.length + handballClubs.length + rugbyClubs.length + volleyballClubs.length + federations.length;
+        
+        console.log('✅ PaieCashPlay Multi-Sports & Équipes Nationales chargé');
+        console.log('⚽ Football Clubs TOTAL : ' + totalFootball + ' clubs français');
+        if (typeof ligue1Clubs !== 'undefined') console.log('   └─ Ligue 1 : ' + ligue1Clubs.length + ' clubs');
+        if (typeof ligue2Clubs !== 'undefined') console.log('   └─ Ligue 2 : ' + ligue2Clubs.length + ' clubs');
+        if (typeof nationalClubs !== 'undefined') console.log('   └─ National : ' + nationalClubs.length + ' clubs');
+        if (typeof national2GroupeA !== 'undefined') {
+            const national2Total = (national2GroupeA.length || 0) + (national2GroupeB?.length || 0) + (national2GroupeC?.length || 0) + (national2GroupeD?.length || 0);
+            console.log('   └─ National 2 : ' + national2Total + ' clubs');
+        }
+        if (typeof national3GroupeA !== 'undefined') {
+            const national3Total = (national3GroupeA.length || 0) + (national3GroupeB?.length || 0) + (national3GroupeC?.length || 0) + (national3GroupeD?.length || 0) + 
+                                   (national3GroupeE?.length || 0) + (national3GroupeF?.length || 0) + (national3GroupeG?.length || 0) + (national3GroupeH?.length || 0);
+            console.log('   └─ National 3 : ' + national3Total + ' clubs');
+        }
+        console.log('🌍 Équipes Nationales TOTAL : ' + totalNationales + ' équipes');
+        if (typeof coupeMondeUEFA !== 'undefined') {
+            const coupeMondeTotal = (coupeMondeUEFA.length || 0) + (coupeMondeConmebol?.length || 0) + (coupeMondeAFC?.length || 0) + 
+                                   (coupeMondeCaf?.length || 0) + (coupeMondeConcacaf?.length || 0) + (coupeMondeOFC?.length || 0);
+            console.log('   └─ Coupe du Monde 2026 : ' + coupeMondeTotal + ' équipes');
+        }
+        if (typeof championsLeagueEquipes !== 'undefined') console.log('   └─ Champions League : ' + championsLeagueEquipes.length + ' clubs');
+        if (typeof can2026Equipes !== 'undefined') console.log('   └─ CAN 2026 : ' + can2026Equipes.length + ' équipes');
+        if (typeof copaAmericaEquipes !== 'undefined') console.log('   └─ Copa América : ' + copaAmericaEquipes.length + ' équipes');
+        if (typeof coupeAsieEquipes !== 'undefined') console.log('   └─ Coupe d\'Asie : ' + coupeAsieEquipes.length + ' équipes');
+        if (typeof goldCupEquipes !== 'undefined') console.log('   └─ Gold Cup : ' + goldCupEquipes.length + ' équipes');
+        console.log('🏀 Basketball : ' + basketballClubs.length + ' clubs');
+        console.log('🤾 Handball : ' + handballClubs.length + ' clubs');
+        console.log('🏉 Rugby : ' + rugbyClubs.length + ' clubs');
+        console.log('🏐 Volleyball : ' + volleyballClubs.length + ' clubs');
+        console.log('🌍 Fédérations : ' + federations.length);
+        console.log('📊 TOTAL GÉNÉRAL : ' + totalClubs + ' clubs/équipes/fédérations');
+        
+        // Update stats display
+        document.getElementById('totalClubs').textContent = totalClubs + '+';
+    </script>
+</body>
+</html>
