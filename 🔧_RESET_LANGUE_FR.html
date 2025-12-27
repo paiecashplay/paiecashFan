@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Réinitialiser la Langue en Français</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196f3;
+            text-align: left;
+        }
+        .info p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .status.before {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.after {
+            background: #d4edda;
+            color: #155724;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .btn.secondary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Réinitialiser la Langue</h1>
+        
+        <div class="info">
+            <p><strong>Problème :</strong> Le site se charge en portugais au lieu du français.</p>
+            <p><strong>Cause :</strong> La langue "pt" (Portugal) est enregistrée dans le localStorage de votre navigateur.</p>
+            <p><strong>Solution :</strong> Cliquer sur le bouton ci-dessous pour forcer le français.</p>
+        </div>
+        
+        <div id="statusBefore" class="status before">
+            Langue actuelle : <span id="currentLang">Vérification...</span>
+        </div>
+        
+        <button class="btn" onclick="resetToFrench()">
+            🇫🇷 FORCER LE FRANÇAIS
+        </button>
+        
+        <button class="btn secondary" onclick="clearAll()">
+            🗑️ EFFACER TOUTES LES PRÉFÉRENCES
+        </button>
+        
+        <div id="statusAfter" class="status after" style="display: none;">
+            ✅ Langue réinitialisée en français !
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="index.html" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                ← Retour à l'accueil
+            </a>
+        </div>
+        
+        <div class="info" style="margin-top: 30px;">
+            <p><strong>Note technique :</strong></p>
+            <div class="code">localStorage.setItem('langue_preferee', 'fr')</div>
+            <p>Ce script force la langue française et supprime la détection automatique par géolocalisation.</p>
+        </div>
+    </div>
+    
+    <script>
+        // FORCER LE FRANÇAIS AUTOMATIQUEMENT AU CHARGEMENT
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentLang = localStorage.getItem('langue_preferee') || 'non définie';
+            document.getElementById('currentLang').textContent = currentLang;
+            
+            // FORCER AUTOMATIQUEMENT LE FRANÇAIS
+            if (currentLang !== 'fr') {
+                console.log('🔧 Langue détectée:', currentLang, '→ Forçage en français...');
+                localStorage.setItem('langue_preferee', 'fr');
+                document.getElementById('statusAfter').innerHTML = '✅ Langue automatiquement réinitialisée en français !';
+                document.getElementById('statusAfter').style.display = 'block';
+                document.getElementById('currentLang').textContent = 'fr';
+                document.getElementById('statusBefore').classList.remove('before');
+                document.getElementById('statusBefore').classList.add('after');
+                document.getElementById('statusBefore').innerHTML = '✅ Langue actuelle : <strong>fr (Français)</strong>';
+                
+                // Rediriger vers index.html après 2 secondes
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            } else {
+                document.getElementById('statusBefore').classList.remove('before');
+                document.getElementById('statusBefore').classList.add('after');
+                document.getElementById('statusBefore').innerHTML = '✅ La langue est déjà en français !';
+                
+                // Rediriger vers index.html après 2 secondes quand même
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        });
+        
+        function resetToFrench() {
+            // Forcer le français
+            localStorage.setItem('langue_preferee', 'fr');
+            
+            // Afficher le statut
+            document.getElementById('statusAfter').style.display = 'block';
+            document.getElementById('currentLang').textContent = 'fr';
+            document.getElementById('statusBefore').classList.remove('before');
+            document.getElementById('statusBefore').classList.add('after');
+            document.getElementById('statusBefore').innerHTML = '✅ Langue actuelle : <strong>fr (Français)</strong>';
+            
+            console.log('✅ Langue réinitialisée en français');
+            
+            // Rediriger vers index.html après 2 secondes
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        function clearAll() {
+            // Effacer TOUTES les préférences
+            localStorage.clear();
+            
+            // Forcer le français
+            localStorage.setItem('langue_preferee', 'fr');
+            
+            // Afficher le statut
+            document.getElementById('statusAfter').innerHTML = '✅ Toutes les préférences effacées ! Langue : <strong>Français</strong>';
+            document.getElementById('statusAfter').style.display = 'block';
+            document.getElementById('currentLang').textContent = 'fr';
+            document.getElementById('statusBefore').classList.remove('before');
+            document.getElementById('statusBefore').classList.add('after');
+            document.getElementById('statusBefore').innerHTML = '✅ Langue actuelle : <strong>fr (Français)</strong>';
+            
+            console.log('✅ localStorage nettoyé + langue réinitialisée en français');
+            
+            // Rediriger vers index.html après 2 secondes
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

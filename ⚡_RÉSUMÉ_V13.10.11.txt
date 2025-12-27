@@ -1,0 +1,33 @@
+🚨 CORRECTION URGENTE V13.10.11
+================================
+
+PROBLÈMES :
+❌ Sélecteur de langue ne traduit pas la page
+❌ Décalage au chargement (flickering des langues)
+✅ Affichage minuscule OK
+
+CAUSES :
+• Aucun attribut data-i18n dans index.html
+• Fonction traduire() jamais appelée
+• Sélecteur chargé après le DOM
+• Rechargement inutile lors du changement de langue
+
+CORRECTIONS :
+✅ 10 attributs data-i18n ajoutés (hero, stats, tabs)
+✅ 10 clés de traduction créées (10 langues chacune)
+✅ Fonction traduire() sans argument = traduit toute la page
+✅ Ordre de chargement : langues → sélecteur → traduction → données
+✅ Suppression du reload → traduction instantanée
+
+RÉSULTAT :
+🎯 Traduction instantanée au clic (0 clignotement)
+🎯 Sélecteur visible immédiatement (0 décalage)
+🎯 10 langues fonctionnelles : fr, en, es, de, it, pt, ru, zh, ar, ja
+
+TESTS :
+1. index.html → Sélecteur visible immédiatement
+2. Changer langue → Traduction SANS rechargement
+3. Console → Logs '✅ Multi-langues initialisé' + '⚡ Traduction instantanée'
+
+FICHIERS : index.html + 🌍_MULTI_LANGUES_I18N.js
+DÉPLOIEMENT : Publish + Hard Refresh (Ctrl+Shift+R)

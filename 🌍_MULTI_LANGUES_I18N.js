@@ -2,16 +2,17 @@
 // Supporte 10+ langues majeures
 
 const LANGUES_SUPPORTEES = {
-    'fr': { nom: 'Français', drapeau: '🇫🇷', direction: 'ltr' },
-    'en': { nom: 'English', drapeau: '🇬🇧', direction: 'ltr' },
-    'es': { nom: 'Español', drapeau: '🇪🇸', direction: 'ltr' },
-    'de': { nom: 'Deutsch', drapeau: '🇩🇪', direction: 'ltr' },
-    'it': { nom: 'Italiano', drapeau: '🇮🇹', direction: 'ltr' },
-    'pt': { nom: 'Português', drapeau: '🇵🇹', direction: 'ltr' },
-    'ru': { nom: 'Русский', drapeau: '🇷🇺', direction: 'ltr' },
-    'zh': { nom: '中文', drapeau: '🇨🇳', direction: 'ltr' },
-    'ar': { nom: 'العربية', drapeau: '🇸🇦', direction: 'rtl' },
-    'ja': { nom: '日本語', drapeau: '🇯🇵', direction: 'ltr' }
+    'fr': { nom: 'Français', code: 'FR', drapeau: '🇫🇷', direction: 'ltr' },
+    'en': { nom: 'English', code: 'GB', drapeau: '🇬🇧', direction: 'ltr' },
+    'es': { nom: 'Español', code: 'ES', drapeau: '🇪🇸', direction: 'ltr' },
+    'de': { nom: 'Deutsch', code: 'DE', drapeau: '🇩🇪', direction: 'ltr' },
+    'it': { nom: 'Italiano', code: 'IT', drapeau: '🇮🇹', direction: 'ltr' },
+    'pt': { nom: 'Português', code: 'PT', drapeau: '🇵🇹', direction: 'ltr' },
+    'tr': { nom: 'Türkçe', code: 'TR', drapeau: '🇹🇷', direction: 'ltr' },
+    'ru': { nom: 'Русский', code: 'RU', drapeau: '🇷🇺', direction: 'ltr' },
+    'zh': { nom: '中文', code: 'CN', drapeau: '🇨🇳', direction: 'ltr' },
+    'ar': { nom: 'العربية', code: 'SA', drapeau: '🇸🇦', direction: 'rtl' },
+    'ja': { nom: '日本語', code: 'JP', drapeau: '🇯🇵', direction: 'ltr' }
 };
 
 // Dictionnaire de traductions
@@ -112,6 +113,164 @@ const TRADUCTIONS = {
         'zh': '个人资料',
         'ar': 'الملف الشخصي',
         'ja': 'プロフィール'
+    },
+    
+    // ========== INDEX.HTML PAGE ==========
+    'hero.title': {
+        'fr': '🏆 Plateforme Multi-Sports Complète',
+        'en': '🏆 Complete Multi-Sports Platform',
+        'es': '🏆 Plataforma Multi-Deportes Completa',
+        'de': '🏆 Vollständige Multi-Sport-Plattform',
+        'it': '🏆 Piattaforma Multi-Sport Completa',
+        'pt': '🏆 Plataforma Multi-Esportes Completa',
+        'tr': '🏆 Eksiksiz Çoklu Spor Platformu',
+        'ru': '🏆 Полная Мульти-Спортивная Платформа',
+        'zh': '🏆 完整多体育平台',
+        'ar': '🏆 منصة متعددة الرياضات الكاملة',
+        'ja': '🏆 完全マルチスポーツプラットフォーム'
+    },
+    'hero.subtitle': {
+        'fr': '700+ équipes et clubs organisés par catégories',
+        'en': '700+ teams and clubs organized by categories',
+        'es': '700+ equipos y clubes organizados por categorías',
+        'de': '700+ Teams und Clubs nach Kategorien organisiert',
+        'it': '700+ squadre e club organizzati per categorie',
+        'pt': '700+ equipes e clubes organizados por categorias',
+        'tr': '700+ takım ve kulüp kategorilere göre düzenlenmiş',
+        'ru': '700+ команд и клубов, организованных по категориям',
+        'zh': '700+支队伍和俱乐部按类别组织',
+        'ar': '700+ فريقًا ونادًا منظمًا حسب الفئات',
+        'ja': 'カテゴリ別に整理された700以上のチームとクラブ'
+    },
+    'stats.total_teams': {
+        'fr': 'Équipes Totales',
+        'en': 'Total Teams',
+        'es': 'Equipos Totales',
+        'de': 'Gesamt Teams',
+        'it': 'Squadre Totali',
+        'pt': 'Equipes Totais',
+        'tr': 'Toplam Takımlar',
+        'ru': 'Всего Команд',
+        'zh': '总队伍',
+        'ar': 'الفرق الإجمالية',
+        'ja': '総チーム数'
+    },
+    'stats.clubs_france': {
+        'fr': 'Clubs France',
+        'en': 'France Clubs',
+        'es': 'Clubes Francia',
+        'de': 'Frankreich Clubs',
+        'it': 'Club Francia',
+        'pt': 'Clubes França',
+        'tr': 'Fransa Kulüpleri',
+        'ru': 'Клубы Франции',
+        'zh': '法国俱乐部',
+        'ar': 'أندية فرنسا',
+        'ja': 'フランスクラブ'
+    },
+    'stats.clubs_europe': {
+        'fr': 'Clubs Europe',
+        'en': 'Europe Clubs',
+        'es': 'Clubes Europa',
+        'de': 'Europa Clubs',
+        'it': 'Club Europa',
+        'pt': 'Clubes Europa',
+        'tr': 'Avrupa Kulüpleri',
+        'ru': 'Клубы Европы',
+        'zh': '欧洲俱乐部',
+        'ar': 'أندية أوروبا',
+        'ja': 'ヨーロッパクラブ'
+    },
+    'stats.federations': {
+        'fr': 'Fédérations',
+        'en': 'Federations',
+        'es': 'Federaciones',
+        'de': 'Verbände',
+        'it': 'Federazioni',
+        'pt': 'Federações',
+        'tr': 'Federasyonlar',
+        'ru': 'Федерации',
+        'zh': '联合会',
+        'ar': 'الاتحادات',
+        'ja': '連盟'
+    },
+    'tabs.football_france': {
+        'fr': '🇫🇷 Football France',
+        'en': '🇫🇷 French Football',
+        'es': '🇫🇷 Fútbol Francia',
+        'de': '🇫🇷 Frankreich Fußball',
+        'it': '🇫🇷 Calcio Francia',
+        'pt': '🇫🇷 Futebol França',
+        'tr': '🇫🇷 Fransa Futbolu',
+        'ru': '🇫🇷 Футбол Франции',
+        'zh': '🇫🇷 法国足球',
+        'ar': '🇫🇷 كرة القدم الفرنسية',
+        'ja': '🇫🇷 フランスサッカー'
+    },
+    'tabs.football_europe': {
+        'fr': '🌍 Football Europe',
+        'en': '🌍 European Football',
+        'es': '🌍 Fútbol Europa',
+        'de': '🌍 Europa Fußball',
+        'it': '🌍 Calcio Europa',
+        'pt': '🌍 Futebol Europa',
+        'tr': '🌍 Avrupa Futbolu',
+        'ru': '🌍 Футбол Европы',
+        'zh': '🌍 欧洲足球',
+        'ar': '🌍 كرة القدم الأوروبية',
+        'ja': '🌍 ヨーロッパサッカー'
+    },
+    'tabs.national_teams': {
+        'fr': '🏆 Équipes Nationales',
+        'en': '🏆 National Teams',
+        'es': '🏆 Equipos Nacionales',
+        'de': '🏆 Nationalmannschaften',
+        'it': '🏆 Nazionali',
+        'pt': '🏆 Seleções Nacionais',
+        'tr': '🏆 Milli Takımlar',
+        'ru': '🏆 Национальные Сборные',
+        'zh': '🏆 国家队',
+        'ar': '🏆 المنتخبات الوطنية',
+        'ja': '🏆 代表チーム'
+    },
+    'tabs.federations': {
+        'fr': '🌐 Fédérations',
+        'en': '🌐 Federations',
+        'es': '🌐 Federaciones',
+        'de': '🌐 Verbände',
+        'it': '🌐 Federazioni',
+        'pt': '🌐 Federações',
+        'tr': '🌐 Federasyonlar',
+        'ru': '🌐 Федерации',
+        'zh': '🌐 联合会',
+        'ar': '🌐 الاتحادات',
+        'ja': '🌐 連盟'
+    },
+    'tabs.multi_sports': {
+        'fr': '🏀 Multi-Sports',
+        'en': '🏀 Multi-Sports',
+        'es': '🏀 Multi-Deportes',
+        'de': '🏀 Multi-Sport',
+        'it': '🏀 Multi-Sport',
+        'pt': '🏀 Multi-Esportes',
+        'tr': '🏀 Çoklu Sporlar',
+        'ru': '🏀 Мульти-Спорт',
+        'zh': '🏀 多体育',
+        'ar': '🏀 رياضات متعددة',
+        'ja': '🏀 マルチスポーツ'
+    },
+    'search.placeholder': {
+        'fr': 'Rechercher une équipe, club, joueur, pays...',
+        'en': 'Search for a team, club, player, country...',
+        'es': 'Buscar equipo, club, jugador, país...',
+        'de': 'Team, Verein, Spieler, Land suchen...',
+        'it': 'Cerca squadra, club, giocatore, paese...',
+        'pt': 'Pesquisar equipe, clube, jogador, país...',
+        'tr': 'Takım, kulüp, oyuncu, ülke ara...',
+        'ru': 'Искать команду, клуб, игрока, страну...',
+        'zh': '搜索球队、俱乐部、球员、国家...',
+        'ar': 'ابحث عن فريق، نادي، لاعب، بلد...',
+        'ja': 'チーム、クラブ、選手、国を検索...'
     },
     
     // ========== WALLET & SOLDES ==========
@@ -392,6 +551,7 @@ async function detecterLangueParGeolocalisation() {
             'DE': 'de', 'AT': 'de',
             'IT': 'it',
             'PT': 'pt', 'BR': 'pt',
+            'TR': 'tr',
             'RU': 'ru',
             'CN': 'zh', 'TW': 'zh', 'HK': 'zh',
             'SA': 'ar', 'EG': 'ar', 'AE': 'ar', 'MA': 'ar',
@@ -410,14 +570,44 @@ async function detecterLangueParGeolocalisation() {
 }
 
 /**
- * Traduit une clé selon la langue active
- * @param {string} cle - Clé de traduction (ex: 'menu.accueil')
+ * Traduit une clé selon la langue active OU traduit toute la page si appelé sans argument
+ * @param {string} cle - Clé de traduction (ex: 'menu.accueil'). Si vide, traduit toute la page
  * @param {string} langue - Code langue (optionnel, utilise langueActive par défaut)
- * @returns {string} Texte traduit
+ * @returns {string} Texte traduit (ou undefined si traduction de toute la page)
  */
-function traduire(cle, langue = null) {
+function traduire(cle = null, langue = null) {
     const lang = langue || langueActive;
     
+    // Si pas de clé fournie, traduire TOUTE la page
+    if (!cle) {
+        // 1. Traduire les textContent avec data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(elem => {
+            const cleElement = elem.getAttribute('data-i18n');
+            if (TRADUCTIONS[cleElement]) {
+                elem.textContent = TRADUCTIONS[cleElement][lang] || TRADUCTIONS[cleElement]['fr'] || cleElement;
+            }
+        });
+        
+        // 2. Traduire les placeholders avec data-i18n-placeholder
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(elem => {
+            const cleElement = elem.getAttribute('data-i18n-placeholder');
+            if (TRADUCTIONS[cleElement]) {
+                elem.placeholder = TRADUCTIONS[cleElement][lang] || TRADUCTIONS[cleElement]['fr'] || cleElement;
+            }
+        });
+        
+        // 3. Traduire les titres avec data-i18n-title
+        document.querySelectorAll('[data-i18n-title]').forEach(elem => {
+            const cleElement = elem.getAttribute('data-i18n-title');
+            if (TRADUCTIONS[cleElement]) {
+                elem.title = TRADUCTIONS[cleElement][lang] || TRADUCTIONS[cleElement]['fr'] || cleElement;
+            }
+        });
+        
+        return;
+    }
+    
+    // Sinon, traduire une clé spécifique
     if (!TRADUCTIONS[cle]) {
         console.warn(`⚠️ Clé de traduction introuvable: ${cle}`);
         return cle;
@@ -436,23 +626,72 @@ function changerLangue(nouvelleLangue) {
         return;
     }
     
+    console.log(`🔄 Changement de langue: ${langueActive} → ${nouvelleLangue}`);
+    
+    // 1. Mettre à jour la langue active
     langueActive = nouvelleLangue;
     localStorage.setItem('langue_preferee', nouvelleLangue);
     
-    // Mettre à jour la direction du texte (RTL pour arabe)
+    // 2. Mettre à jour la direction du texte (RTL pour arabe)
     document.documentElement.setAttribute('dir', LANGUES_SUPPORTEES[nouvelleLangue].direction);
     document.documentElement.setAttribute('lang', nouvelleLangue);
     
-    // Traduire tous les éléments avec data-i18n
-    document.querySelectorAll('[data-i18n]').forEach(elem => {
+    // 3. Traduire TOUS les éléments (textContent, placeholder, title)
+    let totalElements = 0;
+    
+    // 3a. Éléments avec data-i18n (textContent)
+    const elementsTexte = document.querySelectorAll('[data-i18n]');
+    elementsTexte.forEach(elem => {
         const cle = elem.getAttribute('data-i18n');
-        elem.textContent = traduire(cle);
+        if (TRADUCTIONS[cle]) {
+            const traduction = TRADUCTIONS[cle][nouvelleLangue] || TRADUCTIONS[cle]['fr'] || cle;
+            elem.textContent = traduction;
+            console.log(`  ✓ ${cle} → "${traduction}"`);
+            totalElements++;
+        } else {
+            console.warn(`  ⚠️ Clé introuvable: ${cle}`);
+        }
     });
+    
+    // 3b. Éléments avec data-i18n-placeholder (placeholder)
+    const elementsPlaceholder = document.querySelectorAll('[data-i18n-placeholder]');
+    elementsPlaceholder.forEach(elem => {
+        const cle = elem.getAttribute('data-i18n-placeholder');
+        if (TRADUCTIONS[cle]) {
+            const traduction = TRADUCTIONS[cle][nouvelleLangue] || TRADUCTIONS[cle]['fr'] || cle;
+            elem.placeholder = traduction;
+            console.log(`  ✓ ${cle} (placeholder) → "${traduction}"`);
+            totalElements++;
+        }
+    });
+    
+    // 3c. Éléments avec data-i18n-title (title)
+    const elementsTitre = document.querySelectorAll('[data-i18n-title]');
+    elementsTitre.forEach(elem => {
+        const cle = elem.getAttribute('data-i18n-title');
+        if (TRADUCTIONS[cle]) {
+            const traduction = TRADUCTIONS[cle][nouvelleLangue] || TRADUCTIONS[cle]['fr'] || cle;
+            elem.title = traduction;
+            console.log(`  ✓ ${cle} (title) → "${traduction}"`);
+            totalElements++;
+        }
+    });
+    
+    console.log(`🔄 Traduction de ${totalElements} éléments en ${nouvelleLangue}...`);
     
     console.log(`✅ Langue changée: ${LANGUES_SUPPORTEES[nouvelleLangue].nom} ${LANGUES_SUPPORTEES[nouvelleLangue].drapeau}`);
     
-    // Déclencher un événement personnalisé
+    // 4. Re-afficher les données avec les nouvelles traductions
+    if (typeof displayCurrentTab === 'function') {
+        displayCurrentTab();
+        console.log('🔄 Données réaffichées avec traductions');
+    }
+    
+    // 5. Déclencher un événement personnalisé
     window.dispatchEvent(new CustomEvent('langueChangee', { detail: { langue: nouvelleLangue } }));
+    
+    // PAS de rechargement de page - traduction instantanée !
+    console.log('⚡ Traduction instantanée appliquée (pas de rechargement)');
 }
 
 /**
@@ -462,41 +701,54 @@ async function initialiserMultiLangues() {
     // 1. Vérifier si une langue est déjà enregistrée
     const langueSauvegardee = localStorage.getItem('langue_preferee');
     if (langueSauvegardee && LANGUES_SUPPORTEES[langueSauvegardee]) {
-        changerLangue(langueSauvegardee);
+        langueActive = langueSauvegardee;
         console.log('✅ Langue restaurée depuis localStorage:', langueSauvegardee);
         return;
     }
     
-    // 2. Détecter la langue par géolocalisation
-    const langueDetectee = await detecterLangueParGeolocalisation();
-    changerLangue(langueDetectee);
+    // 2. FORCER LE FRANÇAIS PAR DÉFAUT (pas de géolocalisation automatique)
+    // L'utilisateur peut changer manuellement via le sélecteur
+    langueActive = 'fr';
+    localStorage.setItem('langue_preferee', 'fr');
+    console.log('✅ Langue par défaut : Français (fr)');
+    
+    // Note : Pour activer la détection automatique, décommenter ci-dessous :
+    // const langueDetectee = await detecterLangueParGeolocalisation();
+    // langueActive = langueDetectee;
+    // localStorage.setItem('langue_preferee', langueDetectee);
+    // console.log('✅ Langue détectée et sauvegardée:', langueDetectee);
 }
 
 /**
- * Génère le HTML du sélecteur de langue
+ * Génère le HTML du sélecteur de langue (menu déroulant vertical)
  * @returns {string} HTML du sélecteur
  */
 function genererSelecteurLangue() {
-    let html = '<div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">';
-    
-    for (const [code, info] of Object.entries(LANGUES_SUPPORTEES)) {
-        const actif = code === langueActive ? 'background: rgba(255,255,255,0.2); border: 2px solid #4ade80;' : 'background: rgba(255,255,255,0.05);';
-        html += `
-            <button onclick="changerLangue('${code}')" style="${actif} border: 2px solid rgba(255,255,255,0.2); color: white; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
-                <span style="font-size: 24px;">${info.drapeau}</span>
-                <span>${info.nom}</span>
-            </button>
-        `;
+    const langueActuelle = LANGUES_SUPPORTEES[langueActive];
+    if (!langueActuelle) {
+        console.error('❌ Langue active non trouvée:', langueActive);
+        return '';
     }
     
-    html += '</div>';
+    let html = `
+        <select id="mainLanguageSelect" onchange="changerLangue(this.value)" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; outline: none;">
+    `;
+    
+    for (const [code, info] of Object.entries(LANGUES_SUPPORTEES)) {
+        const selected = code === langueActive ? 'selected' : '';
+        html += `<option value="${code}" ${selected} style="background: #1a1f2e; color: white;">${code}</option>`;
+    }
+    
+    html += `</select>`;
+    
     return html;
 }
 
-// Initialiser automatiquement au chargement
-if (typeof window !== 'undefined') {
-    window.addEventListener('DOMContentLoaded', initialiserMultiLangues);
-}
+// NE PAS initialiser automatiquement pour éviter les boucles infinies
+// L'initialisation se fait manuellement depuis chaque page
+// if (typeof window !== 'undefined') {
+//     window.addEventListener('DOMContentLoaded', initialiserMultiLangues);
+// }
 
 // Export pour utilisation dans l'app
 if (typeof module !== 'undefined' && module.exports) {
@@ -508,8 +760,14 @@ if (typeof module !== 'undefined' && module.exports) {
         detecterLangueNavigateur,
         detecterLangueParGeolocalisation,
         initialiserMultiLangues,
-        genererSelecteurLangue
+        genererSelecteurLangue,
+        getLangueActive: () => langueActive
     };
+}
+
+// Rendre langueActive accessible globalement pour index.html
+if (typeof window !== 'undefined') {
+    window.getLangueActive = () => langueActive;
 }
 
 console.log('✅ Module Multi-Langues I18N chargé');

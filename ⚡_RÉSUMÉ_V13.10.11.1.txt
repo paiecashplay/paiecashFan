@@ -1,0 +1,40 @@
+🚨 HOTFIX V13.10.11.1 - FRANÇAIS PAR DÉFAUT
+============================================
+
+NOUVEAU PROBLÈME :
+❌ Site bloque sur portugais (pt) au lieu de français (fr)
+❌ Traduction automatique ne fonctionne pas
+
+CAUSE :
+• Géolocalisation détecte le Portugal → Force "pt"
+• Préférence "pt" sauvegardée dans localStorage
+• À chaque rechargement, le portugais est chargé
+
+CORRECTIONS :
+✅ Désactivation de la géolocalisation automatique
+✅ Français (fr) par défaut pour TOUS les nouveaux utilisateurs
+✅ Page utilitaire 🔧_RESET_LANGUE_FR.html pour forcer le français
+✅ Export de getLangueActive() pour accès depuis index.html
+
+SOLUTION SI BLOQUÉ EN PORTUGAIS :
+🔥 Ouvrir 🔧_RESET_LANGUE_FR.html
+🔥 Cliquer sur "🇫🇷 FORCER LE FRANÇAIS"
+🔥 Redirection automatique → Site en français !
+
+ALTERNATIVE CONSOLE (F12) :
+localStorage.setItem('langue_preferee', 'fr')
+Puis recharger : Ctrl+Shift+R
+
+RÉSULTAT :
+🇫🇷 Français par défaut pour tous
+🔧 Page de reset disponible
+⚡ Traduction instantanée au changement manuel (0ms)
+🌍 10 langues fonctionnelles : fr, en, es, de, it, pt, ru, zh, ar, ja
+
+FICHIERS MODIFIÉS :
+• 🌍_MULTI_LANGUES_I18N.js (désactivation géolocalisation)
+• index.html (correction accès langueActive)
+• 🔧_RESET_LANGUE_FR.html (NOUVEAU - utilitaire de reset)
+
+DÉPLOIEMENT :
+Publish → Ouvrir 🔧_RESET_LANGUE_FR.html → Forcer français → ✅

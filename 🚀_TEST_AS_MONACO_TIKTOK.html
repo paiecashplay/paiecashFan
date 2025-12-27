@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Test AS Monaco - TikTok Feed Dynamique</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        
+        .features {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+        
+        .feature:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+        
+        .button-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+        }
+        
+        .button-secondary:hover {
+            box-shadow: 0 15px 40px rgba(240, 147, 251, 0.6);
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            color: #856404;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .info-box h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-box p {
+            color: #0c5460;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: rgba(0,0,0,0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🇲🇨⚽</div>
+        <h1>PaieCashFan × AS Monaco</h1>
+        <div class="badge">✨ TikTok Feed Dynamique V15.2</div>
+        
+        <div class="description">
+            Testez la nouvelle version de PaieCashFan avec l'intégration TikTok pour AS Monaco !
+            Les posts et stories s'adaptent automatiquement au club connecté.
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <div>
+                    <strong>Feed Social TikTok</strong><br>
+                    Posts, Lives et vidéos dynamiques selon le club
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛍️</div>
+                <div>
+                    <strong>Live Shopping</strong><br>
+                    E-commerce intégré dans le feed social
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📖</div>
+                <div>
+                    <strong>Stories Interactives</strong><br>
+                    Stories des amis et actualités du club
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💰</div>
+                <div>
+                    <strong>Paiement PaieCash</strong><br>
+                    Wallet, Carte Bancaire et Mobile Money
+                </div>
+            </div>
+        </div>
+        
+        <a href="app-universal-simple.html?club=AS+Monaco&logo=%E2%9A%BD&sport=Football&league=Ligue+1&_nocache=1" class="button" target="_blank">
+            🚀 TESTER MAINTENANT
+        </a>
+        
+        <a href="app-universal-simple.html?club=AS+Monaco&logo=%E2%9A%BD&sport=Football&league=Ligue+1" class="button button-secondary" target="_blank">
+            🔗 Lien Production
+        </a>
+        
+        <div class="instructions">
+            <h3>📋 Instructions de Test</h3>
+            <ol>
+                <li>Cliquez sur <strong>"🚀 TESTER MAINTENANT"</strong> pour accéder à la version avec cache désactivé</li>
+                <li>Vérifiez l'onglet <strong>"Accueil"</strong> (premier onglet)</li>
+                <li>Le feed social TikTok doit afficher les posts AS Monaco</li>
+                <li>Vérifiez que les textes mentionnent bien <strong>"AS Monaco"</strong> et non "OM"</li>
+                <li>Testez les stories en haut de la page</li>
+            </ol>
+        </div>
+        
+        <div class="info-box">
+            <h3>🔍 Qu'est-ce qui a changé ?</h3>
+            <p><strong>✅ Feed dynamique :</strong> Les posts s'adaptent automatiquement au paramètre <code>?club=</code> dans l'URL</p>
+            <p><strong>✅ Plus de contenu OM hardcodé :</strong> Tout le contenu est désormais généré dynamiquement selon le club</p>
+            <p><strong>✅ Stories personnalisées :</strong> Les stories mentionnent le nom du club connecté</p>
+            <p><strong>✅ E-commerce intégré :</strong> Live Shopping dans le feed social avec produits du club</p>
+        </div>
+        
+        <div class="info-box" style="background: #d4edda; border-color: #155724; margin-top: 20px;">
+            <h3 style="color: #155724;">✅ Tests Effectués</h3>
+            <p style="color: #155724;">✓ Conteneur social-feed créé et vide au chargement</p>
+            <p style="color: #155724;">✓ Fonction generateDynamicFeed() définie et fonctionnelle</p>
+            <p style="color: #155724;">✓ Appel automatique au chargement de la page (setTimeout 500ms)</p>
+            <p style="color: #155724;">✓ Génération des posts avec ${clubName} comme variable dynamique</p>
+            <p style="color: #155724;">✓ Paramètre _nocache ajouté pour contourner le cache CDN</p>
+        </div>
+    </div>
+</body>
+</html>

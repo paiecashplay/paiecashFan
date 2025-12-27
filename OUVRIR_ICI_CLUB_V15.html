@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Page Club Fonctionnelle - V15</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        .alert {
+            background: #10b981;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .alert-title {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .alert-content {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .links-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: white;
+        }
+
+        .link-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .link-desc {
+            font-size: 16px;
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .link-features {
+            display: grid;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .primary-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+        }
+
+        .steps {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .steps-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .step-content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 PAGE CLUB FONCTIONNELLE</h1>
+            <div class="subtitle">Achat de Billets NFT avec Wallet PaieCash V15</div>
+        </div>
+
+        <div class="alert">
+            <div class="alert-title">✅ TOUT FONCTIONNE !</div>
+            <div class="alert-content">
+                La nouvelle page club intègre un wallet fonctionnel et un système complet d'achat de billets NFT avec 3 méthodes de paiement.
+            </div>
+        </div>
+
+        <div class="links-grid">
+            <a href="club-thirdweb-v15.html?club=AS+Monaco&logo=⚽&sport=Football&league=Ligue+1" class="link-card primary-card">
+                <div class="link-title">⚽ AS Monaco - DÉMO COMPLÈTE</div>
+                <div class="link-desc">
+                    Page club complète avec wallet PaieCash, achat de billets et paiements fonctionnels
+                </div>
+                <div class="link-features">
+                    <div class="feature-item">✅ Wallet PaieCash avec solde 250,00 €</div>
+                    <div class="feature-item">✅ 3 matchs disponibles à l'achat</div>
+                    <div class="feature-item">✅ 3 méthodes de paiement (Stablecoin, Carte, Mobile Money)</div>
+                    <div class="feature-item">✅ Flux d'achat complet A-Z</div>
+                    <div class="feature-item">✅ Confirmations et feedbacks en temps réel</div>
+                </div>
+            </a>
+
+            <a href="club-thirdweb-v15.html?club=Paris+Saint-Germain&logo=🔴🔵&sport=Football&league=Ligue+1" class="link-card">
+                <div class="link-title">🔴🔵 Paris Saint-Germain</div>
+                <div class="link-desc">
+                    Même fonctionnalités pour le PSG - Interface personnalisée
+                </div>
+            </a>
+
+            <a href="club-thirdweb-v15.html?club=Olympique+de+Marseille&logo=⚪🔵&sport=Football&league=Ligue+1" class="link-card">
+                <div class="link-title">⚪🔵 Olympique de Marseille</div>
+                <div class="link-desc">
+                    Même fonctionnalités pour l'OM - Interface personnalisée
+                </div>
+            </a>
+        </div>
+
+        <div class="steps">
+            <div class="steps-title">📋 Comment Utiliser la Page Club</div>
+            
+            <div class="step">
+                <div class="step-number">1️⃣ Connecter le Wallet</div>
+                <div class="step-content">
+                    Cliquez sur "Se connecter" dans la section Wallet. Le wallet se connecte automatiquement et affiche votre solde de <strong>250,00 €</strong>.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2️⃣ Choisir un Billet</div>
+                <div class="step-content">
+                    Scrollez vers "Billets Disponibles". Vous verrez 3 matchs avec date, heure, stade, catégorie et prix. Cliquez sur "Acheter" sur le billet qui vous intéresse.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3️⃣ Sélectionner le Paiement</div>
+                <div class="step-content">
+                    Une modal s'ouvre avec les détails du billet. Choisissez votre méthode de paiement :
+                    <br>• <strong>Stablecoin</strong> : Paiement direct depuis votre wallet (0 frais)
+                    <br>• <strong>Carte Bancaire (SEPA)</strong> : +0,20€ de frais
+                    <br>• <strong>Mobile Money</strong> : +1,5% de frais
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4️⃣ Confirmer et Payer</div>
+                <div class="step-content">
+                    Cliquez sur la méthode choisie. Un loading s'affiche pendant 2 secondes. Puis vous recevez une <strong>confirmation "Paiement Réussi!"</strong>. Votre solde wallet est automatiquement mis à jour.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect après 5 secondes
+        setTimeout(() => {
+            const redirect = confirm("Voulez-vous ouvrir la page club Monaco maintenant ?");
+            if (redirect) {
+                window.location.href = 'club-thirdweb-v15.html?club=AS+Monaco&logo=⚽&sport=Football&league=Ligue+1';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

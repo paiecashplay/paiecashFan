@@ -1,0 +1,49 @@
+═══════════════════════════════════════════════════════════════════
+   ⚡ URGENT - V13.10.9.2 - BUGS FIXES
+═══════════════════════════════════════════════════════════════════
+
+🚨 PROBLÈME 1 : "PT PT" affiché → ✅ RÉSOLU
+🚨 PROBLÈME 2 : Autres pays invisibles → ✅ RÉSOLU
+
+───────────────────────────────────────────────────────────────────
+✅ SOLUTION
+───────────────────────────────────────────────────────────────────
+
+Ajout d'une propriété 'code' dans chaque langue :
+
+'fr' → code: 'FR'
+'en' → code: 'GB' (pas 'EN' !)
+'pt' → code: 'PT'
+'zh' → code: 'CN' (pas 'ZH' !)
+'ar' → code: 'SA' (pas 'AR' !)
+'ja' → code: 'JP' (pas 'JA' !)
+
+───────────────────────────────────────────────────────────────────
+🧪 TESTER MAINTENANT
+───────────────────────────────────────────────────────────────────
+
+1. Ouvrir index.html
+2. Cliquer sur le bouton langue (🇫🇷 FR)
+3. Vérifier que TOUS les 10 pays sont visibles :
+   🇫🇷 FR  🇬🇧 GB  🇪🇸 ES  🇩🇪 DE  🇮🇹 IT
+   🇵🇹 PT  🇷🇺 RU  🇨🇳 CN  🇸🇦 SA  🇯🇵 JP
+4. Cliquer sur 🇵🇹 PT
+5. Vérifier : Affiche "PT" (et pas "PT PT")
+
+───────────────────────────────────────────────────────────────────
+📂 FICHIER MODIFIÉ
+───────────────────────────────────────────────────────────────────
+
+🌍_MULTI_LANGUES_I18N.js
+• LANGUES_SUPPORTEES : Ajout propriété 'code'
+• genererSelecteurLangue() : Utilise info.code
+
+───────────────────────────────────────────────────────────────────
+🚀 DÉPLOYER
+───────────────────────────────────────────────────────────────────
+
+Publish → Hard Refresh (Ctrl+Shift+R) → Tester
+
+───────────────────────────────────────────────────────────────────
+✅ PRÊT - TOUS LES CODES OK
+═══════════════════════════════════════════════════════════════════

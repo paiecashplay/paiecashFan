@@ -489,6 +489,48 @@
             transform: scale(1.02);
             box-shadow: 0 5px 15px rgba(255,255,255,0.2);
         }
+
+        /* Animations pour Stories et Lives */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .stories-bar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .stories-bar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .stories-bar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        .stories-bar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .story-item:hover .story-avatar {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+
+        .post-card {
+            transition: transform 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+        }
     </style>
     <!-- CHARGEMENT BASES DE DONNÉES -->
     <script src="⭐_LEGENDES_CLUBS_DATABASE.js"></script>
@@ -563,6 +605,26 @@
     <div class="container">
         <!-- ACCUEIL -->
         <div class="section active" id="accueil">
+            <!-- BARRE DE STORIES (Type TikTok/Instagram) -->
+            <div class="stories-bar" style="background: rgba(255,255,255,0.05); padding: 15px 0; margin-bottom: 20px; border-radius: 15px; overflow-x: auto; white-space: nowrap;">
+                <div class="stories-scroll" style="display: flex; gap: 15px; padding: 0 15px;">
+                    <!-- Ajouter une story -->
+                    <div class="story-item" style="text-align: center; cursor: pointer;" onclick="alert('📸 Fonctionnalité bientôt disponible : Publier une story')">
+                        <div class="story-avatar" style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                            <span style="font-size: 30px;">+</span>
+                        </div>
+                        <span style="font-size: 11px; opacity: 0.9; display: block;">Votre story</span>
+                    </div>
+                    <!-- Stories des amis/fans - DYNAMIQUES -->
+                    <div id="storiesDynamiques"></div>
+                </div>
+            </div>
+
+            <!-- FEED SOCIAL (Type TikTok) - DYNAMIQUE -->
+            <div id="social-feed" style="margin-bottom: 20px;">
+                <!-- Le contenu sera généré dynamiquement par JavaScript -->
+            </div>
+
             <div class="card">
                 <div class="card-title" id="welcomeMessage">👋 Bienvenue !</div>
                 <p>Vous êtes connecté en tant que <strong id="userName">ETOT Constantin Nicolas</strong></p>
@@ -1750,14 +1812,7 @@
                 <button class="btn" onclick="window.location.href='onboarding.html?force=true'">📖 Guide de démarrage</button>
                 <button class="btn btn-secondary" onclick="window.location.href='support.html'">💬 Support & FAQ</button>
             </div>
-            
-            <div class="card">
-                <div class="card-title">🌐 Sélecteur de Langue</div>
-                <p style="margin-bottom: 15px; font-size: 14px; opacity: 0.8;">Choisissez votre langue préférée. La détection automatique par géolocalisation est activée.</p>
-                <div id="selecteurLangue">
-                    <!-- Le sélecteur sera généré dynamiquement -->
-                </div>
-            </div>
+
         </div>
     </div>
 
@@ -1858,6 +1913,168 @@
             return clubStablecoins[club] || clubStablecoins['olympique-de-marseille'];
         }
 
+        // FONCTION POUR OBTENIR LE NOM DU CLUB EN CLAIR
+        function getClubName() {
+            const club = getCurrentClub();
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubParam = urlParams.get('club');
+            return clubParam || 'Olympique de Marseille';
+        }
+
+        // FONCTION POUR GÉNÉRER LES STORIES DYNAMIQUES
+        function generateDynamicStories() {
+            const clubName = getClubName();
+            const storiesContainer = document.getElementById('storiesDynamiques');
+            
+            if (!storiesContainer) return;
+            
+            const stories = [
+                {
+                    name: 'Sophie',
+                    img: 45,
+                    gradient: 'linear-gradient(45deg, #f093fb, #f5576c)',
+                    content: `⚽ Quelle victoire hier soir ! ${clubName} est de retour au sommet !`
+                },
+                {
+                    name: 'Thomas',
+                    img: 33,
+                    gradient: 'linear-gradient(45deg, #4facfe, #00f2fe)',
+                    content: `🎟️ J'ai mes billets pour le prochain match de ${clubName} !`
+                },
+                {
+                    name: 'Julie',
+                    img: 47,
+                    gradient: 'linear-gradient(45deg, #fa709a, #fee140)',
+                    content: `Le nouveau maillot ${clubName} est juste parfait ! 🤩`
+                },
+                {
+                    name: 'Marc',
+                    img: 51,
+                    gradient: 'linear-gradient(45deg, #667eea, #764ba2)',
+                    content: `Ambiance de dingue au stade ! 😍 Allez ${clubName} ! 🏟️`
+                },
+                {
+                    name: 'Emma',
+                    img: 29,
+                    gradient: 'linear-gradient(45deg, #30cfd0, #330867)',
+                    content: `Rencontre avec une légende de ${clubName} aujourd'hui ! ⭐`
+                }
+            ];
+            
+            let html = '';
+            stories.forEach(story => {
+                html += `
+                    <div class="story-item" style="text-align: center; cursor: pointer;" onclick="alert('👀 Story de ${story.name} : ${story.content}')">
+                        <div class="story-avatar" style="width: 70px; height: 70px; border-radius: 50%; background: ${story.gradient}; display: flex; align-items: center; justify-content: center; border: 3px solid #4ade80; padding: 3px;">
+                            <img src="https://i.pravatar.cc/150?img=${story.img}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+                        </div>
+                        <span style="font-size: 11px; opacity: 0.9; display: block;">${story.name}</span>
+                    </div>
+                `;
+            });
+            
+            storiesContainer.innerHTML = html;
+        }
+
+        // FONCTION POUR GÉNÉRER LE FEED SOCIAL DYNAMIQUE
+        function generateDynamicFeed() {
+            const clubName = getClubName();
+            console.log('🎯 generateDynamicFeed() appelée - Club détecté:', clubName);
+            
+            const feedContainer = document.getElementById('social-feed');
+            
+            if (!feedContainer) {
+                console.error('❌ Conteneur social-feed introuvable');
+                return;
+            }
+            
+            console.log('✅ Conteneur social-feed trouvé, génération du contenu...');
+            
+            feedContainer.innerHTML = `
+                <!-- Post 1: Vidéo Live -->
+                <div class="post-card" style="background: rgba(255,255,255,0.05); border-radius: 15px; margin-bottom: 20px; overflow: hidden;">
+                    <div class="post-header" style="display: flex; align-items: center; padding: 15px; gap: 12px;">
+                        <img src="https://i.pravatar.cc/150?img=45" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px;">Sophie Martin</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Il y a 15 min • 🔴 EN DIRECT</div>
+                        </div>
+                        <button style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">⋮</button>
+                    </div>
+                    <div class="post-content" style="padding: 0 15px 15px;">
+                        <p style="margin-bottom: 15px;">⚽ Quelle victoire hier soir ! ${clubName} est de retour au sommet ! 💙 Le stade était en feu ! #Allez${clubName.replace(/\s+/g, '')}</p>
+                        <div style="position: relative; width: 100%; height: 250px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <div style="position: absolute; top: 10px; left: 10px; background: #ff3366; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite;">
+                                <span style="width: 8px; height: 8px; background: white; border-radius: 50%; animation: blink 1s infinite;"></span>
+                                LIVE
+                            </div>
+                            <div style="font-size: 50px;">🎥</div>
+                            <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 8px; font-size: 12px;">👁️ 2.3K</div>
+                        </div>
+                    </div>
+                    <div class="post-actions" style="display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1; this.style.color = '#ff3366';">❤️ <span>142</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('💬 Commentaires');">💬 <span>23</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('🔗 Partager');">🔗 <span>8</span></button>
+                    </div>
+                </div>
+
+                <!-- Post 2: E-commerce Live Shopping -->
+                <div class="post-card" style="background: rgba(255,255,255,0.05); border-radius: 15px; margin-bottom: 20px; overflow: hidden;">
+                    <div class="post-header" style="display: flex; align-items: center; padding: 15px; gap: 12px;">
+                        <img src="https://i.pravatar.cc/150?img=33" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px;">Boutique Officielle ${clubName}</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Il y a 1h • 🛍️ LIVE SHOPPING</div>
+                        </div>
+                        <button style="background: #4ade80; border: none; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="showSection('boutique')">ACHETER</button>
+                    </div>
+                    <div class="post-content" style="padding: 0 15px 15px;">
+                        <p style="margin-bottom: 15px;">🔥 Nouveau maillot ${clubName} 2024-2025 ! Stock limité -20% en Live ! 🎁</p>
+                        <div style="position: relative; width: 100%; height: 250px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <div style="position: absolute; top: 10px; left: 10px; background: #4ade80; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold;">-20% 🎉</div>
+                            <div style="font-size: 50px;">👕</div>
+                            <div style="position: absolute; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Maillot Domicile ${clubName} 2024-2025</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="font-size: 18px; font-weight: bold; color: #4ade80;">79.99€ <span style="font-size: 12px; text-decoration: line-through; opacity: 0.7;">99.99€</span></div>
+                                    <button style="background: #4ade80; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #000;" onclick="showSection('boutique')">ACHETER</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-actions" style="display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button style="background: none; border: none; color: #ff3366; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;">❤️ <span>215</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('💬 Commentaires');">💬 <span>45</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('🔗 Partager');">🔗 <span>18</span></button>
+                    </div>
+                </div>
+
+                <!-- Post 3: Match Highlights -->
+                <div class="post-card" style="background: rgba(255,255,255,0.05); border-radius: 15px; margin-bottom: 20px; overflow: hidden;">
+                    <div class="post-header" style="display: flex; align-items: center; padding: 15px; gap: 12px;">
+                        <img src="https://i.pravatar.cc/150?img=51" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 14px;">Marc Petit</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Il y a 3h</div>
+                        </div>
+                        <button style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">⋮</button>
+                    </div>
+                    <div class="post-content" style="padding: 0 15px 15px;">
+                        <p style="margin-bottom: 15px;">Ambiance de dingue au stade ! 😍 47 000 supporters derrière ${clubName} ! Allez ! 🏟️💙</p>
+                        <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <div style="font-size: 50px;">🏟️</div>
+                        </div>
+                    </div>
+                    <div class="post-actions" style="display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button style="background: none; border: none; color: #ff3366; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;">❤️ <span>178</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('💬 Commentaires');">💬 <span>28</span></button>
+                        <button style="background: none; border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;" onclick="alert('🔗 Partager');">🔗 <span>15</span></button>
+                    </div>
+                </div>
+            `;
+        }
+
         // PRODUITS BOUTIQUE
         const produitsBoutique = [
             { id: 1, nom: "Maillot Domicile", prix: 89.99, emoji: "👕" },
@@ -1954,6 +2171,21 @@
 
         // INIT
         window.onload = async function() {
+            // 🔥 CORRECTION URGENTE : FORCER LE FRANÇAIS SI LANGUE = 'pt'
+            const langueActuelle = localStorage.getItem('langue_preferee');
+            if (langueActuelle === 'pt') {
+                console.warn('⚠️ Langue "pt" détectée → Forçage en français');
+                localStorage.setItem('langue_preferee', 'fr');
+                window.location.reload();
+                return;
+            }
+            
+            // Initialiser le système multi-langues
+            if (typeof initialiserMultiLangues === 'function') {
+                await initialiserMultiLangues();
+                console.log('✅ Multi-langues initialisé');
+            }
+            
             afficherProduitsBoutique();
             updateSoldes();
             displayLegends(); // Charger les légendes du club
@@ -1964,7 +2196,24 @@
                 const selecteur = document.getElementById('selecteurLangue');
                 if (selecteur) {
                     selecteur.innerHTML = genererSelecteurLangue();
+                    console.log('✅ Sélecteur de langue généré');
                 }
+            }
+            
+            // Traduire la page
+            if (typeof traduire === 'function') {
+                traduire();
+                const langue = typeof getLangueActive === 'function' ? getLangueActive() : 'fr';
+                console.log('✅ Page traduite en:', langue);
+            }
+            
+            // 🎯 INITIALISER LE FEED SOCIAL TIKTOK (AVANT LES APPELS ASYNC)
+            console.log('🔍 Vérification initSocialFeed:', typeof initSocialFeed);
+            if (typeof initSocialFeed === 'function') {
+                console.log('✅ Feed social TikTok planifié (dans 500ms)');
+                setTimeout(initSocialFeed, 500); // Petit délai pour s'assurer que tout est chargé
+            } else {
+                console.error('❌ initSocialFeed n\'est pas une fonction');
             }
             
             // Charger les produits WooCommerce
@@ -4287,8 +4536,18 @@
                 }
             });
 
+            // ÉLIMINER LES DOUBLONS (par titre)
+            const seenTitles = new Set();
+            const uniqueResults = results.filter(result => {
+                if (seenTitles.has(result.title)) {
+                    return false;
+                }
+                seenTitles.add(result.title);
+                return true;
+            });
+
             // Afficher les résultats
-            displaySearchResults(results, query);
+            displaySearchResults(uniqueResults, query);
         }
 
         function displaySearchResults(results, query) {
@@ -5421,8 +5680,39 @@
                 `;
             }).join('');
             
-            console.log(`✅ ${legends.length} légende(s) chargée(s) pour ${clubSlug}`);
+            console.log(`✅ ${legends.length} légende(s) chargée(s) pour ${clubSlub}`);
         }
+
+        // INITIALISATION DU FEED SOCIAL ET STORIES DYNAMIQUES
+        function initSocialFeed() {
+            console.log('🎯 Initialisation du Feed Social dynamique...');
+            const clubName = getClubName();
+            console.log(`📱 Club actuel : ${clubName}`);
+            
+            // Générer les stories dynamiques
+            generateDynamicStories();
+            console.log('✅ Stories dynamiques générées');
+            
+            // Générer le feed dynamique
+            generateDynamicFeed();
+            console.log('✅ Feed social dynamique généré');
+        }
+
+        // APPELER AU CHARGEMENT DE LA PAGE
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page chargée - Initialisation TikTok Feed...');
+            setTimeout(initSocialFeed, 500); // Petit délai pour s'assurer que tout est chargé
+        });
+
+        // Réinitialiser quand on revient sur l'onglet Accueil
+        const originalShowSection = showSection;
+        showSection = function(id, event) {
+            originalShowSection(id, event);
+            if (id === 'accueil') {
+                console.log('🏠 Retour sur Accueil - Rafraîchissement du feed...');
+                setTimeout(initSocialFeed, 100);
+            }
+        };
     </script>
 </body>
 </html>

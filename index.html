@@ -385,13 +385,26 @@
             <div class="logo">
                 ⚡ PaieCashFan
             </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <!-- Sélecteur de langue -->
+                <div id="languageSelector" style="display: flex; gap: 8px;">
+                    <!-- Généré dynamiquement -->
+                </div>
+                <!-- Authentification -->
+                <button onclick="window.location.href='connexion.html'" style="background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    🔐 Connexion
+                </button>
+                <button onclick="window.location.href='inscription.html'" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    ✨ Inscription
+                </button>
+            </div>
         </div>
     </nav>
 
     <!-- HERO -->
     <section class="hero">
-        <h1>🏆 Plateforme Multi-Sports Complète</h1>
-        <p>700+ équipes et clubs organisés par catégories</p>
+        <h1 data-i18n="hero.title">🏆 Plateforme Multi-Sports Complète</h1>
+        <p data-i18n="hero.subtitle">700+ équipes et clubs organisés par catégories</p>
     </section>
 
     <!-- MAIN CONTENT -->
@@ -400,38 +413,38 @@
         <div class="stats-bar">
             <div class="stat-box">
                 <div class="stat-number" id="totalTeams">0</div>
-                <div class="stat-label">Équipes Totales</div>
+                <div class="stat-label" data-i18n="stats.total_teams">Équipes Totales</div>
             </div>
             <div class="stat-box">
                 <div class="stat-number" id="totalFrance">0</div>
-                <div class="stat-label">Clubs France</div>
+                <div class="stat-label" data-i18n="stats.clubs_france">Clubs France</div>
             </div>
             <div class="stat-box">
                 <div class="stat-number" id="totalEurope">0</div>
-                <div class="stat-label">Clubs Europe</div>
+                <div class="stat-label" data-i18n="stats.clubs_europe">Clubs Europe</div>
             </div>
             <div class="stat-box">
                 <div class="stat-number" id="totalFederations">0</div>
-                <div class="stat-label">Fédérations</div>
+                <div class="stat-label" data-i18n="stats.federations">Fédérations</div>
             </div>
         </div>
 
         <!-- MAIN TABS NAVIGATION -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchMainTab('football-france')">
-                🇫🇷 Football France
+                <span data-i18n="tabs.football_france">🇫🇷 Football France</span>
             </button>
             <button class="tab-btn" onclick="switchMainTab('football-europe')">
-                🌍 Football Europe
+                <span data-i18n="tabs.football_europe">🌍 Football Europe</span>
             </button>
             <button class="tab-btn" onclick="switchMainTab('equipes-nationales')">
-                🏆 Équipes Nationales
+                <span data-i18n="tabs.national_teams">🏆 Équipes Nationales</span>
             </button>
             <button class="tab-btn" onclick="switchMainTab('federations')">
-                🌐 Fédérations
+                <span data-i18n="tabs.federations">🌐 Fédérations</span>
             </button>
             <button class="tab-btn" onclick="switchMainTab('multi-sports')">
-                🏀 Multi-Sports
+                <span data-i18n="tabs.multi_sports">🏀 Multi-Sports</span>
             </button>
         </div>
 
@@ -440,6 +453,7 @@
             <div class="search-bar">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" id="searchInput" 
+                       data-i18n-placeholder="search.placeholder"
                        placeholder="Rechercher une équipe, club, joueur, pays...">
                 <button class="search-clear" id="searchClear" onclick="clearSearch()">
                     <i class="fas fa-times"></i>
@@ -464,16 +478,16 @@
         <!-- TAB CONTENT: FOOTBALL EUROPE -->
         <div id="tab-football-europe" class="tab-content">
             <div class="sub-tabs" id="subtabs-football-europe">
-                <button class="sub-tab-btn active" onclick="switchSubTab('angleterre')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('espagne')">🇪🇸 Espagne</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('italie')">🇮🇹 Italie</button>
                 <button class="sub-tab-btn" onclick="switchSubTab('allemagne')">🇩🇪 Allemagne</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('portugal')">🇵🇹 Portugal</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('paysbas')">🇳🇱 Pays-Bas</button>
+                <button class="sub-tab-btn active" onclick="switchSubTab('angleterre')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</button>
                 <button class="sub-tab-btn" onclick="switchSubTab('belgique')">🇧🇪 Belgique</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('turquie')">🇹🇷 Turquie</button>
-                <button class="sub-tab-btn" onclick="switchSubTab('grece')">🇬🇷 Grèce</button>
                 <button class="sub-tab-btn" onclick="switchSubTab('ecosse')">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écosse</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('espagne')">🇪🇸 Espagne</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('grece')">🇬🇷 Grèce</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('italie')">🇮🇹 Italie</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('paysbas')">🇳🇱 Pays-Bas</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('portugal')">🇵🇹 Portugal</button>
+                <button class="sub-tab-btn" onclick="switchSubTab('turquie')">🇹🇷 Turquie</button>
             </div>
             <div class="teams-grid" id="grid-football-europe"></div>
         </div>
@@ -537,6 +551,8 @@
     <script src="🏀_BASKET_FEDERATIONS_CLUBS.js"></script>
     <script src="🤾_HANDBALL_FEDERATIONS_CLUBS.js"></script>
     <script src="🏉_RUGBY_VOLLEY_FEDERATIONS_CLUBS.js"></script>
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+    <script src="🌍_TRADUCTIONS_FEDERATIONS_CLUBS.js"></script>
 
     <script>
         // ========== DONNÉES ORGANISÉES PAR CATÉGORIES ==========
@@ -800,30 +816,79 @@
                     }
                     break;
                 case 'equipes-nationales':
-                    dataToDisplay = allData.equipesNationales[currentSubTab.replace(/-/g, '')] || [];
+                    // Mapping explicite pour équipes nationales
+                    const equipesMapping = {
+                        'coupe-monde-2026': 'coupeMonde2026',
+                        'can-2025': 'can2025',
+                        'joj-2026': 'joj2026'
+                    };
+                    const equipesKey = equipesMapping[currentSubTab] || currentSubTab.replace(/-/g, '');
+                    dataToDisplay = allData.equipesNationales[equipesKey] || [];
+                    console.log('🏆 Équipes Nationales:', currentSubTab, '→', equipesKey, '→', dataToDisplay.length, 'équipes');
                     break;
                 case 'federations':
                     dataToDisplay = allData.federations[currentSubTab] || [];
                     break;
                 case 'multi-sports':
-                    // Nouveau système : sport-ligue combiné
-                    const key = currentSubTab.replace(/-/g, '').replace(/é/g, 'e');
-                    dataToDisplay = allData.multiSports[key] || [];
+                    // Mapping des sous-onglets vers les clés de données
+                    const multiSportsMapping = {
+                        'basketball-betclic-elite': 'basketballBetclicElite',
+                        'basketball-prob': 'basketballProB',
+                        'basketball-lfb': 'basketballLfb',
+                        'basketball-euroleague': 'basketballEuroleague',
+                        'handball-starligue': 'handballStarligue',
+                        'handball-proligue': 'handballProligue',
+                        'handball-lbe': 'handballLbe',
+                        'handball-champions': 'handballChampions',
+                        'rugby-top14': 'rugbyTop14',
+                        'rugby-prod2': 'rugbyProD2',
+                        'rugby-elite1': 'rugbyElite1',
+                        'rugby-champions': 'rugbyChampions',
+                        'volleyball-liguea': 'volleyballLigueA',
+                        'volleyball-ligueb': 'volleyballLigueB',
+                        'volleyball-cev': 'volleyballCev'
+                    };
+                    const mappedKey = multiSportsMapping[currentSubTab];
+                    dataToDisplay = mappedKey ? (allData.multiSports[mappedKey] || []) : [];
+                    console.log('🏀 Multi-Sports:', currentSubTab, '→', mappedKey, '→', dataToDisplay.length, 'clubs');
                     break;
             }
 
-            // Afficher les données
-            grid.innerHTML = dataToDisplay.map(team => `
-                <a href="${team.path || `app-universal-simple.html?club=${encodeURIComponent(team.name)}`}" class="team-card">
-                    <div class="team-header">
-                        <div class="team-logo">${team.logo || team.flag || team.emoji || '⚽'}</div>
-                        <div class="team-info">
-                            <h3>${team.name}</h3>
-                            <div class="team-league">${team.league || team.competition || 'Football'}</div>
+            // Trier les données par ordre alphabétique
+            dataToDisplay.sort((a, b) => {
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            
+            // Afficher les données avec traduction
+            const langueActuelle = localStorage.getItem('langue_preferee') || 'fr';
+            
+            grid.innerHTML = dataToDisplay.map(team => {
+                // Traduire le nom de la ligue/compétition
+                let leagueName = team.league || team.competition || 'Football';
+                if (typeof traduireLigue === 'function') {
+                    leagueName = traduireLigue(leagueName, langueActuelle);
+                }
+                
+                // Traduire le nom de la fédération si c'est une fédération
+                let teamName = team.name;
+                if (currentMainTab === 'federations' && typeof traduireFederation === 'function') {
+                    teamName = traduireFederation(team.name, langueActuelle);
+                }
+                
+                return `
+                    <a href="${team.path || `app-universal-simple.html?club=${encodeURIComponent(team.name)}`}" class="team-card">
+                        <div class="team-header">
+                            <div class="team-logo">${team.logo || team.flag || team.emoji || '⚽'}</div>
+                            <div class="team-info">
+                                <h3>${teamName}</h3>
+                                <div class="team-league">${leagueName}</div>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            `).join('');
+                    </a>
+                `;
+            }).join('');
 
             console.log(`✅ Affichage : ${currentMainTab} > ${currentSubTab} (${dataToDisplay.length} équipes)`);
         }
@@ -1005,18 +1070,25 @@
                 });
             }
 
+            // Utiliser un Set pour éviter les doublons (basé sur le titre)
+            const seenTitles = new Set();
+            
             allTeams.forEach(team => {
                 if (team && team.name && team.name.toLowerCase().includes(lowerQuery)) {
-                    results.push({
-                        icon: team.logo || '⚽',
-                        title: team.name,
-                        desc: team.league || team.country || 'Équipe',
-                        action: () => window.location.href = team.path || '#'
-                    });
+                    // Vérifier si on a déjà ce titre
+                    if (!seenTitles.has(team.name)) {
+                        seenTitles.add(team.name);
+                        results.push({
+                            icon: team.logo || '⚽',
+                            title: team.name,
+                            desc: team.league || team.country || 'Équipe',
+                            action: () => window.location.href = team.path || '#'
+                        });
+                    }
                 }
             });
 
-            console.log('📊 Résultats trouvés:', results.length);
+            console.log('📊 Résultats trouvés (sans doublons):', results.length);
 
             // Afficher les résultats
             displaySearchResults(results, query);
@@ -1077,7 +1149,37 @@
         }
 
         // ========== INITIALISATION ==========
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 🔥 CORRECTION URGENTE : FORCER LE FRANÇAIS SI LANGUE = 'pt'
+            const langueActuelle = localStorage.getItem('langue_preferee');
+            if (langueActuelle === 'pt') {
+                console.warn('⚠️ Langue "pt" détectée → Forçage en français');
+                localStorage.setItem('langue_preferee', 'fr');
+            }
+            
+            // PRIORITÉ 1 : Initialiser les langues AVANT tout le reste
+            if (typeof initialiserMultiLangues === 'function') {
+                await initialiserMultiLangues();
+                console.log('✅ Multi-langues initialisé');
+            }
+            
+            // PRIORITÉ 2 : Générer le sélecteur immédiatement
+            if (typeof genererSelecteurLangue === 'function') {
+                const selector = document.getElementById('languageSelector');
+                if (selector) {
+                    selector.innerHTML = genererSelecteurLangue();
+                    console.log('✅ Sélecteur de langue généré');
+                }
+            }
+            
+            // PRIORITÉ 3 : Traduire TOUTE la page immédiatement
+            if (typeof traduire === 'function') {
+                traduire();
+                const langue = typeof getLangueActive === 'function' ? getLangueActive() : 'fr';
+                console.log('✅ Page traduite en:', langue);
+            }
+            
+            // PRIORITÉ 4 : Charger les données et initialiser la recherche
             loadAllData();
             initSearch();
         });

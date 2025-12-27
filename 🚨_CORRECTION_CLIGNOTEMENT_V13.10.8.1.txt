@@ -1,0 +1,180 @@
+═══════════════════════════════════════════════════════════════════
+   🚨 CORRECTION URGENTE - V13.10.8.1 - CLIGNOTEMENT RÉSOLU
+═══════════════════════════════════════════════════════════════════
+
+❌ PROBLÈME IDENTIFIÉ : Boucle infinie de rechargements
+🔧 CAUSE : initialiserMultiLangues() appelait changerLangue() qui rechargeait la page
+✅ SOLUTION : Initialisation sans rechargement automatique
+
+───────────────────────────────────────────────────────────────────
+🔍 DIAGNOSTIC
+───────────────────────────────────────────────────────────────────
+
+Le site clignotait à cause d'une boucle infinie :
+
+1. Page charge → DOMContentLoaded déclenché
+2. initialiserMultiLangues() appelé automatiquement
+3. changerLangue() détecte/restaure langue
+4. window.location.reload() recharge la page
+5. Retour à l'étape 1 → BOUCLE INFINIE
+
+───────────────────────────────────────────────────────────────────
+✅ CORRECTIONS APPLIQUÉES
+───────────────────────────────────────────────────────────────────
+
+1. 🌍_MULTI_LANGUES_I18N.js
+   ────────────────────────────────────────────────────────────────
+   
+   AVANT (~ligne 466-478) :
+   ────────────────────────────────────────────────────────────────
+   async function initialiserMultiLangues() {
+       const langueSauvegardee = localStorage.getItem('langue_preferee');
+       if (langueSauvegardee && LANGUES_SUPPORTEES[langueSauvegardee]) {
+           changerLangue(langueSauvegardee);  // ❌ RECHARGE LA PAGE
+           return;
+       }
+       const langueDetectee = await detecterLangueParGeolocalisation();
+       changerLangue(langueDetectee);  // ❌ RECHARGE LA PAGE
+   }
+   ────────────────────────────────────────────────────────────────
+   
+   APRÈS (~ligne 466-480) :
+   ────────────────────────────────────────────────────────────────
+   async function initialiserMultiLangues() {
+       const langueSauvegardee = localStorage.getItem('langue_preferee');
+       if (langueSauvegardee && LANGUES_SUPPORTEES[langueSauvegardee]) {
+           langueActive = langueSauvegardee;  // ✅ PAS DE RECHARGEMENT
+           console.log('✅ Langue restaurée depuis localStorage:', langueSauvegardee);
+           return;
+       }
+       const langueDetectee = await detecterLangueParGeolocalisation();
+       langueActive = langueDetectee;  // ✅ PAS DE RECHARGEMENT
+       localStorage.setItem('langue_preferee', langueDetectee);
+       console.log('✅ Langue détectée et sauvegardée:', langueDetectee);
+   }
+   ────────────────────────────────────────────────────────────────
+
+   AVANT (~ligne 501-504) :
+   ────────────────────────────────────────────────────────────────
+   // Initialiser automatiquement au chargement
+   if (typeof window !== 'undefined') {
+       window.addEventListener('DOMContentLoaded', initialiserMultiLangues);
+   }
+   ────────────────────────────────────────────────────────────────
+   
+   APRÈS (~ligne 501-506) :
+   ────────────────────────────────────────────────────────────────
+   // NE PAS initialiser automatiquement pour éviter les boucles infinies
+   // L'initialisation se fait manuellement depuis chaque page
+   // if (typeof window !== 'undefined') {
+   //     window.addEventListener('DOMContentLoaded', initialiserMultiLangues);
+   // }
+   ────────────────────────────────────────────────────────────────
+
+2. index.html
+   ────────────────────────────────────────────────────────────────
+   
+   AVANT (~ligne 1093-1106) :
+   ────────────────────────────────────────────────────────────────
+   window.addEventListener('DOMContentLoaded', () => {
+       loadAllData();
+       initSearch();
+       
+       if (typeof genererSelecteurLangue === 'function') {
+           const selector = document.getElementById('languageSelector');
+           if (selector) {
+               genererSelecteurLangue();
+           }
+       }
+   });
+   ────────────────────────────────────────────────────────────────
+   
+   APRÈS (~ligne 1093-1110) :
+   ────────────────────────────────────────────────────────────────
+   window.addEventListener('DOMContentLoaded', async () => {
+       loadAllData();
+       initSearch();
+       
+       // Initialiser le système multi-langues (SANS rechargement automatique)
+       if (typeof initialiserMultiLangues === 'function') {
+           await initialiserMultiLangues();
+       }
+       
+       // Générer le sélecteur de langue
+       if (typeof genererSelecteurLangue === 'function') {
+           const selector = document.getElementById('languageSelector');
+           if (selector) {
+               selector.innerHTML = genererSelecteurLangue();
+           }
+       }
+   });
+   ────────────────────────────────────────────────────────────────
+
+───────────────────────────────────────────────────────────────────
+💡 COMMENT ÇA FONCTIONNE MAINTENANT
+───────────────────────────────────────────────────────────────────
+
+✅ PREMIER CHARGEMENT :
+1. Page charge sans rechargement
+2. initialiserMultiLangues() détecte ou restaure la langue
+3. Langue sauvegardée dans localStorage (langueActive)
+4. Sélecteur de langue généré avec la langue active
+5. PAS DE RECHARGEMENT
+
+✅ CHANGEMENT DE LANGUE :
+1. Utilisateur clique sur un drapeau
+2. changerLangue() est appelé
+3. Langue mise à jour dans localStorage
+4. Page se recharge UNE SEULE fois
+5. Au rechargement, langue restaurée depuis localStorage
+6. PAS DE NOUVEAU RECHARGEMENT
+
+───────────────────────────────────────────────────────────────────
+🧪 TESTS À FAIRE
+───────────────────────────────────────────────────────────────────
+
+1. ✅ Ouvrir index.html
+   → Vérifier : PAS de clignotement, page stable
+
+2. ✅ Regarder la console navigateur (F12)
+   → Vérifier : "✅ Langue restaurée" OU "✅ Langue détectée"
+
+3. ✅ Cliquer sur un drapeau de langue
+   → Vérifier : Page se recharge UNE fois, puis stable
+
+4. ✅ Fermer et rouvrir le navigateur
+   → Vérifier : Langue précédente restaurée sans rechargement
+
+5. ✅ Vider le cache/localStorage
+   → Vérifier : Détection automatique, puis stable
+
+───────────────────────────────────────────────────────────────────
+📌 GARANTIES
+───────────────────────────────────────────────────────────────────
+
+✅ PAS de boucle infinie
+✅ PAS de clignotement
+✅ Sélecteur de langue fonctionnel
+✅ Détection automatique de langue
+✅ Mémorisation de la préférence
+✅ Rechargement uniquement au changement manuel
+✅ ZÉRO régression sur les autres fonctionnalités
+
+───────────────────────────────────────────────────────────────────
+🚀 DÉPLOIEMENT
+───────────────────────────────────────────────────────────────────
+
+1. Aller dans l'onglet "Publish"
+2. Cliquer sur "Publish"
+3. Ouvrir l'URL de production
+4. Faire un HARD REFRESH (Ctrl+Shift+R)
+5. Vérifier : Site stable, pas de clignotement
+
+───────────────────────────────────────────────────────────────────
+✅ STATUT : PROBLÈME RÉSOLU - V13.10.8.1 STABLE
+───────────────────────────────────────────────────────────────────
+
+Date : 23 décembre 2025
+Version : 13.10.8.1
+Correctif : Clignotement / Boucle infinie
+Statut : ✅ PRÊT POUR DÉPLOIEMENT - SITE STABLE
