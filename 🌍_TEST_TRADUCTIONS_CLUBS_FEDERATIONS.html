@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Test Traductions - Clubs & Fédérations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .language-selector-wrapper {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .link-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .link-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .link-desc {
+            font-size: 14px;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .link-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-ok {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-new {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .features-list li {
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list li i {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .note-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .note-text {
+            color: #78350f;
+            line-height: 1.6;
+        }
+    </style>
+    <!-- 🌍 Système Multi-Langues -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+    <script src="🌍_AUTO_INIT_LANGUES.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Test Traductions</h1>
+            <p style="font-size: 18px; color: #64748b; margin-bottom: 20px;">
+                Système Multi-Langues pour Clubs & Fédérations
+            </p>
+            <div class="language-selector-wrapper">
+                <div id="languageSelector"></div>
+            </div>
+        </div>
+
+        <!-- Section CLUBS -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                <span data-i18n="hero.title">CLUBS</span>
+            </div>
+            <span class="status-badge status-ok">✓ Traductions Activées</span>
+
+            <div class="links-grid">
+                <!-- Olympique de Marseille -->
+                <a href="clubs/olympique-marseille/index.html" class="link-card">
+                    <div class="link-icon">⚽</div>
+                    <div class="link-title" data-i18n="club.om.name">Olympique de Marseille</div>
+                    <div class="link-desc" data-i18n="club.om.subtitle">Olympique de Marseille Edition</div>
+                    <button class="link-btn">
+                        <i class="fas fa-globe"></i> <span data-i18n="club.btn.access_app">Tester</span>
+                    </button>
+                </a>
+
+                <!-- Paris FC -->
+                <a href="clubs/paris-fc/index.html" class="link-card">
+                    <div class="link-icon">⚽</div>
+                    <div class="link-title">Paris FC</div>
+                    <div class="link-desc">Paris Football Club Edition</div>
+                    <button class="link-btn">
+                        <i class="fas fa-globe"></i> <span data-i18n="club.btn.access_app">Tester</span>
+                    </button>
+                </a>
+
+                <!-- AS Monaco -->
+                <a href="clubs/as-monaco/index.html" class="link-card">
+                    <div class="link-icon">⚽</div>
+                    <div class="link-title">AS Monaco</div>
+                    <div class="link-desc">AS Monaco Edition</div>
+                    <button class="link-btn">
+                        <i class="fas fa-globe"></i> <span data-i18n="club.btn.access_app">Tester</span>
+                    </button>
+                </a>
+            </div>
+
+            <ul class="features-list">
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span data-i18n="club.features.tickets.title">Billetterie</span> + 
+                    <span data-i18n="club.features.payments.title">Paiements Globaux</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span data-i18n="club.features.cashback.title">Cashback 5%</span> + 
+                    <span data-i18n="club.features.community.title">Communauté</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <strong>10+ langues supportées:</strong> FR, EN, ES, DE, IT, PT, TR, RU, ZH, AR, JA
+                </li>
+            </ul>
+        </div>
+
+        <!-- Section FEDERATIONS -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-trophy"></i>
+                <span data-i18n="federation.title">FÉDÉRATIONS SPORTIVES</span>
+            </div>
+            <span class="status-badge status-new">🆕 Nouvelles Pages</span>
+
+            <div class="links-grid">
+                <!-- Page Hub Fédérations -->
+                <a href="federations/index.html" class="link-card">
+                    <div class="link-icon">🏆</div>
+                    <div class="link-title" data-i18n="federation.title">Fédérations Sportives</div>
+                    <div class="link-desc" data-i18n="federation.subtitle">6 Fédérations Françaises</div>
+                    <button class="link-btn">
+                        <i class="fas fa-globe"></i> <span data-i18n="club.btn.access_app">Ouvrir</span>
+                    </button>
+                </a>
+            </div>
+
+            <ul class="features-list">
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <strong>6 Fédérations:</strong> FFF (Football), FFR (Rugby), FFB (Basketball), FFA (Athlétisme), FFT (Tennis), FFH (Handball)
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span data-i18n="federation.stats.licenses">Licenciés</span>, 
+                    <span data-i18n="federation.stats.clubs">Clubs</span>, 
+                    <span data-i18n="federation.stats.worldcups">Palmarès</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Traductions complètes:</strong> Noms, descriptions, statistiques, boutons
+                </li>
+            </ul>
+        </div>
+
+        <!-- Note Importante -->
+        <div class="note">
+            <div class="note-title">
+                <i class="fas fa-info-circle"></i> Système Multi-Langues Activé
+            </div>
+            <div class="note-text">
+                <strong>✅ CLUBS:</strong> La page <code>clubs/olympique-marseille/index.html</code> a été mise à jour avec tous les attributs <code>data-i18n</code>.<br><br>
+                
+                <strong>✅ FÉDÉRATIONS:</strong> Une nouvelle page <code>federations/index.html</code> a été créée avec 6 fédérations françaises et traductions complètes.<br><br>
+                
+                <strong>✅ FICHIER I18N:</strong> Le fichier <code>🌍_MULTI_LANGUES_I18N.js</code> contient maintenant toutes les traductions pour clubs et fédérations (10+ langues).<br><br>
+                
+                <strong>🌍 LANGUES SUPPORTÉES:</strong> FR, EN, ES, DE, IT, PT, TR, RU, ZH, AR, JA<br><br>
+                
+                <strong>🔄 CHANGEMENT DE LANGUE:</strong> Utilise le sélecteur en haut de chaque page pour basculer entre les langues. Toutes les traductions s'appliquent automatiquement !
+            </div>
+        </div>
+    </div>
+</body>
+</html>

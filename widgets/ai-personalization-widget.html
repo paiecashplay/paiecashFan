@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Hyper-Personnalisation - PaieCashFan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .ai-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .recommendation {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .recommendation-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .recommendation-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .recommendation-info p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .recommendation-content {
+            font-size: 13px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .recommendation-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            background: rgba(255,255,255,0.15);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .insight-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .insight-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .insight-content p {
+            font-size: 12px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .prediction-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .prediction-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .prediction-label {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🤖</div>
+            <div class="header-text">
+                <h2>IA Hyper-Personnalisation</h2>
+                <p>Analyse en temps réel de vos préférences</p>
+            </div>
+        </div>
+
+        <!-- Section: Recommandations Personnalisées -->
+        <div class="ai-section">
+            <div class="section-title">
+                <div class="section-icon">✨</div>
+                <span>Recommandations Pour Vous</span>
+            </div>
+
+            <div id="recommendations-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Analyse de vos préférences en cours...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Insights Fan -->
+        <div class="ai-section">
+            <div class="section-title">
+                <div class="section-icon">📊</div>
+                <span>Vos Insights Fan</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">⚽</div>
+                <div class="insight-content">
+                    <h4>Votre Équipe Favorite</h4>
+                    <p>AS Monaco • Ligue 1</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 87%"></div>
+                    </div>
+                    <div class="ai-badge pulse">🤖 87% de confiance</div>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">👤</div>
+                <div class="insight-content">
+                    <h4>Votre Joueur Préféré</h4>
+                    <p>Wissam Ben Yedder • Attaquant</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                    <div class="ai-badge pulse">🤖 92% de confiance</div>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🛍️</div>
+                <div class="insight-content">
+                    <h4>Votre Style Shopping</h4>
+                    <p>Maillots authentiques & Éditions limitées</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                    <div class="ai-badge pulse">🤖 78% de confiance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Prédictions IA -->
+        <div class="ai-section">
+            <div class="section-title">
+                <div class="section-icon">🔮</div>
+                <span>Prédictions IA</span>
+            </div>
+
+            <div class="prediction-grid">
+                <div class="prediction-item">
+                    <div class="prediction-value">87%</div>
+                    <div class="prediction-label">Prochain Achat</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-value">3.2x</div>
+                    <div class="prediction-label">Engagement↑</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-value">142€</div>
+                    <div class="prediction-label">Valeur Prévue</div>
+                </div>
+                <div class="prediction-item">
+                    <div class="prediction-value">Gold</div>
+                    <div class="prediction-label">Niveau Futur</div>
+                </div>
+            </div>
+
+            <button class="action-btn">📈 Voir Détails Prédictions</button>
+        </div>
+
+        <!-- Section: IA Coach Personnel -->
+        <div class="ai-section">
+            <div class="section-title">
+                <div class="section-icon">🎯</div>
+                <span>IA Coach Personnel</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">💡</div>
+                <div class="insight-content">
+                    <h4>Conseil du Jour</h4>
+                    <p>Participer au Live Shopping ce soir vous fera gagner +15€ bonus FOMO. Ne manquez pas l'offre maillot -20% !</p>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🎁</div>
+                <div class="insight-content">
+                    <h4>Opportunité Détectée</h4>
+                    <p>3 amis susceptibles d'accepter votre parrainage = +6€. Envoyez-leur une invitation maintenant !</p>
+                </div>
+            </div>
+
+            <button class="action-btn">🚀 Activer Suggestions Auto</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulation de données personnalisées
+        const recommendations = [
+            {
+                id: 1,
+                avatar: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                title: 'Match Monaco vs PSG',
+                subtitle: 'Dimanche 15h • Stade Louis II',
+                content: 'Votre équipe favorite joue dimanche ! Billets disponibles + 10% cashback.',
+                tags: ['⚽ Match', '🎟️ Billet', '💰 Cashback 10%']
+            },
+            {
+                id: 2,
+                avatar: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                title: 'Maillot Ben Yedder Signé',
+                subtitle: 'Édition Limitée • 50 exemplaires',
+                content: 'Votre joueur préféré ! Maillot authentique signé. Livraison gratuite.',
+                tags: ['👕 Maillot', '✍️ Signé', '🚚 Gratuit']
+            },
+            {
+                id: 3,
+                avatar: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                title: 'Live Shopping Exclusif',
+                subtitle: 'Ce soir 20h • En direct',
+                content: 'Session shopping en direct avec des joueurs. Offres flash -30% garanties.',
+                tags: ['🔴 LIVE', '🛍️ Shopping', '⚡ -30%']
+            },
+            {
+                id: 4,
+                avatar: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                title: 'Inviter 3 Amis Fans',
+                subtitle: 'Recommandé par IA',
+                content: 'Thomas, Julie et Marc sont fans de Monaco ! Invitez-les = +6€ bonus.',
+                tags: ['👥 Parrainage', '💶 +6€', '🤖 IA']
+            }
+        ];
+
+        // Charger les recommandations après 1.5s (simulation)
+        setTimeout(() => {
+            const container = document.getElementById('recommendations-container');
+            container.innerHTML = '';
+
+            recommendations.forEach(rec => {
+                const recElement = document.createElement('div');
+                recElement.className = 'recommendation';
+                recElement.innerHTML = `
+                    <div class="recommendation-header">
+                        <div class="recommendation-avatar" style="background: ${rec.avatar}"></div>
+                        <div class="recommendation-info">
+                            <h4>${rec.title}</h4>
+                            <p>${rec.subtitle}</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-content">${rec.content}</div>
+                    <div class="recommendation-tags">
+                        ${rec.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                `;
+                recElement.onclick = () => {
+                    window.parent.postMessage({
+                        type: 'AI_RECOMMENDATION_CLICKED',
+                        data: rec
+                    }, '*');
+                };
+                container.appendChild(recElement);
+            });
+        }, 1500);
+
+        // Communication avec parent
+        function sendToParent(type, data) {
+            window.parent.postMessage({
+                type: type,
+                data: data
+            }, '*');
+        }
+
+        // Écouter les messages du parent
+        window.addEventListener('message', (event) => {
+            const { type, data } = event.data;
+            
+            if (type === 'UPDATE_USER_PREFERENCES') {
+                console.log('Préférences utilisateur mises à jour:', data);
+                // Recalculer les recommandations
+            }
+            
+            if (type === 'REQUEST_AI_INSIGHTS') {
+                sendToParent('AI_INSIGHTS_RESPONSE', {
+                    favoriteTeam: 'AS Monaco',
+                    favoritePlayer: 'Wissam Ben Yedder',
+                    shoppingStyle: 'Premium',
+                    nextPurchaseProbability: 0.87
+                });
+            }
+        });
+
+        // Envoyer un message de prêt
+        sendToParent('AI_WIDGET_READY', { version: '1.0.0' });
+    </script>
+</body>
+</html>

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Super App TikTok Style</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* HEADER */
+        .app-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .club-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .header-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        /* CONTAINER */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* SECTIONS */
+        .app-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .app-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* HOME SECTION */
+        .balance-card {
+            margin: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.4);
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+        
+        .balance-wallet {
+            font-size: 12px;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .action-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            padding: 20px 20px 12px;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .see-all {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .content-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .content-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .content-card:active {
+            transform: scale(0.98);
+        }
+        
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .card-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--success);
+            margin-top: 10px;
+        }
+        
+        /* CHAT SECTION */
+        .chat-list {
+            padding: 15px;
+        }
+        
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chat-item:active {
+            transform: scale(0.98);
+        }
+        
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .chat-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        
+        .chat-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .chat-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        /* IA SECTION */
+        .ia-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1));
+            text-align: center;
+        }
+        
+        .ia-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .ia-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .ia-suggestions {
+            padding: 20px;
+            display: grid;
+            gap: 15px;
+        }
+        
+        .ia-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .ia-card:active {
+            transform: scale(0.98);
+        }
+        
+        .ia-card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .ia-card-content {
+            flex: 1;
+        }
+        
+        .ia-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .ia-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        /* PROFIL SECTION */
+        .profile-header {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 15px;
+        }
+        
+        .profile-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        
+        .profile-email {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .profile-services {
+            padding: 20px;
+        }
+        
+        .service-group-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+        
+        .service-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .service-item:active {
+            transform: scale(0.98);
+        }
+        
+        .service-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .service-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .service-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        /* BOTTOM NAV - STYLE TIKTOK */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+        
+        .nav-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active .nav-icon {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .nav-item.active .nav-label {
+            color: var(--primary);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .balance-amount { font-size: 36px; }
+            .content-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-left">
+            <div class="club-logo" id="clubLogo">⚽</div>
+            <div class="club-name" id="clubName">AS Monaco</div>
+        </div>
+        <div class="header-right">
+            <div class="header-btn" onclick="alert('Notifications')">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="header-btn" onclick="toggleLanguage()">
+                <span id="currentLang">🇫🇷</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div class="app-container">
+        <!-- HOME SECTION -->
+        <section id="home" class="app-section active">
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="balance-label">Solde PaieCash</div>
+                <div class="balance-amount">250,00 €</div>
+                <div class="balance-wallet">Wallet: 0x1234...5678</div>
+                
+                <div class="quick-actions">
+                    <div class="action-btn" onclick="alert('Envoyer')">
+                        <div class="action-icon">📤</div>
+                        <div class="action-label">Envoyer</div>
+                    </div>
+                    <div class="action-btn" onclick="alert('Recevoir')">
+                        <div class="action-icon">📥</div>
+                        <div class="action-label">Recevoir</div>
+                    </div>
+                    <div class="action-btn" onclick="alert('Recharger')">
+                        <div class="action-icon">➕</div>
+                        <div class="action-label">Recharger</div>
+                    </div>
+                    <div class="action-btn" onclick="alert('Historique')">
+                        <div class="action-icon">📊</div>
+                        <div class="action-label">Historique</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Matchs à Venir -->
+            <div class="section-title">
+                <span>🎫 Billets NFT</span>
+                <span class="see-all" onclick="alert('Voir tous les billets')">Tout voir</span>
+            </div>
+            <div class="content-grid">
+                <div class="content-card" onclick="alert('Acheter billet NFT')">
+                    <div class="card-icon">🏟️</div>
+                    <div class="card-title">Monaco vs PSG</div>
+                    <div class="card-subtitle">12 Jan 2025, 21:00</div>
+                    <div class="card-price">45,00 €</div>
+                </div>
+                <div class="content-card" onclick="alert('Acheter billet NFT')">
+                    <div class="card-icon">🏆</div>
+                    <div class="card-title">Monaco vs OM</div>
+                    <div class="card-subtitle">19 Jan 2025, 17:00</div>
+                    <div class="card-price">40,00 €</div>
+                </div>
+            </div>
+            
+            <!-- Produits -->
+            <div class="section-title">
+                <span>🛍️ Boutique</span>
+                <span class="see-all" onclick="alert('Voir la boutique')">Tout voir</span>
+            </div>
+            <div class="content-grid">
+                <div class="content-card" onclick="alert('Acheter produit')">
+                    <div class="card-icon">👕</div>
+                    <div class="card-title">Maillot Domicile</div>
+                    <div class="card-subtitle">Saison 2024/25</div>
+                    <div class="card-price">89,99 €</div>
+                </div>
+                <div class="content-card" onclick="alert('Acheter produit')">
+                    <div class="card-icon">🧢</div>
+                    <div class="card-title">Casquette</div>
+                    <div class="card-subtitle">Officielle</div>
+                    <div class="card-price">24,99 €</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAT SECTION -->
+        <section id="chat" class="app-section">
+            <div class="section-title">
+                <span>💬 Messages</span>
+                <span class="see-all" onclick="alert('Nouveau message')">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </div>
+            <div class="chat-list">
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">👤</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Jean Dupont</div>
+                        <div class="chat-message">Salut ! Tu seras au match ce weekend ? 🔴⚪</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">5 min</div>
+                        <div class="chat-badge">2</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">👨</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Marc Martin</div>
+                        <div class="chat-message">J'ai acheté mon billet NFT ! 🎫</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">1h</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">👩</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Sophie Laurent</div>
+                        <div class="chat-message">Super app ! J'adore le nouveau design 💜</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">3h</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">🎮</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Groupe Supporters</div>
+                        <div class="chat-message">Thomas: On se retrouve où avant le match ?</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">5h</div>
+                        <div class="chat-badge">12</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Démarrer appel vidéo')">
+                    <div class="chat-avatar">📹</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Appel Vidéo</div>
+                        <div class="chat-message">Commencer un appel vidéo avec d'autres fans</div>
+                    </div>
+                    <div class="chat-meta">
+                        <i class="fas fa-video" style="color: var(--success); font-size: 20px;"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- IA SECTION -->
+        <section id="ia" class="app-section">
+            <div class="ia-header">
+                <div class="ia-title">🤖 Assistant IA</div>
+                <div class="ia-subtitle">Intelligence artificielle personnalisée pour vous</div>
+            </div>
+            
+            <div class="ia-suggestions">
+                <div class="ia-card" onclick="alert('Prédiction match')">
+                    <div class="ia-card-icon">⚽</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Prédiction Match</div>
+                        <div class="ia-card-desc">AS Monaco a 68% de chances de gagner contre PSG selon notre IA</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Analyse performances')">
+                    <div class="ia-card-icon">📊</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Analyse Performances</div>
+                        <div class="ia-card-desc">Statistiques complètes du club cette saison</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Recommandations produits')">
+                    <div class="ia-card-icon">🛍️</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Recommandations</div>
+                        <div class="ia-card-desc">Nouveau maillot en édition limitée disponible</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Moments forts')">
+                    <div class="ia-card-icon">🎬</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Moments Forts</div>
+                        <div class="ia-card-desc">Revivez les meilleurs moments du dernier match</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Assistant vocal')">
+                    <div class="ia-card-icon">🎙️</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Assistant Vocal</div>
+                        <div class="ia-card-desc">Posez vos questions à l'assistant IA vocal</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFIL SECTION -->
+        <section id="profil" class="app-section">
+            <div class="profile-header">
+                <div class="profile-avatar">😊</div>
+                <div class="profile-name">Jean Dupont</div>
+                <div class="profile-email">jean.dupont@example.com</div>
+            </div>
+            
+            <div class="profile-services">
+                <!-- Services Financiers -->
+                <div class="service-group-title">💰 Services Financiers</div>
+                
+                <div class="service-item" onclick="openService('wallet')">
+                    <div class="service-left">
+                        <div class="service-icon">💳</div>
+                        <div class="service-info">
+                            <div class="service-name">Wallet PaieCash</div>
+                            <div class="service-desc">Gérer mon portefeuille</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">250 €</div>
+                </div>
+                
+                <div class="service-item" onclick="openService('savings')">
+                    <div class="service-left">
+                        <div class="service-icon">🏦</div>
+                        <div class="service-info">
+                            <div class="service-name">Épargne & Goals</div>
+                            <div class="service-desc">10 objectifs actifs</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="openService('cards')">
+                    <div class="service-left">
+                        <div class="service-icon">💳</div>
+                        <div class="service-info">
+                            <div class="service-name">Cartes Prépayées</div>
+                            <div class="service-desc">Virtuelle & physique</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <!-- Services Connectivité -->
+                <div class="service-group-title" style="margin-top: 20px;">📱 Connectivité</div>
+                
+                <div class="service-item" onclick="openService('esim')">
+                    <div class="service-left">
+                        <div class="service-icon">📡</div>
+                        <div class="service-info">
+                            <div class="service-name">eSIM</div>
+                            <div class="service-desc">3 forfaits actifs</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">Actif</div>
+                </div>
+                
+                <!-- Services Commerce -->
+                <div class="service-group-title" style="margin-top: 20px;">🛍️ Commerce</div>
+                
+                <div class="service-item" onclick="openService('shop')">
+                    <div class="service-left">
+                        <div class="service-icon">🛒</div>
+                        <div class="service-info">
+                            <div class="service-name">Boutique</div>
+                            <div class="service-desc">Produits officiels</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="openService('tickets')">
+                    <div class="service-left">
+                        <div class="service-icon">🎫</div>
+                        <div class="service-info">
+                            <div class="service-name">Billets NFT</div>
+                            <div class="service-desc">5 billets achetés</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <!-- Paramètres -->
+                <div class="service-group-title" style="margin-top: 20px;">⚙️ Paramètres</div>
+                
+                <div class="service-item" onclick="openService('notifications')">
+                    <div class="service-left">
+                        <div class="service-icon">🔔</div>
+                        <div class="service-info">
+                            <div class="service-name">Notifications</div>
+                            <div class="service-desc">Gérer les alertes</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="openService('security')">
+                    <div class="service-left">
+                        <div class="service-icon">🔐</div>
+                        <div class="service-info">
+                            <div class="service-name">Sécurité & Confidentialité</div>
+                            <div class="service-desc">2FA activé</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">✓</div>
+                </div>
+                
+                <div class="service-item" onclick="openService('language')">
+                    <div class="service-left">
+                        <div class="service-icon">🌍</div>
+                        <div class="service-info">
+                            <div class="service-name">Langue</div>
+                            <div class="service-desc">Français (fr)</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="alert('Déconnexion...')" style="margin-top: 20px; border-color: rgba(239, 68, 68, 0.3);">
+                    <div class="service-left">
+                        <div class="service-icon" style="background: rgba(239, 68, 68, 0.2);">
+                            <i class="fas fa-sign-out-alt" style="color: #ef4444;"></i>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name" style="color: #ef4444;">Déconnexion</div>
+                            <div class="service-desc">Se déconnecter du compte</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- BOTTOM NAVIGATION - STYLE TIKTOK -->
+    <div class="bottom-nav">
+        <div class="nav-content">
+            <div class="nav-item active" onclick="switchSection('home')">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('chat')">
+                <i class="fas fa-comments nav-icon"></i>
+                <span class="nav-label">Chat</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('ia')">
+                <i class="fas fa-robot nav-icon"></i>
+                <span class="nav-label">IA</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('profil')">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Profil</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let currentSection = 'home';
+        let currentLangIndex = 0;
+        const langs = ['🇫🇷', '🇬🇧', '🇪🇸', '🇩🇪', '🇮🇹', '🇵🇹', '🇹🇷', '🇷🇺', '🇨🇳', '🇸🇦', '🇯🇵'];
+        
+        // INIT
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const club = params.get('club') || 'AS Monaco';
+            const logo = params.get('logo') || '⚽';
+            
+            document.getElementById('clubLogo').textContent = logo;
+            document.getElementById('clubName').textContent = club;
+        });
+        
+        // NAVIGATION
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active to clicked nav item
+            event.currentTarget.classList.add('active');
+            
+            // Update current section
+            currentSection = sectionId;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // LANGUAGE TOGGLE
+        function toggleLanguage() {
+            currentLangIndex = (currentLangIndex + 1) % langs.length;
+            document.getElementById('currentLang').textContent = langs[currentLangIndex];
+        }
+        
+        // OPEN SERVICE
+        function openService(service) {
+            alert(`Ouverture de : ${service}\n\nCette fonctionnalité sera développée prochainement.`);
+        }
+    </script>
+</body>
+</html>

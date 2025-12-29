@@ -1,118 +1,104 @@
-# 🎉 BIENVENUE - PaieCashPlay v2.6.0
+# LIRE EN PREMIER - ARCHITECTURE MICROSERVICES
 
-## ✅ STATUT : 100% TERMINÉ
+## TU AS DEMANDE UNE ARCHITECTURE MICROSERVICES
 
-**Toutes les 15 corrections que vous avez demandées sont complètes et fonctionnelles.**
-
----
-
-## 🚀 DÉMARRAGE RAPIDE
-
-### Option 1 : Page d'Accueil Interactive
-👉 **[CLIQUER ICI](APPLICATION_COMPLETE_v2.6.0.html)** pour voir le résumé complet
-
-### Option 2 : Ouvrir l'Application Directement
-👉 **[OUVRIR L'APPLICATION](index.html)**
-
-**Mode Mobile** (recommandé) :
-1. F12 → DevTools
-2. Ctrl+Shift+M → Mode responsive
-3. Sélectionner "iPhone 12 Pro"
+Tu veux que **chaque module soit autonome** et puisse être utilisé :
+- **En iframe** : `<iframe src="https://wallet.paiecashfan.com"></iframe>`
+- **En SDK JavaScript** : `PaieCashFan.Wallet.init({ container: '#wallet' })`
+- **En API REST** : `GET https://api.paiecashfan.com/wallet/balance/123`
 
 ---
 
-## 💰 NOUVEAUTÉ : Avantages Stablecoins
+## CE QUI A ETE CREE AUJOURD'HUI
 
-**Pourquoi payer en stablecoin plutôt qu'en carte bancaire ?**
+### 1. Architecture Microservices
+**Fichier** : [`ARCHITECTURE_MICROSERVICES_2026.md`](./ARCHITECTURE_MICROSERVICES_2026.md)
 
-| Avantage | Stablecoin (OMC, EURC, USDT) | Carte Bancaire |
-|----------|------------------------------|----------------|
-| **Frais boutique** | **0.5%** 📉 | 2.5% ❌ |
-| **Frais stade** | **0.5%** 📉 | 2.5% ❌ |
-| **Vitesse** | **<1 seconde** ⚡ | 3-5 secondes ⏱️ |
-| **Cash In/Out** | **Oui au stade** ✅ | Non ❌ |
-| **Économie** | **Jusqu'à 80%** 🎉 | - |
-
-**Exemple concret** :
-- Billet OM 50€
-- Frais carte : 1,25€
-- Frais stablecoin : **0,25€**
-- **Économie : 1€ par billet !**
+**Contenu** :
+- 9 microservices autonomes (Wallet, eSIM, Shop, Tickets, Feed, Gamif, Auth, Payment, Legends)
+- Chaque microservice a son propre domaine et database
+- Chaque microservice expose : iframe + SDK + API REST
 
 ---
 
-## 📋 LES 15 CORRECTIONS (RÉSUMÉ)
+### 2. Widget Wallet (AUTONOME)
+**Fichier** : [`widgets/wallet-widget.html`](./widgets/wallet-widget.html)
 
-### 👥 Amis & Social
-1. ✅ Bouton rond ➕ pour ajouter amis
-2. ✅ Envoi argent avec autocomplétion (Cameron inclus)
-3. ✅ Envoi OM Coin avec autocomplétion
-4. ✅ Système invitation amis (+50 pts, +2% cashback)
+**Fonctionnalités** :
+- Affichage solde total
+- Liste assets (PaieCash, Stablecoins clubs, Cryptos)
+- Historique transactions
+- Actions : Dépôt, Envoi, Réception
+- Communication parent-enfant via postMessage
 
-### 💳 Paiements
-5. ✅ BNPL amélioré (6x fonctionne, commission 1.5% affichée)
-6. ✅ Modal paiement universelle (6 modes)
-7. ✅ Code secret obligatoire si > 30€
-8. ✅ Statut "Validé" au lieu de "En cours"
-
-### 💰 Coins & Wallet
-9. ✅ Achat coins avec débit OM Coin
-10. ✅ Échange coins (+ EURC et USDT)
-11. ✅ Section avantages stablecoins
-12. ✅ Gestion Wallet & Carte + BNPL
-
-### 🎯 Interface
-13. ✅ Photo profil modifiable (header avec badge 📷)
-14. ✅ Badges cliquables
-15. ✅ Missions partageables (bouton 📤)
+**Utilisation iframe** :
+```html
+<iframe 
+  src="https://widgets.paiecashfan.com/wallet-widget.html?userId=123"
+  width="100%"
+  height="600px">
+</iframe>
+```
 
 ---
 
-## 📄 DOCUMENTATION COMPLÈTE
+### 3. SDK JavaScript
+**Fichier** : [`sdk/paiecashfan-sdk.js`](./sdk/paiecashfan-sdk.js)
 
-- **[TOUTES_CORRECTIONS_TERMINEES_v2.6.0.md](TOUTES_CORRECTIONS_TERMINEES_v2.6.0.md)** - Documentation technique détaillée
-- **[APPLICATION_COMPLETE_v2.6.0.html](APPLICATION_COMPLETE_v2.6.0.html)** - Vue d'ensemble interactive
-- **[README.md](README.md)** - Documentation générale du projet
+**Utilisation** :
+```html
+<!-- Charger SDK -->
+<script src="https://sdk.paiecashfan.com/paiecashfan-sdk.js"></script>
 
----
-
-## 🧪 TESTS RAPIDES (5 min)
-
-### Test 1 : Bouton Ajouter Ami
-Voir le bouton ➕ en bas à droite → Cliquer → Modal s'ouvre
-
-### Test 2 : Avantages Stablecoins
-Aller dans **Paiement** → Voir section verte avec 4 avantages
-
-### Test 3 : BNPL
-Acheter un produit → Modal 6 modes → Choisir BNPL → Sélectionner **6x** → Commission 1.5% affichée
-
-### Test 4 : Envoi Argent
-Stories → Cliquer ami → Transférer → Taper "Cam" → Cameron apparaît
-
-### Test 5 : Échange Coins
-Cliquer PSG Coin → Échanger → Voir **EURC et USDT** dans la liste
+<!-- Initialiser Wallet -->
+<div id="wallet"></div>
+<script>
+  PaieCashFan.Wallet.init({
+    container: '#wallet',
+    userId: '123',
+    onTransaction: (tx) => console.log(tx)
+  });
+</script>
+```
 
 ---
 
-## 📊 FICHIERS CRÉÉS
+## EXEMPLE : INTEGRER SUR UN SITE CLUB
 
-1. `corrections_v2.6.0.js` (11 500 caractères)
-2. `integration_paiement.js` (8 500 caractères)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AS Monaco - Mon Wallet</title>
+    <script src="https://sdk.paiecashfan.com/paiecashfan-sdk.js"></script>
+</head>
+<body>
+    <h1>Bienvenue sur AS Monaco</h1>
+    <div id="my-wallet"></div>
 
-**Total** : ~2 000 lignes de code ajoutées
+    <script>
+        PaieCashFan.Wallet.init({
+            container: '#my-wallet',
+            userId: '123',
+            theme: 'red'
+        });
+    </script>
+</body>
+</html>
+```
 
 ---
 
-## 📞 CONTACT
+## FICHIERS CREES
 
-**Email** : etot@paiecash.com  
-**Téléphone** : +33 7 67 12 96 52
+- [`ARCHITECTURE_MICROSERVICES_2026.md`](./ARCHITECTURE_MICROSERVICES_2026.md) - Architecture complète
+- [`widgets/wallet-widget.html`](./widgets/wallet-widget.html) - Widget Wallet autonome
+- [`sdk/paiecashfan-sdk.js`](./sdk/paiecashfan-sdk.js) - SDK JavaScript
+- [`examples/integration-complete.html`](./examples/integration-complete.html) - Exemple intégration
 
 ---
 
-## 🎊 L'APPLICATION EST PRÊTE !
+**Version** : 1.0  
+**Date** : 28 Décembre 2025  
 
-**Profitez de toutes les nouvelles fonctionnalités.**
-
-👉 **[COMMENCER](APPLICATION_COMPLETE_v2.6.0.html)**
+**Prochaine étape** : Créer les widgets manquants (eSIM, Shop, Tickets) !

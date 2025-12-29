@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Super App Complète</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            color: white;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        /* HEADER */
+        .header {
+            background: rgba(16, 185, 129, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .club-logo-header {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .header-info h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        .header-info p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .btn-home {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Sélecteur de langue */
+        .language-selector {
+            position: relative;
+        }
+        .language-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .language-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: rgba(26, 31, 53, 0.98);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 10px;
+            min-width: 200px;
+            display: none;
+            z-index: 10000;
+        }
+        .language-dropdown.active {
+            display: block;
+        }
+        .language-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .language-option:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .language-option.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* SECTIONS */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* CARDS */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #10b981;
+        }
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #10b981;
+        }
+        
+        /* WALLET CARD */
+        .wallet-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+        .wallet-balance {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .wallet-address {
+            font-size: 13px;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+        .wallet-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .wallet-btn {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .wallet-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* GRID PRODUITS */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        .product-info {
+            padding: 20px;
+        }
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+            margin: 10px 0;
+        }
+        .btn-buy {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* CHAT */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .message-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 12px;
+            max-width: 70%;
+        }
+        .message.own .message-content {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+        }
+        .btn-send {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* VIDEO CALL */
+        .video-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        .video-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .video-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .video-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .video-btn.mute {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .video-btn.hangup {
+            background: #ef4444;
+            color: white;
+        }
+        
+        /* IA */
+        .ai-suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .ai-suggestion {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .ai-suggestion:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        .ai-suggestion-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .ai-suggestion-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        /* TICKETS */
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        .ticket-match {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .ticket-date {
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+        .ticket-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: #10b981;
+            margin: 15px 0;
+        }
+        
+        /* ESIM */
+        .esim-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .esim-plan {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .esim-plan:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-5px);
+        }
+        .esim-plan.featured {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .esim-plan-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .esim-plan-data {
+            font-size: 32px;
+            font-weight: 700;
+            color: #10b981;
+            margin: 15px 0;
+        }
+        .esim-plan-price {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .esim-features {
+            list-style: none;
+            margin: 15px 0;
+        }
+        .esim-features li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .esim-features li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        /* TAB BAR */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 31, 53, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 10px 0;
+            z-index: 999;
+        }
+        .tab-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .tab-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+            flex: 1;
+            max-width: 100px;
+        }
+        .tab-button i {
+            font-size: 22px;
+        }
+        .tab-button.active {
+            color: #10b981;
+        }
+        .tab-button:hover {
+            color: #10b981;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .products-grid,
+            .tickets-grid,
+            .esim-plans {
+                grid-template-columns: 1fr;
+            }
+            .wallet-balance {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="club-logo-header" id="clubLogoHeader">⚽</div>
+                <div class="header-info">
+                    <h1 id="clubNameHeader">AS Monaco</h1>
+                    <p id="clubLeagueHeader">Ligue 1</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="btn-home">
+                    <i class="fas fa-home"></i>
+                    <span>Portail</span>
+                </a>
+                <div class="language-selector">
+                    <button class="language-btn" onclick="toggleLanguageDropdown()">
+                        <span id="currentLangFlag">🇫🇷</span>
+                        <span id="currentLangCode">fr</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="language-dropdown" id="languageDropdown">
+                        <div class="language-option active" data-lang="fr" onclick="changeLang('fr')">
+                            <span>🇫🇷</span> Français (fr)
+                        </div>
+                        <div class="language-option" data-lang="en" onclick="changeLang('en')">
+                            <span>🇬🇧</span> English (en)
+                        </div>
+                        <div class="language-option" data-lang="es" onclick="changeLang('es')">
+                            <span>🇪🇸</span> Español (es)
+                        </div>
+                        <div class="language-option" data-lang="de" onclick="changeLang('de')">
+                            <span>🇩🇪</span> Deutsch (de)
+                        </div>
+                        <div class="language-option" data-lang="it" onclick="changeLang('it')">
+                            <span>🇮🇹</span> Italiano (it)
+                        </div>
+                        <div class="language-option" data-lang="pt" onclick="changeLang('pt')">
+                            <span>🇵🇹</span> Português (pt)
+                        </div>
+                        <div class="language-option" data-lang="tr" onclick="changeLang('tr')">
+                            <span>🇹🇷</span> Türkçe (tr)
+                        </div>
+                        <div class="language-option" data-lang="ru" onclick="changeLang('ru')">
+                            <span>🇷🇺</span> Русский (ru)
+                        </div>
+                        <div class="language-option" data-lang="zh" onclick="changeLang('zh')">
+                            <span>🇨🇳</span> 中文 (zh)
+                        </div>
+                        <div class="language-option" data-lang="ar" onclick="changeLang('ar')">
+                            <span>🇸🇦</span> العربية (ar)
+                        </div>
+                        <div class="language-option" data-lang="ja" onclick="changeLang('ja')">
+                            <span>🇯🇵</span> 日本語 (ja)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- SECTION ACCUEIL -->
+        <section id="accueil" class="section active">
+            <div class="card">
+                <h2>🏠 Bienvenue sur PaieCashFan</h2>
+                <p style="opacity: 0.8; line-height: 1.6;">
+                    Votre super app TikTok × Fintech × IA pour supporter <strong id="welcomeClub">AS Monaco</strong> et gagner de l'argent !
+                </p>
+            </div>
+            
+            <div class="wallet-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <div style="opacity: 0.8; margin-bottom: 5px;">Solde PaieCash</div>
+                        <div class="wallet-balance" id="homeBalance">250,00 €</div>
+                        <div class="wallet-address">Wallet: 0x1234...5678</div>
+                    </div>
+                    <div style="font-size: 50px;">💰</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="wallet-btn" onclick="showSection('wallet')">
+                        <i class="fas fa-wallet"></i> Gérer
+                    </button>
+                    <button class="wallet-btn" onclick="alert('Recharge en cours...')">
+                        <i class="fas fa-plus"></i> Recharger
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🎯 Actions Rapides</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <button class="wallet-btn" onclick="showSection('billets')">
+                        <i class="fas fa-ticket-alt"></i> Billets
+                    </button>
+                    <button class="wallet-btn" onclick="showSection('boutique')">
+                        <i class="fas fa-shopping-bag"></i> Shop
+                    </button>
+                    <button class="wallet-btn" onclick="showSection('esim')">
+                        <i class="fas fa-sim-card"></i> eSIM
+                    </button>
+                    <button class="wallet-btn" onclick="showSection('chat')">
+                        <i class="fas fa-comments"></i> Chat
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Statistiques</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; color: #10b981;">5</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Billets achetés</div>
+                    </div>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; color: #667eea;">12</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Articles achetés</div>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; color: #ef4444;">3</div>
+                        <div style="opacity: 0.7; font-size: 14px;">eSIM actives</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION WALLET -->
+        <section id="wallet" class="section">
+            <div class="wallet-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <div style="opacity: 0.8; margin-bottom: 5px;">Solde Total</div>
+                        <div class="wallet-balance" id="walletBalance">250,00 €</div>
+                        <div class="wallet-address">0x1234...5678</div>
+                    </div>
+                    <div style="font-size: 60px;">💳</div>
+                </div>
+                <div class="wallet-actions">
+                    <button class="wallet-btn" onclick="alert('Envoi d\'argent...')">
+                        <i class="fas fa-paper-plane"></i> Envoyer
+                    </button>
+                    <button class="wallet-btn" onclick="alert('Recevoir de l\'argent...')">
+                        <i class="fas fa-qrcode"></i> Recevoir
+                    </button>
+                    <button class="wallet-btn" onclick="alert('Recharge en cours...')">
+                        <i class="fas fa-plus-circle"></i> Recharger
+                    </button>
+                    <button class="wallet-btn" onclick="alert('Retrait en cours...')">
+                        <i class="fas fa-minus-circle"></i> Retirer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>💱 Stablecoins Disponibles</h2>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 18px;">USDC</div>
+                            <div style="opacity: 0.7; font-size: 14px;">USD Coin</div>
+                        </div>
+                        <div style="font-size: 24px; font-weight: 700; color: #10b981;">250.00</div>
+                    </div>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 18px;">EURC</div>
+                            <div style="opacity: 0.7; font-size: 14px;">Euro Coin</div>
+                        </div>
+                        <div style="font-size: 24px; font-weight: 700; color: #667eea;">0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📜 Historique des Transactions</h2>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">Achat Billet NFT</div>
+                            <div style="opacity: 0.7; font-size: 13px;">27 Déc 2024, 14:32</div>
+                        </div>
+                        <div style="font-weight: 700; color: #ef4444;">-45.00 €</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">Recharge Wallet</div>
+                            <div style="opacity: 0.7; font-size: 13px;">25 Déc 2024, 10:15</div>
+                        </div>
+                        <div style="font-weight: 700; color: #10b981;">+100.00 €</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">Achat Maillot</div>
+                            <div style="opacity: 0.7; font-size: 13px;">23 Déc 2024, 16:45</div>
+                        </div>
+                        <div style="font-weight: 700; color: #ef4444;">-85.00 €</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION ESIM -->
+        <section id="esim" class="section">
+            <div class="card">
+                <h2>📱 PaieCash eSIM</h2>
+                <p style="opacity: 0.8; line-height: 1.6;">
+                    Restez connecté partout dans le monde avec nos forfaits eSIM ultra-compétitifs. 
+                    Activation instantanée, aucune carte SIM physique nécessaire.
+                </p>
+            </div>
+            
+            <div class="esim-plans">
+                <div class="esim-plan">
+                    <div class="esim-plan-name">🇪🇺 Europe</div>
+                    <div class="esim-plan-data">5 GB</div>
+                    <div class="esim-plan-price">9,99 € / 30 jours</div>
+                    <ul class="esim-features">
+                        <li>5G inclus</li>
+                        <li>27 pays couverts</li>
+                        <li>Activation instantanée</li>
+                        <li>Support 24/7</li>
+                    </ul>
+                    <button class="btn-buy">Acheter</button>
+                </div>
+                
+                <div class="esim-plan featured">
+                    <div style="background: #10b981; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; font-size: 12px; font-weight: 600;">
+                        ⭐ POPULAIRE
+                    </div>
+                    <div class="esim-plan-name">🌍 Mondial</div>
+                    <div class="esim-plan-data">10 GB</div>
+                    <div class="esim-plan-price">24,99 € / 30 jours</div>
+                    <ul class="esim-features">
+                        <li>5G inclus</li>
+                        <li>120+ pays couverts</li>
+                        <li>Activation instantanée</li>
+                        <li>Support prioritaire 24/7</li>
+                        <li>Hotspot inclus</li>
+                    </ul>
+                    <button class="btn-buy">Acheter</button>
+                </div>
+                
+                <div class="esim-plan">
+                    <div class="esim-plan-name">🌍 Premium</div>
+                    <div class="esim-plan-data">20 GB</div>
+                    <div class="esim-plan-price">39,99 € / 30 jours</div>
+                    <ul class="esim-features">
+                        <li>5G Premium</li>
+                        <li>150+ pays couverts</li>
+                        <li>Activation instantanée</li>
+                        <li>Support VIP 24/7</li>
+                        <li>Hotspot illimité</li>
+                        <li>Appels inclus</li>
+                    </ul>
+                    <button class="btn-buy">Acheter</button>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 30px;">
+                <h3>📡 Mes eSIM Actives</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-weight: 600; font-size: 18px;">🇪🇺 Europe 5GB</div>
+                            <div style="background: #10b981; padding: 5px 10px; border-radius: 20px; font-size: 12px;">Active</div>
+                        </div>
+                        <div style="opacity: 0.7; margin-bottom: 10px;">2.3 GB restants sur 5 GB</div>
+                        <div style="background: rgba(255, 255, 255, 0.1); height: 8px; border-radius: 20px; overflow: hidden;">
+                            <div style="background: #10b981; height: 100%; width: 46%;"></div>
+                        </div>
+                        <div style="opacity: 0.7; font-size: 13px; margin-top: 10px;">Expire le 15 Jan 2025</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION BOUTIQUE -->
+        <section id="boutique" class="section">
+            <div class="card">
+                <h2>🛍️ Boutique Officielle</h2>
+                <p style="opacity: 0.8;">Achetez vos produits préférés avec PaieCash Coin (stablecoin)</p>
+            </div>
+            
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">👕</div>
+                    <div class="product-info">
+                        <div class="product-title">Maillot Domicile 2024/25</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Taille: S, M, L, XL, XXL</div>
+                        <div class="product-price">89,99 €</div>
+                        <button class="btn-buy" onclick="buyProduct('Maillot Domicile', 89.99)">
+                            <i class="fas fa-shopping-cart"></i> Acheter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">🧢</div>
+                    <div class="product-info">
+                        <div class="product-title">Casquette Officielle</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Taille unique</div>
+                        <div class="product-price">24,99 €</div>
+                        <button class="btn-buy" onclick="buyProduct('Casquette', 24.99)">
+                            <i class="fas fa-shopping-cart"></i> Acheter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">🧣</div>
+                    <div class="product-info">
+                        <div class="product-title">Écharpe Supporters</div>
+                        <div style="opacity: 0.7; font-size: 14px;">100% polyester</div>
+                        <div class="product-price">19,99 €</div>
+                        <button class="btn-buy" onclick="buyProduct('Écharpe', 19.99)">
+                            <i class="fas fa-shopping-cart"></i> Acheter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">⚽</div>
+                    <div class="product-info">
+                        <div class="product-title">Ballon Officiel</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Taille 5</div>
+                        <div class="product-price">34,99 €</div>
+                        <button class="btn-buy" onclick="buyProduct('Ballon', 34.99)">
+                            <i class="fas fa-shopping-cart"></i> Acheter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">💳</div>
+                    <div class="product-info">
+                        <div class="product-title">Carte Prépayée PaieCash</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Virtuelle ou physique</div>
+                        <div class="product-price">À partir de 10 €</div>
+                        <button class="btn-buy" onclick="alert('Redirection vers les cartes prépayées...')">
+                            <i class="fas fa-credit-card"></i> Découvrir
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">📱</div>
+                    <div class="product-info">
+                        <div class="product-title">PaieCash eSIM</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Connectivité mondiale</div>
+                        <div class="product-price">À partir de 9,99 €</div>
+                        <button class="btn-buy" onclick="showSection('esim')">
+                            <i class="fas fa-sim-card"></i> Découvrir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION BILLETS -->
+        <section id="billets" class="section">
+            <div class="card">
+                <h2>🎫 Billets NFT</h2>
+                <p style="opacity: 0.8;">Achetez vos billets sous forme de NFT sur la blockchain</p>
+            </div>
+            
+            <div class="tickets-grid">
+                <div class="ticket-card">
+                    <div class="ticket-match">🏠 AS Monaco vs PSG</div>
+                    <div class="ticket-date">
+                        <i class="fas fa-calendar"></i> 12 Janvier 2025, 21:00
+                    </div>
+                    <div style="opacity: 0.7; font-size: 14px; margin-top: 5px;">
+                        <i class="fas fa-map-marker-alt"></i> Stade Louis II, Monaco
+                    </div>
+                    <div class="ticket-price">45,00 €</div>
+                    <button class="btn-buy" onclick="buyTicket('AS Monaco vs PSG', 45.00)">
+                        <i class="fas fa-ticket-alt"></i> Acheter NFT
+                    </button>
+                </div>
+                
+                <div class="ticket-card">
+                    <div class="ticket-match">🏠 AS Monaco vs OM</div>
+                    <div class="ticket-date">
+                        <i class="fas fa-calendar"></i> 19 Janvier 2025, 17:00
+                    </div>
+                    <div style="opacity: 0.7; font-size: 14px; margin-top: 5px;">
+                        <i class="fas fa-map-marker-alt"></i> Stade Louis II, Monaco
+                    </div>
+                    <div class="ticket-price">40,00 €</div>
+                    <button class="btn-buy" onclick="buyTicket('AS Monaco vs OM', 40.00)">
+                        <i class="fas fa-ticket-alt"></i> Acheter NFT
+                    </button>
+                </div>
+                
+                <div class="ticket-card">
+                    <div class="ticket-match">🏠 AS Monaco vs OL</div>
+                    <div class="ticket-date">
+                        <i class="fas fa-calendar"></i> 26 Janvier 2025, 20:45
+                    </div>
+                    <div style="opacity: 0.7; font-size: 14px; margin-top: 5px;">
+                        <i class="fas fa-map-marker-alt"></i> Stade Louis II, Monaco
+                    </div>
+                    <div class="ticket-price">38,00 €</div>
+                    <button class="btn-buy" onclick="buyTicket('AS Monaco vs OL', 38.00)">
+                        <i class="fas fa-ticket-alt"></i> Acheter NFT
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 30px;">
+                <h3>🎟️ Mes Billets NFT</h3>
+                <div id="myTickets" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <div style="text-align: center; opacity: 0.5; padding: 40px;">
+                        Vous n'avez pas encore de billets.<br>
+                        Achetez votre premier billet NFT ci-dessus !
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION CHAT -->
+        <section id="chat" class="section">
+            <div class="card">
+                <h2>💬 Chat Communautaire</h2>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div>
+                        <div style="font-weight: 600; font-size: 18px;">💬 Communauté <span id="chatClub">AS Monaco</span></div>
+                        <div style="opacity: 0.7; font-size: 13px;">1,234 fans en ligne</div>
+                    </div>
+                    <button class="wallet-btn" style="padding: 10px 20px;" onclick="alert('Lancement de l\'appel vidéo...')">
+                        <i class="fas fa-video"></i> Appel Vidéo
+                    </button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <div class="message-avatar">👤</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 13px; margin-bottom: 5px;">Jean Dupont</div>
+                            <div class="message-content">
+                                Salut tout le monde ! Qui sera au match ce weekend ? 🔴⚪
+                            </div>
+                            <div style="opacity: 0.5; font-size: 11px; margin-top: 5px;">Il y a 5 min</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">👨</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 13px; margin-bottom: 5px;">Marc Martin</div>
+                            <div class="message-content">
+                                Moi ! J'ai acheté mon billet NFT hier 🎫
+                            </div>
+                            <div style="opacity: 0.5; font-size: 11px; margin-top: 5px;">Il y a 3 min</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message own">
+                        <div class="message-avatar">😊</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 13px; margin-bottom: 5px; text-align: right;">Vous</div>
+                            <div class="message-content">
+                                Super ! On se retrouve là-bas 💪
+                            </div>
+                            <div style="opacity: 0.5; font-size: 11px; margin-top: 5px; text-align: right;">À l'instant</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Tapez votre message..." id="chatInput">
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 30px;">
+                <h3>📹 Appels Vidéo</h3>
+                <p style="opacity: 0.8; margin-bottom: 20px;">Organisez des appels vidéo avec d'autres fans</p>
+                <div class="video-container" style="display: none;" id="videoCall">
+                    <div class="video-placeholder">
+                        📹
+                    </div>
+                    <div class="video-controls">
+                        <button class="video-btn mute">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="video-btn hangup" onclick="endCall()">
+                            <i class="fas fa-phone-slash"></i>
+                        </button>
+                        <button class="video-btn mute">
+                            <i class="fas fa-video"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn-buy" onclick="startCall()">
+                    <i class="fas fa-video"></i> Démarrer un appel vidéo
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION IA -->
+        <section id="ia" class="section">
+            <div class="card">
+                <h2>🤖 Intelligence Artificielle Personnalisée</h2>
+                <p style="opacity: 0.8; line-height: 1.6;">
+                    Notre IA analyse vos préférences pour vous proposer du contenu personnalisé, 
+                    des recommandations de produits et des prévisions de matchs.
+                </p>
+            </div>
+            
+            <div class="card">
+                <h3>✨ Suggestions pour vous</h3>
+                <div class="ai-suggestions">
+                    <div class="ai-suggestion" onclick="alert('Prévision du match...')">
+                        <div class="ai-suggestion-icon">⚽</div>
+                        <div class="ai-suggestion-title">Prédiction Match</div>
+                        <div style="opacity: 0.7; font-size: 14px;">AS Monaco a 68% de chances de gagner contre PSG</div>
+                    </div>
+                    
+                    <div class="ai-suggestion" onclick="alert('Analyse des performances...')">
+                        <div class="ai-suggestion-icon">📊</div>
+                        <div class="ai-suggestion-title">Analyse Performances</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Les stats du club cette saison</div>
+                    </div>
+                    
+                    <div class="ai-suggestion" onclick="showSection('boutique')">
+                        <div class="ai-suggestion-icon">🛍️</div>
+                        <div class="ai-suggestion-title">Produit Recommandé</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Nouveau maillot en édition limitée</div>
+                    </div>
+                    
+                    <div class="ai-suggestion" onclick="alert('Moments forts...')">
+                        <div class="ai-suggestion-icon">🎬</div>
+                        <div class="ai-suggestion-title">Moments Forts</div>
+                        <div style="opacity: 0.7; font-size: 14px;">Revivez les meilleurs moments</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>💬 Assistant IA</h3>
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-top: 15px;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+                            🤖
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 10px;">Assistant PaieCashFan</div>
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px;">
+                                Bonjour ! Je suis votre assistant IA personnel. Je peux vous aider avec :
+                                <ul style="margin-top: 10px; padding-left: 20px;">
+                                    <li>Recommandations de produits</li>
+                                    <li>Prédictions de matchs</li>
+                                    <li>Analyse de performances</li>
+                                    <li>Conseils d'achat de billets</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" placeholder="Posez-moi une question..." style="flex: 1; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: white;">
+                        <button class="btn-send" onclick="alert('Traitement de votre question...')">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📈 Votre Profil IA</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px;">
+                        <div style="font-size: 28px; margin-bottom: 10px;">⚽</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Sport Préféré</div>
+                        <div style="opacity: 0.7;">Football</div>
+                    </div>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px;">
+                        <div style="font-size: 28px; margin-bottom: 10px;">🎫</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Matchs Assistés</div>
+                        <div style="opacity: 0.7;">12 cette saison</div>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 12px;">
+                        <div style="font-size: 28px; margin-bottom: 10px;">🛍️</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Catégorie Favorite</div>
+                        <div style="opacity: 0.7;">Maillots</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION PROFIL -->
+        <section id="profil" class="section">
+            <div class="card">
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+                        😊
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 style="margin-bottom: 5px;">Jean Dupont</h2>
+                        <div style="opacity: 0.7;">jean.dupont@example.com</div>
+                        <div style="opacity: 0.7;">+33 6 12 34 56 78</div>
+                    </div>
+                </div>
+                <button class="wallet-btn" style="width: 100%;" onclick="alert('Modification du profil...')">
+                    <i class="fas fa-edit"></i> Modifier le profil
+                </button>
+            </div>
+            
+            <div class="card">
+                <h3>⚙️ Paramètres</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">🔔 Notifications</div>
+                            <div style="opacity: 0.7; font-size: 14px;">Recevoir les alertes</div>
+                        </div>
+                        <label style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #10b981; transition: .4s; border-radius: 24px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">🌙 Mode Sombre</div>
+                            <div style="opacity: 0.7; font-size: 14px;">Interface sombre</div>
+                        </div>
+                        <label style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                            <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #10b981; transition: .4s; border-radius: 24px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">🌍 Langue</div>
+                            <div style="opacity: 0.7; font-size: 14px;">Français (fr)</div>
+                        </div>
+                        <button class="wallet-btn" style="padding: 8px 15px;" onclick="toggleLanguageDropdown()">
+                            <i class="fas fa-globe"></i> Changer
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🔐 Sécurité</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <button class="wallet-btn" style="width: 100%;" onclick="alert('Changement de mot de passe...')">
+                        <i class="fas fa-key"></i> Changer le mot de passe
+                    </button>
+                    <button class="wallet-btn" style="width: 100%;" onclick="alert('Configuration 2FA...')">
+                        <i class="fas fa-shield-alt"></i> Activer 2FA
+                    </button>
+                    <button class="wallet-btn" style="width: 100%; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3);" onclick="alert('Déconnexion...')">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+        <div class="tab-bar-content">
+            <button class="tab-button active" onclick="showSection('accueil')">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </button>
+            <button class="tab-button" onclick="showSection('wallet')">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </button>
+            <button class="tab-button" onclick="showSection('esim')">
+                <i class="fas fa-sim-card"></i>
+                <span>eSIM</span>
+            </button>
+            <button class="tab-button" onclick="showSection('boutique')">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Shop</span>
+            </button>
+            <button class="tab-button" onclick="showSection('billets')">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Billets</span>
+            </button>
+            <button class="tab-button" onclick="showSection('chat')">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </button>
+            <button class="tab-button" onclick="showSection('ia')">
+                <i class="fas fa-robot"></i>
+                <span>IA</span>
+            </button>
+            <button class="tab-button" onclick="showSection('profil')">
+                <i class="fas fa-user"></i>
+                <span>Profil</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let walletBalance = 250.00;
+        let currentLang = 'fr';
+
+        // INIT
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const club = params.get('club') || 'AS Monaco';
+            const logo = params.get('logo') || '⚽';
+            const league = params.get('league') || 'Ligue 1';
+            
+            document.getElementById('clubLogoHeader').textContent = logo;
+            document.getElementById('clubNameHeader').textContent = club;
+            document.getElementById('clubLeagueHeader').textContent = league;
+            document.getElementById('welcomeClub').textContent = club;
+            document.getElementById('chatClub').textContent = club;
+            
+            // Load saved language
+            const savedLang = localStorage.getItem('paiecashfan_lang');
+            if (savedLang) {
+                changeLang(savedLang);
+            }
+        });
+
+        // NAVIGATION
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active to clicked tab button
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                const onclick = btn.getAttribute('onclick');
+                if (onclick && onclick.includes(sectionId)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // LANGUE
+        function toggleLanguageDropdown() {
+            document.getElementById('languageDropdown').classList.toggle('active');
+        }
+
+        function changeLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('paiecashfan_lang', lang);
+            
+            const langs = {
+                fr: {flag: '🇫🇷', code: 'fr'},
+                en: {flag: '🇬🇧', code: 'en'},
+                es: {flag: '🇪🇸', code: 'es'},
+                de: {flag: '🇩🇪', code: 'de'},
+                it: {flag: '🇮🇹', code: 'it'},
+                pt: {flag: '🇵🇹', code: 'pt'},
+                tr: {flag: '🇹🇷', code: 'tr'},
+                ru: {flag: '🇷🇺', code: 'ru'},
+                zh: {flag: '🇨🇳', code: 'zh'},
+                ar: {flag: '🇸🇦', code: 'ar'},
+                ja: {flag: '🇯🇵', code: 'ja'}
+            };
+            
+            document.getElementById('currentLangFlag').textContent = langs[lang].flag;
+            document.getElementById('currentLangCode').textContent = langs[lang].code;
+            
+            document.querySelectorAll('.language-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.getAttribute('data-lang') === lang) {
+                    opt.classList.add('active');
+                }
+            });
+            
+            toggleLanguageDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('languageDropdown');
+            const btn = document.querySelector('.language-btn');
+            if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // SHOPPING
+        function buyProduct(productName, price) {
+            if (walletBalance >= price) {
+                if (confirm(`Acheter ${productName} pour ${price.toFixed(2)} € avec PaieCash Coin (stablecoin) ?\n\nSolde actuel: ${walletBalance.toFixed(2)} €`)) {
+                    walletBalance -= price;
+                    updateBalances();
+                    alert(`✅ Achat réussi !\n\n${productName} acheté pour ${price.toFixed(2)} €\nNouveau solde: ${walletBalance.toFixed(2)} €\n\nTransaction blockchain confirmée 🔗`);
+                }
+            } else {
+                alert(`❌ Solde insuffisant\n\nSolde actuel: ${walletBalance.toFixed(2)} €\nPrix: ${price.toFixed(2)} €\n\nVeuillez recharger votre wallet.`);
+            }
+        }
+
+        function buyTicket(matchName, price) {
+            if (walletBalance >= price) {
+                if (confirm(`Acheter le billet NFT pour ${matchName} à ${price.toFixed(2)} € ?\n\nSolde actuel: ${walletBalance.toFixed(2)} €\n\nLe billet sera minté comme NFT sur la blockchain.`)) {
+                    walletBalance -= price;
+                    updateBalances();
+                    
+                    // Add ticket to my tickets
+                    const myTickets = document.getElementById('myTickets');
+                    myTickets.innerHTML = `
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                <div>
+                                    <div style="font-weight: 700; font-size: 18px; color: #10b981; margin-bottom: 5px;">🎫 ${matchName}</div>
+                                    <div style="opacity: 0.7; font-size: 14px;">NFT Token #${Math.floor(Math.random() * 10000)}</div>
+                                </div>
+                                <div style="background: #10b981; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    ✓ Validé
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-top: 10px;">
+                                <div id="qrcode-${Date.now()}" style="width: 150px; height: 150px;"></div>
+                            </div>
+                            <div style="margin-top: 15px; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 10px;">
+                                <div style="font-size: 12px; opacity: 0.7; margin-bottom: 5px;">Blockchain</div>
+                                <div style="font-family: monospace; font-size: 11px;">0x${Math.random().toString(16).substr(2, 40)}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    alert(`✅ Billet NFT acheté avec succès !\n\n${matchName}\nPrix: ${price.toFixed(2)} €\nNouveau solde: ${walletBalance.toFixed(2)} €\n\n🔗 NFT minté sur la blockchain\n📱 Consultez vos billets dans l'onglet "Mes Billets NFT"`);
+                }
+            } else {
+                alert(`❌ Solde insuffisant\n\nSolde actuel: ${walletBalance.toFixed(2)} €\nPrix: ${price.toFixed(2)} €`);
+            }
+        }
+
+        function updateBalances() {
+            const formatted = walletBalance.toFixed(2) + ' €';
+            document.getElementById('homeBalance').textContent = formatted;
+            document.getElementById('walletBalance').textContent = formatted;
+        }
+
+        // CHAT
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message own';
+                newMessage.innerHTML = `
+                    <div class="message-avatar">😊</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 13px; margin-bottom: 5px; text-align: right;">Vous</div>
+                        <div class="message-content">${message}</div>
+                        <div style="opacity: 0.5; font-size: 11px; margin-top: 5px; text-align: right;">À l'instant</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(newMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                input.value = '';
+            }
+        }
+
+        // VIDEO CALL
+        function startCall() {
+            const videoCall = document.getElementById('videoCall');
+            videoCall.style.display = 'block';
+            alert('📹 Appel vidéo démarré !\n\nVous pouvez maintenant communiquer avec d\'autres fans.');
+        }
+
+        function endCall() {
+            if (confirm('Terminer l\'appel vidéo ?')) {
+                const videoCall = document.getElementById('videoCall');
+                videoCall.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

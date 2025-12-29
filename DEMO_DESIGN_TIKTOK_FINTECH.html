@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PaieCashFan - Design TikTok × Fintech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* HEADER TIKTOK STYLE */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .wallet-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* STORIES SECTION */
+        .stories {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #0a0a0a;
+        }
+
+        .stories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story {
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .story-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3px;
+            margin-bottom: 8px;
+        }
+
+        .story-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .story-label {
+            font-size: 12px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        /* FEED POSTS TIKTOK */
+        .feed {
+            padding-bottom: 80px;
+        }
+
+        .post {
+            background: #0a0a0a;
+            margin-bottom: 2px;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            gap: 12px;
+        }
+
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-author {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .post-content {
+            padding: 0 20px 15px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .post-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px;
+            border-top: 1px solid #111;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 15px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn.liked {
+            color: #ef4444;
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .earn-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        /* BOTTOM NAV TIKTOK */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #222;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post {
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+            z-index: 200;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">PaieCashFan</div>
+        <div class="wallet-badge">
+            <span id="balance">247.50</span> OMC
+        </div>
+    </header>
+
+    <!-- STORIES -->
+    <div class="stories">
+        <div class="story">
+            <div class="story-circle">
+                <div class="story-inner">🔴</div>
+            </div>
+            <div class="story-label">Live</div>
+        </div>
+        <div class="story">
+            <div class="story-circle">
+                <div class="story-inner">⚽</div>
+            </div>
+            <div class="story-label">Match</div>
+        </div>
+        <div class="story">
+            <div class="story-circle">
+                <div class="story-inner">🎉</div>
+            </div>
+            <div class="story-label">Promo</div>
+        </div>
+        <div class="story">
+            <div class="story-circle">
+                <div class="story-inner">💰</div>
+            </div>
+            <div class="story-label">Cashback</div>
+        </div>
+        <div class="story">
+            <div class="story-circle">
+                <div class="story-inner">🎁</div>
+            </div>
+            <div class="story-label">Offres</div>
+        </div>
+    </div>
+
+    <!-- FEED -->
+    <div class="feed">
+        <!-- POST 1 -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">⚽</div>
+                <div class="post-info">
+                    <div class="post-author">Olympique de Marseille</div>
+                    <div class="post-time">Il y a 2h • Stade Vélodrome</div>
+                </div>
+            </div>
+            <div class="post-content">
+                🔥 Victoire 2-0 ! Félicitations à nos supporters ! Profitez de 10% de cashback sur la boutique aujourd'hui ! #DroitAuBut ⚽💙
+            </div>
+            <div class="post-image">⚽</div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="handleLike(this, 0.01)">
+                    <span class="action-icon">❤️</span>
+                    <span class="action-label">Like</span>
+                    <span class="earn-badge">+0.01€</span>
+                </button>
+                <button class="action-btn" onclick="handleComment(this, 0.02)">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">Commenter</span>
+                    <span class="earn-badge">+0.02€</span>
+                </button>
+                <button class="action-btn" onclick="handleShare(this, 0.05)">
+                    <span class="action-icon">↗️</span>
+                    <span class="action-label">Partager</span>
+                    <span class="earn-badge">+0.05€</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- POST 2 -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">⚽</div>
+                <div class="post-info">
+                    <div class="post-author">Paris Saint-Germain</div>
+                    <div class="post-time">Il y a 5h • Parc des Princes</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ⚡ Nouvelle collection de maillots disponible ! Cashback 5% sur tous les achats. Livraison offerte dès 50€ ! #IciCestParis 🔴🔵
+            </div>
+            <div class="post-image">👕</div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="handleLike(this, 0.01)">
+                    <span class="action-icon">❤️</span>
+                    <span class="action-label">Like</span>
+                    <span class="earn-badge">+0.01€</span>
+                </button>
+                <button class="action-btn" onclick="handleComment(this, 0.02)">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">Commenter</span>
+                    <span class="earn-badge">+0.02€</span>
+                </button>
+                <button class="action-btn" onclick="handleShare(this, 0.05)">
+                    <span class="action-icon">↗️</span>
+                    <span class="action-label">Partager</span>
+                    <span class="earn-badge">+0.05€</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- POST 3 -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">⚽</div>
+                <div class="post-info">
+                    <div class="post-author">AS Monaco</div>
+                    <div class="post-time">Il y a 1 jour • Stade Louis II</div>
+                </div>
+            </div>
+            <div class="post-content">
+                🏆 Champions de France ! Merci pour votre soutien indéfectible. Offre spéciale : 20% sur tous les produits du club ! #DagheMunegu 🔴⚪
+            </div>
+            <div class="post-image">🏆</div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="handleLike(this, 0.01)">
+                    <span class="action-icon">❤️</span>
+                    <span class="action-label">Like</span>
+                    <span class="earn-badge">+0.01€</span>
+                </button>
+                <button class="action-btn" onclick="handleComment(this, 0.02)">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">Commenter</span>
+                    <span class="earn-badge">+0.02€</span>
+                </button>
+                <button class="action-btn" onclick="handleShare(this, 0.05)">
+                    <span class="action-icon">↗️</span>
+                    <span class="action-label">Partager</span>
+                    <span class="earn-badge">+0.05€</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- POST 4 - LIVE SHOPPING -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">📺</div>
+                <div class="post-info">
+                    <div class="post-author">Live Shopping OM</div>
+                    <div class="post-time">🔴 EN DIRECT</div>
+                </div>
+            </div>
+            <div class="post-content">
+                🔥 LIVE SHOPPING EN COURS ! Cashback doublé : 10% au lieu de 5% ! Maillot domicile 2025 à -30% ! Ne manquez pas ça ! 🛍️💰
+            </div>
+            <div class="post-image">🛍️</div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="handleLike(this, 0.01)">
+                    <span class="action-icon">❤️</span>
+                    <span class="action-label">Like</span>
+                    <span class="earn-badge">+0.01€</span>
+                </button>
+                <button class="action-btn" onclick="handleComment(this, 0.02)">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">Commenter</span>
+                    <span class="earn-badge">+0.02€</span>
+                </button>
+                <button class="action-btn" onclick="alert('Redirection vers boutique...')">
+                    <span class="action-icon">🛒</span>
+                    <span class="action-label">Acheter</span>
+                    <span class="earn-badge">10%</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Accueil</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">🔥</span>
+            <span class="nav-label">FOMO</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span class="nav-label">Wallet</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">🛍️</span>
+            <span class="nav-label">Shop</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profil</span>
+        </div>
+    </nav>
+
+    <script>
+        let balance = 247.50;
+
+        function showNotification(message) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateBalance(amount) {
+            balance += amount;
+            document.getElementById('balance').textContent = balance.toFixed(2);
+        }
+
+        function handleLike(btn, amount) {
+            const icon = btn.querySelector('.action-icon');
+            
+            if (icon.textContent === '❤️') {
+                icon.textContent = '💖';
+                btn.classList.add('liked');
+                updateBalance(amount);
+                showNotification(`+${amount.toFixed(2)}€ gagné ! 👍`);
+            } else {
+                icon.textContent = '❤️';
+                btn.classList.remove('liked');
+            }
+        }
+
+        function handleComment(btn, amount) {
+            const comment = prompt('Votre commentaire:');
+            if (comment && comment.trim()) {
+                updateBalance(amount);
+                showNotification(`+${amount.toFixed(2)}€ gagné ! 💬`);
+                alert(`Commentaire publié: "${comment}"`);
+            }
+        }
+
+        function handleShare(btn, amount) {
+            if (confirm('Partager cette publication?')) {
+                updateBalance(amount);
+                showNotification(`+${amount.toFixed(2)}€ gagné ! 🔄`);
+                alert('Publication partagée avec succès !');
+            }
+        }
+
+        // Animation des posts au scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const posts = document.querySelectorAll('.post');
+            posts.forEach((post, index) => {
+                post.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+
+</body>
+</html>

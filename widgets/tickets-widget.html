@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets PaieCash - Widget</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.08);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            color: #fff;
+        }
+
+        .tab.active {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .my-tickets-section {
+            margin-bottom: 20px;
+        }
+
+        .ticket-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nft-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .ticket-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ticket-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .ticket-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .ticket-info p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .ticket-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.08);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .qr-code-section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .qr-code-id {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        .ticket-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .event-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+        }
+
+        .event-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #ef4444;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .seats-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #10b981;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .event-content {
+            padding: 20px;
+        }
+
+        .event-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .event-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .price-label {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .price-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .buy-ticket-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .buy-ticket-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .marketplace-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .marketplace-card:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .marketplace-image {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+
+        .marketplace-info {
+            flex: 1;
+        }
+
+        .marketplace-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .marketplace-seller {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .marketplace-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .marketplace-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .verified-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .filter-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .filter-chip.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🎟️</div>
+            <div class="header-text">
+                <h2>Billets & NFT Tickets</h2>
+                <p>Vos places pour les matchs</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('my-tickets')">Mes Billets</button>
+            <button class="tab" onclick="switchTab('events')">Événements</button>
+            <button class="tab" onclick="switchTab('marketplace')">Marketplace</button>
+        </div>
+
+        <!-- Tab: Mes Billets -->
+        <div class="tab-content active" id="tab-my-tickets">
+            <div class="my-tickets-section">
+                <!-- Ticket 1 -->
+                <div class="ticket-card">
+                    <div class="nft-badge">🎨 NFT</div>
+                    <div class="ticket-header">
+                        <div class="ticket-icon">⚽</div>
+                        <div class="ticket-info">
+                            <h3>Monaco vs PSG</h3>
+                            <p>Dimanche 15 Février 2026 • 15:00</p>
+                        </div>
+                    </div>
+
+                    <div class="ticket-details">
+                        <div class="detail-item">
+                            <div class="detail-label">TRIBUNE</div>
+                            <div class="detail-value">Jean Bouin Nord</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">PLACE</div>
+                            <div class="detail-value">Section B • Rang 12 • N°47</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">CATÉGORIE</div>
+                            <div class="detail-value">Premium</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">PRIX</div>
+                            <div class="detail-value">89.99€</div>
+                        </div>
+                    </div>
+
+                    <div class="qr-code-section">
+                        <p style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">QR Code d'Entrée</p>
+                        <div class="qr-code">📱</div>
+                        <div class="qr-code-id">ID: MNCP-2026-0047-B12</div>
+                    </div>
+
+                    <div class="ticket-actions">
+                        <button class="action-btn" onclick="handleTicketAction('download', 1)">
+                            <span>📥</span> Télécharger
+                        </button>
+                        <button class="action-btn" onclick="handleTicketAction('share', 1)">
+                            <span>📤</span> Partager
+                        </button>
+                        <button class="action-btn" onclick="handleTicketAction('sell', 1)">
+                            <span>💰</span> Revendre
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ticket 2 -->
+                <div class="ticket-card">
+                    <div class="nft-badge">🎨 NFT</div>
+                    <div class="ticket-header">
+                        <div class="ticket-icon">⚽</div>
+                        <div class="ticket-info">
+                            <h3>Monaco vs Lyon</h3>
+                            <p>Samedi 28 Mars 2026 • 21:00</p>
+                        </div>
+                    </div>
+
+                    <div class="ticket-details">
+                        <div class="detail-item">
+                            <div class="detail-label">TRIBUNE</div>
+                            <div class="detail-value">Annonciade</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">PLACE</div>
+                            <div class="detail-value">Section A • Rang 5 • N°23</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">CATÉGORIE</div>
+                            <div class="detail-value">VIP</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">PRIX</div>
+                            <div class="detail-value">149.99€</div>
+                        </div>
+                    </div>
+
+                    <div class="qr-code-section">
+                        <p style="font-size: 12px; opacity: 0.8; margin-bottom: 8px;">QR Code d'Entrée</p>
+                        <div class="qr-code">📱</div>
+                        <div class="qr-code-id">ID: MNCL-2026-0023-A5</div>
+                    </div>
+
+                    <div class="ticket-actions">
+                        <button class="action-btn" onclick="handleTicketAction('download', 2)">
+                            <span>📥</span> Télécharger
+                        </button>
+                        <button class="action-btn" onclick="handleTicketAction('share', 2)">
+                            <span>📤</span> Partager
+                        </button>
+                        <button class="action-btn" onclick="handleTicketAction('sell', 2)">
+                            <span>💰</span> Revendre
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Événements -->
+        <div class="tab-content" id="tab-events">
+            <div class="filters">
+                <div class="filter-chip active" onclick="filterEvents('all')">🔥 Tous</div>
+                <div class="filter-chip" onclick="filterEvents('ligue1')">🏆 Ligue 1</div>
+                <div class="filter-chip" onclick="filterEvents('champions')">⭐ Champions</div>
+                <div class="filter-chip" onclick="filterEvents('cup')">🏅 Coupe</div>
+            </div>
+
+            <!-- Event 1 -->
+            <div class="event-card" onclick="viewEvent(1)">
+                <div class="event-image">
+                    <div class="event-badge">🔥 HOT</div>
+                    <div class="seats-badge">142 places</div>
+                    ⚽
+                </div>
+                <div class="event-content">
+                    <div class="event-title">AS Monaco vs Paris Saint-Germain</div>
+                    <div class="event-info-row">
+                        <span>📅</span>
+                        <span>Dimanche 15 Février 2026 • 15:00</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>📍</span>
+                        <span>Stade Louis II, Monaco</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>🏆</span>
+                        <span>Ligue 1 • Journée 24</span>
+                    </div>
+                    <div class="price-section">
+                        <div>
+                            <div class="price-label">À partir de</div>
+                            <div class="price-value">49.99€</div>
+                        </div>
+                    </div>
+                    <button class="buy-ticket-btn" onclick="buyTicket(event, 1)">
+                        🎟️ Acheter Billet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event 2 -->
+            <div class="event-card" onclick="viewEvent(2)">
+                <div class="event-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="event-badge">⭐ VIP</div>
+                    <div class="seats-badge">23 places</div>
+                    ⚽
+                </div>
+                <div class="event-content">
+                    <div class="event-title">AS Monaco vs Manchester City</div>
+                    <div class="event-info-row">
+                        <span>📅</span>
+                        <span>Mercredi 5 Mars 2026 • 21:00</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>📍</span>
+                        <span>Stade Louis II, Monaco</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>🏆</span>
+                        <span>UEFA Champions League • 1/8 Finale</span>
+                    </div>
+                    <div class="price-section">
+                        <div>
+                            <div class="price-label">À partir de</div>
+                            <div class="price-value">149.99€</div>
+                        </div>
+                    </div>
+                    <button class="buy-ticket-btn" onclick="buyTicket(event, 2)">
+                        🎟️ Acheter Billet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event 3 -->
+            <div class="event-card" onclick="viewEvent(3)">
+                <div class="event-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="seats-badge">87 places</div>
+                    ⚽
+                </div>
+                <div class="event-content">
+                    <div class="event-title">AS Monaco vs Olympique Lyonnais</div>
+                    <div class="event-info-row">
+                        <span>📅</span>
+                        <span>Samedi 28 Mars 2026 • 21:00</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>📍</span>
+                        <span>Stade Louis II, Monaco</span>
+                    </div>
+                    <div class="event-info-row">
+                        <span>🏆</span>
+                        <span>Ligue 1 • Journée 29</span>
+                    </div>
+                    <div class="price-section">
+                        <div>
+                            <div class="price-label">À partir de</div>
+                            <div class="price-value">59.99€</div>
+                        </div>
+                    </div>
+                    <button class="buy-ticket-btn" onclick="buyTicket(event, 3)">
+                        🎟️ Acheter Billet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Marketplace -->
+        <div class="tab-content" id="tab-marketplace">
+            <div class="filters">
+                <div class="filter-chip active" onclick="filterMarketplace('all')">🔥 Tous</div>
+                <div class="filter-chip" onclick="filterMarketplace('verified')">✓ Vérifiés</div>
+                <div class="filter-chip" onclick="filterMarketplace('cheap')">💰 Bon prix</div>
+            </div>
+
+            <!-- Marketplace Item 1 -->
+            <div class="marketplace-card" onclick="viewMarketplaceItem(1)">
+                <div class="marketplace-image">🎟️</div>
+                <div class="marketplace-info">
+                    <div class="marketplace-title">Monaco vs PSG • Premium</div>
+                    <div class="marketplace-seller">Vendeur: @fan_monaco_47</div>
+                    <div class="marketplace-price-row">
+                        <div class="marketplace-price">75.00€</div>
+                        <div class="verified-badge">✓ Vérifié</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Item 2 -->
+            <div class="marketplace-card" onclick="viewMarketplaceItem(2)">
+                <div class="marketplace-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎟️</div>
+                <div class="marketplace-info">
+                    <div class="marketplace-title">Monaco vs Man City • VIP</div>
+                    <div class="marketplace-seller">Vendeur: @supporter_asm</div>
+                    <div class="marketplace-price-row">
+                        <div class="marketplace-price">199.00€</div>
+                        <div class="verified-badge">✓ Vérifié</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Item 3 -->
+            <div class="marketplace-card" onclick="viewMarketplaceItem(3)">
+                <div class="marketplace-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🎟️</div>
+                <div class="marketplace-info">
+                    <div class="marketplace-title">Monaco vs Lyon • Standard</div>
+                    <div class="marketplace-seller">Vendeur: @monaco_fan</div>
+                    <div class="marketplace-price-row">
+                        <div class="marketplace-price">45.00€</div>
+                        <div class="verified-badge">✓ Vérifié</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            sendToParent('TICKETS_TAB_CHANGED', { tab: tabName });
+        }
+
+        // Handle ticket actions
+        function handleTicketAction(action, ticketId) {
+            sendToParent('TICKET_ACTION', { 
+                action: action, 
+                ticketId: ticketId,
+                timestamp: Date.now()
+            });
+        }
+
+        // View event
+        function viewEvent(eventId) {
+            sendToParent('EVENT_VIEWED', { eventId: eventId });
+        }
+
+        // Buy ticket
+        function buyTicket(event, eventId) {
+            event.stopPropagation();
+            sendToParent('TICKET_PURCHASE_INITIATED', { 
+                eventId: eventId,
+                timestamp: Date.now()
+            });
+        }
+
+        // Filter events
+        function filterEvents(filter) {
+            document.querySelectorAll('#tab-events .filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            sendToParent('EVENTS_FILTERED', { filter: filter });
+        }
+
+        // Filter marketplace
+        function filterMarketplace(filter) {
+            document.querySelectorAll('#tab-marketplace .filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            sendToParent('MARKETPLACE_FILTERED', { filter: filter });
+        }
+
+        // View marketplace item
+        function viewMarketplaceItem(itemId) {
+            sendToParent('MARKETPLACE_ITEM_VIEWED', { itemId: itemId });
+        }
+
+        // Communication avec parent
+        function sendToParent(type, data) {
+            window.parent.postMessage({
+                type: type,
+                data: data
+            }, '*');
+        }
+
+        // Écouter les messages du parent
+        window.addEventListener('message', (event) => {
+            const { type, data } = event.data;
+            
+            if (type === 'UPDATE_TICKETS') {
+                console.log('Mise à jour billets:', data);
+            }
+            
+            if (type === 'REFRESH_EVENTS') {
+                console.log('Rafraîchir événements');
+            }
+        });
+
+        // Envoyer un message de prêt
+        sendToParent('TICKETS_WIDGET_READY', { 
+            version: '1.0.0',
+            myTicketsCount: 2,
+            upcomingEventsCount: 3
+        });
+    </script>
+</body>
+</html>

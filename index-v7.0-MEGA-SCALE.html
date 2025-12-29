@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PaieCashFan - 708+ Clubs & Équipes | Super App Sport</title>
+    
+    <!-- SEO Meta -->
+    <meta name="description" content="Rejoins 708+ clubs et équipes pro/amateur sur 5 sports. Football, Basket, Handball, Rugby, Volleyball. Une seule app pour 5 milliards de fans.">
+    <meta name="keywords" content="sport, clubs, football, basketball, handball, rugby, volleyball, fans, cashback, esim, nft">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Couleurs principales */
+            --color-primary: #2563eb;
+            --color-secondary: #8b5cf6;
+            --color-success: #10b981;
+            --color-urgent: #ef4444;
+            --color-hot: #f97316;
+            --color-gold: #f59e0b;
+            
+            /* Backgrounds */
+            --bg-dark: #0a0f1e;
+            --bg-card: #1a1f2e;
+            --bg-card-hover: #252a3d;
+            
+            /* Textes */
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            /* Effets */
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.4);
+            --shadow-urgent: 0 0 30px rgba(239, 68, 68, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f2e 50%, var(--bg-dark) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-header {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-success);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* SEARCH */
+        .search-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1.25rem 3.5rem 1.25rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-box:focus {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+
+        .search-box::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            pointer-events: none;
+        }
+
+        /* INSTANT RESULTS */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-result-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .search-result-logo {
+            font-size: 2rem;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .search-result-league {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* TABS */
+        .tabs-container {
+            max-width: 1400px;
+            margin: 0 auto 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-primary) transparent;
+        }
+
+        .tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tabs::-webkit-scrollbar-thumb {
+            background: var(--color-primary);
+            border-radius: 4px;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* CARDS GRID */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-count {
+            background: var(--color-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* CLUB CARD avec effet FOMO */
+        .club-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .club-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .club-card:hover::before {
+            opacity: 1;
+        }
+
+        .club-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .club-logo {
+            font-size: 3rem;
+            line-height: 1;
+        }
+
+        .club-info {
+            flex: 1;
+        }
+
+        .club-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+
+        .club-league {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .club-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .badge-popular {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+        }
+
+        .badge-verified {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .badge-premium {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .club-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .club-stat {
+            text-align: center;
+        }
+
+        .club-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: block;
+        }
+
+        .club-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* FOMO Elements */
+        .fomo-banner {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: var(--shadow-urgent);
+        }
+
+        .fomo-icon {
+            font-size: 2rem;
+        }
+
+        .fomo-text {
+            flex: 1;
+        }
+
+        .fomo-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .fomo-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .fomo-timer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* LIVE COUNTER */
+        .live-counter {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            border: 2px solid var(--color-success);
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--color-urgent);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .live-text {
+            font-weight: 700;
+            color: var(--color-urgent);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .live-count {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--color-success);
+        }
+
+        .live-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* LOADING */
+        .loading-container {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+        }
+
+        /* LOAD MORE BUTTON */
+        .load-more-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .load-more-btn {
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .load-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-header {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .live-counter {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .search-box {
+                font-size: 0.9375rem;
+            }
+        }
+
+        /* NO RESULTS */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .no-results-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-results-text {
+            color: var(--text-muted);
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--bg-card);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>PaieCashFan</span>
+            </a>
+            
+            <div class="stats-header">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalTeams">708+</span>
+                    <span class="stat-label">Équipes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">5</span>
+                    <span class="stat-label">Sports</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalFans">5B</span>
+                    <span class="stat-label">Fans Potentiels</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input 
+                type="text" 
+                class="search-box" 
+                id="searchBox"
+                placeholder="🔍 Recherche instantanée : club, équipe, joueur, pays..."
+                autocomplete="off"
+            >
+            <i class="fas fa-search search-icon"></i>
+            
+            <!-- INSTANT RESULTS -->
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- FOMO BANNER -->
+    <div class="content-container">
+        <div class="fomo-banner">
+            <div class="fomo-icon">🔥</div>
+            <div class="fomo-text">
+                <div class="fomo-title">Plus de 247 382 fans actifs en ce moment !</div>
+                <div class="fomo-subtitle">Rejoins ta communauté maintenant et profite de 20% de cashback</div>
+            </div>
+            <div class="fomo-timer" id="fomoTimer">04:23:15</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" data-sport="all">
+                <i class="fas fa-globe"></i>
+                <span>Tous</span>
+                <span class="tab-badge" id="badgeAll">708+</span>
+            </button>
+            <button class="tab-btn" data-sport="football">
+                <span>⚽</span>
+                <span>Football</span>
+                <span class="tab-badge" id="badgeFootball">400+</span>
+            </button>
+            <button class="tab-btn" data-sport="basketball">
+                <span>🏀</span>
+                <span>Basketball</span>
+                <span class="tab-badge" id="badgeBasketball">109</span>
+            </button>
+            <button class="tab-btn" data-sport="handball">
+                <span>🤾</span>
+                <span>Handball</span>
+                <span class="tab-badge" id="badgeHandball">78</span>
+            </button>
+            <button class="tab-btn" data-sport="rugby">
+                <span>🏉</span>
+                <span>Rugby</span>
+                <span class="tab-badge" id="badgeRugby">67</span>
+            </button>
+            <button class="tab-btn" data-sport="volleyball">
+                <span>🏐</span>
+                <span>Volleyball</span>
+                <span class="tab-badge" id="badgeVolleyball">54</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="section-header">
+            <div class="section-title">
+                <span id="sectionIcon">🌍</span>
+                <span id="sectionTitle">Toutes les Équipes</span>
+                <span class="section-count" id="sectionCount">708+</span>
+            </div>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- CARDS GRID -->
+        <div class="cards-grid" id="cardsGrid">
+            <!-- Les cartes seront chargées dynamiquement ici -->
+        </div>
+
+        <!-- LOADING -->
+        <div class="loading-container" id="loadingContainer" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Chargement des équipes...</div>
+        </div>
+
+        <!-- NO RESULTS -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <div class="no-results-icon">😕</div>
+            <div class="no-results-title">Aucun résultat</div>
+            <div class="no-results-text">Essaye avec un autre mot-clé</div>
+        </div>
+
+        <!-- LOAD MORE -->
+        <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+            <button class="load-more-btn" id="loadMoreBtn">
+                <i class="fas fa-chevron-down"></i>
+                Charger plus d'équipes
+            </button>
+        </div>
+    </div>
+
+    <!-- LIVE COUNTER -->
+    <div class="live-counter">
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <div class="live-text">En direct</div>
+        </div>
+        <div class="live-count" id="liveCount">247 382</div>
+        <div class="live-label">fans actifs maintenant</div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-text">
+            © 2025 PaieCashFan - Super App Sport | 708+ Clubs & Équipes
+        </div>
+        <div class="footer-links">
+            <a href="#" class="footer-link">À propos</a>
+            <a href="#" class="footer-link">Contact</a>
+            <a href="#" class="footer-link">CGU</a>
+            <a href="#" class="footer-link">Confidentialité</a>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS - Charger les données -->
+    <script src="clubs-football-complet.js"></script>
+    <script src="clubs-national-3-data.js"></script>
+    <script src="equipes-nationales-internationales.js"></script>
+    <script src="🏀_BASKET_FEDERATIONS_CLUBS.js"></script>
+    <script src="🤾_HANDBALL_FEDERATIONS_CLUBS.js"></script>
+    <script src="🏉_RUGBY_VOLLEY_FEDERATIONS_CLUBS.js"></script>
+
+    <script>
+        // ============================================
+        // DATA AGGREGATION - Centraliser toutes les données
+        // ============================================
+        
+        const ALL_DATA = {
+            football: [],
+            basketball: [],
+            handball: [],
+            rugby: [],
+            volleyball: []
+        };
+
+        // Agréger Football
+        if (typeof ligue1Clubs !== 'undefined') ALL_DATA.football.push(...ligue1Clubs);
+        if (typeof ligue2Clubs !== 'undefined') ALL_DATA.football.push(...ligue2Clubs);
+        if (typeof nationalClubs !== 'undefined') ALL_DATA.football.push(...nationalClubs);
+        if (typeof national2GroupeA !== 'undefined') ALL_DATA.football.push(...national2GroupeA);
+        if (typeof national2GroupeB !== 'undefined') ALL_DATA.football.push(...national2GroupeB);
+        if (typeof national2GroupeC !== 'undefined') ALL_DATA.football.push(...national2GroupeC);
+        if (typeof national2GroupeD !== 'undefined') ALL_DATA.football.push(...national2GroupeD);
+        if (typeof national3GroupeA !== 'undefined') ALL_DATA.football.push(...national3GroupeA);
+        if (typeof national3GroupeB !== 'undefined') ALL_DATA.football.push(...national3GroupeB);
+        if (typeof national3GroupeC !== 'undefined') ALL_DATA.football.push(...national3GroupeC);
+        if (typeof national3GroupeD !== 'undefined') ALL_DATA.football.push(...national3GroupeD);
+        if (typeof national3GroupeE !== 'undefined') ALL_DATA.football.push(...national3GroupeE);
+        if (typeof national3GroupeF !== 'undefined') ALL_DATA.football.push(...national3GroupeF);
+        if (typeof national3GroupeG !== 'undefined') ALL_DATA.football.push(...national3GroupeG);
+        if (typeof national3GroupeH !== 'undefined') ALL_DATA.football.push(...national3GroupeH);
+        if (typeof coupeMondeUEFA !== 'undefined') ALL_DATA.football.push(...coupeMondeUEFA);
+        if (typeof coupeMondeConmebol !== 'undefined') ALL_DATA.football.push(...coupeMondeConmebol);
+        if (typeof coupeMondeAFC !== 'undefined') ALL_DATA.football.push(...coupeMondeAFC);
+
+        // Agréger Basketball
+        if (typeof basketFederations !== 'undefined') ALL_DATA.basketball.push(...basketFederations);
+        if (typeof betclicEliteHommes !== 'undefined') ALL_DATA.basketball.push(...betclicEliteHommes);
+
+        // Agréger Handball
+        if (typeof handballFederations !== 'undefined') ALL_DATA.handball.push(...handballFederations);
+        if (typeof starligueMasculine !== 'undefined') ALL_DATA.handball.push(...starligueMasculine);
+
+        // Agréger Rugby & Volleyball (à adapter selon les fichiers JS)
+        // TODO: Ajouter quand les fichiers seront chargés
+
+        // Créer un index unique pour toutes les données
+        const ALL_TEAMS = [
+            ...ALL_DATA.football.map(t => ({...t, sport: 'football', icon: '⚽'})),
+            ...ALL_DATA.basketball.map(t => ({...t, sport: 'basketball', icon: '🏀'})),
+            ...ALL_DATA.handball.map(t => ({...t, sport: 'handball', icon: '🤾'})),
+            ...ALL_DATA.rugby.map(t => ({...t, sport: 'rugby', icon: '🏉'})),
+            ...ALL_DATA.volleyball.map(t => ({...t, sport: 'volleyball', icon: '🏐'}))
+        ];
+
+        console.log('✅ Données chargées :', {
+            football: ALL_DATA.football.length,
+            basketball: ALL_DATA.basketball.length,
+            handball: ALL_DATA.handball.length,
+            rugby: ALL_DATA.rugby.length,
+            volleyball: ALL_DATA.volleyball.length,
+            total: ALL_TEAMS.length
+        });
+
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        
+        const STATE = {
+            currentSport: 'all',
+            currentPage: 1,
+            pageSize: 20,
+            searchQuery: '',
+            filteredData: [],
+            displayedData: []
+        };
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        
+        function renderClubCard(club) {
+            // Générer des badges FOMO aléatoires
+            const badges = [];
+            const random = Math.random();
+            
+            if (random > 0.8) badges.push('<span class="badge badge-new">🆕 Nouveau</span>');
+            if (random > 0.6) badges.push('<span class="badge badge-popular">🔥 Populaire</span>');
+            if (random > 0.7) badges.push('<span class="badge badge-verified">✓ Vérifié</span>');
+            
+            // Générer stats aléatoires
+            const fans = Math.floor(Math.random() * 5000000) + 10000;
+            const stories = Math.floor(Math.random() * 1000) + 50;
+            
+            return `
+                <div class="club-card" onclick="goToClub('${club.name}', '${club.logo || club.icon || club.flag || '⚽'}', '${club.sport}', '${club.league}')">
+                    <div class="club-card-header">
+                        <div class="club-logo">${club.logo || club.icon || club.flag || '⚽'}</div>
+                        <div class="club-info">
+                            <div class="club-name">${club.name}</div>
+                            <div class="club-league">${club.league || club.sport}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="club-badges">
+                        ${badges.join('')}
+                    </div>
+                    
+                    <div class="club-stats">
+                        <div class="club-stat">
+                            <span class="club-stat-value">${formatNumber(fans)}</span>
+                            <span class="club-stat-label">Fans</span>
+                        </div>
+                        <div class="club-stat">
+                            <span class="club-stat-value">${stories}</span>
+                            <span class="club-stat-label">Stories</span>
+                        </div>
+                        <div class="club-stat">
+                            <span class="club-stat-value">20%</span>
+                            <span class="club-stat-label">Cashback</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+            return num.toString();
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('cardsGrid');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const noResults = document.getElementById('noResults');
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            
+            // Calculer les données à afficher
+            const startIndex = 0;
+            const endIndex = STATE.currentPage * STATE.pageSize;
+            const dataToShow = STATE.filteredData.slice(startIndex, endIndex);
+            
+            // Afficher/cacher les éléments
+            loadingContainer.style.display = 'none';
+            
+            if (dataToShow.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                loadMoreContainer.style.display = 'none';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            // Render cards
+            grid.innerHTML = dataToShow.map(club => renderClubCard(club)).join('');
+            
+            // Show/hide load more button
+            if (endIndex < STATE.filteredData.length) {
+                loadMoreContainer.style.display = 'block';
+            } else {
+                loadMoreContainer.style.display = 'none';
+            }
+        }
+
+        function filterData() {
+            let data = ALL_TEAMS;
+            
+            // Filter by sport
+            if (STATE.currentSport !== 'all') {
+                data = data.filter(team => team.sport === STATE.currentSport);
+            }
+            
+            // Filter by search
+            if (STATE.searchQuery) {
+                const query = STATE.searchQuery.toLowerCase();
+                data = data.filter(team => 
+                    team.name.toLowerCase().includes(query) ||
+                    (team.league && team.league.toLowerCase().includes(query)) ||
+                    (team.sport && team.sport.toLowerCase().includes(query))
+                );
+            }
+            
+            STATE.filteredData = data;
+            STATE.currentPage = 1; // Reset pagination
+            renderCards();
+        }
+
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        
+        function goToClub(name, logo, sport, league) {
+            const url = `app-universal-simple.html?club=${encodeURIComponent(name)}&logo=${encodeURIComponent(logo)}&sport=${encodeURIComponent(sport)}&league=${encodeURIComponent(league)}`;
+            window.location.href = url;
+        }
+
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update state
+                STATE.currentSport = btn.dataset.sport;
+                
+                // Update section title
+                const icons = {
+                    all: '🌍',
+                    football: '⚽',
+                    basketball: '🏀',
+                    handball: '🤾',
+                    rugby: '🏉',
+                    volleyball: '🏐'
+                };
+                
+                const titles = {
+                    all: 'Toutes les Équipes',
+                    football: 'Football',
+                    basketball: 'Basketball',
+                    handball: 'Handball',
+                    rugby: 'Rugby',
+                    volleyball: 'Volleyball'
+                };
+                
+                document.getElementById('sectionIcon').textContent = icons[STATE.currentSport];
+                document.getElementById('sectionTitle').textContent = titles[STATE.currentSport];
+                
+                // Filter and render
+                filterData();
+                
+                // Update count
+                document.getElementById('sectionCount').textContent = STATE.filteredData.length + '+';
+            });
+        });
+
+        // Search
+        const searchBox = document.getElementById('searchBox');
+        const searchResults = document.getElementById('searchResults');
+        
+        let searchTimeout;
+        searchBox.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+            
+            if (query.length < 2) {
+                searchResults.classList.remove('active');
+                STATE.searchQuery = '';
+                filterData();
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                STATE.searchQuery = query;
+                filterData();
+                
+                // Show instant results (first 5)
+                const topResults = STATE.filteredData.slice(0, 5);
+                if (topResults.length > 0) {
+                    searchResults.innerHTML = topResults.map(team => `
+                        <div class="search-result-item" onclick="goToClub('${team.name}', '${team.logo || team.icon || team.flag}', '${team.sport}', '${team.league}')">
+                            <div class="search-result-logo">${team.logo || team.icon || team.flag || '⚽'}</div>
+                            <div class="search-result-info">
+                                <div class="search-result-name">${team.name}</div>
+                                <div class="search-result-league">${team.league || team.sport}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    searchResults.classList.add('active');
+                } else {
+                    searchResults.classList.remove('active');
+                }
+            }, 300);
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrapper')) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // Load more button
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            STATE.currentPage++;
+            renderCards();
+        });
+
+        // ============================================
+        // FOMO FEATURES
+        // ============================================
+        
+        // Countdown timer
+        function updateFOMOTimer() {
+            const timer = document.getElementById('fomoTimer');
+            let seconds = 15835; // 4h 23min 55s
+            
+            setInterval(() => {
+                seconds--;
+                if (seconds < 0) seconds = 15835; // Reset
+                
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Live counter animation
+        function updateLiveCounter() {
+            const counter = document.getElementById('liveCount');
+            let count = 247382;
+            
+            setInterval(() => {
+                // Random increment/decrement
+                const change = Math.floor(Math.random() * 20) - 5;
+                count = Math.max(200000, Math.min(300000, count + change));
+                counter.textContent = formatNumber(count);
+            }, 5000);
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        function init() {
+            // Update stats
+            document.getElementById('badgeFootball').textContent = ALL_DATA.football.length;
+            document.getElementById('badgeBasketball').textContent = ALL_DATA.basketball.length;
+            document.getElementById('badgeHandball').textContent = ALL_DATA.handball.length;
+            document.getElementById('badgeRugby').textContent = ALL_DATA.rugby.length;
+            document.getElementById('badgeVolleyball').textContent = ALL_DATA.volleyball.length;
+            document.getElementById('badgeAll').textContent = ALL_TEAMS.length + '+';
+            
+            document.getElementById('totalTeams').textContent = ALL_TEAMS.length + '+';
+            
+            // Initial render
+            filterData();
+            
+            // Start FOMO features
+            updateFOMOTimer();
+            updateLiveCounter();
+            
+            console.log('✅ Application initialisée - ' + ALL_TEAMS.length + ' équipes chargées');
+        }
+
+        // Start when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+
+</body>
+</html>

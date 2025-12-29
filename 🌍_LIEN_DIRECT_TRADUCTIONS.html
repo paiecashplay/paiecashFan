@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Lien Direct - Traductions Clubs & Fédérations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 60px 50px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        .main-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .main-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .links {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .links-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .link-item {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: #1e293b;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .link-item:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .link-icon {
+            font-size: 28px;
+            margin-right: 15px;
+        }
+
+        .link-text {
+            flex: 1;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .link-arrow {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">🌍</div>
+        <h1>Traductions Activées</h1>
+        <p class="subtitle">
+            Système Multi-Langues pour Clubs & Fédérations<br>
+            <strong>10+ langues supportées</strong>
+        </p>
+
+        <a href="🌍_TEST_TRADUCTIONS_CLUBS_FEDERATIONS.html" class="main-btn">
+            🚀 TESTER LES TRADUCTIONS
+        </a>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value">11</div>
+                <div class="stat-label">Langues</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">45+</div>
+                <div class="stat-label">Clés Ajoutées</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">405</div>
+                <div class="stat-label">Traductions</div>
+            </div>
+        </div>
+
+        <div class="links">
+            <div class="links-title">📄 Accès Directs</div>
+
+            <a href="clubs/olympique-marseille/index.html" class="link-item">
+                <span class="link-icon">⚽</span>
+                <span class="link-text">Olympique de Marseille (Traduit)</span>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <a href="federations/index.html" class="link-item">
+                <span class="link-icon">🏆</span>
+                <span class="link-text">Fédérations Sportives (Nouveau)</span>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <a href="README_TRADUCTIONS_V16.md" class="link-item" target="_blank">
+                <span class="link-icon">📖</span>
+                <span class="link-text">Documentation Complète</span>
+                <span class="link-arrow">→</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

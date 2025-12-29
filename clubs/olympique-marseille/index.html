@@ -214,63 +214,66 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg" alt="OM" class="logo">
         
         <h1>PaieCashPlay</h1>
-        <p class="subtitle">Olympique de Marseille Edition</p>
+        <p class="subtitle"><span data-i18n="club.om.subtitle">Olympique de Marseille Edition</span></p>
+        
+        <!-- 🌍 Sélecteur de Langue -->
+        <div id="languageSelector" style="margin-bottom: 20px;"></div>
 
         <div class="club-info">
-            <h2><i class="fas fa-shield-alt"></i> Olympique de Marseille</h2>
-            <p><i class="fas fa-map-marker-alt"></i> Stade Vélodrome</p>
-            <p><i class="fas fa-trophy"></i> Ligue 1 France - 9x Champions</p>
+            <h2><i class="fas fa-shield-alt"></i> <span data-i18n="club.om.name">Olympique de Marseille</span></h2>
+            <p><i class="fas fa-map-marker-alt"></i> <span data-i18n="club.om.stadium">Stade Vélodrome</span></p>
+            <p><i class="fas fa-trophy"></i> <span data-i18n="club.om.league">Ligue 1 France - 9x Champions</span></p>
         </div>
 
         <div class="user-info" id="userInfo">
-            <p><strong><i class="fas fa-user"></i> Connecté :</strong> <span id="userName"></span></p>
-            <p class="balance"><i class="fas fa-wallet"></i> Solde : <span id="userBalance"></span></p>
+            <p><strong><i class="fas fa-user"></i> <span data-i18n="user.connected">Connecté</span> :</strong> <span id="userName"></span></p>
+            <p class="balance"><i class="fas fa-wallet"></i> <span data-i18n="user.balance">Solde</span> : <span id="userBalance"></span></p>
         </div>
 
         <div class="features">
             <div class="feature">
                 <i class="fas fa-ticket-alt"></i>
                 <div>
-                    <h3>Billetterie Vélodrome</h3>
-                    <p>Achetez vos places pour le stade</p>
+                    <h3 data-i18n="club.features.tickets.title">Billetterie Vélodrome</h3>
+                    <p data-i18n="club.features.tickets.desc">Achetez vos places pour le stade</p>
                 </div>
             </div>
 
             <div class="feature">
                 <i class="fas fa-credit-card"></i>
                 <div>
-                    <h3>Paiements Globaux</h3>
-                    <p>Alipay, Stablecoin, Mobile Money</p>
+                    <h3 data-i18n="club.features.payments.title">Paiements Globaux</h3>
+                    <p data-i18n="club.features.payments.desc">Alipay, Stablecoin, Mobile Money</p>
                 </div>
             </div>
 
             <div class="feature">
                 <i class="fas fa-gift"></i>
                 <div>
-                    <h3>Cashback 5%</h3>
-                    <p>Sur tous vos achats OM</p>
+                    <h3 data-i18n="club.features.cashback.title">Cashback 5%</h3>
+                    <p data-i18n="club.features.cashback.desc">Sur tous vos achats OM</p>
                 </div>
             </div>
 
             <div class="feature">
                 <i class="fas fa-users"></i>
                 <div>
-                    <h3>Communauté</h3>
-                    <p>Partagez avec les fans de l'OM</p>
+                    <h3 data-i18n="club.features.community.title">Communauté</h3>
+                    <p data-i18n="club.features.community.desc">Partagez avec les fans de l'OM</p>
                 </div>
             </div>
         </div>
 
         <button class="btn-primary" onclick="goToApp()">
-            <i class="fas fa-rocket"></i> Accéder à l'Application
+            <i class="fas fa-rocket"></i> <span data-i18n="club.btn.access_app">Accéder à l'Application</span>
         </button>
 
         <button class="btn-secondary" onclick="goToLogin()">
-            <i class="fas fa-sign-in-alt"></i> Se Connecter / S'inscrire
+            <i class="fas fa-sign-in-alt"></i> <span data-i18n="club.btn.login">Se Connecter / S'inscrire</span>
         </button>
 
         <button class="btn-back" onclick="goBackToHub()">
-            <i class="fas fa-arrow-left"></i> Retour au Hub Ligue 1
+            <i class="fas fa-arrow-left"></i> <span data-i18n="club.btn.back_hub">Retour au Hub Ligue 1</span>
         </button>
     </div>
 

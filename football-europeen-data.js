@@ -3,9 +3,9 @@
 // Source: Sites officiels des clubs et ligues (2025)
 
 const footballEuropeenData = [
-    // ========== 🏴󠁧󠁢󠁥󠁮󠁧󠁿 ANGLETERRE - PREMIER LEAGUE ==========
+    // ========== 🏴󠁧󠁢󠁥󠁮󠁧󠁿 ANGLETERRE - PREMIER LEAGUE (SAISON 2025/2026) ==========
     {
-        name: 'Arsenal FC',
+        name: 'Arsenal',
         nameEnglish: 'Arsenal FC',
         logo: '🔴⚪',
         league: 'Premier League',
@@ -14,79 +14,7 @@ const footballEuropeenData = [
         stadium: 'Emirates Stadium',
         founded: 1886,
         website: 'https://www.arsenal.com',
-        path: 'app-universal-simple.html?club=arsenal-fc'
-    },
-    {
-        name: 'Liverpool FC',
-        nameEnglish: 'Liverpool FC',
-        logo: '🔴',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#C8102E', secondary: '#00B2A9' },
-        stadium: 'Anfield',
-        founded: 1892,
-        website: 'https://www.liverpoolfc.com',
-        path: 'app-universal-simple.html?club=liverpool-fc'
-    },
-    {
-        name: 'Manchester City',
-        nameEnglish: 'Manchester City',
-        logo: '🔵⚪',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#6CABDD', secondary: '#1C2C5B' },
-        stadium: 'Etihad Stadium',
-        founded: 1880,
-        website: 'https://www.mancity.com',
-        path: 'app-universal-simple.html?club=manchester-city'
-    },
-    {
-        name: 'Manchester United',
-        nameEnglish: 'Manchester United',
-        logo: '🔴⚫',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#DA291C', secondary: '#FBE122' },
-        stadium: 'Old Trafford',
-        founded: 1878,
-        website: 'https://www.manutd.com',
-        path: 'app-universal-simple.html?club=manchester-united'
-    },
-    {
-        name: 'Chelsea FC',
-        nameEnglish: 'Chelsea FC',
-        logo: '🔵⚪',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#034694', secondary: '#FFFFFF' },
-        stadium: 'Stamford Bridge',
-        founded: 1905,
-        website: 'https://www.chelseafc.com',
-        path: 'app-universal-simple.html?club=chelsea-fc'
-    },
-    {
-        name: 'Tottenham Hotspur',
-        nameEnglish: 'Tottenham Hotspur',
-        logo: '⚪🔵',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#132257', secondary: '#FFFFFF' },
-        stadium: 'Tottenham Hotspur Stadium',
-        founded: 1882,
-        website: 'https://www.tottenhamhotspur.com',
-        path: 'app-universal-simple.html?club=tottenham-hotspur'
-    },
-    {
-        name: 'Newcastle United',
-        nameEnglish: 'Newcastle United',
-        logo: '⚫⚪',
-        league: 'Premier League',
-        country: 'Angleterre',
-        colors: { primary: '#241F20', secondary: '#FFFFFF' },
-        stadium: 'St James\' Park',
-        founded: 1892,
-        website: 'https://www.nufc.co.uk',
-        path: 'app-universal-simple.html?club=newcastle-united'
+        path: 'app-universal-simple.html?club=Arsenal&logo=⚽&sport=Football&league=Premier+League'
     },
     {
         name: 'Aston Villa',
@@ -98,10 +26,238 @@ const footballEuropeenData = [
         stadium: 'Villa Park',
         founded: 1874,
         website: 'https://www.avfc.co.uk',
-        path: 'app-universal-simple.html?club=aston-villa'
+        path: 'app-universal-simple.html?club=Aston+Villa&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Bournemouth',
+        nameEnglish: 'AFC Bournemouth',
+        logo: '🔴⚫',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#DA291C', secondary: '#000000' },
+        stadium: 'Vitality Stadium',
+        founded: 1899,
+        website: 'https://www.afcb.co.uk',
+        path: 'app-universal-simple.html?club=Bournemouth&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Brentford',
+        nameEnglish: 'Brentford FC',
+        logo: '🔴⚪⚫',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#D20000', secondary: '#FBB800' },
+        stadium: 'Gtech Community Stadium',
+        founded: 1889,
+        website: 'https://www.brentfordfc.com',
+        path: 'app-universal-simple.html?club=Brentford&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Brighton',
+        nameEnglish: 'Brighton & Hove Albion',
+        logo: '🔵⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#0057B8', secondary: '#FFFFFF' },
+        stadium: 'Amex Stadium',
+        founded: 1901,
+        website: 'https://www.brightonandhovealbion.com',
+        path: 'app-universal-simple.html?club=Brighton&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Burnley',
+        nameEnglish: 'Burnley FC',
+        logo: '🟣🔵',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#6C1D45', secondary: '#99D6EA' },
+        stadium: 'Turf Moor',
+        founded: 1882,
+        website: 'https://www.burnleyfootballclub.com',
+        path: 'app-universal-simple.html?club=Burnley&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Chelsea',
+        nameEnglish: 'Chelsea FC',
+        logo: '🔵⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#034694', secondary: '#FFFFFF' },
+        stadium: 'Stamford Bridge',
+        founded: 1905,
+        website: 'https://www.chelseafc.com',
+        path: 'app-universal-simple.html?club=Chelsea&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Crystal Palace',
+        nameEnglish: 'Crystal Palace FC',
+        logo: '🔴🔵',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#1B458F', secondary: '#C4122E' },
+        stadium: 'Selhurst Park',
+        founded: 1905,
+        website: 'https://www.cpfc.co.uk',
+        path: 'app-universal-simple.html?club=Crystal+Palace&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Everton',
+        nameEnglish: 'Everton FC',
+        logo: '🔵⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#003399', secondary: '#FFFFFF' },
+        stadium: 'Goodison Park',
+        founded: 1878,
+        website: 'https://www.evertonfc.com',
+        path: 'app-universal-simple.html?club=Everton&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Fulham',
+        nameEnglish: 'Fulham FC',
+        logo: '⚪⚫',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#FFFFFF', secondary: '#000000' },
+        stadium: 'Craven Cottage',
+        founded: 1879,
+        website: 'https://www.fulhamfc.com',
+        path: 'app-universal-simple.html?club=Fulham&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Leeds',
+        nameEnglish: 'Leeds United',
+        logo: '⚪🔵🟡',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#FFFFFF', secondary: '#1D428A' },
+        stadium: 'Elland Road',
+        founded: 1919,
+        website: 'https://www.leedsunited.com',
+        path: 'app-universal-simple.html?club=Leeds&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Liverpool',
+        nameEnglish: 'Liverpool FC',
+        logo: '🔴',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#C8102E', secondary: '#00B2A9' },
+        stadium: 'Anfield',
+        founded: 1892,
+        website: 'https://www.liverpoolfc.com',
+        path: 'app-universal-simple.html?club=Liverpool&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Manchester City',
+        nameEnglish: 'Manchester City',
+        logo: '🔵⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#6CABDD', secondary: '#1C2C5B' },
+        stadium: 'Etihad Stadium',
+        founded: 1880,
+        website: 'https://www.mancity.com',
+        path: 'app-universal-simple.html?club=Manchester+City&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Manchester United',
+        nameEnglish: 'Manchester United',
+        logo: '🔴⚫',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#DA291C', secondary: '#FBE122' },
+        stadium: 'Old Trafford',
+        founded: 1878,
+        website: 'https://www.manutd.com',
+        path: 'app-universal-simple.html?club=Manchester+United&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Newcastle',
+        nameEnglish: 'Newcastle United',
+        logo: '⚫⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#241F20', secondary: '#FFFFFF' },
+        stadium: 'St James\' Park',
+        founded: 1892,
+        website: 'https://www.nufc.co.uk',
+        path: 'app-universal-simple.html?club=Newcastle&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Nottingham Forest',
+        nameEnglish: 'Nottingham Forest FC',
+        logo: '🔴⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#DD0000', secondary: '#FFFFFF' },
+        stadium: 'City Ground',
+        founded: 1865,
+        website: 'https://www.nottinghamforest.co.uk',
+        path: 'app-universal-simple.html?club=Nottingham+Forest&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Sunderland',
+        nameEnglish: 'Sunderland AFC',
+        logo: '🔴⚪',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#EB172B', secondary: '#211E1E' },
+        stadium: 'Stadium of Light',
+        founded: 1879,
+        website: 'https://www.safc.com',
+        path: 'app-universal-simple.html?club=Sunderland&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Tottenham',
+        nameEnglish: 'Tottenham Hotspur',
+        logo: '⚪🔵',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#132257', secondary: '#FFFFFF' },
+        stadium: 'Tottenham Hotspur Stadium',
+        founded: 1882,
+        website: 'https://www.tottenhamhotspur.com',
+        path: 'app-universal-simple.html?club=Tottenham&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'West Ham',
+        nameEnglish: 'West Ham United',
+        logo: '🟣🔵',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#7A263A', secondary: '#1BB1E7' },
+        stadium: 'London Stadium',
+        founded: 1895,
+        website: 'https://www.whufc.com',
+        path: 'app-universal-simple.html?club=West+Ham&logo=⚽&sport=Football&league=Premier+League'
+    },
+    {
+        name: 'Wolverhampton',
+        nameEnglish: 'Wolverhampton Wanderers',
+        logo: '🟡⚫',
+        league: 'Premier League',
+        country: 'Angleterre',
+        colors: { primary: '#FDB913', secondary: '#231F20' },
+        stadium: 'Molineux Stadium',
+        founded: 1877,
+        website: 'https://www.wolves.co.uk',
+        path: 'app-universal-simple.html?club=Wolverhampton&logo=⚽&sport=Football&league=Premier+League'
     },
 
-    // ========== 🇩🇪 ALLEMAGNE - BUNDESLIGA ==========
+    // ========== 🇩🇪 ALLEMAGNE - BUNDESLIGA (SAISON 2025/2026) ==========
+    {
+        name: 'Augsburg',
+        nameEnglish: 'FC Augsburg',
+        logo: '🔴⚪🟢',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#BA3733', secondary: '#FFFFFF' },
+        stadium: 'WWK Arena',
+        founded: 1907,
+        website: 'https://www.fcaugsburg.de',
+        path: 'app-universal-simple.html?club=Augsburg&logo=⚽&sport=Football&league=Bundesliga'
+    },
     {
         name: 'Bayern Munich',
         nameEnglish: 'FC Bayern München',
@@ -112,10 +268,22 @@ const footballEuropeenData = [
         stadium: 'Allianz Arena',
         founded: 1900,
         website: 'https://fcbayern.com',
-        path: 'app-universal-simple.html?club=bayern-munich'
+        path: 'app-universal-simple.html?club=Bayern+Munich&logo=⚽&sport=Football&league=Bundesliga'
     },
     {
-        name: 'Borussia Dortmund',
+        name: 'Cologne',
+        nameEnglish: '1. FC Köln',
+        logo: '🔴⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#ED1C24', secondary: '#FFFFFF' },
+        stadium: 'RheinEnergieStadion',
+        founded: 1948,
+        website: 'https://www.fc-koeln.de',
+        path: 'app-universal-simple.html?club=Cologne&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Dortmund',
         nameEnglish: 'Borussia Dortmund',
         logo: '🟡⚫',
         league: 'Bundesliga',
@@ -124,10 +292,70 @@ const footballEuropeenData = [
         stadium: 'Signal Iduna Park',
         founded: 1909,
         website: 'https://www.bvb.de',
-        path: 'app-universal-simple.html?club=borussia-dortmund'
+        path: 'app-universal-simple.html?club=Dortmund&logo=⚽&sport=Football&league=Bundesliga'
     },
     {
-        name: 'RB Leipzig',
+        name: 'Francfort',
+        nameEnglish: 'Eintracht Frankfurt',
+        logo: '🔴⚫⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#E1000F', secondary: '#000000' },
+        stadium: 'Deutsche Bank Park',
+        founded: 1899,
+        website: 'https://www.eintracht.de',
+        path: 'app-universal-simple.html?club=Francfort&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Fribourg',
+        nameEnglish: 'SC Freiburg',
+        logo: '🔴⚫⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#E3000F', secondary: '#000000' },
+        stadium: 'Europa-Park Stadion',
+        founded: 1904,
+        website: 'https://www.scfreiburg.com',
+        path: 'app-universal-simple.html?club=Fribourg&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Hamburg',
+        nameEnglish: 'Hamburger SV',
+        logo: '🔵⚪⚫',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#003B7B', secondary: '#FFFFFF' },
+        stadium: 'Volksparkstadion',
+        founded: 1887,
+        website: 'https://www.hsv.de',
+        path: 'app-universal-simple.html?club=Hamburg&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Heidenheim',
+        nameEnglish: '1. FC Heidenheim',
+        logo: '🔴🔵⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#00326E', secondary: '#ED1C24' },
+        stadium: 'Voith-Arena',
+        founded: 1846,
+        website: 'https://www.fc-heidenheim.de',
+        path: 'app-universal-simple.html?club=Heidenheim&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Hoffenheim',
+        nameEnglish: 'TSG 1899 Hoffenheim',
+        logo: '🔵⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#1863B5', secondary: '#FFFFFF' },
+        stadium: 'PreZero Arena',
+        founded: 1899,
+        website: 'https://www.achtzehn99.de',
+        path: 'app-universal-simple.html?club=Hoffenheim&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Leipzig',
         nameEnglish: 'RB Leipzig',
         logo: '🔴⚪',
         league: 'Bundesliga',
@@ -136,10 +364,10 @@ const footballEuropeenData = [
         stadium: 'Red Bull Arena',
         founded: 2009,
         website: 'https://www.dierotenbullen.com',
-        path: 'app-universal-simple.html?club=rb-leipzig'
+        path: 'app-universal-simple.html?club=Leipzig&logo=⚽&sport=Football&league=Bundesliga'
     },
     {
-        name: 'Bayer Leverkusen',
+        name: 'Leverkusen',
         nameEnglish: 'Bayer 04 Leverkusen',
         logo: '🔴⚫',
         league: 'Bundesliga',
@@ -148,10 +376,22 @@ const footballEuropeenData = [
         stadium: 'BayArena',
         founded: 1904,
         website: 'https://www.bayer04.de',
-        path: 'app-universal-simple.html?club=bayer-leverkusen'
+        path: 'app-universal-simple.html?club=Leverkusen&logo=⚽&sport=Football&league=Bundesliga'
     },
     {
-        name: 'Borussia Mönchengladbach',
+        name: 'Mayence',
+        nameEnglish: '1. FSV Mainz 05',
+        logo: '🔴⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#C3141E', secondary: '#FFFFFF' },
+        stadium: 'Mewa Arena',
+        founded: 1905,
+        website: 'https://www.mainz05.de',
+        path: 'app-universal-simple.html?club=Mayence&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Mönchengladbach',
         nameEnglish: 'Borussia Mönchengladbach',
         logo: '⚫⚪🟢',
         league: 'Bundesliga',
@@ -160,10 +400,22 @@ const footballEuropeenData = [
         stadium: 'Borussia-Park',
         founded: 1900,
         website: 'https://www.borussia.de',
-        path: 'app-universal-simple.html?club=borussia-monchengladbach'
+        path: 'app-universal-simple.html?club=Mönchengladbach&logo=⚽&sport=Football&league=Bundesliga'
     },
     {
-        name: 'VfB Stuttgart',
+        name: 'St. Pauli',
+        nameEnglish: 'FC St. Pauli',
+        logo: '⚫🤎',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#5A3E23', secondary: '#FFFFFF' },
+        stadium: 'Millerntor-Stadion',
+        founded: 1910,
+        website: 'https://www.fcstpauli.com',
+        path: 'app-universal-simple.html?club=St.+Pauli&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Stuttgart',
         nameEnglish: 'VfB Stuttgart',
         logo: '⚪🔴',
         league: 'Bundesliga',
@@ -172,21 +424,165 @@ const footballEuropeenData = [
         stadium: 'Mercedes-Benz Arena',
         founded: 1893,
         website: 'https://www.vfb.de',
-        path: 'app-universal-simple.html?club=vfb-stuttgart'
+        path: 'app-universal-simple.html?club=Stuttgart&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Union Berlin',
+        nameEnglish: '1. FC Union Berlin',
+        logo: '🔴⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#ED1C24', secondary: '#FFFFFF' },
+        stadium: 'Stadion An der Alten Försterei',
+        founded: 1966,
+        website: 'https://www.fc-union-berlin.de',
+        path: 'app-universal-simple.html?club=Union+Berlin&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Werder Bremen',
+        nameEnglish: 'SV Werder Bremen',
+        logo: '🟢⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#1D9053', secondary: '#FFFFFF' },
+        stadium: 'Weserstadion',
+        founded: 1899,
+        website: 'https://www.werder.de',
+        path: 'app-universal-simple.html?club=Werder+Bremen&logo=⚽&sport=Football&league=Bundesliga'
+    },
+    {
+        name: 'Wolfsburg',
+        nameEnglish: 'VfL Wolfsburg',
+        logo: '🟢⚪',
+        league: 'Bundesliga',
+        country: 'Allemagne',
+        colors: { primary: '#65B32E', secondary: '#FFFFFF' },
+        stadium: 'Volkswagen Arena',
+        founded: 1945,
+        website: 'https://www.vfl-wolfsburg.de',
+        path: 'app-universal-simple.html?club=Wolfsburg&logo=⚽&sport=Football&league=Bundesliga'
     },
 
-    // ========== 🇮🇹 ITALIE - SERIE A ==========
+    // ========== 🇮🇹 ITALIE - SERIE A (SAISON 2025/2026) ==========
     {
-        name: 'Juventus Turin',
-        nameEnglish: 'Juventus FC',
-        logo: '⚫⚪',
+        name: 'AC Milan',
+        nameEnglish: 'AC Milan',
+        logo: '🔴⚫',
         league: 'Serie A',
         country: 'Italie',
-        colors: { primary: '#000000', secondary: '#FFFFFF' },
-        stadium: 'Allianz Stadium',
-        founded: 1897,
-        website: 'https://www.juventus.com',
-        path: 'app-universal-simple.html?club=juventus-turin'
+        colors: { primary: '#FB090B', secondary: '#000000' },
+        stadium: 'San Siro',
+        founded: 1899,
+        website: 'https://www.acmilan.com',
+        path: 'app-universal-simple.html?club=AC+Milan&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'AS Rome',
+        nameEnglish: 'AS Roma',
+        logo: '🟡🔴',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#C19A6B', secondary: '#8B2342' },
+        stadium: 'Stadio Olimpico',
+        founded: 1927,
+        website: 'https://www.asroma.com',
+        path: 'app-universal-simple.html?club=AS+Rome&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Bergame',
+        nameEnglish: 'Atalanta BC',
+        logo: '🔵⚫',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#1D2951', secondary: '#1AA2DB' },
+        stadium: 'Gewiss Stadium',
+        founded: 1907,
+        website: 'https://www.atalanta.it',
+        path: 'app-universal-simple.html?club=Bergame&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Bologne',
+        nameEnglish: 'Bologna FC',
+        logo: '🔴🔵',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#002D72', secondary: '#A41E32' },
+        stadium: 'Stadio Renato Dall\'Ara',
+        founded: 1909,
+        website: 'https://www.bolognafc.it',
+        path: 'app-universal-simple.html?club=Bologne&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Cagliari',
+        nameEnglish: 'Cagliari Calcio',
+        logo: '🔴🔵',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#E4002B', secondary: '#0046AD' },
+        stadium: 'Unipol Domus',
+        founded: 1920,
+        website: 'https://www.cagliaricalcio.com',
+        path: 'app-universal-simple.html?club=Cagliari&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Côme',
+        nameEnglish: 'Como 1907',
+        logo: '🔵⚪',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#0033A0', secondary: '#FFFFFF' },
+        stadium: 'Stadio Giuseppe Sinigaglia',
+        founded: 1907,
+        website: 'https://www.como1907.com',
+        path: 'app-universal-simple.html?club=Côme&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Cremonese',
+        nameEnglish: 'US Cremonese',
+        logo: '🔴⚫',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#E30613', secondary: '#000000' },
+        stadium: 'Stadio Giovanni Zini',
+        founded: 1903,
+        website: 'https://www.uscremonese.it',
+        path: 'app-universal-simple.html?club=Cremonese&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Fiorentina',
+        nameEnglish: 'ACF Fiorentina',
+        logo: '🟣⚪',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#592C82', secondary: '#FFFFFF' },
+        stadium: 'Stadio Artemio Franchi',
+        founded: 1926,
+        website: 'https://www.acffiorentina.com',
+        path: 'app-universal-simple.html?club=Fiorentina&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Genoa',
+        nameEnglish: 'Genoa CFC',
+        logo: '🔴🔵',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#A51F30', secondary: '#005FAA' },
+        stadium: 'Stadio Luigi Ferraris',
+        founded: 1893,
+        website: 'https://www.genoacfc.it',
+        path: 'app-universal-simple.html?club=Genoa&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Hellas Vérone',
+        nameEnglish: 'Hellas Verona FC',
+        logo: '🟡🔵',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#FFD200', secondary: '#005FAA' },
+        stadium: 'Stadio Marcantonio Bentegodi',
+        founded: 1903,
+        website: 'https://www.hellasverona.it',
+        path: 'app-universal-simple.html?club=Hellas+Vérone&logo=⚽&sport=Football&league=Serie+A'
     },
     {
         name: 'Inter Milan',
@@ -198,43 +594,19 @@ const footballEuropeenData = [
         stadium: 'San Siro',
         founded: 1908,
         website: 'https://www.inter.it',
-        path: 'app-universal-simple.html?club=inter-milan'
+        path: 'app-universal-simple.html?club=Inter+Milan&logo=⚽&sport=Football&league=Serie+A'
     },
     {
-        name: 'AC Milan',
-        nameEnglish: 'AC Milan',
-        logo: '🔴⚫',
+        name: 'Juventus Turin',
+        nameEnglish: 'Juventus FC',
+        logo: '⚫⚪',
         league: 'Serie A',
         country: 'Italie',
-        colors: { primary: '#FB090B', secondary: '#000000' },
-        stadium: 'San Siro',
-        founded: 1899,
-        website: 'https://www.acmilan.com',
-        path: 'app-universal-simple.html?club=ac-milan'
-    },
-    {
-        name: 'AS Roma',
-        nameEnglish: 'AS Roma',
-        logo: '🟡🔴',
-        league: 'Serie A',
-        country: 'Italie',
-        colors: { primary: '#C19A6B', secondary: '#8B2342' },
-        stadium: 'Stadio Olimpico',
-        founded: 1927,
-        website: 'https://www.asroma.com',
-        path: 'app-universal-simple.html?club=as-roma'
-    },
-    {
-        name: 'SSC Napoli',
-        nameEnglish: 'SSC Napoli',
-        logo: '🔵⚪',
-        league: 'Serie A',
-        country: 'Italie',
-        colors: { primary: '#037BC7', secondary: '#FFFFFF' },
-        stadium: 'Stadio Diego Armando Maradona',
-        founded: 1926,
-        website: 'https://www.sscnapoli.it',
-        path: 'app-universal-simple.html?club=ssc-napoli'
+        colors: { primary: '#000000', secondary: '#FFFFFF' },
+        stadium: 'Allianz Stadium',
+        founded: 1897,
+        website: 'https://www.juventus.com',
+        path: 'app-universal-simple.html?club=Juventus+Turin&logo=⚽&sport=Football&league=Serie+A'
     },
     {
         name: 'Lazio Rome',
@@ -246,22 +618,432 @@ const footballEuropeenData = [
         stadium: 'Stadio Olimpico',
         founded: 1900,
         website: 'https://www.sslazio.it',
-        path: 'app-universal-simple.html?club=lazio-rome'
+        path: 'app-universal-simple.html?club=Lazio+Rome&logo=⚽&sport=Football&league=Serie+A'
     },
     {
-        name: 'Atalanta Bergame',
-        nameEnglish: 'Atalanta BC',
+        name: 'Lecce',
+        nameEnglish: 'US Lecce',
+        logo: '🟡🔴',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#FFD700', secondary: '#ED1C24' },
+        stadium: 'Stadio Via del Mare',
+        founded: 1908,
+        website: 'https://www.uslecce.it',
+        path: 'app-universal-simple.html?club=Lecce&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Naples',
+        nameEnglish: 'SSC Napoli',
+        logo: '🔵⚪',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#037BC7', secondary: '#FFFFFF' },
+        stadium: 'Stadio Diego Armando Maradona',
+        founded: 1926,
+        website: 'https://www.sscnapoli.it',
+        path: 'app-universal-simple.html?club=Naples&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Parme',
+        nameEnglish: 'Parma Calcio 1913',
+        logo: '🟡🔵⚪',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#FFCD00', secondary: '#005FAA' },
+        stadium: 'Stadio Ennio Tardini',
+        founded: 1913,
+        website: 'https://www.parmacalcio1913.com',
+        path: 'app-universal-simple.html?club=Parme&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Pisa',
+        nameEnglish: 'Pisa SC',
         logo: '🔵⚫',
         league: 'Serie A',
         country: 'Italie',
-        colors: { primary: '#1D2951', secondary: '#1AA2DB' },
-        stadium: 'Gewiss Stadium',
-        founded: 1907,
-        website: 'https://www.atalanta.it',
-        path: 'app-universal-simple.html?club=atalanta-bergame'
+        colors: { primary: '#004B9B', secondary: '#000000' },
+        stadium: 'Arena Garibaldi - Stadio Romeo Anconetani',
+        founded: 1909,
+        website: 'https://www.pisasportingclub.com',
+        path: 'app-universal-simple.html?club=Pisa&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Sassuolo',
+        nameEnglish: 'US Sassuolo',
+        logo: '🟢⚫',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#00965E', secondary: '#000000' },
+        stadium: 'Mapei Stadium',
+        founded: 1920,
+        website: 'https://www.sassuolocalcio.it',
+        path: 'app-universal-simple.html?club=Sassuolo&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Torino',
+        nameEnglish: 'Torino FC',
+        logo: '🟤🟡',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#8B1A1A', secondary: '#FFD700' },
+        stadium: 'Stadio Olimpico Grande Torino',
+        founded: 1906,
+        website: 'https://www.torinofc.it',
+        path: 'app-universal-simple.html?club=Torino&logo=⚽&sport=Football&league=Serie+A'
+    },
+    {
+        name: 'Udinese',
+        nameEnglish: 'Udinese Calcio',
+        logo: '⚫⚪',
+        league: 'Serie A',
+        country: 'Italie',
+        colors: { primary: '#000000', secondary: '#FFFFFF' },
+        stadium: 'Dacia Arena',
+        founded: 1896,
+        website: 'https://www.udinese.it',
+        path: 'app-universal-simple.html?club=Udinese&logo=⚽&sport=Football&league=Serie+A'
     },
 
-    // ========== 🇪🇸 ESPAGNE - LA LIGA ==========
+    // ========== 🇨🇭 SUISSE - SUPER LEAGUE (SAISON 2025/2026) ==========
+    {
+        name: 'Bâle',
+        nameEnglish: 'FC Basel',
+        logo: '🔴🔵',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#ED1C24', secondary: '#0E4C92' },
+        stadium: 'St. Jakob-Park',
+        founded: 1893,
+        website: 'https://www.fcb.ch',
+        path: 'app-universal-simple.html?club=Bâle&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Berne',
+        nameEnglish: 'BSC Young Boys',
+        logo: '🟡⚫',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#FFED00', secondary: '#000000' },
+        stadium: 'Wankdorf Stadium',
+        founded: 1898,
+        website: 'https://www.bscyb.ch',
+        path: 'app-universal-simple.html?club=Berne&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'FC Thun',
+        nameEnglish: 'FC Thun',
+        logo: '🔴⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#ED1C24', secondary: '#FFFFFF' },
+        stadium: 'Stockhorn Arena',
+        founded: 1898,
+        website: 'https://www.fcthun.ch',
+        path: 'app-universal-simple.html?club=FC+Thun&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'FC Zürich',
+        nameEnglish: 'FC Zürich',
+        logo: '🔵⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#0066B3', secondary: '#FFFFFF' },
+        stadium: 'Letzigrund',
+        founded: 1896,
+        website: 'https://www.fcz.ch',
+        path: 'app-universal-simple.html?club=FC+Zürich&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Grasshoppers',
+        nameEnglish: 'Grasshopper Club Zürich',
+        logo: '🔵⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#0066B3', secondary: '#FFFFFF' },
+        stadium: 'Letzigrund',
+        founded: 1886,
+        website: 'https://www.gcz.ch',
+        path: 'app-universal-simple.html?club=Grasshoppers&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Lausanne Sport',
+        nameEnglish: 'FC Lausanne-Sport',
+        logo: '🔵⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#0066B3', secondary: '#FFFFFF' },
+        stadium: 'Stade de la Tuilière',
+        founded: 1896,
+        website: 'https://www.lausanne-sport.ch',
+        path: 'app-universal-simple.html?club=Lausanne+Sport&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Lucerne',
+        nameEnglish: 'FC Luzern',
+        logo: '🔵⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#0066B3', secondary: '#FFFFFF' },
+        stadium: 'Swissporarena',
+        founded: 1901,
+        website: 'https://www.fcl.ch',
+        path: 'app-universal-simple.html?club=Lucerne&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Lugano',
+        nameEnglish: 'FC Lugano',
+        logo: '⚪⚫',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#FFFFFF', secondary: '#000000' },
+        stadium: 'Stadio di Cornaredo',
+        founded: 1908,
+        website: 'https://www.fclugano.com',
+        path: 'app-universal-simple.html?club=Lugano&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Saint-Gall',
+        nameEnglish: 'FC St. Gallen',
+        logo: '🟢⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#00923F', secondary: '#FFFFFF' },
+        stadium: 'Kybunpark',
+        founded: 1879,
+        website: 'https://www.fcsg.ch',
+        path: 'app-universal-simple.html?club=Saint-Gall&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Servette Genève',
+        nameEnglish: 'Servette FC',
+        logo: '🟤⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#6F263D', secondary: '#FFFFFF' },
+        stadium: 'Stade de Genève',
+        founded: 1890,
+        website: 'https://www.servettefc.ch',
+        path: 'app-universal-simple.html?club=Servette+Genève&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Sion',
+        nameEnglish: 'FC Sion',
+        logo: '🔴⚪',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#ED1C24', secondary: '#FFFFFF' },
+        stadium: 'Stade de Tourbillon',
+        founded: 1909,
+        website: 'https://www.fcsion.ch',
+        path: 'app-universal-simple.html?club=Sion&logo=⚽&sport=Football&league=Super+League'
+    },
+    {
+        name: 'Winterthur',
+        nameEnglish: 'FC Winterthur',
+        logo: '🔴⚪⚫',
+        league: 'Super League',
+        country: 'Suisse',
+        colors: { primary: '#ED1C24', secondary: '#000000' },
+        stadium: 'Stadion Schützenwiese',
+        founded: 1896,
+        website: 'https://www.fcwinterthur.ch',
+        path: 'app-universal-simple.html?club=Winterthur&logo=⚽&sport=Football&league=Super+League'
+    },
+
+    // ========== 🇪🇸 ESPAGNE - LA LIGA (SAISON 2025/2026) ==========
+    {
+        name: 'Alavès',
+        nameEnglish: 'Deportivo Alavés',
+        logo: '🔵⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#005296', secondary: '#FFFFFF' },
+        stadium: 'Mendizorroza',
+        founded: 1921,
+        website: 'https://www.deportivoalaves.com',
+        path: 'app-universal-simple.html?club=Alavès&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Athletic Bilbao',
+        nameEnglish: 'Athletic Club',
+        logo: '🔴⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#EE2523', secondary: '#FFFFFF' },
+        stadium: 'San Mamés',
+        founded: 1898,
+        website: 'https://www.athletic-club.eus',
+        path: 'app-universal-simple.html?club=Athletic+Bilbao&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Atletico Madrid',
+        nameEnglish: 'Club Atlético de Madrid',
+        logo: '🔴⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#CE3524', secondary: '#FFFFFF' },
+        stadium: 'Cívitas Metropolitano',
+        founded: 1903,
+        website: 'https://www.atleticodemadrid.com',
+        path: 'app-universal-simple.html?club=Atletico+Madrid&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Betis Séville',
+        nameEnglish: 'Real Betis',
+        logo: '🟢⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#00954C', secondary: '#FFFFFF' },
+        stadium: 'Benito Villamarín',
+        founded: 1907,
+        website: 'https://www.realbetisbalompie.es',
+        path: 'app-universal-simple.html?club=Betis+Séville&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Celta Vigo',
+        nameEnglish: 'RC Celta',
+        logo: '🔵⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#7FC3E7', secondary: '#FFFFFF' },
+        stadium: 'Balaídos',
+        founded: 1923,
+        website: 'https://www.celtavigo.net',
+        path: 'app-universal-simple.html?club=Celta+Vigo&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Elche',
+        nameEnglish: 'Elche CF',
+        logo: '🟢⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#00703C', secondary: '#FFFFFF' },
+        stadium: 'Martínez Valero',
+        founded: 1923,
+        website: 'https://www.elchecf.es',
+        path: 'app-universal-simple.html?club=Elche&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Espanyol',
+        nameEnglish: 'RCD Espanyol',
+        logo: '🔵⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#007DC5', secondary: '#FFFFFF' },
+        stadium: 'RCDE Stadium',
+        founded: 1900,
+        website: 'https://www.rcdespanyol.com',
+        path: 'app-universal-simple.html?club=Espanyol&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'FC Barcelone',
+        nameEnglish: 'FC Barcelona',
+        logo: '🔵🔴',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#004D98', secondary: '#A50044' },
+        stadium: 'Spotify Camp Nou',
+        founded: 1899,
+        website: 'https://www.fcbarcelona.com',
+        path: 'app-universal-simple.html?club=FC+Barcelone&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'FC Séville',
+        nameEnglish: 'Sevilla FC',
+        logo: '⚪🔴',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#FFFFFF', secondary: '#F43333' },
+        stadium: 'Ramón Sánchez Pizjuán',
+        founded: 1890,
+        website: 'https://www.sevillafc.es',
+        path: 'app-universal-simple.html?club=FC+Séville&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Gérone',
+        nameEnglish: 'Girona FC',
+        logo: '🔴⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#CC0000', secondary: '#FFFFFF' },
+        stadium: 'Montilivi',
+        founded: 1930,
+        website: 'https://www.gironafc.cat',
+        path: 'app-universal-simple.html?club=Gérone&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Getafe',
+        nameEnglish: 'Getafe CF',
+        logo: '🔵⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#005999', secondary: '#FFFFFF' },
+        stadium: 'Coliseum Alfonso Pérez',
+        founded: 1983,
+        website: 'https://www.getafecf.com',
+        path: 'app-universal-simple.html?club=Getafe&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Levante',
+        nameEnglish: 'Levante UD',
+        logo: '🔴🔵',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#0B3A82', secondary: '#C8102E' },
+        stadium: 'Ciutat de València',
+        founded: 1909,
+        website: 'https://www.levanteud.com',
+        path: 'app-universal-simple.html?club=Levante&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Majorque',
+        nameEnglish: 'RCD Mallorca',
+        logo: '🔴⚫',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#E20613', secondary: '#000000' },
+        stadium: 'Son Moix',
+        founded: 1916,
+        website: 'https://www.rcdmallorca.es',
+        path: 'app-universal-simple.html?club=Majorque&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Osasuna',
+        nameEnglish: 'CA Osasuna',
+        logo: '🔴🔵',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#D81920', secondary: '#191560' },
+        stadium: 'El Sadar',
+        founded: 1920,
+        website: 'https://www.osasuna.es',
+        path: 'app-universal-simple.html?club=Osasuna&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Oviedo',
+        nameEnglish: 'Real Oviedo',
+        logo: '🔵⚪',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#0050A0', secondary: '#FFFFFF' },
+        stadium: 'Carlos Tartiere',
+        founded: 1926,
+        website: 'https://www.realov iedo.es',
+        path: 'app-universal-simple.html?club=Oviedo&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Rayo Vallecano',
+        nameEnglish: 'Rayo Vallecano',
+        logo: '⚪🔴',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#FFFFFF', secondary: '#E4002B' },
+        stadium: 'Vallecas',
+        founded: 1924,
+        website: 'https://www.rayovallecano.es',
+        path: 'app-universal-simple.html?club=Rayo+Vallecano&logo=⚽&sport=Football&league=La+Liga'
+    },
     {
         name: 'Real Madrid',
         nameEnglish: 'Real Madrid CF',
@@ -272,43 +1054,7 @@ const footballEuropeenData = [
         stadium: 'Santiago Bernabéu',
         founded: 1902,
         website: 'https://www.realmadrid.com',
-        path: 'app-universal-simple.html?club=real-madrid'
-    },
-    {
-        name: 'FC Barcelone',
-        nameEnglish: 'FC Barcelona',
-        logo: '🔵🔴',
-        league: 'La Liga',
-        country: 'Espagne',
-        colors: { primary: '#004D98', secondary: '#A50044' },
-        stadium: 'Camp Nou',
-        founded: 1899,
-        website: 'https://www.fcbarcelona.com',
-        path: 'app-universal-simple.html?club=fc-barcelone'
-    },
-    {
-        name: 'Atlético Madrid',
-        nameEnglish: 'Club Atlético de Madrid',
-        logo: '🔴⚪',
-        league: 'La Liga',
-        country: 'Espagne',
-        colors: { primary: '#CE3524', secondary: '#FFFFFF' },
-        stadium: 'Cívitas Metropolitano',
-        founded: 1903,
-        website: 'https://www.atleticodemadrid.com',
-        path: 'app-universal-simple.html?club=atletico-madrid'
-    },
-    {
-        name: 'Séville FC',
-        nameEnglish: 'Sevilla FC',
-        logo: '⚪🔴',
-        league: 'La Liga',
-        country: 'Espagne',
-        colors: { primary: '#FFFFFF', secondary: '#F43333' },
-        stadium: 'Ramón Sánchez Pizjuán',
-        founded: 1890,
-        website: 'https://www.sevillafc.es',
-        path: 'app-universal-simple.html?club=seville-fc'
+        path: 'app-universal-simple.html?club=Real+Madrid&logo=⚽&sport=Football&league=La+Liga'
     },
     {
         name: 'Real Sociedad',
@@ -320,10 +1066,22 @@ const footballEuropeenData = [
         stadium: 'Anoeta',
         founded: 1909,
         website: 'https://www.realsociedad.eus',
-        path: 'app-universal-simple.html?club=real-sociedad'
+        path: 'app-universal-simple.html?club=Real+Sociedad&logo=⚽&sport=Football&league=La+Liga'
     },
     {
-        name: 'Villarreal CF',
+        name: 'Valence',
+        nameEnglish: 'Valencia CF',
+        logo: '⚪🟠⚫',
+        league: 'La Liga',
+        country: 'Espagne',
+        colors: { primary: '#FFFFFF', secondary: '#EE7433' },
+        stadium: 'Mestalla',
+        founded: 1919,
+        website: 'https://www.valenciacf.com',
+        path: 'app-universal-simple.html?club=Valence&logo=⚽&sport=Football&league=La+Liga'
+    },
+    {
+        name: 'Villarreal',
         nameEnglish: 'Villarreal CF',
         logo: '🟡🔵',
         league: 'La Liga',
@@ -332,7 +1090,7 @@ const footballEuropeenData = [
         stadium: 'Estadio de la Cerámica',
         founded: 1923,
         website: 'https://www.villarrealcf.es',
-        path: 'app-universal-simple.html?club=villarreal-cf'
+        path: 'app-universal-simple.html?club=Villarreal&logo=⚽&sport=Football&league=La+Liga'
     },
 
     // ========== 🇫🇷 FRANCE - LIGUE 1 (Top Clubs Européens) ==========
@@ -561,15 +1319,235 @@ const footballEuropeenData = [
         founded: 1903,
         website: 'https://www.bjk.com.tr',
         path: 'app-universal-simple.html?club=besiktas'
+    },
+
+    // ========== 🇸🇦 ARABIE SAOUDITE - SAUDI PRO LEAGUE (SAISON 2025/2026) ==========
+    {
+        name: 'Al Ahli SFC',
+        nameEnglish: 'Al-Ahli Saudi FC',
+        logo: '🟢⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#00873E', secondary: '#FFFFFF' },
+        stadium: 'King Abdullah Sports City',
+        founded: 1937,
+        website: 'https://www.alahli.sa',
+        path: 'app-universal-simple.html?club=Al+Ahli+SFC&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Ettifaq',
+        nameEnglish: 'Ettifaq FC',
+        logo: '🟡🔵',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#0066CC' },
+        stadium: 'Prince Mohamed bin Fahd Stadium',
+        founded: 1945,
+        website: 'https://www.ettifaq.sa',
+        path: 'app-universal-simple.html?club=Al+Ettifaq&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Fateh',
+        nameEnglish: 'Al-Fateh SC',
+        logo: '🟡⚫',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#000000' },
+        stadium: 'Prince Abdullah bin Jalawi Stadium',
+        founded: 1958,
+        website: 'https://www.alfatehclub.com',
+        path: 'app-universal-simple.html?club=Al+Fateh&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Fayha',
+        nameEnglish: 'Al-Fayha FC',
+        logo: '🟠⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FF6600', secondary: '#FFFFFF' },
+        stadium: 'Al-Majma\'ah Sports City',
+        founded: 1954,
+        website: 'https://www.alfayhaclub.com',
+        path: 'app-universal-simple.html?club=Al+Fayha&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Hilal',
+        nameEnglish: 'Al Hilal SFC',
+        logo: '🔵⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#0066CC', secondary: '#FFFFFF' },
+        stadium: 'King Fahd International Stadium',
+        founded: 1957,
+        website: 'https://www.alhilal.com',
+        path: 'app-universal-simple.html?club=Al+Hilal&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Ittihad',
+        nameEnglish: 'Ittihad FC',
+        logo: '🟡⚫',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#000000' },
+        stadium: 'King Abdullah Sports City',
+        founded: 1927,
+        website: 'https://www.ittihad.sa',
+        path: 'app-universal-simple.html?club=Al+Ittihad&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Khaleej',
+        nameEnglish: 'Al-Khaleej Saihat FC',
+        logo: '🔵🟡',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#0066CC', secondary: '#FFD700' },
+        stadium: 'Prince Mohamed bin Fahd Stadium',
+        founded: 1945,
+        website: 'https://www.alkhaleejclub.com',
+        path: 'app-universal-simple.html?club=Al+Khaleej&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Kholood',
+        nameEnglish: 'Al-Kholood Club',
+        logo: '🟢⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#00873E', secondary: '#FFFFFF' },
+        stadium: 'Prince Saud bin Jalawi Stadium',
+        founded: 1971,
+        website: 'https://www.alkholood.com',
+        path: 'app-universal-simple.html?club=Al+Kholood&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Najma',
+        nameEnglish: 'Al-Nassr FC',
+        logo: '🟡🔵',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#0066CC' },
+        stadium: 'Mrsool Park',
+        founded: 1955,
+        website: 'https://www.alnassr.com',
+        path: 'app-universal-simple.html?club=Al+Najma&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Nassr',
+        nameEnglish: 'Al-Nassr FC',
+        logo: '🟡🔵',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#0066CC' },
+        stadium: 'Mrsool Park',
+        founded: 1955,
+        website: 'https://www.alnassr.com',
+        path: 'app-universal-simple.html?club=Al+Nassr&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Okhdood',
+        nameEnglish: 'Al-Okhdood Club',
+        logo: '🟠⚫',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FF6600', secondary: '#000000' },
+        stadium: 'Prince Sultan bin Abdulaziz Sports City',
+        founded: 1976,
+        website: 'https://www.alokhdood.com',
+        path: 'app-universal-simple.html?club=Al+Okhdood&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Qadsiah',
+        nameEnglish: 'Al-Qadsiah FC',
+        logo: '🟡🔵',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#0066CC' },
+        stadium: 'Prince Mohammed bin Fahd Stadium',
+        founded: 1967,
+        website: 'https://www.alqadisiyah.com',
+        path: 'app-universal-simple.html?club=Al+Qadsiah&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Riyadh',
+        nameEnglish: 'Al-Riyadh SC',
+        logo: '🔵⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#0066CC', secondary: '#FFFFFF' },
+        stadium: 'Prince Faisal bin Fahd Stadium',
+        founded: 1954,
+        website: 'https://www.alriyadh.com',
+        path: 'app-universal-simple.html?club=Al+Riyadh&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Shabab',
+        nameEnglish: 'Al-Shabab FC',
+        logo: '⚪🔵',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFFFFF', secondary: '#0066CC' },
+        stadium: 'Prince Khalid bin Sultan Stadium',
+        founded: 1947,
+        website: 'https://www.alshabab.sa',
+        path: 'app-universal-simple.html?club=Al+Shabab&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al Taawoun',
+        nameEnglish: 'Al-Taawoun FC',
+        logo: '🟡⚫',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#FFD700', secondary: '#000000' },
+        stadium: 'King Abdullah Sport City Stadium',
+        founded: 1956,
+        website: 'https://www.taawoun.sa',
+        path: 'app-universal-simple.html?club=Al+Taawoun&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Al-Hazm',
+        nameEnglish: 'Al-Hazm Club',
+        logo: '🟢⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#00873E', secondary: '#FFFFFF' },
+        stadium: 'Prince Abdul Aziz bin Musa\'ed Stadium',
+        founded: 1957,
+        website: 'https://www.alhazm.com',
+        path: 'app-universal-simple.html?club=Al-Hazm&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Damac FC',
+        nameEnglish: 'Damac FC',
+        logo: '🔵🟡',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#0066CC', secondary: '#FFD700' },
+        stadium: 'Prince Sultan bin Abdul Aziz Stadium',
+        founded: 1972,
+        website: 'https://www.damacfc.com',
+        path: 'app-universal-simple.html?club=Damac+FC&logo=⚽&sport=Football&league=Saudi+Pro+League'
+    },
+    {
+        name: 'Neom',
+        nameEnglish: 'Neom SC',
+        logo: '🟣⚪',
+        league: 'Saudi Pro League',
+        country: 'Arabie Saoudite',
+        colors: { primary: '#6B2C91', secondary: '#FFFFFF' },
+        stadium: 'Neom Stadium',
+        founded: 2023,
+        website: 'https://www.neomsc.com',
+        path: 'app-universal-simple.html?club=Neom&logo=⚽&sport=Football&league=Saudi+Pro+League'
     }
 ];
 
 // Statistiques des championnats
 const championshipsStats = {
-    'Premier League': { country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre', clubs: 8, emoji: '👑' },
-    'Bundesliga': { country: '🇩🇪 Allemagne', clubs: 6, emoji: '⚡' },
-    'Serie A': { country: '🇮🇹 Italie', clubs: 7, emoji: '🏆' },
-    'La Liga': { country: '🇪🇸 Espagne', clubs: 6, emoji: '⭐' },
+    'Premier League': { country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre', clubs: 20, emoji: '👑' },
+    'Bundesliga': { country: '🇩🇪 Allemagne', clubs: 18, emoji: '⚡' },
+    'Serie A': { country: '🇮🇹 Italie', clubs: 20, emoji: '🏆' },
+    'La Liga': { country: '🇪🇸 Espagne', clubs: 20, emoji: '⭐' },
+    'Super League': { country: '🇨🇭 Suisse', clubs: 12, emoji: '⚪' },
+    'Saudi Pro League': { country: '🇸🇦 Arabie Saoudite', clubs: 18, emoji: '🐪' },
     'Ligue 1': { country: '🇫🇷 France', clubs: 5, emoji: '🔵' },
     'Primeira Liga': { country: '🇵🇹 Portugal', clubs: 3, emoji: '🦅' },
     'Eredivisie': { country: '🇳🇱 Pays-Bas', clubs: 3, emoji: '🧡' },
@@ -578,4 +1556,4 @@ const championshipsStats = {
     'Süper Lig': { country: '🇹🇷 Turquie', clubs: 3, emoji: '🌙' }
 };
 
-console.log(`⚽🇪🇺 FOOTBALL EUROPÉEN: ${footballEuropeenData.length} clubs chargés depuis 10 championnats`);
+console.log(`⚽🌍 FOOTBALL INTERNATIONAL: ${footballEuropeenData.length} clubs chargés depuis 12 championnats`);

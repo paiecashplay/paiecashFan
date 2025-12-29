@@ -2,17 +2,17 @@
 // Supporte 10+ langues majeures
 
 const LANGUES_SUPPORTEES = {
-    'fr': { nom: 'Français', code: 'FR', drapeau: '🇫🇷', direction: 'ltr' },
-    'en': { nom: 'English', code: 'GB', drapeau: '🇬🇧', direction: 'ltr' },
-    'es': { nom: 'Español', code: 'ES', drapeau: '🇪🇸', direction: 'ltr' },
-    'de': { nom: 'Deutsch', code: 'DE', drapeau: '🇩🇪', direction: 'ltr' },
-    'it': { nom: 'Italiano', code: 'IT', drapeau: '🇮🇹', direction: 'ltr' },
-    'pt': { nom: 'Português', code: 'PT', drapeau: '🇵🇹', direction: 'ltr' },
-    'tr': { nom: 'Türkçe', code: 'TR', drapeau: '🇹🇷', direction: 'ltr' },
-    'ru': { nom: 'Русский', code: 'RU', drapeau: '🇷🇺', direction: 'ltr' },
-    'zh': { nom: '中文', code: 'CN', drapeau: '🇨🇳', direction: 'ltr' },
-    'ar': { nom: 'العربية', code: 'SA', drapeau: '🇸🇦', direction: 'rtl' },
-    'ja': { nom: '日本語', code: 'JP', drapeau: '🇯🇵', direction: 'ltr' }
+    'fr': { nom: 'Français', nomLong: 'Français', code: 'FR', drapeau: '🇫🇷', direction: 'ltr' },
+    'en': { nom: 'English', nomLong: 'English', code: 'GB', drapeau: '🇬🇧', direction: 'ltr' },
+    'es': { nom: 'Español', nomLong: 'Español', code: 'ES', drapeau: '🇪🇸', direction: 'ltr' },
+    'de': { nom: 'Deutsch', nomLong: 'Deutsch', code: 'DE', drapeau: '🇩🇪', direction: 'ltr' },
+    'it': { nom: 'Italiano', nomLong: 'Italiano', code: 'IT', drapeau: '🇮🇹', direction: 'ltr' },
+    'pt': { nom: 'Português', nomLong: 'Português', code: 'PT', drapeau: '🇵🇹', direction: 'ltr' },
+    'tr': { nom: 'Türkçe', nomLong: 'Türkçe', code: 'TR', drapeau: '🇹🇷', direction: 'ltr' },
+    'ru': { nom: 'Русский', nomLong: 'Русский', code: 'RU', drapeau: '🇷🇺', direction: 'ltr' },
+    'zh': { nom: '中文', nomLong: '中文', code: 'CN', drapeau: '🇨🇳', direction: 'ltr' },
+    'ar': { nom: 'العربية', nomLong: 'العربية', code: 'SA', drapeau: '🇸🇦', direction: 'rtl' },
+    'ja': { nom: '日本語', nomLong: '日本語', code: 'JP', drapeau: '🇯🇵', direction: 'ltr' }
 };
 
 // Dictionnaire de traductions
@@ -180,6 +180,32 @@ const TRADUCTIONS = {
         'zh': '欧洲俱乐部',
         'ar': 'أندية أوروبا',
         'ja': 'ヨーロッパクラブ'
+    },
+    'stats.teams': {
+        'fr': 'Équipes & Clubs',
+        'en': 'Teams & Clubs',
+        'es': 'Equipos y Clubes',
+        'de': 'Teams & Clubs',
+        'it': 'Squadre e Club',
+        'pt': 'Equipes e Clubes',
+        'tr': 'Takımlar ve Kulüpler',
+        'ru': 'Команды и Клубы',
+        'zh': '队伍和俱乐部',
+        'ar': 'الفرق والأندية',
+        'ja': 'チームとクラブ'
+    },
+    'stats.sports': {
+        'fr': 'Sports',
+        'en': 'Sports',
+        'es': 'Deportes',
+        'de': 'Sportarten',
+        'it': 'Sport',
+        'pt': 'Esportes',
+        'tr': 'Sporlar',
+        'ru': 'Виды спорта',
+        'zh': '运动项目',
+        'ar': 'الرياضات',
+        'ja': 'スポーツ'
     },
     'stats.federations': {
         'fr': 'Fédérations',
@@ -509,6 +535,340 @@ const TRADUCTIONS = {
         'zh': '欢迎',
         'ar': 'مرحبا',
         'ja': 'ようこそ'
+    },
+    
+    // ========== CLUBS & FEDERATIONS ==========
+    'club.om.subtitle': {
+        'fr': 'Olympique de Marseille Edition',
+        'en': 'Olympique de Marseille Edition',
+        'es': 'Edición Olympique de Marseille',
+        'de': 'Olympique de Marseille Ausgabe',
+        'it': 'Edizione Olympique de Marseille',
+        'pt': 'Edição Olympique de Marseille',
+        'ar': 'إصدار أولمبيك مارسيليا',
+        'zh': '马赛奥林匹克版',
+        'ja': 'オリンピック・マルセイユ版'
+    },
+    'club.om.name': {
+        'fr': 'Olympique de Marseille',
+        'en': 'Olympique de Marseille',
+        'es': 'Olympique de Marseille',
+        'de': 'Olympique de Marseille',
+        'it': 'Olympique de Marseille',
+        'pt': 'Olympique de Marseille',
+        'ar': 'أولمبيك مارسيليا',
+        'zh': '马赛奥林匹克',
+        'ja': 'オリンピック・マルセイユ'
+    },
+    'club.om.stadium': {
+        'fr': 'Stade Vélodrome',
+        'en': 'Vélodrome Stadium',
+        'es': 'Estadio Vélodrome',
+        'de': 'Vélodrome-Stadion',
+        'it': 'Stadio Vélodrome',
+        'pt': 'Estádio Vélodrome',
+        'ar': 'ملعب فيلودروم',
+        'zh': '韦洛德罗姆球场',
+        'ja': 'ヴェロドローム・スタジアム'
+    },
+    'club.om.league': {
+        'fr': 'Ligue 1 France - 9x Champions',
+        'en': 'Ligue 1 France - 9x Champions',
+        'es': 'Ligue 1 Francia - 9x Campeones',
+        'de': 'Ligue 1 Frankreich - 9x Champions',
+        'it': 'Ligue 1 Francia - 9x Campioni',
+        'pt': 'Ligue 1 França - 9x Campeões',
+        'ar': 'الدوري الفرنسي - بطل 9 مرات',
+        'zh': '法甲 - 9次冠军',
+        'ja': 'リーグ1フランス - 9回チャンピオン'
+    },
+    'user.connected': {
+        'fr': 'Connecté',
+        'en': 'Connected',
+        'es': 'Conectado',
+        'de': 'Verbunden',
+        'it': 'Connesso',
+        'pt': 'Conectado',
+        'ar': 'متصل',
+        'zh': '已连接',
+        'ja': '接続済み'
+    },
+    'user.balance': {
+        'fr': 'Solde',
+        'en': 'Balance',
+        'es': 'Saldo',
+        'de': 'Guthaben',
+        'it': 'Saldo',
+        'pt': 'Saldo',
+        'ar': 'الرصيد',
+        'zh': '余额',
+        'ja': '残高'
+    },
+    'club.features.tickets.title': {
+        'fr': 'Billetterie Vélodrome',
+        'en': 'Vélodrome Ticketing',
+        'es': 'Venta de Entradas Vélodrome',
+        'de': 'Vélodrome Ticketing',
+        'it': 'Biglietteria Vélodrome',
+        'pt': 'Bilheteria Vélodrome',
+        'ar': 'تذاكر فيلودروم',
+        'zh': '韦洛德罗姆售票',
+        'ja': 'ヴェロドロームチケット'
+    },
+    'club.features.tickets.desc': {
+        'fr': 'Achetez vos places pour le stade',
+        'en': 'Buy your stadium tickets',
+        'es': 'Compre sus entradas para el estadio',
+        'de': 'Kaufen Sie Ihre Stadiontickets',
+        'it': 'Acquista i tuoi biglietti per lo stadio',
+        'pt': 'Compre seus ingressos para o estádio',
+        'ar': 'اشترِ تذاكر الملعب',
+        'zh': '购买体育场门票',
+        'ja': 'スタジアムチケットを購入'
+    },
+    'club.features.payments.title': {
+        'fr': 'Paiements Globaux',
+        'en': 'Global Payments',
+        'es': 'Pagos Globales',
+        'de': 'Globale Zahlungen',
+        'it': 'Pagamenti Globali',
+        'pt': 'Pagamentos Globais',
+        'ar': 'مدفوعات عالمية',
+        'zh': '全球支付',
+        'ja': 'グローバル決済'
+    },
+    'club.features.payments.desc': {
+        'fr': 'Alipay, Stablecoin, Mobile Money',
+        'en': 'Alipay, Stablecoin, Mobile Money',
+        'es': 'Alipay, Stablecoin, Mobile Money',
+        'de': 'Alipay, Stablecoin, Mobile Money',
+        'it': 'Alipay, Stablecoin, Mobile Money',
+        'pt': 'Alipay, Stablecoin, Mobile Money',
+        'ar': 'أليباي، عملة مستقرة، موبايل موني',
+        'zh': '支付宝、稳定币、移动支付',
+        'ja': 'Alipay、ステーブルコイン、モバイルマネー'
+    },
+    'club.features.cashback.title': {
+        'fr': 'Cashback 5%',
+        'en': 'Cashback 5%',
+        'es': 'Cashback 5%',
+        'de': 'Cashback 5%',
+        'it': 'Cashback 5%',
+        'pt': 'Cashback 5%',
+        'ar': 'استرداد نقدي 5٪',
+        'zh': '5% 返现',
+        'ja': '5% キャッシュバック'
+    },
+    'club.features.cashback.desc': {
+        'fr': 'Sur tous vos achats OM',
+        'en': 'On all your OM purchases',
+        'es': 'En todas sus compras de OM',
+        'de': 'Auf alle Ihre OM-Einkäufe',
+        'it': 'Su tutti i tuoi acquisti OM',
+        'pt': 'Em todas as suas compras OM',
+        'ar': 'على جميع مشترياتك من OM',
+        'zh': '所有OM购买',
+        'ja': 'すべてのOM購入'
+    },
+    'club.features.community.title': {
+        'fr': 'Communauté',
+        'en': 'Community',
+        'es': 'Comunidad',
+        'de': 'Gemeinschaft',
+        'it': 'Comunità',
+        'pt': 'Comunidade',
+        'ar': 'المجتمع',
+        'zh': '社区',
+        'ja': 'コミュニティ'
+    },
+    'club.features.community.desc': {
+        'fr': 'Partagez avec les fans de l\'OM',
+        'en': 'Share with OM fans',
+        'es': 'Comparte con los fans del OM',
+        'de': 'Teilen Sie mit OM-Fans',
+        'it': 'Condividi con i tifosi dell\'OM',
+        'pt': 'Compartilhe com os fãs do OM',
+        'ar': 'شارك مع مشجعي OM',
+        'zh': '与OM粉丝分享',
+        'ja': 'OMファンと共有'
+    },
+    'club.btn.access_app': {
+        'fr': 'Accéder à l\'Application',
+        'en': 'Access the App',
+        'es': 'Acceder a la Aplicación',
+        'de': 'Auf die App zugreifen',
+        'it': 'Accedi all\'App',
+        'pt': 'Acessar o App',
+        'ar': 'الوصول إلى التطبيق',
+        'zh': '访问应用',
+        'ja': 'アプリにアクセス'
+    },
+    'club.btn.login': {
+        'fr': 'Se Connecter / S\'inscrire',
+        'en': 'Login / Sign Up',
+        'es': 'Iniciar Sesión / Registrarse',
+        'de': 'Anmelden / Registrieren',
+        'it': 'Accedi / Registrati',
+        'pt': 'Entrar / Cadastrar',
+        'ar': 'تسجيل الدخول / التسجيل',
+        'zh': '登录 / 注册',
+        'ja': 'ログイン / 登録'
+    },
+    'club.btn.back_hub': {
+        'fr': 'Retour au Hub Ligue 1',
+        'en': 'Back to Ligue 1 Hub',
+        'es': 'Volver al Hub Ligue 1',
+        'de': 'Zurück zum Ligue 1 Hub',
+        'it': 'Torna all\'Hub Ligue 1',
+        'pt': 'Voltar ao Hub Ligue 1',
+        'ar': 'العودة إلى مركز الدوري 1',
+        'zh': '返回法甲中心',
+        'ja': 'リーグ1ハブに戻る'
+    },
+    
+    // ========== FEDERATIONS ==========
+    'federation.title': {
+        'fr': 'Fédérations Sportives',
+        'en': 'Sports Federations',
+        'es': 'Federaciones Deportivas',
+        'de': 'Sportverbände',
+        'it': 'Federazioni Sportive',
+        'pt': 'Federações Esportivas',
+        'ar': 'الاتحادات الرياضية',
+        'zh': '体育联合会',
+        'ja': 'スポーツ連盟'
+    },
+    'federation.subtitle': {
+        'fr': 'Connectez-vous avec les fédérations officielles',
+        'en': 'Connect with official federations',
+        'es': 'Conéctese con las federaciones oficiales',
+        'de': 'Verbinden Sie sich mit offiziellen Verbänden',
+        'it': 'Connettiti con le federazioni ufficiali',
+        'pt': 'Conecte-se com federações oficiais',
+        'ar': 'اتصل بالاتحادات الرسمية',
+        'zh': '连接官方联合会',
+        'ja': '公式連盟と接続'
+    },
+    'federation.fff.name': {
+        'fr': 'Fédération Française de Football',
+        'en': 'French Football Federation',
+        'es': 'Federación Francesa de Fútbol',
+        'de': 'Französischer Fußballverband',
+        'it': 'Federazione Francese di Calcio',
+        'pt': 'Federação Francesa de Futebol',
+        'ar': 'الاتحاد الفرنسي لكرة القدم',
+        'zh': '法国足球联合会',
+        'ja': 'フランスサッカー連盟'
+    },
+    'federation.ffr.name': {
+        'fr': 'Fédération Française de Rugby',
+        'en': 'French Rugby Federation',
+        'es': 'Federación Francesa de Rugby',
+        'de': 'Französischer Rugby-Verband',
+        'it': 'Federazione Francese di Rugby',
+        'pt': 'Federação Francesa de Rugby',
+        'ar': 'الاتحاد الفرنسي للرجبي',
+        'zh': '法国橄榄球联合会',
+        'ja': 'フランスラグビー連盟'
+    },
+    'federation.ffb.name': {
+        'fr': 'Fédération Française de Basketball',
+        'en': 'French Basketball Federation',
+        'es': 'Federación Francesa de Baloncesto',
+        'de': 'Französischer Basketballverband',
+        'it': 'Federazione Francese di Pallacanestro',
+        'pt': 'Federação Francesa de Basquete',
+        'ar': 'الاتحاد الفرنسي لكرة السلة',
+        'zh': '法国篮球联合会',
+        'ja': 'フランスバスケットボール連盟'
+    },
+    'federation.stats.licenses': {
+        'fr': 'Licenciés',
+        'en': 'Licensed Players',
+        'es': 'Licenciados',
+        'de': 'Lizenzierte Spieler',
+        'it': 'Tesserati',
+        'pt': 'Licenciados',
+        'ar': 'المرخصون',
+        'zh': '注册球员',
+        'ja': 'ライセンスプレーヤー'
+    },
+    'federation.stats.clubs': {
+        'fr': 'Clubs',
+        'en': 'Clubs',
+        'es': 'Clubes',
+        'de': 'Vereine',
+        'it': 'Club',
+        'pt': 'Clubes',
+        'ar': 'الأندية',
+        'zh': '俱乐部',
+        'ja': 'クラブ'
+    },
+    'federation.stats.worldcups': {
+        'fr': 'Coupes du Monde',
+        'en': 'World Cups',
+        'es': 'Copas del Mundo',
+        'de': 'Weltmeisterschaften',
+        'it': 'Coppe del Mondo',
+        'pt': 'Copas do Mundo',
+        'ar': 'كؤوس العالم',
+        'zh': '世界杯',
+        'ja': 'ワールドカップ'
+    },
+    'federation.stats.grandslams': {
+        'fr': 'Grand Chelems',
+        'en': 'Grand Slams',
+        'es': 'Grand Slams',
+        'de': 'Grand Slams',
+        'it': 'Grande Slam',
+        'pt': 'Grand Slams',
+        'ar': 'البطولات الكبرى',
+        'zh': '大满贯',
+        'ja': 'グランドスラム'
+    },
+    'federation.stats.olympic_medals': {
+        'fr': 'Médailles Olympiques',
+        'en': 'Olympic Medals',
+        'es': 'Medallas Olímpicas',
+        'de': 'Olympische Medaillen',
+        'it': 'Medaglie Olimpiche',
+        'pt': 'Medalhas Olímpicas',
+        'ar': 'الميداليات الأولمبية',
+        'zh': '奥运奖牌',
+        'ja': 'オリンピックメダル'
+    },
+    'federation.stats.davis_cups': {
+        'fr': 'Coupes Davis',
+        'en': 'Davis Cups',
+        'es': 'Copas Davis',
+        'de': 'Davis Cups',
+        'it': 'Coppe Davis',
+        'pt': 'Copas Davis',
+        'ar': 'كأس ديفيس',
+        'zh': '戴维斯杯',
+        'ja': 'デビスカップ'
+    },
+    'federation.stats.world_titles': {
+        'fr': 'Titres Mondiaux',
+        'en': 'World Titles',
+        'es': 'Títulos Mundiales',
+        'de': 'Weltmeistertitel',
+        'it': 'Titoli Mondiali',
+        'pt': 'Títulos Mundiais',
+        'ar': 'الألقاب العالمية',
+        'zh': '世界冠军',
+        'ja': '世界タイトル'
+    },
+    'btn.back_home': {
+        'fr': 'Retour à l\'Accueil',
+        'en': 'Back to Home',
+        'es': 'Volver al Inicio',
+        'de': 'Zurück zur Startseite',
+        'it': 'Torna alla Home',
+        'pt': 'Voltar ao Início',
+        'ar': 'العودة إلى الصفحة الرئيسية',
+        'zh': '返回首页',
+        'ja': 'ホームに戻る'
     }
 };
 
@@ -703,20 +1063,27 @@ async function initialiserMultiLangues() {
     if (langueSauvegardee && LANGUES_SUPPORTEES[langueSauvegardee]) {
         langueActive = langueSauvegardee;
         console.log('✅ Langue restaurée depuis localStorage:', langueSauvegardee);
-        return;
+    } else {
+        // 2. FORCER LE FRANÇAIS PAR DÉFAUT (pas de géolocalisation automatique)
+        // L'utilisateur peut changer manuellement via le sélecteur
+        langueActive = 'fr';
+        localStorage.setItem('langue_preferee', 'fr');
+        console.log('✅ Langue par défaut : Français (fr)');
     }
     
-    // 2. FORCER LE FRANÇAIS PAR DÉFAUT (pas de géolocalisation automatique)
-    // L'utilisateur peut changer manuellement via le sélecteur
-    langueActive = 'fr';
-    localStorage.setItem('langue_preferee', 'fr');
-    console.log('✅ Langue par défaut : Français (fr)');
+    // 3. GÉNÉRER LE SÉLECTEUR DE LANGUE
+    const selecteurContainer = document.getElementById('languageSelector');
+    if (selecteurContainer) {
+        selecteurContainer.innerHTML = genererSelecteurLangue();
+        console.log('✅ Sélecteur de langue généré');
+    } else {
+        console.warn('⚠️ Élément #languageSelector non trouvé');
+    }
     
-    // Note : Pour activer la détection automatique, décommenter ci-dessous :
-    // const langueDetectee = await detecterLangueParGeolocalisation();
-    // langueActive = langueDetectee;
-    // localStorage.setItem('langue_preferee', langueDetectee);
-    // console.log('✅ Langue détectée et sauvegardée:', langueDetectee);
+    // 4. TRADUIRE TOUS LES ÉLÉMENTS [data-i18n]
+    changerLangue(langueActive);
+    
+    console.log('✅ Initialisation I18N terminée - Langue:', langueActive);
 }
 
 /**

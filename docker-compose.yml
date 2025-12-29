@@ -1,168 +1,92 @@
 version: '3.8'
 
 services:
-  # API Gateway
-  gateway:
-    build: ./gateway
-    ports:
-      - "3100:3100"
-    environment:
-      - NODE_ENV=production
-    networks:
-      - paiecashplay-network
-    depends_on:
-      - marseille
-      - parisfc
-
-  # Microservice Marseille (OM)
-  marseille:
-    build: ./microservices/marseille
+  # API Backend
+  api:
+    build: ./api
+    container_name: paiecashfan-api
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
+      - NODE_ENV=production
       - PORT=3000
-      - CLUB_ID=om
-      - CLUB_NAME=Olympique de Marseille
-      - DATABASE_URL=mongodb://mongo-marseille:27017/om_db
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_OM}
-    networks:
-      - paiecashplay-network
+      - JWT_SECRET=${JWT_SECRET:-paiecashfan-secret-key-2026}
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/paiecashfan
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - mongo-marseille
-
-  # Base de données Marseille
-  mongo-marseille:
-    image: mongo:6.0
-    volumes:
-      - marseille-data:/data/db
+      - postgres
+      - redis
     networks:
-      - paiecashplay-network
+      - paiecashfan-network
+    volumes:
+      - ./api:/app
+      - /app/node_modules
 
-  # Microservice Paris FC
-  parisfc:
-    build: ./microservices/parisfc
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: paiecashfan-postgres
+    restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "5432:5432"
     environment:
-      - PORT=3001
-      - CLUB_ID=parisfc
-      - CLUB_NAME=Paris Football Club
-      - DATABASE_URL=mongodb://mongo-parisfc:27017/parisfc_db
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_PARISFC}
-    networks:
-      - paiecashplay-network
-    depends_on:
-      - mongo-parisfc
-
-  # Base de données Paris FC
-  mongo-parisfc:
-    image: mongo:6.0
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=paiecashfan
     volumes:
-      - parisfc-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
     networks:
-      - paiecashplay-network
+      - paiecashfan-network
 
-  # Microservice Lyon (OL)
-  lyon:
-    build: ./microservices/lyon
-    ports:
-      - "3002:3002"
-    environment:
-      - PORT=3002
-      - CLUB_ID=ol
-      - CLUB_NAME=Olympique Lyonnais
-      - DATABASE_URL=mongodb://mongo-lyon:27017/lyon_db
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_LYON}
-    networks:
-      - paiecashplay-network
-    depends_on:
-      - mongo-lyon
-
-  # Base de données Lyon
-  mongo-lyon:
-    image: mongo:6.0
-    volumes:
-      - lyon-data:/data/db
-    networks:
-      - paiecashplay-network
-
-  # Microservice PSG
-  psg:
-    build: ./microservices/psg
-    ports:
-      - "3003:3003"
-    environment:
-      - PORT=3003
-      - CLUB_ID=psg
-      - CLUB_NAME=Paris Saint-Germain
-      - DATABASE_URL=mongodb://mongo-psg:27017/psg_db
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_PSG}
-    networks:
-      - paiecashplay-network
-    depends_on:
-      - mongo-psg
-
-  # Base de données PSG
-  mongo-psg:
-    image: mongo:6.0
-    volumes:
-      - psg-data:/data/db
-    networks:
-      - paiecashplay-network
-
-  # Microservice Monaco
-  monaco:
-    build: ./microservices/monaco
-    ports:
-      - "3004:3004"
-    environment:
-      - PORT=3004
-      - CLUB_ID=monaco
-      - CLUB_NAME=AS Monaco
-      - DATABASE_URL=mongodb://mongo-monaco:27017/monaco_db
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY_MONACO}
-    networks:
-      - paiecashplay-network
-    depends_on:
-      - mongo-monaco
-
-  # Base de données Monaco
-  mongo-monaco:
-    image: mongo:6.0
-    volumes:
-      - monaco-data:/data/db
-    networks:
-      - paiecashplay-network
-
-  # Redis (Cache partagé)
+  # Redis Cache
   redis:
     image: redis:7-alpine
+    container_name: paiecashfan-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
     networks:
-      - paiecashplay-network
+      - paiecashfan-network
 
-  # Dashboard Admin
-  admin:
-    build: ./admin
+  # Nginx (Optional - Load Balancer & Reverse Proxy)
+  nginx:
+    image: nginx:alpine
+    container_name: paiecashfan-nginx
+    restart: unless-stopped
     ports:
-      - "3200:3200"
-    environment:
-      - NODE_ENV=production
-      - REDIS_URL=redis://redis:6379
-    networks:
-      - paiecashplay-network
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - redis
-      - gateway
+      - api
+    networks:
+      - paiecashfan-network
+
+  # pgAdmin (Optional - Database Management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: paiecashfan-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@paiecashfan.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - postgres
+    networks:
+      - paiecashfan-network
 
 networks:
-  paiecashplay-network:
+  paiecashfan-network:
     driver: bridge
 
 volumes:
-  marseille-data:
-  parisfc-data:
-  lyon-data:
-  psg-data:
-  monaco-data:
+  postgres-data:
+  redis-data:

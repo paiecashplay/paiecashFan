@@ -1,0 +1,61 @@
+⚽ LIGUE 1 & LIGUE 2 - SAISON 2025/2026 ⚽
+
+═══════════════════════════════════════════════════════════════
+
+✅ MISE À JOUR COMPLÈTE V6.3.1
+
+═══════════════════════════════════════════════════════════════
+
+🎯 LIGUE 1 (18 clubs)
+
+Angers, Auxerre, Brest, FC Metz, Le Havre, Lens, Lille, Lorient, 
+Lyon, Marseille, Monaco, Nantes, Nice, Paris FC, Paris SG, Rennes, 
+Strasbourg, Toulouse
+
+📊 Changement :
+- Lorient ⬆️ PROMU (remplace Montpellier)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 LIGUE 2 (18 clubs)
+
+Amiens, Annecy, Boulogne, Clermont, Dunkerque, Grenoble, Guingamp, 
+Laval, Le Mans, Montpellier, Nancy, Pau, Red Star, Reims, Rodez, 
+Saint-Étienne, SC Bastia, Troyes
+
+📊 Changement :
+- Montpellier ⬇️ RELÉGUÉ (remplace Lorient)
+
+═══════════════════════════════════════════════════════════════
+
+📁 FICHIER MODIFIÉ
+
+clubs-football-complet.js (lignes 7-49)
+
+═══════════════════════════════════════════════════════════════
+
+🧪 TEST RAPIDE
+
+1. Aller sur : https://jphbvnok.gensparkspace.com/
+2. Onglet "Football France"
+3. Vérifier Ligue 1 : Lorient présent ✅
+4. Vérifier Ligue 2 : Montpellier présent ✅
+
+═══════════════════════════════════════════════════════════════
+
+🚀 PROCHAINE ÉTAPE
+
+1. Republier (Publish)
+2. Attendre 60 secondes
+3. Hard refresh (Ctrl+Shift+R)
+4. Tester
+
+═══════════════════════════════════════════════════════════════
+
+📊 VERSION : 6.3.1
+📅 DATE : 29 Décembre 2024
+✅ STATUT : LIGUE 1 & LIGUE 2 À JOUR
+
+═══════════════════════════════════════════════════════════════
+
+FIN DU RÉSUMÉ V6.3.1

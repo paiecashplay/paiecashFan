@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - TikTok × Fintech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            padding-bottom: 80px;
+        }
+        
+        /* HEADER TIKTOK */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .wallet {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        /* SEARCH */
+        .search {
+            padding: 15px 20px;
+            background: #0a0a0a;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #222;
+            border-radius: 25px;
+            background: #111;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        /* STORIES */
+        .stories {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            background: #0a0a0a;
+        }
+        .stories::-webkit-scrollbar { display: none; }
+        .story {
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .story-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 3px;
+            margin-bottom: 8px;
+        }
+        .story-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .story-label {
+            font-size: 12px;
+            color: #888;
+            font-weight: 600;
+        }
+        
+        /* TABS */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: #0a0a0a;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            color: #888;
+        }
+        .tab.active {
+            color: #fff;
+            border-bottom-color: #667eea;
+        }
+        
+        /* CONTENT */
+        .content {
+            display: none;
+            min-height: 60vh;
+        }
+        .content.active {
+            display: block;
+        }
+        
+        /* FEED */
+        .post {
+            background: #0a0a0a;
+            margin-bottom: 2px;
+            border-top: 1px solid #111;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            gap: 12px;
+        }
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .post-info { flex: 1; }
+        .post-author {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .post-time {
+            font-size: 13px;
+            color: #888;
+        }
+        .post-content {
+            padding: 0 20px 15px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px;
+            border-top: 1px solid #111;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px;
+            position: relative;
+        }
+        .earn-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        
+        /* WALLET SECTION */
+        .wallet-card {
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        .balance-amount {
+            font-size: 48px;
+            font-weight: 900;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .wallet-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .wallet-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* JOJ 2026 */
+        .joj-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .joj-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .joj-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .persona-card {
+            background: #111;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #222;
+        }
+        .persona-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .persona-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .persona-desc {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #222;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #888;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .nav-item.active { color: #667eea; }
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(16,185,129,0.4);
+            z-index: 200;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo" id="clubName">PaieCashFan</div>
+        <div class="wallet"><span id="balance">247.50</span> OMC</div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search">
+        <input type="text" class="search-input" placeholder="Rechercher clubs, joueurs, produits...">
+    </div>
+
+    <!-- STORIES -->
+    <div class="stories">
+        <div class="story">
+            <div class="story-circle"><div class="story-inner">🔴</div></div>
+            <div class="story-label">Live</div>
+        </div>
+        <div class="story">
+            <div class="story-circle"><div class="story-inner">⚽</div></div>
+            <div class="story-label">Match</div>
+        </div>
+        <div class="story">
+            <div class="story-circle"><div class="story-inner">🎉</div></div>
+            <div class="story-label">Promo</div>
+        </div>
+        <div class="story">
+            <div class="story-circle"><div class="story-inner">💰</div></div>
+            <div class="story-label">Cashback</div>
+        </div>
+        <div class="story">
+            <div class="story-circle"><div class="story-inner">🎁</div></div>
+            <div class="story-label">Offres</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" data-tab="feed">🔥 Feed</div>
+        <div class="tab" data-tab="wallet">💰 Wallet</div>
+        <div class="tab" data-tab="shop">🛍️ Shop</div>
+        <div class="tab" data-tab="tickets">🎫 Billets</div>
+        <div class="tab" data-tab="legendes">⭐ Légendes</div>
+        <div class="tab" data-tab="ambassadeurs">👑 Ambassadeurs</div>
+        <div class="tab" data-tab="joj2026">🏅 JOJ 2026</div>
+        <div class="tab" data-tab="profile">👤 Profil</div>
+    </div>
+
+    <!-- FEED -->
+    <div class="content active" id="feed">
+        <div class="post">
+            <div class="post-header">
+                <div class="avatar" id="postAvatar1">⚽</div>
+                <div class="post-info">
+                    <div class="post-author" id="postAuthor1">Olympique de Marseille</div>
+                    <div class="post-time">Il y a 2h</div>
+                </div>
+            </div>
+            <div class="post-content">🔥 Victoire 2-0 ! Profitez de 10% de cashback sur la boutique ! #DroitAuBut</div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="earn(0.01, 'Like')">
+                    <span style="font-size:24px">❤️</span>
+                    <span style="font-size:12px">Like</span>
+                    <span class="earn-badge">+0.01€</span>
+                </button>
+                <button class="action-btn" onclick="earn(0.02, 'Commentaire')">
+                    <span style="font-size:24px">💬</span>
+                    <span style="font-size:12px">Commenter</span>
+                    <span class="earn-badge">+0.02€</span>
+                </button>
+                <button class="action-btn" onclick="earn(0.05, 'Partage')">
+                    <span style="font-size:24px">↗️</span>
+                    <span style="font-size:12px">Partager</span>
+                    <span class="earn-badge">+0.05€</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="content" id="wallet">
+        <div class="wallet-card">
+            <div style="text-align:center; margin-bottom:20px">
+                <div style="font-size:14px; opacity:0.9">Votre Solde</div>
+                <div class="balance-amount"><span id="balanceMain">247.50</span> OMC</div>
+            </div>
+            <div class="wallet-actions">
+                <button class="wallet-btn">📥 Déposer</button>
+                <button class="wallet-btn">📤 Envoyer</button>
+                <button class="wallet-btn">🔄 Échanger</button>
+                <button class="wallet-btn">📊 Gains</button>
+            </div>
+        </div>
+        <div style="padding:20px">
+            <h3 style="margin-bottom:15px">Transactions Récentes</h3>
+            <div style="background:#111; padding:15px; border-radius:10px; margin-bottom:10px">
+                <div style="display:flex; justify-content:space-between">
+                    <div>
+                        <div style="font-weight:600">Cashback boutique</div>
+                        <div style="font-size:13px; color:#888">Il y a 2h</div>
+                    </div>
+                    <div style="color:#10b981; font-weight:700">+5.00 OMC</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="content" id="shop">
+        <div style="padding:20px">
+            <h2 style="margin-bottom:20px">🛍️ Boutique Officielle</h2>
+            <div style="background:#111; padding:20px; border-radius:15px; margin-bottom:15px">
+                <div style="font-size:18px; font-weight:700; margin-bottom:10px">Maillot Domicile 2025</div>
+                <div style="font-size:24px; font-weight:900; color:#10b981; margin-bottom:10px">89.99€</div>
+                <div style="font-size:14px; color:#888; margin-bottom:15px">Cashback 5% : -4.50€</div>
+                <button style="width:100%; background:linear-gradient(135deg, #667eea, #764ba2); border:none; padding:15px; border-radius:10px; color:white; font-weight:700; cursor:pointer">
+                    Acheter Maintenant
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKETS -->
+    <div class="content" id="tickets">
+        <div style="padding:20px">
+            <h2 style="margin-bottom:20px">🎫 Billets NFT</h2>
+            <div style="background:#111; padding:20px; border-radius:15px">
+                <div style="font-size:18px; font-weight:700; margin-bottom:10px">Match OM vs PSG</div>
+                <div style="font-size:14px; color:#888; margin-bottom:15px">25 Décembre 2025 - Stade Vélodrome</div>
+                <button style="width:100%; background:linear-gradient(135deg, #10b981, #059669); border:none; padding:15px; border-radius:10px; color:white; font-weight:700; cursor:pointer">
+                    Acheter Billet NFT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEGENDES -->
+    <div class="content" id="legendes">
+        <div style="padding:20px">
+            <h2 style="margin-bottom:20px">⭐ Légendes du Club</h2>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px">
+                <div style="background:#111; padding:15px; border-radius:10px; text-align:center">
+                    <div style="font-size:48px; margin-bottom:10px">⚽</div>
+                    <div style="font-weight:700">Didier Drogba</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AMBASSADEURS -->
+    <div class="content" id="ambassadeurs">
+        <div style="padding:20px">
+            <h2 style="margin-bottom:20px">👑 Programme Ambassadeur</h2>
+            <div style="background:#111; padding:20px; border-radius:15px">
+                <div style="font-size:18px; font-weight:700; margin-bottom:10px">Devenez Ambassadeur</div>
+                <div style="font-size:14px; color:#888; margin-bottom:15px">Gagnez jusqu'à 20% de commission</div>
+                <button style="width:100%; background:linear-gradient(135deg, #f59e0b, #d97706); border:none; padding:15px; border-radius:10px; color:white; font-weight:700; cursor:pointer">
+                    Rejoindre le Programme
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JOJ 2026 -->
+    <div class="content" id="joj2026">
+        <div class="joj-header">
+            <div class="joj-title">🏅 JOJ Dakar 2026</div>
+            <div class="joj-subtitle">L'expérience olympique complète</div>
+        </div>
+        <div class="persona-grid">
+            <div class="persona-card">
+                <div class="persona-icon">🎭</div>
+                <div class="persona-title">Fan</div>
+                <div class="persona-desc">Suivez vos athlètes, achetez des billets NFT, gagnez des récompenses</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">🏃</div>
+                <div class="persona-title">Athlète</div>
+                <div class="persona-desc">Coaching IA, suivi de performance, engagement avec les fans</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">💼</div>
+                <div class="persona-title">Sponsor</div>
+                <div class="persona-desc">ROI tracking, marketing d'athlètes, analytics avancés</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">📅</div>
+                <div class="persona-title">Organisateur</div>
+                <div class="persona-desc">Gestion d'événements, billetterie, logistique</div>
+            </div>
+            <div class="persona-card">
+                <div class="persona-icon">👨‍💼</div>
+                <div class="persona-title">Admin</div>
+                <div class="persona-desc">Analytics, tableau de bord, gestion globale</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="content" id="profile">
+        <div style="padding:20px">
+            <h2 style="margin-bottom:20px">👤 Mon Profil</h2>
+            <div style="background:#111; padding:20px; border-radius:15px">
+                <div style="font-size:18px; font-weight:700; margin-bottom:15px">Paramètres du compte</div>
+                <button style="width:100%; background:#222; border:none; padding:15px; border-radius:10px; color:white; margin-bottom:10px; text-align:left">
+                    📧 Email & Notifications
+                </button>
+                <button style="width:100%; background:#222; border:none; padding:15px; border-radius:10px; color:white; margin-bottom:10px; text-align:left">
+                    🔐 Sécurité & KYC
+                </button>
+                <button style="width:100%; background:#222; border:none; padding:15px; border-radius:10px; color:white; text-align:left">
+                    🌍 Langue & Région
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('feed')">
+            <span>🏠</span>
+            <span class="nav-label">Feed</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet')">
+            <span>💰</span>
+            <span class="nav-label">Wallet</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('shop')">
+            <span>🛍️</span>
+            <span class="nav-label">Shop</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('joj2026')">
+            <span>🏅</span>
+            <span class="nav-label">JOJ 2026</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span>👤</span>
+            <span class="nav-label">Profil</span>
+        </div>
+    </nav>
+
+    <script>
+        // Get club from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const club = urlParams.get('club') || 'PaieCashFan';
+        document.getElementById('clubName').textContent = club;
+        document.getElementById('postAuthor1').textContent = club;
+        
+        let balance = 247.50;
+
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Tab clicks
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+
+        function earn(amount, action) {
+            balance += amount;
+            document.getElementById('balance').textContent = balance.toFixed(2);
+            document.getElementById('balanceMain').textContent = balance.toFixed(2);
+            
+            const notif = document.getElementById('notification');
+            notif.textContent = `+${amount.toFixed(2)}€ gagné ! ${action}`;
+            notif.style.display = 'block';
+            setTimeout(() => notif.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan API Client - Démo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #10b981;
+        }
+
+        .status-offline {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PaieCashFan API Client</h1>
+            <p>Démo d'utilisation du client API JavaScript</p>
+        </div>
+
+        <!-- Section: Status -->
+        <div class="section">
+            <div class="section-title">
+                <span class="status-indicator status-offline" id="status-indicator"></span>
+                Statut de l'API
+            </div>
+            <div class="grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-version">-</div>
+                    <div class="stat-label">Version</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-users">-</div>
+                    <div class="stat-label">Utilisateurs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-transactions">-</div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-tickets">-</div>
+                    <div class="stat-label">Billets</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Auth -->
+        <div class="section">
+            <div class="section-title">🔐 Authentification</div>
+            
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="auth-email" placeholder="user@example.com" value="demo@paiecashfan.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-input" id="auth-password" placeholder="••••••••" value="demo123">
+            </div>
+
+            <div class="grid">
+                <button class="btn" onclick="handleRegister()">📝 S'inscrire</button>
+                <button class="btn" onclick="handleLogin()">🔓 Se connecter</button>
+                <button class="btn" onclick="handleLogout()">🚪 Se déconnecter</button>
+            </div>
+
+            <div class="result-box" id="auth-result"></div>
+        </div>
+
+        <!-- Section: Wallet -->
+        <div class="section">
+            <div class="section-title">💰 Wallet</div>
+            
+            <div class="grid">
+                <button class="btn" onclick="handleGetBalance()">📊 Voir Solde</button>
+                <button class="btn" onclick="handleGetTransactions()">📜 Historique</button>
+                <button class="btn" onclick="handleDeposit()">💳 Déposer 100€</button>
+            </div>
+
+            <div class="result-box" id="wallet-result"></div>
+        </div>
+
+        <!-- Section: eSIM -->
+        <div class="section">
+            <div class="section-title">📡 eSIM</div>
+            
+            <div class="grid">
+                <button class="btn" onclick="handleGetPlans()">📋 Voir Forfaits</button>
+                <button class="btn" onclick="handleActivateESIM()">✅ Activer Europe</button>
+                <button class="btn" onclick="handleGetActiveESIM()">📱 eSIM Active</button>
+            </div>
+
+            <div class="result-box" id="esim-result"></div>
+        </div>
+
+        <!-- Section: Shop -->
+        <div class="section">
+            <div class="section-title">🛍️ Shop</div>
+            
+            <div class="grid">
+                <button class="btn" onclick="handleGetProducts()">🏬 Voir Produits</button>
+                <button class="btn" onclick="handleAddToCart()">🛒 Ajouter Panier</button>
+                <button class="btn" onclick="handleCheckout()">💳 Payer</button>
+            </div>
+
+            <div class="result-box" id="shop-result"></div>
+        </div>
+
+        <!-- Section: Tickets -->
+        <div class="section">
+            <div class="section-title">🎟️ Tickets</div>
+            
+            <div class="grid">
+                <button class="btn" onclick="handleGetEvents()">📅 Voir Événements</button>
+                <button class="btn" onclick="handlePurchaseTicket()">🎫 Acheter Billet</button>
+                <button class="btn" onclick="handleGetMyTickets()">🎟️ Mes Billets</button>
+            </div>
+
+            <div class="result-box" id="tickets-result"></div>
+        </div>
+
+        <!-- Section: AI -->
+        <div class="section">
+            <div class="section-title">🤖 IA Personnalisation</div>
+            
+            <div class="grid">
+                <button class="btn" onclick="handleGetRecommendations()">✨ Recommandations</button>
+                <button class="btn" onclick="handleGetInsights()">📊 Insights</button>
+                <button class="btn" onclick="handleGetPredictions()">🔮 Prédictions</button>
+            </div>
+
+            <div class="result-box" id="ai-result"></div>
+        </div>
+    </div>
+
+    <!-- Load API Client -->
+    <script src="../api/client.js"></script>
+
+    <script>
+        // Initialize API Client
+        const api = new PaieCashFanAPIClient({
+            baseURL: 'http://localhost:3000/api',
+            onTokenExpired: () => {
+                alert('Token expiré, veuillez vous reconnecter');
+                handleLogout();
+            }
+        });
+
+        // Check API health on load
+        window.addEventListener('load', async () => {
+            try {
+                const health = await api.getHealth();
+                document.getElementById('status-indicator').className = 'status-indicator status-online';
+                document.getElementById('stat-version').textContent = health.version;
+
+                const stats = await api.getStats();
+                document.getElementById('stat-users').textContent = stats.users;
+                document.getElementById('stat-transactions').textContent = stats.transactions;
+                document.getElementById('stat-tickets').textContent = stats.tickets;
+            } catch (error) {
+                document.getElementById('status-indicator').className = 'status-indicator status-offline';
+                showResult('auth-result', 'API hors ligne: ' + error.message, 'error');
+            }
+        });
+
+        // Helper: Show result
+        function showResult(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.className = `result-box ${type}`;
+            element.textContent = typeof data === 'object' 
+                ? JSON.stringify(data, null, 2) 
+                : data;
+        }
+
+        // Auth handlers
+        async function handleRegister() {
+            try {
+                const email = document.getElementById('auth-email').value;
+                const password = document.getElementById('auth-password').value;
+                const data = await api.register(email, password, 'Demo User');
+                showResult('auth-result', data);
+            } catch (error) {
+                showResult('auth-result', error.message, 'error');
+            }
+        }
+
+        async function handleLogin() {
+            try {
+                const email = document.getElementById('auth-email').value;
+                const password = document.getElementById('auth-password').value;
+                const data = await api.login(email, password);
+                showResult('auth-result', data);
+            } catch (error) {
+                showResult('auth-result', error.message, 'error');
+            }
+        }
+
+        function handleLogout() {
+            api.logout();
+            showResult('auth-result', 'Déconnecté avec succès');
+        }
+
+        // Wallet handlers
+        async function handleGetBalance() {
+            try {
+                const data = await api.getWalletBalance();
+                showResult('wallet-result', data);
+            } catch (error) {
+                showResult('wallet-result', error.message, 'error');
+            }
+        }
+
+        async function handleGetTransactions() {
+            try {
+                const data = await api.getWalletTransactions(10);
+                showResult('wallet-result', data);
+            } catch (error) {
+                showResult('wallet-result', error.message, 'error');
+            }
+        }
+
+        async function handleDeposit() {
+            try {
+                const data = await api.depositMoney(100);
+                showResult('wallet-result', data);
+            } catch (error) {
+                showResult('wallet-result', error.message, 'error');
+            }
+        }
+
+        // eSIM handlers
+        async function handleGetPlans() {
+            try {
+                const data = await api.getESIMPlans();
+                showResult('esim-result', data);
+            } catch (error) {
+                showResult('esim-result', error.message, 'error');
+            }
+        }
+
+        async function handleActivateESIM() {
+            try {
+                const data = await api.activateESIM('europe-unlimited');
+                showResult('esim-result', data);
+            } catch (error) {
+                showResult('esim-result', error.message, 'error');
+            }
+        }
+
+        async function handleGetActiveESIM() {
+            try {
+                const data = await api.getActiveESIM();
+                showResult('esim-result', data);
+            } catch (error) {
+                showResult('esim-result', error.message, 'error');
+            }
+        }
+
+        // Shop handlers
+        async function handleGetProducts() {
+            try {
+                const data = await api.getProducts();
+                showResult('shop-result', data);
+            } catch (error) {
+                showResult('shop-result', error.message, 'error');
+            }
+        }
+
+        async function handleAddToCart() {
+            try {
+                const data = await api.addToCart('1', 1);
+                showResult('shop-result', data);
+            } catch (error) {
+                showResult('shop-result', error.message, 'error');
+            }
+        }
+
+        async function handleCheckout() {
+            try {
+                const data = await api.checkout(79.99);
+                showResult('shop-result', data);
+            } catch (error) {
+                showResult('shop-result', error.message, 'error');
+            }
+        }
+
+        // Tickets handlers
+        async function handleGetEvents() {
+            try {
+                const data = await api.getEvents();
+                showResult('tickets-result', data);
+            } catch (error) {
+                showResult('tickets-result', error.message, 'error');
+            }
+        }
+
+        async function handlePurchaseTicket() {
+            try {
+                const data = await api.purchaseTicket('1', 'premium', 89.99);
+                showResult('tickets-result', data);
+            } catch (error) {
+                showResult('tickets-result', error.message, 'error');
+            }
+        }
+
+        async function handleGetMyTickets() {
+            try {
+                const data = await api.getMyTickets();
+                showResult('tickets-result', data);
+            } catch (error) {
+                showResult('tickets-result', error.message, 'error');
+            }
+        }
+
+        // AI handlers
+        async function handleGetRecommendations() {
+            try {
+                const data = await api.getAIRecommendations();
+                showResult('ai-result', data);
+            } catch (error) {
+                showResult('ai-result', error.message, 'error');
+            }
+        }
+
+        async function handleGetInsights() {
+            try {
+                const data = await api.getAIInsights();
+                showResult('ai-result', data);
+            } catch (error) {
+                showResult('ai-result', error.message, 'error');
+            }
+        }
+
+        async function handleGetPredictions() {
+            try {
+                const data = await api.getAIPredictions();
+                showResult('ai-result', data);
+            } catch (error) {
+                showResult('ai-result', error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

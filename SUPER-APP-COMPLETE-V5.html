@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Super App v5.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* HEADER */
+        .app-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .club-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .header-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        /* CONTAINER */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* SECTIONS */
+        .app-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .app-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* DUAL BALANCE CARDS */
+        .balances-container {
+            padding: 20px;
+            display: grid;
+            gap: 15px;
+        }
+        
+        .balance-card {
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card.bank {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+        
+        .balance-card.wallet {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+        }
+        
+        .balance-type {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        
+        .balance-subtitle {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .balance-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .balance-action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .balance-action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .balance-action-icon {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+        
+        .section-title {
+            padding: 20px 20px 12px;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .see-all {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .content-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .content-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .content-card:active {
+            transform: scale(0.98);
+        }
+        
+        .card-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--success);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .card-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--success);
+            margin-top: 10px;
+        }
+        
+        .card-partner {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--warning);
+        }
+        
+        /* PAYMENT MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2f45 100%);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: modalSlideUp 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .modal-subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .payment-item-preview {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .payment-item-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .payment-item-details {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
+        .payment-item-price {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--success);
+            margin-top: 10px;
+        }
+        
+        .payment-methods {
+            margin-bottom: 25px;
+        }
+        
+        .payment-method-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+        
+        .payment-method {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.15);
+        }
+        
+        .payment-method-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .payment-method-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .payment-method-icon.bank {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+        }
+        
+        .payment-method-icon.wallet {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+        }
+        
+        .payment-method-icon.partner {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .payment-method-info {
+            flex: 1;
+        }
+        
+        .payment-method-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .payment-method-balance {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .payment-method-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .payment-method.selected .payment-method-check {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .payment-method.selected .payment-method-check::after {
+            content: "✓";
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .partner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+        
+        .btn-pay {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+        }
+        
+        .btn-pay:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* CODE VERIFICATION */
+        .code-verification {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .code-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .code-subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+        
+        .code-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .code-input {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .success-animation {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            animation: successPulse 0.6s ease-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--success);
+        }
+        
+        .success-message {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        /* LEGENDS & AMBASSADORS */
+        .legends-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            gap: 15px;
+        }
+        
+        .legend-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .legend-card:active {
+            transform: scale(0.98);
+        }
+        
+        .legend-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+            border: 3px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .legend-info {
+            flex: 1;
+        }
+        
+        .legend-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .legend-role {
+            font-size: 13px;
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .legend-nft {
+            font-size: 12px;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .legend-association {
+            font-size: 11px;
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+        
+        /* PLAYERS */
+        .players-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .player-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .player-card:active {
+            transform: scale(0.98);
+        }
+        
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 12px;
+            border: 3px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .player-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .player-position {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .player-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .player-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 4px;
+            border-radius: 8px;
+        }
+        
+        .player-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        
+        .player-stat-label {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        
+        /* FANS */
+        .fans-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            gap: 12px;
+        }
+        
+        .fan-card {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .fan-card:active {
+            transform: scale(0.98);
+        }
+        
+        .fan-rank {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        
+        .fan-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .fan-info {
+            flex: 1;
+        }
+        
+        .fan-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .fan-points {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        /* CHAT, IA, PROFIL - Same as before */
+        .chat-list {
+            padding: 15px;
+        }
+        
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chat-item:active {
+            transform: scale(0.98);
+        }
+        
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .chat-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        
+        .chat-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .chat-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .ia-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1));
+            text-align: center;
+        }
+        
+        .ia-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .ia-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .ia-suggestions {
+            padding: 20px;
+            display: grid;
+            gap: 15px;
+        }
+        
+        .ia-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .ia-card:active {
+            transform: scale(0.98);
+        }
+        
+        .ia-card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .ia-card-content {
+            flex: 1;
+        }
+        
+        .ia-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .ia-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        .profile-header {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 15px;
+        }
+        
+        .profile-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        
+        .profile-email {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .profile-services {
+            padding: 20px;
+        }
+        
+        .service-group-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+        
+        .service-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .service-item:active {
+            transform: scale(0.98);
+        }
+        
+        .service-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .service-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .service-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+        
+        .nav-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active .nav-icon {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .nav-item.active .nav-label {
+            color: var(--primary);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .balance-amount { font-size: 30px; }
+            .content-grid { grid-template-columns: 1fr; }
+            .players-grid { grid-template-columns: 1fr; }
+            .code-input { width: 50px; height: 50px; font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-left">
+            <div class="club-logo" id="clubLogo">⚽</div>
+            <div class="club-name" id="clubName">AS Monaco</div>
+        </div>
+        <div class="header-right">
+            <div class="header-btn" onclick="alert('Notifications')">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="header-btn" onclick="toggleLanguage()">
+                <span id="currentLang">🇫🇷</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div class="app-container">
+        <!-- HOME SECTION -->
+        <section id="home" class="app-section active">
+            <!-- Dual Balance Cards -->
+            <div class="balances-container">
+                <!-- Bank Card -->
+                <div class="balance-card bank">
+                    <div class="balance-type">
+                        <i class="fas fa-credit-card"></i>
+                        Carte Bancaire
+                    </div>
+                    <div class="balance-amount">1,250.50 €</div>
+                    <div class="balance-subtitle">Compte courant principal</div>
+                    <div class="balance-actions">
+                        <div class="balance-action-btn" onclick="alert('Recharger carte')">
+                            <div class="balance-action-icon">➕</div>
+                            <div>Recharger</div>
+                        </div>
+                        <div class="balance-action-btn" onclick="alert('Retirer')">
+                            <div class="balance-action-icon">📤</div>
+                            <div>Retirer</div>
+                        </div>
+                        <div class="balance-action-btn" onclick="alert('Historique')">
+                            <div class="balance-action-icon">📊</div>
+                            <div>Historique</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wallet Card -->
+                <div class="balance-card wallet">
+                    <div class="balance-type">
+                        <i class="fas fa-wallet"></i>
+                        Wallet Crypto
+                    </div>
+                    <div class="balance-amount">250.00 €</div>
+                    <div class="balance-subtitle">USDC • 0x1234...5678</div>
+                    <div class="balance-actions">
+                        <div class="balance-action-btn" onclick="alert('Envoyer crypto')">
+                            <div class="balance-action-icon">📤</div>
+                            <div>Envoyer</div>
+                        </div>
+                        <div class="balance-action-btn" onclick="alert('Recevoir crypto')">
+                            <div class="balance-action-icon">📥</div>
+                            <div>Recevoir</div>
+                        </div>
+                        <div class="balance-action-btn" onclick="alert('Swap')">
+                            <div class="balance-action-icon">🔄</div>
+                            <div>Swap</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Billets NFT -->
+            <div class="section-title">
+                <span>🎫 Billets NFT</span>
+                <span class="see-all" onclick="alert('Voir tous les billets')">Tout voir</span>
+            </div>
+            <div class="content-grid">
+                <div class="content-card" onclick="openPaymentModal('billet', 'Monaco vs PSG', '12 Jan 2025, 21:00', 45.00, true)">
+                    <div class="card-badge">⚡ 1-Clic</div>
+                    <div class="card-icon">🏟️</div>
+                    <div class="card-title">Monaco vs PSG</div>
+                    <div class="card-subtitle">12 Jan 2025, 21:00</div>
+                    <div class="card-price">45,00 €</div>
+                    <div class="card-partner">
+                        <i class="fas fa-bolt"></i> Paiement partenaire disponible
+                    </div>
+                </div>
+                <div class="content-card" onclick="openPaymentModal('billet', 'Monaco vs OM', '19 Jan 2025, 17:00', 40.00, false)">
+                    <div class="card-icon">🏆</div>
+                    <div class="card-title">Monaco vs OM</div>
+                    <div class="card-subtitle">19 Jan 2025, 17:00</div>
+                    <div class="card-price">40,00 €</div>
+                </div>
+            </div>
+            
+            <!-- Merchandising -->
+            <div class="section-title">
+                <span>🛍️ Merchandising</span>
+                <span class="see-all" onclick="alert('Voir la boutique')">Tout voir</span>
+            </div>
+            <div class="content-grid">
+                <div class="content-card" onclick="openPaymentModal('produit', 'Maillot Domicile 2024/25', 'Tailles: S, M, L, XL', 89.99, true)">
+                    <div class="card-badge">⚡ 1-Clic</div>
+                    <div class="card-icon">👕</div>
+                    <div class="card-title">Maillot Domicile</div>
+                    <div class="card-subtitle">Saison 2024/25</div>
+                    <div class="card-price">89,99 €</div>
+                    <div class="card-partner">
+                        <i class="fas fa-bolt"></i> Paiement partenaire disponible
+                    </div>
+                </div>
+                <div class="content-card" onclick="openPaymentModal('produit', 'Casquette Officielle', 'Taille unique', 24.99, false)">
+                    <div class="card-icon">🧢</div>
+                    <div class="card-title">Casquette</div>
+                    <div class="card-subtitle">Officielle</div>
+                    <div class="card-price">24,99 €</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAT SECTION -->
+        <section id="chat" class="app-section">
+            <div class="section-title">
+                <span>💬 Messages</span>
+                <span class="see-all" onclick="alert('Nouveau message')">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </div>
+            <div class="chat-list">
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">👤</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Jean Dupont</div>
+                        <div class="chat-message">Salut ! Tu seras au match ce weekend ? 🔴⚪</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">5 min</div>
+                        <div class="chat-badge">2</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Ouvrir chat')">
+                    <div class="chat-avatar">👨</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Marc Martin</div>
+                        <div class="chat-message">J'ai acheté mon billet NFT ! 🎫</div>
+                    </div>
+                    <div class="chat-meta">
+                        <div class="chat-time">1h</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="alert('Démarrer appel vidéo')">
+                    <div class="chat-avatar">📹</div>
+                    <div class="chat-content">
+                        <div class="chat-name">Appel Vidéo</div>
+                        <div class="chat-message">Commencer un appel vidéo avec d'autres fans</div>
+                    </div>
+                    <div class="chat-meta">
+                        <i class="fas fa-video" style="color: var(--success); font-size: 20px;"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- IA SECTION -->
+        <section id="ia" class="app-section">
+            <div class="ia-header">
+                <div class="ia-title">🤖 Assistant IA</div>
+                <div class="ia-subtitle">Intelligence artificielle personnalisée pour vous</div>
+            </div>
+            
+            <div class="ia-suggestions">
+                <div class="ia-card" onclick="alert('Prédiction match')">
+                    <div class="ia-card-icon">⚽</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Prédiction Match</div>
+                        <div class="ia-card-desc">AS Monaco a 68% de chances de gagner contre PSG selon notre IA</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Analyse performances')">
+                    <div class="ia-card-icon">📊</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Analyse Performances</div>
+                        <div class="ia-card-desc">Statistiques complètes du club cette saison</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Recommandations produits')">
+                    <div class="ia-card-icon">🛍️</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Recommandations</div>
+                        <div class="ia-card-desc">Nouveau maillot en édition limitée disponible</div>
+                    </div>
+                </div>
+                
+                <div class="ia-card" onclick="alert('Assistant vocal')">
+                    <div class="ia-card-icon">🎙️</div>
+                    <div class="ia-card-content">
+                        <div class="ia-card-title">Assistant Vocal</div>
+                        <div class="ia-card-desc">Posez vos questions à l'assistant IA vocal</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFIL SECTION -->
+        <section id="profil" class="app-section">
+            <div class="profile-header">
+                <div class="profile-avatar">😊</div>
+                <div class="profile-name">Jean Dupont</div>
+                <div class="profile-email">jean.dupont@example.com</div>
+            </div>
+            
+            <div class="profile-services">
+                <!-- Légendes & Ambassadeurs -->
+                <div class="service-group-title">🌟 Légendes & Ambassadeurs</div>
+                
+                <div class="service-item" onclick="showSection('legendes')">
+                    <div class="service-left">
+                        <div class="service-icon">👑</div>
+                        <div class="service-info">
+                            <div class="service-name">Légendes du Club</div>
+                            <div class="service-desc">NFT & Associations</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="showSection('joueurs')">
+                    <div class="service-left">
+                        <div class="service-icon">⚽</div>
+                        <div class="service-info">
+                            <div class="service-name">Joueurs en Activité</div>
+                            <div class="service-desc">Effectif 2024/25</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <div class="service-item" onclick="showSection('fans')">
+                    <div class="service-left">
+                        <div class="service-icon">👥</div>
+                        <div class="service-info">
+                            <div class="service-name">Fans Actifs</div>
+                            <div class="service-desc">Classement communauté</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <!-- Services Financiers -->
+                <div class="service-group-title" style="margin-top: 20px;">💰 Services Financiers</div>
+                
+                <div class="service-item" onclick="openService('wallet')">
+                    <div class="service-left">
+                        <div class="service-icon">💳</div>
+                        <div class="service-info">
+                            <div class="service-name">Wallet PaieCash</div>
+                            <div class="service-desc">Gérer mon portefeuille</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">250 €</div>
+                </div>
+                
+                <div class="service-item" onclick="openService('savings')">
+                    <div class="service-left">
+                        <div class="service-icon">🏦</div>
+                        <div class="service-info">
+                            <div class="service-name">Épargne & Goals</div>
+                            <div class="service-desc">10 objectifs actifs</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                
+                <!-- Connectivité -->
+                <div class="service-group-title" style="margin-top: 20px;">📱 Connectivité</div>
+                
+                <div class="service-item" onclick="openService('esim')">
+                    <div class="service-left">
+                        <div class="service-icon">📡</div>
+                        <div class="service-info">
+                            <div class="service-name">eSIM</div>
+                            <div class="service-desc">3 forfaits actifs</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">Actif</div>
+                </div>
+                
+                <!-- Paramètres -->
+                <div class="service-group-title" style="margin-top: 20px;">⚙️ Paramètres</div>
+                
+                <div class="service-item" onclick="openService('security')">
+                    <div class="service-left">
+                        <div class="service-icon">🔐</div>
+                        <div class="service-info">
+                            <div class="service-name">Sécurité & Confidentialité</div>
+                            <div class="service-desc">2FA activé</div>
+                        </div>
+                    </div>
+                    <div class="service-badge">✓</div>
+                </div>
+                
+                <div class="service-item" onclick="alert('Déconnexion...')" style="margin-top: 20px; border-color: rgba(239, 68, 68, 0.3);">
+                    <div class="service-left">
+                        <div class="service-icon" style="background: rgba(239, 68, 68, 0.2);">
+                            <i class="fas fa-sign-out-alt" style="color: #ef4444;"></i>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name" style="color: #ef4444;">Déconnexion</div>
+                            <div class="service-desc">Se déconnecter du compte</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEGENDES SECTION -->
+        <section id="legendes" class="app-section">
+            <div class="section-title">
+                <span onclick="showSection('profil')" style="cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>👑 Légendes & Ambassadeurs</span>
+                <span></span>
+            </div>
+            <div class="legends-grid">
+                <div class="legend-card" onclick="alert('Thierry Henry\n\nLégende du club\nNFT Collection disponible')">
+                    <div class="legend-avatar">👑</div>
+                    <div class="legend-info">
+                        <div class="legend-name">Thierry Henry</div>
+                        <div class="legend-role">Légende & Ambassadeur</div>
+                        <div class="legend-nft">
+                            <i class="fas fa-certificate"></i>
+                            NFT Collection disponible (500 éditions)
+                        </div>
+                        <div class="legend-association">🤝 Association: Henry for Kids</div>
+                    </div>
+                </div>
+                
+                <div class="legend-card" onclick="alert('Kylian Mbappé\n\nAmbassadeur\nNFT Moments disponibles')">
+                    <div class="legend-avatar">⭐</div>
+                    <div class="legend-info">
+                        <div class="legend-name">Kylian Mbappé</div>
+                        <div class="legend-role">Ambassadeur</div>
+                        <div class="legend-nft">
+                            <i class="fas fa-certificate"></i>
+                            NFT Moments disponibles (1000 éditions)
+                        </div>
+                        <div class="legend-association">🤝 Association: Inspired by KM</div>
+                    </div>
+                </div>
+                
+                <div class="legend-card" onclick="alert('Didier Deschamps\n\nLégende\nNFT Exclusifs')">
+                    <div class="legend-avatar">🏆</div>
+                    <div class="legend-info">
+                        <div class="legend-name">Didier Deschamps</div>
+                        <div class="legend-role">Légende du Club</div>
+                        <div class="legend-nft">
+                            <i class="fas fa-certificate"></i>
+                            NFT Exclusifs (250 éditions)
+                        </div>
+                        <div class="legend-association">🤝 Association: DD Foundation</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- JOUEURS SECTION -->
+        <section id="joueurs" class="app-section">
+            <div class="section-title">
+                <span onclick="showSection('profil')" style="cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>⚽ Joueurs en Activité</span>
+                <span></span>
+            </div>
+            <div class="players-grid">
+                <div class="player-card" onclick="alert('Wissam Ben Yedder\n\nAttaquant\n15 buts cette saison')">
+                    <div class="player-avatar">⚽</div>
+                    <div class="player-name">Wissam Ben Yedder</div>
+                    <div class="player-position">Attaquant</div>
+                    <div class="player-stats">
+                        <div class="player-stat">
+                            <div class="player-stat-value">15</div>
+                            <div class="player-stat-label">Buts</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">8</div>
+                            <div class="player-stat-label">Passes</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">92</div>
+                            <div class="player-stat-label">Note</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card" onclick="alert('Youssouf Fofana\n\nMilieu\n350 passes réussies')">
+                    <div class="player-avatar">⚡</div>
+                    <div class="player-name">Youssouf Fofana</div>
+                    <div class="player-position">Milieu</div>
+                    <div class="player-stats">
+                        <div class="player-stat">
+                            <div class="player-stat-value">3</div>
+                            <div class="player-stat-label">Buts</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">12</div>
+                            <div class="player-stat-label">Passes</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">88</div>
+                            <div class="player-stat-label">Note</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card" onclick="alert('Axel Disasi\n\nDéfenseur\n85% duels gagnés')">
+                    <div class="player-avatar">🛡️</div>
+                    <div class="player-name">Axel Disasi</div>
+                    <div class="player-position">Défenseur</div>
+                    <div class="player-stats">
+                        <div class="player-stat">
+                            <div class="player-stat-value">2</div>
+                            <div class="player-stat-label">Buts</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">85%</div>
+                            <div class="player-stat-label">Duels</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">87</div>
+                            <div class="player-stat-label">Note</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="player-card" onclick="alert('Alexander Nübel\n\nGardien\n12 clean sheets')">
+                    <div class="player-avatar">🧤</div>
+                    <div class="player-name">Alexander Nübel</div>
+                    <div class="player-position">Gardien</div>
+                    <div class="player-stats">
+                        <div class="player-stat">
+                            <div class="player-stat-value">45</div>
+                            <div class="player-stat-label">Arrêts</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">12</div>
+                            <div class="player-stat-label">Clean</div>
+                        </div>
+                        <div class="player-stat">
+                            <div class="player-stat-value">90</div>
+                            <div class="player-stat-label">Note</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FANS SECTION -->
+        <section id="fans" class="app-section">
+            <div class="section-title">
+                <span onclick="showSection('profil')" style="cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>👥 Fans Actifs</span>
+                <span></span>
+            </div>
+            <div class="fans-grid">
+                <div class="fan-card" onclick="alert('Marc Dubois\nTop Fan #1\n15,450 points')">
+                    <div class="fan-rank">1</div>
+                    <div class="fan-avatar">👑</div>
+                    <div class="fan-info">
+                        <div class="fan-name">Marc Dubois</div>
+                        <div class="fan-points">⭐ 15,450 points • Top Fan</div>
+                    </div>
+                </div>
+                
+                <div class="fan-card" onclick="alert('Sophie Martin\nSuper Fan #2\n12,380 points')">
+                    <div class="fan-rank">2</div>
+                    <div class="fan-avatar">⭐</div>
+                    <div class="fan-info">
+                        <div class="fan-name">Sophie Martin</div>
+                        <div class="fan-points">⭐ 12,380 points • Super Fan</div>
+                    </div>
+                </div>
+                
+                <div class="fan-card" onclick="alert('Thomas Leroy\nFan Actif #3\n10,920 points')">
+                    <div class="fan-rank">3</div>
+                    <div class="fan-avatar">🌟</div>
+                    <div class="fan-info">
+                        <div class="fan-name">Thomas Leroy</div>
+                        <div class="fan-points">⭐ 10,920 points • Fan Actif</div>
+                    </div>
+                </div>
+                
+                <div class="fan-card" onclick="alert('Julie Moreau\nFan Engagé #4\n9,580 points')">
+                    <div class="fan-rank">4</div>
+                    <div class="fan-avatar">💫</div>
+                    <div class="fan-info">
+                        <div class="fan-name">Julie Moreau</div>
+                        <div class="fan-points">⭐ 9,580 points • Fan Engagé</div>
+                    </div>
+                </div>
+                
+                <div class="fan-card" onclick="alert('Vous\nFan Actif #15\n6,240 points')">
+                    <div class="fan-rank" style="background: var(--warning);">15</div>
+                    <div class="fan-avatar" style="background: linear-gradient(135deg, var(--warning), #d97706);">😊</div>
+                    <div class="fan-info">
+                        <div class="fan-name">Vous (Jean Dupont)</div>
+                        <div class="fan-points">⭐ 6,240 points • Fan Actif</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePaymentModal()">×</button>
+            
+            <div id="paymentStep1">
+                <div class="modal-header">
+                    <div class="modal-title">💳 Paiement</div>
+                    <div class="modal-subtitle">Choisissez votre mode de paiement</div>
+                </div>
+                
+                <div class="payment-item-preview">
+                    <div class="payment-item-name" id="paymentItemName"></div>
+                    <div class="payment-item-details" id="paymentItemDetails"></div>
+                    <div class="payment-item-price" id="paymentItemPrice"></div>
+                </div>
+                
+                <div class="payment-methods">
+                    <div class="payment-method-title">Mode de paiement</div>
+                    
+                    <div class="payment-method" onclick="selectPaymentMethod('bank')">
+                        <div class="payment-method-left">
+                            <div class="payment-method-icon bank">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="payment-method-info">
+                                <div class="payment-method-name">Carte Bancaire</div>
+                                <div class="payment-method-balance">Solde: 1,250.50 €</div>
+                            </div>
+                        </div>
+                        <div class="payment-method-check"></div>
+                    </div>
+                    
+                    <div class="payment-method" onclick="selectPaymentMethod('wallet')">
+                        <div class="payment-method-left">
+                            <div class="payment-method-icon wallet">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="payment-method-info">
+                                <div class="payment-method-name">Wallet Crypto</div>
+                                <div class="payment-method-balance">Solde: 250.00 € (USDC)</div>
+                            </div>
+                        </div>
+                        <div class="payment-method-check"></div>
+                    </div>
+                    
+                    <div class="payment-method partner-method" onclick="selectPaymentMethod('partner')" style="display: none;">
+                        <div class="payment-method-left">
+                            <div class="payment-method-icon partner">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="payment-method-info">
+                                <div class="payment-method-name">Paiement 1-Clic Partenaire</div>
+                                <div class="payment-method-balance">Monaco Fan Club • Instantané</div>
+                                <div class="partner-badge">
+                                    <i class="fas fa-bolt"></i> Paiement rapide
+                                </div>
+                            </div>
+                        </div>
+                        <div class="payment-method-check"></div>
+                    </div>
+                </div>
+                
+                <button class="btn-pay" onclick="proceedToCode()" disabled id="btnProceed">
+                    Continuer <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <div id="paymentStep2" style="display: none;">
+                <div class="code-verification">
+                    <div class="code-title">🔐 Code de Confirmation</div>
+                    <div class="code-subtitle">Entrez votre code de sécurité à 4 chiffres</div>
+                    <div class="code-inputs">
+                        <input type="text" class="code-input" maxlength="1" id="code1" oninput="moveToNext(this, 'code2')">
+                        <input type="text" class="code-input" maxlength="1" id="code2" oninput="moveToNext(this, 'code3')">
+                        <input type="text" class="code-input" maxlength="1" id="code3" oninput="moveToNext(this, 'code4')">
+                        <input type="text" class="code-input" maxlength="1" id="code4" oninput="verifyCode()">
+                    </div>
+                    <button class="btn-pay" onclick="verifyCode()">
+                        Valider le Paiement <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="paymentStep3" style="display: none;">
+                <div class="success-animation">
+                    <div class="success-icon">✓</div>
+                    <div class="success-title">Paiement Réussi !</div>
+                    <div class="success-message">
+                        Votre achat a été confirmé avec succès.<br>
+                        Vous allez recevoir une confirmation par email.
+                    </div>
+                    <button class="btn-pay" onclick="closePaymentModal()">
+                        Fermer <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+        <div class="nav-content">
+            <div class="nav-item active" onclick="switchSection('home')">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Accueil</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('chat')">
+                <i class="fas fa-comments nav-icon"></i>
+                <span class="nav-label">Chat</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('ia')">
+                <i class="fas fa-robot nav-icon"></i>
+                <span class="nav-label">IA</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('profil')">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Profil</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let currentSection = 'home';
+        let currentLangIndex = 0;
+        let selectedPaymentMethod = null;
+        let currentPaymentData = null;
+        const langs = ['🇫🇷', '🇬🇧', '🇪🇸', '🇩🇪', '🇮🇹', '🇵🇹', '🇹🇷', '🇷🇺', '🇨🇳', '🇸🇦', '🇯🇵'];
+        
+        // INIT
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const club = params.get('club') || 'AS Monaco';
+            const logo = params.get('logo') || '⚽';
+            
+            document.getElementById('clubLogo').textContent = logo;
+            document.getElementById('clubName').textContent = club;
+        });
+        
+        // NAVIGATION
+        function switchSection(sectionId) {
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            currentSection = sectionId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // LANGUAGE
+        function toggleLanguage() {
+            currentLangIndex = (currentLangIndex + 1) % langs.length;
+            document.getElementById('currentLang').textContent = langs[currentLangIndex];
+        }
+        
+        // PAYMENT MODAL
+        function openPaymentModal(type, name, details, price, hasPartner) {
+            currentPaymentData = { type, name, details, price, hasPartner };
+            
+            document.getElementById('paymentItemName').textContent = name;
+            document.getElementById('paymentItemDetails').textContent = details;
+            document.getElementById('paymentItemPrice').textContent = price.toFixed(2) + ' €';
+            
+            // Show/hide partner payment
+            const partnerMethod = document.querySelector('.partner-method');
+            if (hasPartner) {
+                partnerMethod.style.display = 'flex';
+            } else {
+                partnerMethod.style.display = 'none';
+            }
+            
+            // Reset steps
+            document.getElementById('paymentStep1').style.display = 'block';
+            document.getElementById('paymentStep2').style.display = 'none';
+            document.getElementById('paymentStep3').style.display = 'none';
+            
+            // Reset selection
+            selectedPaymentMethod = null;
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            document.getElementById('btnProceed').disabled = true;
+            
+            // Show modal
+            document.getElementById('paymentModal').classList.add('active');
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            // Clear code inputs
+            for(let i = 1; i <= 4; i++) {
+                document.getElementById('code' + i).value = '';
+            }
+        }
+        
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.getElementById('btnProceed').disabled = false;
+        }
+        
+        function proceedToCode() {
+            if (!selectedPaymentMethod) return;
+            
+            document.getElementById('paymentStep1').style.display = 'none';
+            document.getElementById('paymentStep2').style.display = 'block';
+            
+            // Auto focus first input
+            setTimeout(() => {
+                document.getElementById('code1').focus();
+            }, 100);
+        }
+        
+        function moveToNext(current, nextId) {
+            if (current.value.length === 1) {
+                const next = document.getElementById(nextId);
+                if (next) next.focus();
+            }
+        }
+        
+        function verifyCode() {
+            const code = document.getElementById('code1').value +
+                        document.getElementById('code2').value +
+                        document.getElementById('code3').value +
+                        document.getElementById('code4').value;
+            
+            if (code.length === 4) {
+                // Simulate verification
+                setTimeout(() => {
+                    document.getElementById('paymentStep2').style.display = 'none';
+                    document.getElementById('paymentStep3').style.display = 'block';
+                    
+                    // Auto close after 3 seconds
+                    setTimeout(() => {
+                        closePaymentModal();
+                    }, 3000);
+                }, 500);
+            }
+        }
+        
+        function openService(service) {
+            alert(`Ouverture de : ${service}\n\nCette fonctionnalité sera développée prochainement.`);
+        }
+    </script>
+</body>
+</html>

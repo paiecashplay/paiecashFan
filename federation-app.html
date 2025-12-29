@@ -7,13 +7,35 @@
     <link rel="stylesheet" href="clubs/paris-fc/app.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ========== DESIGN PREMIUM POUR TOUTES LES FÉDÉRATIONS ========== */
+        /* ========== NOUVEAU DESIGN CAF - FOND DÉGRADÉ BLEU/VIOLET ========== */
+        body {
+            background: linear-gradient(135deg, #1e3a8a 0%, #581c87 50%, #1e293b 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .app-container {
+            background: transparent !important;
+            padding-top: 0 !important;
+        }
+        
+        .app-main {
+            background: transparent !important;
+            padding-top: 40px !important;
+        }
+        
+        /* Cacher le header pour design CAF */
+        .app-header {
+            display: none !important;
+        }
+        
         .fed-members-section {
             margin-top: 30px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(139, 92, 246, 0.05));
+            background: transparent;
             border-radius: 20px;
             padding: 30px 20px;
-            border: 2px solid rgba(16, 185, 129, 0.2);
+            border: none;
         }
 
         .fed-header {
@@ -22,12 +44,11 @@
         }
 
         .fed-header h3 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #10b981, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #06b6d4;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
         }
 
         .fed-stats {
@@ -39,18 +60,18 @@
         }
 
         .fed-stat-box {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(6, 182, 212, 0.1);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(16, 185, 129, 0.3);
+            border: 2px solid #06b6d4;
             border-radius: 15px;
-            padding: 15px 25px;
+            padding: 20px 30px;
             text-align: center;
         }
 
         .fed-stat-box .stat-number {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            color: #10b981;
+            color: #06b6d4;
         }
 
         .fed-stat-box .stat-label {
@@ -67,16 +88,79 @@
         }
 
         .fed-member-card {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(6, 182, 212, 0.05);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(16, 185, 129, 0.3);
+            border: 2px solid #06b6d4;
             border-radius: 15px;
             padding: 20px 15px;
-            text-align: center;
+            text-align: left;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .region-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .region-filter-btn.active {
+            background: #06b6d4 !important;
+            border-color: #06b6d4 !important;
+        }
+        
+        .fed-member-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .fed-member-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        
+        .fed-member-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fed-member-cta {
+            width: 100%;
+            padding: 10px;
+            background: #06b6d4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+        
+        .fed-member-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        
+        .region-section-header {
+            background: rgba(6, 182, 212, 0.2);
+            border-left: 4px solid #06b6d4;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #06b6d4;
         }
 
         .fed-member-card::before {
@@ -97,9 +181,9 @@
 
         .fed-member-card:hover {
             transform: translateY(-8px) scale(1.03);
-            border-color: #10b981;
-            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
-            background: rgba(16, 185, 129, 0.15);
+            border-color: #06b6d4;
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.5);
+            background: rgba(6, 182, 212, 0.15);
         }
 
         .fed-member-flag {
@@ -123,9 +207,9 @@
 
         .fed-member-code {
             font-size: 0.8rem;
-            color: #10b981;
+            color: #06b6d4;
             font-weight: 700;
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(6, 182, 212, 0.15);
             padding: 4px 10px;
             border-radius: 10px;
             display: inline-block;
@@ -249,96 +333,26 @@
     </div>
 
     <div id="app" class="app-container" style="display: none;">
-        <header class="app-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <div class="club-logo-header">
-                        <div id="fedLogo" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">🌍</div>
-                    </div>
-                    <div class="header-title">
-                        <h1 id="fedName">Fédération</h1>
-                        <span>International</span>
-                    </div>
-                </div>
-                <div class="header-right">
-                    <button class="btn-icon" onclick="window.location.href='support.html'">
-                        <span>💬</span>
-                    </button>
-                    <button class="btn-icon">
-                        <span>🤖</span>
-                    </button>
-                    <button class="btn-icon notification-btn">
-                        <span>🔔</span>
-                        <span class="badge">5</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+        <!-- HEADER SUPPRIMÉ POUR NOUVEAU DESIGN CAF -->
 
         <main class="app-main" id="mainContent">
             <section id="accueilSection" class="section active">
-                <div class="section-header">
-                    <h2 id="fedTitle">🌍 Fédération Mondiale</h2>
-                    <p id="fedDescription">Compétitions internationales</p>
+                <!-- Bouton retour en haut à gauche -->
+                <div style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+                    <button onclick="window.location.href='index.html'" style="padding: 12px 20px; background: rgba(6, 182, 212, 0.2); border: 2px solid #06b6d4; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px); transition: all 0.3s ease;">
+                        🏠 Accueil
+                    </button>
                 </div>
-
-                <div class="wallet-card" style="background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 25px; margin-bottom: 20px;">
-                    <h3>💰 Mon Wallet</h3>
-                    <div style="font-size: 28px; font-weight: 800; margin: 15px 0;">1 247,50 €</div>
-                    <div style="display: flex; gap: 15px;">
-                        <button style="flex: 1; padding: 12px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">➕ Recharger</button>
-                        <button style="flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">📤 Retirer</button>
+                
+                <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                        <div id="fedLogo" style="font-size: 48px;">🌍</div>
+                        <h2 id="fedTitle" style="font-size: 2.2rem; font-weight: 800; color: #06b6d4; margin: 0; text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);">Fédération Mondiale</h2>
                     </div>
+                    <p id="fedDescription" style="color: #60a5fa; font-size: 1.1rem; margin: 0;">54 Associations Membres • CAN 2025</p>
                 </div>
 
-                <!-- ========== SECTION PARRAINAGE (UX_CREDIBILITE_V7.3) ========== -->
-                <div class="parrainage-section">
-                    <h3>🎁 Programme de Parrainage</h3>
-                    <p>Invitez vos amis et gagnez des récompenses incroyables !</p>
-                    
-                    <div class="parrainage-benefits">
-                        <div class="parrainage-benefit">
-                            <div class="parrainage-benefit-icon">💰</div>
-                            <div class="parrainage-benefit-value">15€</div>
-                            <div class="parrainage-benefit-label">par ami parrainé</div>
-                        </div>
-                        <div class="parrainage-benefit">
-                            <div class="parrainage-benefit-icon">🔁</div>
-                            <div class="parrainage-benefit-value">5%</div>
-                            <div class="parrainage-benefit-label">de leurs gains à vie</div>
-                        </div>
-                        <div class="parrainage-benefit">
-                            <div class="parrainage-benefit-icon">♾️</div>
-                            <div class="parrainage-benefit-value">Illimité</div>
-                            <div class="parrainage-benefit-label">parrainages possibles</div>
-                        </div>
-                    </div>
-
-                    <button class="parrainage-cta" onclick="alert('🎉 Fonctionnalité parrainage : Partagez votre code unique via WhatsApp, email ou SMS. Vous recevrez 15€ + 5% à vie sur les gains de vos filleuls !')">
-                        🚀 Parrainer mes Amis
-                    </button>
-
-                    <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9; text-align: center;">
-                        ✨ Plus vous parrainez, plus vous gagnez ! Créez votre réseau passif.
-                    </div>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #10b981, #059669); border-radius: 15px; padding: 25px; color: white; margin: 20px 0;">
-                    <h3>🎟️ Billets Coupe du Monde 2026</h3>
-                    <p style="margin: 10px 0;">Réservez vos places dès maintenant</p>
-                    <button style="width: 100%; padding: 14px; background: white; color: #10b981; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px;">
-                        🏆 Réserver mes Billets
-                    </button>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-                    <button onclick="window.location.href='onboarding.html'" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border: 2px solid #3b82f6; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
-                        📚 Guide
-                    </button>
-                    <button onclick="window.location.href='support.html'" style="padding: 16px; background: rgba(59, 130, 246, 0.1); border: 2px solid #3b82f6; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
-                        💬 Support
-                    </button>
-                </div>
+                <!-- PAS DE WALLET NI PARRAINAGE POUR LES PAGES FÉDÉRATIONS -->
 
                 <!-- ========== SECTION FÉDÉRATIONS MEMBRES ========== -->
                 <div id="fedMembersSection" class="fed-members-section" style="display: none;">
@@ -349,10 +363,35 @@
 
                     <div class="fed-stats" id="fedStatsContainer"></div>
 
+                    <!-- FILTRES PAR RÉGION (CAF uniquement) -->
+                    <div id="regionFilters" style="display: none; margin: 25px 0;">
+                        <h4 style="color: #10ee90; font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; text-align: center;">Toutes les régions</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                            <button class="region-filter-btn active" data-region="all" style="padding: 12px 24px; background: #06b6d4; color: white; border: none; border-radius: 25px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                Toutes les régions
+                            </button>
+                            <button class="region-filter-btn" data-region="Afrique du Nord" style="padding: 12px 24px; background: rgba(6, 182, 212, 0.1); color: white; border: 2px solid #06b6d4; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                🏜️ Afrique du Nord
+                            </button>
+                            <button class="region-filter-btn" data-region="Afrique de l'Ouest" style="padding: 12px 24px; background: rgba(6, 182, 212, 0.1); color: white; border: 2px solid #06b6d4; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                🌴 Afrique de l'Ouest
+                            </button>
+                            <button class="region-filter-btn" data-region="Afrique Centrale" style="padding: 12px 24px; background: rgba(6, 182, 212, 0.1); color: white; border: 2px solid #06b6d4; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                🌳 Afrique Centrale
+                            </button>
+                            <button class="region-filter-btn" data-region="Afrique de l'Est" style="padding: 12px 24px; background: rgba(6, 182, 212, 0.1); color: white; border: 2px solid #06b6d4; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                🦁 Afrique de l'Est
+                            </button>
+                            <button class="region-filter-btn" data-region="Afrique Australe" style="padding: 12px 24px; background: rgba(6, 182, 212, 0.1); color: white; border: 2px solid #06b6d4; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;">
+                                🦓 Afrique Australe
+                            </button>
+                        </div>
+                    </div>
+
                     <div id="fedMembersList" class="fed-members-grid"></div>
                 </div>
 
-                <button onclick="window.location.href='index.html'" style="width: 100%; padding: 16px; margin-top: 20px; background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                <button onclick="window.location.href='index.html'" style="width: 100%; padding: 16px; margin-top: 40px; background: rgba(6, 182, 212, 0.2); border: 2px solid #06b6d4; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
                     🏠 Retour Accueil
                 </button>
             </section>
@@ -440,43 +479,175 @@
             
             // Statistiques
             const statsContainer = document.getElementById('fedStatsContainer');
-            statsContainer.innerHTML = `
+            let statsHTML = `
                 <div class="fed-stat-box">
                     <div class="stat-number">${data.members}</div>
                     <div class="stat-label">Fédérations</div>
                 </div>
-                <div class="fed-stat-box">
-                    <div class="stat-number">${fedName}</div>
-                    <div class="stat-label">Confédération</div>
-                </div>
             `;
             
+            // Pour CAF, ajouter nombre de régions
+            if (fedName === 'CAF') {
+                statsHTML += `
+                    <div class="fed-stat-box">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Régions</div>
+                    </div>
+                    <div class="fed-stat-box">
+                        <div class="stat-number">1957</div>
+                        <div class="stat-label">Fondation</div>
+                    </div>
+                `;
+            } else {
+                statsHTML += `
+                    <div class="fed-stat-box">
+                        <div class="stat-number">${fedName}</div>
+                        <div class="stat-label">Confédération</div>
+                    </div>
+                `;
+            }
+            
+            statsContainer.innerHTML = statsHTML;
+            
             // Affichage des membres
-            displayFedMembers(data.data);
+            displayFedMembers(data.data, fedName);
+            
+            // Afficher filtres régions pour CAF
+            if (fedName === 'CAF') {
+                document.getElementById('regionFilters').style.display = 'block';
+                setupRegionFilters(data.data);
+            }
             
             console.log(`✅ ${fedName} : ${data.members} fédérations chargées et affichées`);
         }
 
         // ========== FONCTION AFFICHAGE FÉDÉRATIONS ==========
-        function displayFedMembers(members) {
+        function displayFedMembers(members, federation = '') {
             const membersList = document.getElementById('fedMembersList');
             membersList.innerHTML = '';
             
-            members.forEach(fed => {
-                const card = document.createElement('div');
-                card.className = 'fed-member-card';
-                
-                card.innerHTML = `
-                    <div class="fed-member-flag">${fed.flag || fed.logo}</div>
-                    <div class="fed-member-name">${fed.name}</div>
-                    <div class="fed-member-code">${fed.code}</div>
-                `;
-                
-                card.onclick = () => {
-                    window.location.href = fed.path;
+            // Si CAF, grouper par régions
+            if (federation === 'CAF' && members.some(m => m.region)) {
+                const regions = {
+                    'Afrique du Nord': [],
+                    'Afrique de l\'Ouest': [],
+                    'Afrique Centrale': [],
+                    'Afrique de l\'Est': [],
+                    'Afrique Australe': []
                 };
                 
-                membersList.appendChild(card);
+                // Grouper par région
+                members.forEach(fed => {
+                    if (fed.region && regions[fed.region]) {
+                        regions[fed.region].push(fed);
+                    }
+                });
+                
+                // Afficher par région
+                for (const [regionName, regionMembers] of Object.entries(regions)) {
+                    if (regionMembers.length > 0) {
+                        // Header de région
+                        const regionHeader = document.createElement('div');
+                        regionHeader.className = 'region-section-header';
+                        regionHeader.textContent = getRegionIcon(regionName) + ' ' + regionName;
+                        regionHeader.dataset.region = regionName;
+                        membersList.appendChild(regionHeader);
+                        
+                        // Cartes de la région
+                        regionMembers.forEach(fed => {
+                            const card = createFedCard(fed);
+                            card.dataset.region = regionName;
+                            membersList.appendChild(card);
+                        });
+                    }
+                }
+            } else {
+                // Affichage simple pour autres fédérations
+                members.forEach(fed => {
+                    const card = createFedCard(fed);
+                    membersList.appendChild(card);
+                });
+            }
+        }
+        
+        // ========== CRÉER CARTE FÉDÉRATION ==========
+        function createFedCard(fed) {
+            const card = document.createElement('div');
+            card.className = 'fed-member-card';
+            
+            card.innerHTML = `
+                <div class="fed-member-header">
+                    <div style="font-size: 3rem;">${fed.flag || fed.logo}</div>
+                    <div style="flex: 1;">
+                        <div class="fed-member-name" style="font-weight: 700; font-size: 1rem; color: #10b981; margin-bottom: 4px;">${fed.name}</div>
+                        <div class="fed-member-code" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">${fed.code}</div>
+                    </div>
+                </div>
+                
+                <div class="fed-member-info">
+                    <div class="fed-member-info-row">
+                        <span style="opacity: 0.7;">Président:</span>
+                        <span style="font-weight: 600; color: white;">${fed.president || 'N/A'}</span>
+                    </div>
+                    <div class="fed-member-info-row">
+                        <span style="opacity: 0.7;">Fondation:</span>
+                        <span style="font-weight: 600; color: white;">${fed.founded || 'N/A'}</span>
+                    </div>
+                    <div class="fed-member-info-row">
+                        <span style="opacity: 0.7;">Membre FIFA:</span>
+                        <span style="font-weight: 600; color: white;">${fed.fifaMember || 'N/A'}</span>
+                    </div>
+                </div>
+                
+                <button class="fed-member-cta">🚀 Voir l'application</button>
+            `;
+            
+            card.onclick = () => {
+                window.location.href = fed.path;
+            };
+            
+            return card;
+        }
+        
+        // ========== ICÔNE PAR RÉGION ==========
+        function getRegionIcon(regionName) {
+            const icons = {
+                'Afrique du Nord': '🏜️',
+                'Afrique de l\'Ouest': '🌴',
+                'Afrique Centrale': '🌳',
+                'Afrique de l\'Est': '🦁',
+                'Afrique Australe': '🦓'
+            };
+            return icons[regionName] || '🌍';
+        }
+        
+        // ========== FILTRES PAR RÉGION ==========
+        function setupRegionFilters(members) {
+            const filterBtns = document.querySelectorAll('.region-filter-btn');
+            const cards = document.querySelectorAll('.fed-member-card');
+            const regionHeaders = document.querySelectorAll('.region-section-header');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedRegion = btn.dataset.region;
+                    
+                    // Mettre à jour boutons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Filtrer cartes
+                    if (selectedRegion === 'all') {
+                        cards.forEach(c => c.style.display = 'flex');
+                        regionHeaders.forEach(h => h.style.display = 'block');
+                    } else {
+                        cards.forEach(c => {
+                            c.style.display = c.dataset.region === selectedRegion ? 'flex' : 'none';
+                        });
+                        regionHeaders.forEach(h => {
+                            h.style.display = h.dataset.region === selectedRegion ? 'block' : 'none';
+                        });
+                    }
+                });
             });
         }
 
@@ -485,6 +656,20 @@
             document.getElementById('loader').style.display = 'none';
             document.getElementById('app').style.display = 'block';
         }, 1500);
+    </script>
+
+    <!-- 🌍 SYSTÈME MULTILINGUE I18N (11 LANGUES) -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+    <script>
+        // Initialiser le système I18N au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initialiserMultiLangues === 'function') {
+                initialiserMultiLangues();
+                console.log('✅ I18N initialisé pour federation-app.html');
+            } else {
+                console.warn('⚠️ Fonction initialiserMultiLangues non trouvée');
+            }
+        });
     </script>
 </body>
 </html>
