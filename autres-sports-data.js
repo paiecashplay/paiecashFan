@@ -82,12 +82,12 @@ const volleyballClubs = [
 
 // ========== FÉDÉRATIONS INTERNATIONALES (6) ==========
 const federations = [
-    { name: 'FIFA', logo: '🌍', league: 'Fédération Internationale', colors: ['#004170', '#FFC627'], path: 'federation-app.html?fed=FIFA' },
-    { name: 'UEFA', logo: '🇪🇺', league: 'Union Européenne de Football', colors: ['#003087', '#FFFFFF'], path: 'federation-app.html?fed=UEFA' },
-    { name: 'CAF', logo: '🌍', league: 'Confédération Africaine de Football', colors: ['#00A651', '#FFC627'], path: 'federation-app.html?fed=CAF' },
-    { name: 'CONMEBOL', logo: '🌎', league: 'Confédération Sudaméricaine', colors: ['#CE1126', '#FFC627'], path: 'federation-app.html?fed=CONMEBOL' },
-    { name: 'AFC', logo: '🌏', league: 'Confédération Asiatique', colors: ['#0066B3', '#FFFFFF'], path: 'federation-app.html?fed=AFC' },
-    { name: 'CONCACAF', logo: '🌎', league: 'Confédération Nord/Centre-Amérique', colors: ['#CE1126', '#0066B3'], path: 'federation-app.html?fed=CONCACAF' }
+    { name: 'FIFA', logo: '🌍', league: 'Fédération Internationale', colors: ['#004170', '#FFC627'], path: 'fifa.html' },
+    { name: 'UEFA', logo: '🇪🇺', league: 'Union Européenne de Football', colors: ['#003087', '#FFFFFF'], path: 'uefa.html' },
+    { name: 'CAF', logo: '🌍', league: 'Confédération Africaine de Football', colors: ['#00A651', '#FFC627'], path: 'caf.html' },
+    { name: 'CONMEBOL', logo: '🌎', league: 'Confédération Sudaméricaine', colors: ['#CE1126', '#FFC627'], path: 'conmebol.html' },
+    { name: 'AFC', logo: '🌏', league: 'Confédération Asiatique', colors: ['#0066B3', '#FFFFFF'], path: 'afc.html' },
+    { name: 'CONCACAF', logo: '🌎', league: 'Confédération Nord/Centre-Amérique', colors: ['#CE1126', '#0066B3'], path: 'concacaf.html' }
 ];
 
 // Console log pour confirmation de chargement

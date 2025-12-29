@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA - Fédération Internationale de Football Association</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --secondary: #8b5cf6;
+            --bg-dark: #0a0e1a;
+            --bg-card: #1a1f2e;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 65, 112, 0.3);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-5px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
+            color: white;
+            padding: 1.5rem 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 65, 112, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .filters-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .fifa-filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid #004170;
+            border-radius: 25px;
+            color: #0066B3;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .fifa-filter-btn:hover,
+        .fifa-filter-btn.active {
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 65, 112, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .fifa-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fifa-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #004170 0%, #FFC627 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .fifa-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .fifa-card:hover {
+            transform: translateY(-8px);
+            border-color: #004170;
+            box-shadow: 0 12px 40px rgba(0, 65, 112, 0.3);
+        }
+
+        .fifa-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fifa-card-flag {
+            font-size: 2.5rem;
+        }
+
+        .fifa-card-logo-container {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .fifa-card-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .fifa-card-info {
+            flex: 1;
+        }
+
+        .fifa-card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .fifa-card-code {
+            font-size: 0.85rem;
+            color: #0066B3;
+            font-weight: 600;
+        }
+
+        .fifa-card-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .fifa-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.3rem 0;
+        }
+
+        .fifa-detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .fifa-confederation-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #FFC627 0%, #FF9800 100%);
+            color: #1a1f2e;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .fifa-app-link {
+            display: block;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .fifa-app-link:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 65, 112, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <h1><i class="fas fa-globe"></i> FIFA - Fédération Internationale de Football Association</h1>
+        <p>211 Associations Membres • 6 Confédérations • Fondée en 1904</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-number">211</div>
+                <div class="stat-label">Associations</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Confédérations</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">1904</div>
+                <div class="stat-label">Fondation</div>
+            </div>
+        </div>
+
+        <div class="filters-container" id="fifa-filters">
+            <button class="fifa-filter-btn active" data-confederation="all" onclick="filterFIFAConfederation('all')">
+                Toutes les confédérations
+            </button>
+            <button class="fifa-filter-btn" data-confederation="UEFA" onclick="filterFIFAConfederation('UEFA')">
+                🇪🇺 UEFA (Europe)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="CAF" onclick="filterFIFAConfederation('CAF')">
+                🌍 CAF (Afrique)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="AFC" onclick="filterFIFAConfederation('AFC')">
+                🌏 AFC (Asie)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="CONCACAF" onclick="filterFIFAConfederation('CONCACAF')">
+                🌎 CONCACAF (Amérique du Nord)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="CONMEBOL" onclick="filterFIFAConfederation('CONMEBOL')">
+                🌎 CONMEBOL (Amérique du Sud)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="OFC" onclick="filterFIFAConfederation('OFC')">
+                🌊 OFC (Océanie)
+            </button>
+        </div>
+
+        <div id="fifa-federations-grid" class="grid"></div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 PaieCashFan - Tous droits réservés</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport 🚀</p>
+    </div>
+
+    <script src="🌍_FIFA_MEMBERS.js"></script>
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    <script src="🌍_UEFA_MEMBERS.js"></script>
+    <script>
+        let currentFIFAFilter = 'all';
+
+        // Combiner toutes les associations
+        let allFIFAMembers = [];
+        
+        // Ajouter les associations de FIFA_MEMBERS (AFC, CONCACAF, CONMEBOL, OFC)
+        if (typeof fifaMembersWithLogos !== 'undefined') {
+            allFIFAMembers = allFIFAMembers.concat(fifaMembersWithLogos);
+        }
+        
+        // Ajouter les associations CAF
+        if (typeof cafMembersWithLogos !== 'undefined') {
+            const cafForFifa = cafMembersWithLogos.map(fed => ({
+                ...fed,
+                confederation: 'CAF'
+            }));
+            allFIFAMembers = allFIFAMembers.concat(cafForFifa);
+        }
+        
+        // Ajouter les associations UEFA
+        if (typeof uefaMembersWithLogos !== 'undefined') {
+            const uefaForFifa = uefaMembersWithLogos.map(fed => ({
+                ...fed,
+                confederation: 'UEFA'
+            }));
+            allFIFAMembers = allFIFAMembers.concat(uefaForFifa);
+        }
+
+        function createFIFACard(fed) {
+            const card = document.createElement('div');
+            card.className = 'fifa-card';
+            card.setAttribute('data-confederation', fed.confederation);
+            
+            card.innerHTML = `
+                <span class="fifa-confederation-badge">${fed.confederation}</span>
+                <div class="fifa-card-header">
+                    <div class="fifa-card-flag">${fed.flag}</div>
+                    <div class="fifa-card-logo-container">
+                        <img src="${fed.logo}" 
+                             alt="${fed.name} Logo" 
+                             class="fifa-card-logo" 
+                             loading="lazy"
+                             onerror="this.style.display='none'">
+                    </div>
+                    <div class="fifa-card-info">
+                        <div class="fifa-card-name">${fed.name}</div>
+                        <div class="fifa-card-code">${fed.code}</div>
+                    </div>
+                </div>
+                <div class="fifa-card-details">
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Confédération:</span>
+                        <span>${fed.confederation}</span>
+                    </div>
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Fondation:</span>
+                        <span>${fed.founded}</span>
+                    </div>
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Membre FIFA:</span>
+                        <span>${fed.fifaMember}</span>
+                    </div>
+                </div>
+                <a href="${fed.path}" class="fifa-app-link" target="_blank">
+                    🚀 Voir l'application
+                </a>
+            `;
+            
+            return card;
+        }
+
+        function displayFIFAFederations(filter = 'all') {
+            const fifaGrid = document.getElementById('fifa-federations-grid');
+            if (!fifaGrid) return;
+            
+            fifaGrid.innerHTML = '';
+            
+            const filteredFederations = filter === 'all' 
+                ? allFIFAMembers 
+                : allFIFAMembers.filter(fed => fed.confederation === filter);
+            
+            filteredFederations.forEach(fed => {
+                fifaGrid.appendChild(createFIFACard(fed));
+            });
+        }
+
+        function filterFIFAConfederation(confederation) {
+            currentFIFAFilter = confederation;
+            
+            // Update active button
+            document.querySelectorAll('.fifa-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-confederation') === confederation) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Render filtered federations
+            displayFIFAFederations(confederation);
+        }
+
+        // Initial display
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log(`Total FIFA members loaded: ${allFIFAMembers.length}`);
+            displayFIFAFederations('all');
+        });
+    </script>
+</body>
+</html>
