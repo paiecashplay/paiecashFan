@@ -833,8 +833,13 @@
             card.className = 'card';
             card.onclick = () => window.location.href = team.path;
             
+            // Détecter si le logo est une image ou un emoji
+            const logoHTML = team.logo.endsWith('.png') || team.logo.endsWith('.jpg') || team.logo.endsWith('.svg')
+                ? `<img src="${team.logo}" alt="${team.name}" style="width: 60px; height: 60px; object-fit: contain;">`
+                : team.logo;
+            
             card.innerHTML = `
-                <div class="card-logo">${team.logo}</div>
+                <div class="card-logo">${logoHTML}</div>
                 <div class="card-name">${team.name}</div>
                 <div class="card-league">
                     <i class="fas fa-trophy"></i> ${team.league}
