@@ -7,10 +7,10 @@
 // ========== LIGUE 1 (18 clubs) - SAISON 2025/2026 ==========
 const ligue1Clubs = [
     { name: 'Angers', logo: 'assets/logos/clubs/angers.png', league: 'Ligue 1', colors: ['#000000', '#FFFFFF'], path: 'app-universal-simple.html?club=Angers&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Auxerre', logo: '⚽', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Auxerre&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Brest', logo: '⚽', league: 'Ligue 1', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Brest&logo=⚽&sport=Football&league=Ligue+1' },
+    { name: 'Auxerre', logo: 'assets/logos/clubs/auxerre.png', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Auxerre&logo=⚽&sport=Football&league=Ligue+1' },
+    { name: 'Brest', logo: 'assets/logos/clubs/brest.png', league: 'Ligue 1', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Brest&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'FC Metz', logo: 'assets/logos/clubs/fc_metz.png', league: 'Ligue 1', colors: ['#8b0304', '#ffc627'], path: 'app-universal-simple.html?club=FC+Metz&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Le Havre', logo: '⚽', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Le+Havre&logo=⚽&sport=Football&league=Ligue+1' },
+    { name: 'Le Havre', logo: 'assets/logos/clubs/le_havre.png', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Le+Havre&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Lens', logo: 'assets/logos/clubs/lens.png', league: 'Ligue 1', colors: ['#ffc627', '#c8102e'], path: 'app-universal-simple.html?club=Lens&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Lille', logo: 'assets/logos/clubs/lille.png', league: 'Ligue 1', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Lille&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Lorient', logo: 'assets/logos/clubs/lorient.png', league: 'Ligue 1', colors: ['#ff8c00', '#000000'], path: 'app-universal-simple.html?club=Lorient&logo=⚽&sport=Football&league=Ligue+1' },
@@ -22,8 +22,8 @@ const ligue1Clubs = [
     { name: 'Paris FC', logo: 'assets/logos/clubs/paris_fc.png', league: 'Ligue 1', colors: ['#002f6c', '#004ba8'], path: 'app-universal-simple.html?club=Paris+FC&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Paris SG', logo: 'assets/logos/clubs/paris_sg.png', league: 'Ligue 1', colors: ['#004170', '#c8102e'], path: 'app-universal-simple.html?club=Paris+SG&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Rennes', logo: 'assets/logos/clubs/rennes.png', league: 'Ligue 1', colors: ['#c8102e', '#000000'], path: 'app-universal-simple.html?club=Rennes&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Strasbourg', logo: '⚽', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Strasbourg&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Toulouse', logo: '⚽', league: 'Ligue 1', colors: ['#5d1d81', '#FFFFFF'], path: 'app-universal-simple.html?club=Toulouse&logo=⚽&sport=Football&league=Ligue+1' }
+    { name: 'Strasbourg', logo: 'assets/logos/clubs/strasbourg.png', league: 'Ligue 1', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Strasbourg&logo=⚽&sport=Football&league=Ligue+1' },
+    { name: 'Toulouse', logo: 'assets/logos/clubs/toulouse.png', league: 'Ligue 1', colors: ['#5d1d81', '#FFFFFF'], path: 'app-universal-simple.html?club=Toulouse&logo=⚽&sport=Football&league=Ligue+1' }
 ];
 
 // ========== LIGUE 2 (18 clubs) - SAISON 2025/2026 ==========
