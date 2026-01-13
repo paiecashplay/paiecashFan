@@ -28,24 +28,24 @@ const ligue1Clubs = [
 
 // ========== LIGUE 2 (18 clubs) - SAISON 2025/2026 ==========
 const ligue2Clubs = [
-    { name: 'Amiens', logo: '⚽', league: 'Ligue 2', colors: ['#FFFFFF', '#000000'], path: 'app-universal-simple.html?club=Amiens&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Annecy', logo: '⚽', league: 'Ligue 2', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Annecy&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Boulogne', logo: '⚽', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Boulogne&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Amiens', logo: 'assets/logos/clubs/amiens.png', league: 'Ligue 2', colors: ['#FFFFFF', '#000000'], path: 'app-universal-simple.html?club=Amiens&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Annecy', logo: 'assets/logos/clubs/annecy.png', league: 'Ligue 2', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Annecy&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Boulogne', logo: 'assets/logos/clubs/boulogne.png', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Boulogne&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Clermont', logo: 'assets/logos/clubs/clermont.png', league: 'Ligue 2', colors: ['#c8102e', '#0066b2'], path: 'app-universal-simple.html?club=Clermont&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Dunkerque', logo: 'assets/logos/clubs/dunkerque.png', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Dunkerque&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Grenoble', logo: 'assets/logos/clubs/grenoble.png', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Grenoble&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Guingamp', logo: 'assets/logos/clubs/guingamp.png', league: 'Ligue 2', colors: ['#c8102e', '#000000'], path: 'app-universal-simple.html?club=Guingamp&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Laval', logo: '⚽', league: 'Ligue 2', colors: ['#ff8c00', '#FFFFFF'], path: 'app-universal-simple.html?club=Laval&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Le Mans', logo: '⚽', league: 'Ligue 2', colors: ['#ffc627', '#000000'], path: 'app-universal-simple.html?club=Le+Mans&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Laval', logo: 'assets/logos/clubs/laval.png', league: 'Ligue 2', colors: ['#ff8c00', '#FFFFFF'], path: 'app-universal-simple.html?club=Laval&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Le Mans', logo: 'assets/logos/clubs/le_mans.png', league: 'Ligue 2', colors: ['#ffc627', '#000000'], path: 'app-universal-simple.html?club=Le+Mans&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Montpellier', logo: 'assets/logos/clubs/montpellier.png', league: 'Ligue 2', colors: ['#0066b2', '#ff8c00'], path: 'app-universal-simple.html?club=Montpellier&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Nancy', logo: '⚽', league: 'Ligue 2', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Nancy&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Nancy', logo: 'assets/logos/clubs/nancy.png', league: 'Ligue 2', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Nancy&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Pau', logo: 'assets/logos/clubs/pau.png', league: 'Ligue 2', colors: ['#ffc627', '#0066b2'], path: 'app-universal-simple.html?club=Pau&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Red Star', logo: '⚽', league: 'Ligue 2', colors: ['#00a651', '#FFFFFF'], path: 'app-universal-simple.html?club=Red+Star&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Red Star', logo: 'assets/logos/clubs/red_star.png', league: 'Ligue 2', colors: ['#00a651', '#FFFFFF'], path: 'app-universal-simple.html?club=Red+Star&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Reims', logo: 'assets/logos/clubs/reims.png', league: 'Ligue 2', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Reims&logo=⚽&sport=Football&league=Ligue+2' },
     { name: 'Rodez', logo: 'assets/logos/clubs/rodez.png', league: 'Ligue 2', colors: ['#c8102e', '#ffc627'], path: 'app-universal-simple.html?club=Rodez&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Saint-Étienne', logo: '⚽', league: 'Ligue 2', colors: ['#00a651', '#FFFFFF'], path: 'app-universal-simple.html?club=Saint-Étienne&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'SC Bastia', logo: '⚽', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=SC+Bastia&logo=⚽&sport=Football&league=Ligue+2' },
-    { name: 'Troyes', logo: '⚽', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Troyes&logo=⚽&sport=Football&league=Ligue+2' }
+    { name: 'Saint-Étienne', logo: 'assets/logos/clubs/saint_etienne.png', league: 'Ligue 2', colors: ['#00a651', '#FFFFFF'], path: 'app-universal-simple.html?club=Saint-Étienne&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'SC Bastia', logo: 'assets/logos/clubs/sc_bastia.png', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=SC+Bastia&logo=⚽&sport=Football&league=Ligue+2' },
+    { name: 'Troyes', logo: 'assets/logos/clubs/troyes.png', league: 'Ligue 2', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Troyes&logo=⚽&sport=Football&league=Ligue+2' }
 ];
 
 // ========== NATIONAL (18 clubs) ==========
@@ -62,12 +62,12 @@ const nationalClubs = [
     { name: 'Châteauroux', logo: '⚽', league: 'National', colors: ['#c8102e', '#0066b2'], path: 'app-universal-simple.html?club=Châteauroux&logo=⚽&sport=Football&league=National' },
     { name: 'Le Puy Foot', logo: '⚽', league: 'National', colors: ['#ffc627', '#000000'], path: 'app-universal-simple.html?club=Le+Puy+Foot&logo=⚽&sport=Football&league=National' },
     { name: 'Épinal', logo: '⚽', league: 'National', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Épinal&logo=⚽&sport=Football&league=National' },
-    { name: 'Boulogne', logo: '⚽', league: 'National', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Boulogne&logo=⚽&sport=Football&league=National' },
+    { name: 'Boulogne', logo: 'assets/logos/clubs/boulogne.png', league: 'National', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Boulogne&logo=⚽&sport=Football&league=National' },
     { name: 'Concarneau', logo: '⚽', league: 'National', colors: ['#ffc627', '#0066b2'], path: 'app-universal-simple.html?club=Concarneau&logo=⚽&sport=Football&league=National' },
     { name: 'Aubagne', logo: '⚽', league: 'National', colors: ['#ffc627', '#0066b2'], path: 'app-universal-simple.html?club=Aubagne&logo=⚽&sport=Football&league=National' },
     { name: 'Sète', logo: '⚽', league: 'National', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Sète&logo=⚽&sport=Football&league=National' },
     { name: 'Avranches', logo: '⚽', league: 'National', colors: ['#0066b2', '#FFFFFF'], path: 'app-universal-simple.html?club=Avranches&logo=⚽&sport=Football&league=National' },
-    { name: 'Nancy', logo: '⚽', league: 'National', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Nancy&logo=⚽&sport=Football&league=National' }
+    { name: 'Nancy', logo: 'assets/logos/clubs/nancy.png', league: 'National', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Nancy&logo=⚽&sport=Football&league=National' }
 ];
 
 // ========== NATIONAL 2 (64 clubs - 4 groupes de 16) ==========
