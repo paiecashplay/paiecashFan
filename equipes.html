@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Équipes - PaieCashFan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #C1272D;
+            --secondary: #006233;
+            --bg-dark: #0a0e1a;
+            --bg-card: #1a1f2e;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(193, 39, 45, 0.3);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-5px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(193, 39, 45, 0.3);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            flex-shrink: 0;
+        }
+
+        .card-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .card-sport {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .card-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 0.5rem;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+
+        .card-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .card-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(193, 39, 45, 0.4);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .no-data i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="header">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <h1 id="headerTitle">Équipes</h1>
+        <p id="headerSubtitle">Toutes les équipes</p>
+    </div>
+
+    <div class="container">
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-number" id="statNationales">0</div>
+                <div class="stat-label">Équipes Nationales</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statMasculins">0</div>
+                <div class="stat-label">Clubs Masculins</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statFeminins">0</div>
+                <div class="stat-label">Clubs Féminins</div>
+            </div>
+        </div>
+
+        <div id="equipesNationales"></div>
+        <div id="clubsMasculins"></div>
+        <div id="clubsFeminins"></div>
+        <div id="noData" class="no-data" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Aucune équipe trouvée pour ce club/fédération.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 PaieCashFan - Tous droits réservés</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport 🚀</p>
+    </div>
+
+    <script src="clubs-maroc-data.js"></script>
+    <script>
+        // Récupérer le paramètre club depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubName = urlParams.get('club') || 'Maroc';
+
+        // Base de données des équipes (simplifiée pour Maroc)
+        const equipesDatabase = {
+            'Maroc': {
+                type: 'federation',
+                name: 'Maroc',
+                logo: '🇲🇦',
+                colors: {
+                    primary: '#C1272D',
+                    secondary: '#006233'
+                },
+                equipesNationales: [
+                    {
+                        name: 'Équipe Nationale A',
+                        shortName: 'E.N.A',
+                        logo: '🇲🇦',
+                        category: 'Séniors',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale sénior du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U23',
+                        shortName: 'E.N. U23',
+                        logo: '🇲🇦',
+                        category: 'U23',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U23 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U20',
+                        shortName: 'E.N. U20',
+                        logo: '🇲🇦',
+                        category: 'U20',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U20 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U18',
+                        shortName: 'E.N. U18',
+                        logo: '🇲🇦',
+                        category: 'U18',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U18 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U17',
+                        shortName: 'E.N. U17',
+                        logo: '🇲🇦',
+                        category: 'U17',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U17 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U16',
+                        shortName: 'E.N. U16',
+                        logo: '🇲🇦',
+                        category: 'U16',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U16 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale U15',
+                        shortName: 'E.N. U15',
+                        logo: '🇲🇦',
+                        category: 'U15',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale U15 du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale Féminine',
+                        shortName: 'FÉMININE',
+                        logo: '🇲🇦',
+                        category: 'Féminine',
+                        type: 'nationale',
+                        sport: 'Football',
+                        description: 'Équipe nationale féminine du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale Futsal',
+                        shortName: 'FUTSAL',
+                        logo: '🇲🇦',
+                        category: 'Futsal',
+                        type: 'nationale',
+                        sport: 'Futsal',
+                        description: 'Équipe nationale de futsal du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Futsal&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale Futsal Féminine',
+                        shortName: 'FUTSAL FÉMININE',
+                        logo: '🇲🇦',
+                        category: 'Futsal Féminine',
+                        type: 'nationale',
+                        sport: 'Futsal',
+                        description: 'Équipe nationale de futsal féminine du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Futsal&league=Maroc'
+                    },
+                    {
+                        name: 'Équipe Nationale Beach Soccer',
+                        shortName: 'BEACH SOCCER',
+                        logo: '🇲🇦',
+                        category: 'Beach Soccer',
+                        type: 'nationale',
+                        sport: 'Beach Soccer',
+                        description: 'Équipe nationale de beach soccer du Maroc',
+                        appUrl: 'app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Beach+Soccer&league=Maroc'
+                    }
+                ],
+                clubsMasculins: 'clubsMarocMasculins',
+                clubsFeminins: 'clubsMarocFeminins'
+            },
+            'Marseille': {
+                type: 'club',
+                name: 'Olympique de Marseille',
+                logo: 'assets/logos/clubs/marseille.svg',
+                colors: {
+                    primary: '#2FAEE0',
+                    secondary: '#FFFFFF'
+                },
+                equipesNationales: [],
+                clubsMasculins: [
+                    {
+                        name: 'Équipe Première',
+                        shortName: 'OM - Pro',
+                        logo: 'assets/logos/clubs/marseille.svg',
+                        category: 'Professionnelle',
+                        type: 'masculine',
+                        sport: 'Football',
+                        description: 'Équipe professionnelle de l\'Olympique de Marseille',
+                        appUrl: 'app-universal-simple.html?club=Marseille&logo=assets/logos/clubs/marseille.svg&sport=Football&league=Ligue+1'
+                    },
+                    {
+                        name: 'Équipe Réserve',
+                        shortName: 'OM - Réserve',
+                        logo: 'assets/logos/clubs/marseille.svg',
+                        category: 'Réserve',
+                        type: 'masculine',
+                        sport: 'Football',
+                        description: 'Équipe réserve de l\'Olympique de Marseille',
+                        appUrl: 'app-universal-simple.html?club=Marseille&logo=assets/logos/clubs/marseille.svg&sport=Football&league=National+3'
+                    },
+                    {
+                        name: 'Équipe U19',
+                        shortName: 'OM - U19',
+                        logo: 'assets/logos/clubs/marseille.svg',
+                        category: 'U19',
+                        type: 'masculine',
+                        sport: 'Football',
+                        description: 'Équipe U19 de l\'Olympique de Marseille',
+                        appUrl: 'app-universal-simple.html?club=Marseille&logo=assets/logos/clubs/marseille.svg&sport=Football&league=U19'
+                    },
+                    {
+                        name: 'Équipe U17',
+                        shortName: 'OM - U17',
+                        logo: 'assets/logos/clubs/marseille.svg',
+                        category: 'U17',
+                        type: 'masculine',
+                        sport: 'Football',
+                        description: 'Équipe U17 de l\'Olympique de Marseille',
+                        appUrl: 'app-universal-simple.html?club=Marseille&logo=assets/logos/clubs/marseille.svg&sport=Football&league=U17'
+                    }
+                ],
+                clubsFeminins: [
+                    {
+                        name: 'Équipe Féminine',
+                        shortName: 'OM - Féminine',
+                        logo: 'assets/logos/clubs/marseille.svg',
+                        category: 'Professionnelle',
+                        type: 'feminine',
+                        sport: 'Football',
+                        description: 'Équipe féminine de l\'Olympique de Marseille',
+                        appUrl: 'app-universal-simple.html?club=Marseille&logo=assets/logos/clubs/marseille.svg&sport=Football&league=D1+Féminine'
+                    }
+                ]
+            }
+        };
+
+        // Fonction pour appliquer les couleurs du club
+        function applyClubColors(clubData) {
+            if (clubData && clubData.colors) {
+                document.documentElement.style.setProperty('--primary', clubData.colors.primary);
+                document.documentElement.style.setProperty('--secondary', clubData.colors.secondary);
+            }
+        }
+
+        // Fonction pour créer une card
+        function createCard(equipe) {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const isImageLogo = equipe.logo && (equipe.logo.includes('assets/') || equipe.logo.includes('.png') || equipe.logo.includes('.svg') || equipe.logo.includes('.jpg'));
+            const logoHTML = isImageLogo 
+                ? `<img src="${equipe.logo}" alt="${equipe.name}">`
+                : equipe.logo;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-logo">
+                        ${logoHTML}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">${equipe.name}</div>
+                        <div class="card-sport">${equipe.sport}</div>
+                        <span class="card-badge">${equipe.category}</span>
+                    </div>
+                </div>
+                <div class="card-description">${equipe.description}</div>
+                <a href="${equipe.appUrl}" class="card-button">
+                    <i class="fas fa-mobile-alt"></i> Voir l'application
+                </a>
+            `;
+
+            return card;
+        }
+
+        // Fonction pour afficher les équipes
+        function displayEquipes() {
+            const clubData = equipesDatabase[clubName];
+
+            if (!clubData) {
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+
+            // Appliquer les couleurs
+            applyClubColors(clubData);
+
+            // Mettre à jour le header
+            const isImageLogo = clubData.logo && (clubData.logo.includes('assets/') || clubData.logo.includes('.png') || clubData.logo.includes('.svg') || clubData.logo.includes('.jpg'));
+            if (isImageLogo) {
+                document.getElementById('headerTitle').innerHTML = `<img src="${clubData.logo}" alt="${clubData.name}" style="height: 50px; vertical-align: middle; margin-right: 15px;"> ${clubData.name}`;
+            } else {
+                document.getElementById('headerTitle').textContent = `${clubData.logo} ${clubData.name}`;
+            }
+            document.getElementById('headerSubtitle').textContent = `Toutes les équipes de ${clubData.name}`;
+
+            // Afficher les statistiques
+            let countNationales = 0;
+            let countMasculins = 0;
+            let countFeminins = 0;
+
+            // Équipes nationales
+            if (clubData.equipesNationales && clubData.equipesNationales.length > 0) {
+                countNationales = clubData.equipesNationales.length;
+                const section = document.createElement('div');
+                section.innerHTML = `<h2 class="section-title">${clubData.logo} Équipes Nationales</h2>`;
+                const grid = document.createElement('div');
+                grid.className = 'grid';
+                clubData.equipesNationales.forEach(equipe => {
+                    grid.appendChild(createCard(equipe));
+                });
+                section.appendChild(grid);
+                document.getElementById('equipesNationales').appendChild(section);
+            }
+
+            // Clubs masculins
+            if (clubData.clubsMasculins) {
+                const clubsMasculins = clubData.clubsMasculins === 'clubsMarocMasculins' && typeof clubsMarocMasculins !== 'undefined'
+                    ? clubsMarocMasculins
+                    : clubData.clubsMasculins;
+
+                if (clubsMasculins && clubsMasculins.length > 0) {
+                    countMasculins = clubsMasculins.length;
+                    const section = document.createElement('div');
+                    section.innerHTML = `<h2 class="section-title">⚽ Équipes Masculines</h2>`;
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+                    clubsMasculins.forEach(club => {
+                        // Créer l'URL avec le logo du club
+                        const equipe = {
+                            name: club.name,
+                            shortName: club.shortName,
+                            logo: club.logo,
+                            category: club.ville,
+                            sport: 'Football',
+                            description: `${club.stade} • Fondé en ${club.fondation}${club.titres > 0 ? ` • ${club.titres} titre(s)` : ''}`,
+                            appUrl: `app-universal-simple.html?club=${encodeURIComponent(club.name)}&logo=${encodeURIComponent(club.logo)}&sport=Football&league=Maroc`
+                        };
+                        grid.appendChild(createCard(equipe));
+                    });
+                    section.appendChild(grid);
+                    document.getElementById('clubsMasculins').appendChild(section);
+                }
+            }
+
+            // Clubs féminins
+            if (clubData.clubsFeminins) {
+                const clubsFeminins = clubData.clubsFeminins === 'clubsMarocFeminins' && typeof clubsMarocFeminins !== 'undefined'
+                    ? clubsMarocFeminins
+                    : clubData.clubsFeminins;
+
+                if (clubsFeminins && clubsFeminins.length > 0) {
+                    countFeminins = clubsFeminins.length;
+                    const section = document.createElement('div');
+                    section.innerHTML = `<h2 class="section-title">👩‍⚽ Équipes Féminines</h2>`;
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+                    clubsFeminins.forEach(club => {
+                        // Créer l'URL avec le logo du club
+                        const equipe = {
+                            name: club.name,
+                            shortName: club.shortName,
+                            logo: club.logo,
+                            category: club.ville,
+                            sport: 'Football',
+                            description: `${club.stade} • Fondé en ${club.fondation}${club.titres > 0 ? ` • ${club.titres} titre(s)` : ''}`,
+                            appUrl: `app-universal-simple.html?club=${encodeURIComponent(club.name)}&logo=${encodeURIComponent(club.logo)}&sport=Football&league=Maroc`
+                        };
+                        grid.appendChild(createCard(equipe));
+                    });
+                    section.appendChild(grid);
+                    document.getElementById('clubsFeminins').appendChild(section);
+                }
+            }
+
+            // Afficher les stats
+            if (countNationales > 0 || countMasculins > 0 || countFeminins > 0) {
+                document.getElementById('stats').style.display = 'flex';
+                document.getElementById('statNationales').textContent = countNationales;
+                document.getElementById('statMasculins').textContent = countMasculins;
+                document.getElementById('statFeminins').textContent = countFeminins;
+            }
+        }
+
+        // Charger les équipes au chargement de la page
+        document.addEventListener('DOMContentLoaded', displayEquipes);
+    </script>
+</body>
+</html>
