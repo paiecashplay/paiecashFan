@@ -1,5 +1,0 @@
-// ========== DONNÉES DES 211 ASSOCIATIONS MEMBRES DE LA FIFA ==========
-// Mise à jour: 29 décembre 2024
-// Source: FIFA.com et Wikipedia
-
-const fifaMembersWithLogos = [
