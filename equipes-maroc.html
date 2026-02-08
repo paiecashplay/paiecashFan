@@ -219,6 +219,24 @@
             gap: 0.3rem;
         }
 
+        .club-app-link {
+            display: block;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .club-app-link:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
+        }
+
         .stats-container {
             display: flex;
             justify-content: center;
@@ -279,7 +297,7 @@
 </head>
 <body>
     <div class="header">
-        <a href="javascript:history.back()" class="back-button">
+        <a href="index.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
         <h1>🇲🇦 Équipes Marocaines de Football</h1>
@@ -356,6 +374,9 @@
                     </div>
                     ` : ''}
                 </div>
+                <a href="#" class="club-app-link" onclick="alert('Application en cours de développement'); return false;">
+                    🚀 Voir l'application
+                </a>
             `;
             
             return card;
