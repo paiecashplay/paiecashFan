@@ -242,7 +242,7 @@ const equipesDatabase = {
     "lyon": {
         name: "Olympique Lyonnais",
         logo: "assets/logos/clubs/lyon.png",
-        colors: ["#002366", "#C8102E"], // Bleu marine et rouge
+        colors: ["#DA291C", "#004F9E"], // Rouge et bleu
         appUrl: "app-universal-simple.html?club=Lyon&logo=⚽&sport=Football&league=Ligue+1",
         categories: [
             {
@@ -274,6 +274,213 @@ const equipesDatabase = {
                         league: "D1 Féminine",
                         stadium: "Groupama Stadium",
                         url: "app-universal-simple.html?club=Lyon+Féminine&logo=⚽&sport=Football&league=D1+Féminine"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== NICE ==========
+    "nice": {
+        name: "OGC Nice",
+        logo: "assets/logos/clubs/nice.png",
+        colors: ["#E2001A", "#000000"], // Rouge et noir
+        appUrl: "app-universal-simple.html?club=Nice&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/nice.png",
+                        coach: "Francesco Farioli",
+                        league: "Ligue 1",
+                        stadium: "Allianz Riviera",
+                        url: "app-universal-simple.html?club=Nice+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== LENS ==========
+    "lens": {
+        name: "RC Lens",
+        logo: "assets/logos/clubs/lens.png",
+        colors: ["#FFC627", "#DA291C"], // Or et rouge
+        appUrl: "app-universal-simple.html?club=Lens&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/lens.png",
+                        coach: "Franck Haise",
+                        league: "Ligue 1",
+                        stadium: "Stade Bollaert-Delelis",
+                        url: "app-universal-simple.html?club=Lens+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== LILLE ==========
+    "lille": {
+        name: "LOSC Lille",
+        logo: "assets/logos/clubs/lille.png",
+        colors: ["#E30613", "#FFFFFF"], // Rouge et blanc
+        appUrl: "app-universal-simple.html?club=Lille&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/lille.png",
+                        coach: "Paulo Fonseca",
+                        league: "Ligue 1",
+                        stadium: "Stade Pierre-Mauroy",
+                        url: "app-universal-simple.html?club=Lille+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== RENNES ==========
+    "rennes": {
+        name: "Stade Rennais",
+        logo: "assets/logos/clubs/rennes.png",
+        colors: ["#E30613", "#000000"], // Rouge et noir
+        appUrl: "app-universal-simple.html?club=Rennes&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/rennes.png",
+                        coach: "Julien Stéphan",
+                        league: "Ligue 1",
+                        stadium: "Roazhon Park",
+                        url: "app-universal-simple.html?club=Rennes+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== NANTES ==========
+    "nantes": {
+        name: "FC Nantes",
+        logo: "assets/logos/clubs/nantes.png",
+        colors: ["#FFC627", "#006A32"], // Jaune et vert
+        appUrl: "app-universal-simple.html?club=Nantes&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/nantes.png",
+                        coach: "Jocelyn Gourvennec",
+                        league: "Ligue 1",
+                        stadium: "Stade de la Beaujoire",
+                        url: "app-universal-simple.html?club=Nantes+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== STRASBOURG ==========
+    "strasbourg": {
+        name: "RC Strasbourg",
+        logo: "assets/logos/clubs/strasbourg.png",
+        colors: ["#009FE3", "#FFFFFF"], // Bleu ciel et blanc
+        appUrl: "app-universal-simple.html?club=Strasbourg&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/strasbourg.png",
+                        coach: "Patrick Vieira",
+                        league: "Ligue 1",
+                        stadium: "Stade de la Meinau",
+                        url: "app-universal-simple.html?club=Strasbourg+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== BREST ==========
+    "brest": {
+        name: "Stade Brestois",
+        logo: "assets/logos/clubs/brest.png",
+        colors: ["#E30613", "#FFFFFF"], // Rouge et blanc
+        appUrl: "app-universal-simple.html?club=Brest&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/brest.png",
+                        coach: "Éric Roy",
+                        league: "Ligue 1",
+                        stadium: "Stade Francis-Le Blé",
+                        url: "app-universal-simple.html?club=Brest+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== MONTPELLIER ==========
+    "montpellier": {
+        name: "Montpellier HSC",
+        logo: "assets/logos/clubs/montpellier.png",
+        colors: ["#003366", "#FF6600"], // Bleu marine et orange
+        appUrl: "app-universal-simple.html?club=Montpellier&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/montpellier.png",
+                        coach: "Michel Der Zakarian",
+                        league: "Ligue 1",
+                        stadium: "Stade de la Mosson",
+                        url: "app-universal-simple.html?club=Montpellier+Pro&logo=⚽&sport=Football&league=Ligue+1"
+                    }
+                ]
+            }
+        ]
+    },
+
+    // ========== REIMS ==========
+    "reims": {
+        name: "Stade de Reims",
+        logo: "assets/logos/clubs/reims.png",
+        colors: ["#E30613", "#FFFFFF"], // Rouge et blanc
+        appUrl: "app-universal-simple.html?club=Reims&logo=⚽&sport=Football&league=Ligue+1",
+        categories: [
+            {
+                title: "⚽ Équipes Masculines",
+                teams: [
+                    {
+                        name: "Équipe Professionnelle",
+                        logo: "assets/logos/clubs/reims.png",
+                        coach: "Will Still",
+                        league: "Ligue 1",
+                        stadium: "Stade Auguste-Delaune",
+                        url: "app-universal-simple.html?club=Reims+Pro&logo=⚽&sport=Football&league=Ligue+1"
                     }
                 ]
             }

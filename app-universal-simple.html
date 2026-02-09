@@ -970,7 +970,7 @@
             <i class="fas fa-home"></i>
             <div class="tab-label">Accueil</div>
         </div>
-        <div class="tab-item active" onclick="window.location.href='equipes-maroc.html'">
+        <div class="tab-item active" onclick="navigateToEquipes()">
             <i class="fas fa-users"></i>
             <div class="tab-label">Équipes</div>
         </div>
@@ -1696,6 +1696,25 @@
             const query = prompt('🔍 Rechercher:');
             if (query) {
                 alert(`Recherche: "${query}"`);
+            }
+        }
+        
+        // Navigation vers les équipes spécifiques du club
+        function navigateToEquipes() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || 'Maroc';
+            
+            // Normaliser le nom du club pour l'URL
+            const clubId = clubName.toLowerCase().replace(/\s+/g, '-');
+            
+            // Clubs spéciaux avec leur propre page
+            const specialClubs = ['maroc', 'morocco'];
+            
+            if (specialClubs.includes(clubId)) {
+                window.location.href = 'equipes-maroc.html';
+            } else {
+                // Tous les autres clubs utilisent equipes.html avec paramètre
+                window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}`;
             }
         }
         
