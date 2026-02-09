@@ -833,9 +833,10 @@
             card.className = 'card';
             card.onclick = () => window.location.href = team.path;
             
-            // Détecter si le logo est une image ou un emoji
-            const logoHTML = team.logo.endsWith('.png') || team.logo.endsWith('.jpg') || team.logo.endsWith('.svg')
-                ? `<img src="${team.logo}" alt="${team.name}" style="width: 60px; height: 60px; object-fit: contain;">`
+            // Détecter si le logo est une image (chemin vers fichier) ou un emoji
+            const isImage = team.logo && (team.logo.includes('assets/') || team.logo.includes('/') || team.logo.endsWith('.png') || team.logo.endsWith('.jpg') || team.logo.endsWith('.svg'));
+            const logoHTML = isImage
+                ? `<img src="${team.logo}" alt="${team.name}" style="width: 60px; height: 60px; object-fit: contain;" onerror="this.parentElement.innerHTML='${team.logo.includes('assets/') ? '⚽' : team.logo}';">`
                 : team.logo;
             
             card.innerHTML = `
