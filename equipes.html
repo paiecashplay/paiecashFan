@@ -306,13 +306,17 @@
     </div>
 
     <script src="clubs-maroc-data.js"></script>
+    <script src="equipes-database.js"></script>
     <script>
         // Récupérer le paramètre club depuis l'URL
         const urlParams = new URLSearchParams(window.location.search);
-        const clubName = urlParams.get('club') || 'Maroc';
+        const clubId = urlParams.get('club') || 'maroc';
 
-        // Base de données des équipes (simplifiée pour Maroc)
-        const equipesDatabase = {
+        // Récupérer les données du club depuis la base de données
+        const clubData = getClubData(clubId);
+
+        // ANCIEN CODE - Base de données des équipes (simplifiée pour Maroc) - CONSERVÉ POUR COMPATIBILITÉ
+        const equipesDatabase_OLD = {
             'Maroc': {
                 type: 'federation',
                 name: 'Maroc',
@@ -542,15 +546,16 @@
 
         // Fonction pour afficher les équipes
         function displayEquipes() {
-            const clubData = equipesDatabase[clubName];
-
             if (!clubData) {
                 document.getElementById('noData').style.display = 'block';
                 return;
             }
 
-            // Appliquer les couleurs
-            applyClubColors(clubData);
+            // Appliquer les couleurs dynamiques
+            if (clubData.colors && clubData.colors.length >= 2) {
+                document.documentElement.style.setProperty('--primary', clubData.colors[0]);
+                document.documentElement.style.setProperty('--secondary', clubData.colors[1]);
+            }
 
             // Mettre à jour le header
             const isImageLogo = clubData.logo && (clubData.logo.includes('assets/') || clubData.logo.includes('.png') || clubData.logo.includes('.svg') || clubData.logo.includes('.jpg'));
@@ -566,20 +571,39 @@
             let countMasculins = 0;
             let countFeminins = 0;
 
-            // Équipes nationales
-            if (clubData.equipesNationales && clubData.equipesNationales.length > 0) {
-                countNationales = clubData.equipesNationales.length;
-                const section = document.createElement('div');
-                section.innerHTML = `<h2 class="section-title">${clubData.logo} Équipes Nationales</h2>`;
-                const grid = document.createElement('div');
-                grid.className = 'grid';
-                clubData.equipesNationales.forEach(equipe => {
-                    grid.appendChild(createCard(equipe));
+            // Parcourir les catégories
+            if (clubData.categories && clubData.categories.length > 0) {
+                clubData.categories.forEach(category => {
+                    const section = document.createElement('div');
+                    section.innerHTML = `<h2 class="section-title">${category.title}</h2>`;
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+                    
+                    category.teams.forEach(team => {
+                        // Adapter le format pour createCard
+                        const equipe = {
+                            name: team.name,
+                            shortName: team.name,
+                            logo: team.logo,
+                            category: team.league || team.description || '',
+                            sport: 'Football',
+                            description: team.coach ? `Coach: ${team.coach}` : (team.achievements || team.stadium || ''),
+                            appUrl: team.url || clubData.appUrl
+                        };
+                        grid.appendChild(createCard(equipe));
+                        
+                        // Compter les équipes
+                        if (category.title.includes('Nationales')) countNationales++;
+                        else if (category.title.includes('Masculines')) countMasculins++;
+                        else if (category.title.includes('Féminines')) countFeminins++;
+                    });
+                    
+                    section.appendChild(grid);
+                    document.getElementById('equipesNationales').appendChild(section);
                 });
-                section.appendChild(grid);
-                document.getElementById('equipesNationales').appendChild(section);
             }
 
+            // ANCIEN CODE CONSERVÉ POUR COMPATIBILITÉ AVEC MAROC (clubs-maroc-data.js)
             // Clubs masculins
             if (clubData.clubsMasculins) {
                 const clubsMasculins = clubData.clubsMasculins === 'clubsMarocMasculins' && typeof clubsMarocMasculins !== 'undefined'
@@ -593,7 +617,6 @@
                     const grid = document.createElement('div');
                     grid.className = 'grid';
                     clubsMasculins.forEach(club => {
-                        // Créer l'URL avec le logo du club
                         const equipe = {
                             name: club.name,
                             shortName: club.shortName,
@@ -623,7 +646,6 @@
                     const grid = document.createElement('div');
                     grid.className = 'grid';
                     clubsFeminins.forEach(club => {
-                        // Créer l'URL avec le logo du club
                         const equipe = {
                             name: club.name,
                             shortName: club.shortName,

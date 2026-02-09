@@ -15,7 +15,7 @@ const ligue1Clubs = [
     { name: 'Lille', logo: 'assets/logos/clubs/lille.png', league: 'Ligue 1', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Lille&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Lorient', logo: 'assets/logos/clubs/lorient.png', league: 'Ligue 1', colors: ['#ff8c00', '#000000'], path: 'app-universal-simple.html?club=Lorient&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Lyon', logo: 'assets/logos/clubs/lyon.png', league: 'Ligue 1', colors: ['#002366', '#c8102e'], path: 'app-universal-simple.html?club=Lyon&logo=⚽&sport=Football&league=Ligue+1' },
-    { name: 'Marseille', logo: 'assets/logos/clubs/marseille.png', league: 'Ligue 1', colors: ['#1e3c72', '#2a5298'], path: 'app-universal-simple.html?club=Marseille&logo=⚽&sport=Football&league=Ligue+1' },
+    { name: 'Marseille', logo: 'assets/logos/clubs/marseille.svg', league: 'Ligue 1', colors: ['#2FAEE0', '#FFFFFF'], path: 'app-universal-simple.html?club=Marseille&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Monaco', logo: 'assets/logos/clubs/monaco.png', league: 'Ligue 1', colors: ['#c8102e', '#FFFFFF'], path: 'app-universal-simple.html?club=Monaco&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Nantes', logo: 'assets/logos/clubs/nantes.png', league: 'Ligue 1', colors: ['#ffc627', '#00a651'], path: 'app-universal-simple.html?club=Nantes&logo=⚽&sport=Football&league=Ligue+1' },
     { name: 'Nice', logo: 'assets/logos/clubs/nice.png', league: 'Ligue 1', colors: ['#c8102e', '#000000'], path: 'app-universal-simple.html?club=Nice&logo=⚽&sport=Football&league=Ligue+1' },

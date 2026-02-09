@@ -366,7 +366,7 @@
                         <span>${equipe.palmares}</span>
                     </div>
                 </div>
-                <a href="#" class="club-app-link" onclick="alert('Application en cours de développement'); return false;">
+                <a href="app-universal-simple.html?club=Maroc+${encodeURIComponent(equipe.name)}&logo=🇲🇦&sport=Football&league=Équipe+Nationale" class="club-app-link">
                     🚀 Voir l'application
                 </a>
             `;
@@ -414,7 +414,7 @@
                     </div>
                     ` : ''}
                 </div>
-                <a href="#" class="club-app-link" onclick="alert('Application en cours de développement'); return false;">
+                <a href="app-universal-simple.html?club=${encodeURIComponent(club.name)}&logo=${encodeURIComponent(club.logo)}&sport=Football&league=Botola+Pro" class="club-app-link">
                     🚀 Voir l'application
                 </a>
             `;
