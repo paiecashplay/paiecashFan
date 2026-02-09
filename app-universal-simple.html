@@ -1704,13 +1704,46 @@
             const urlParams = new URLSearchParams(window.location.search);
             const clubName = urlParams.get('club') || 'Maroc';
             
-            // Normaliser le nom du club pour l'URL
-            const clubId = clubName.toLowerCase().replace(/\s+/g, '-');
+            // Mapping des noms de clubs vers leurs identifiants
+            const clubMapping = {
+                'Paris SG': 'psg',
+                'Paris Saint-Germain': 'psg',
+                'PSG': 'psg',
+                'Olympique de Marseille': 'marseille',
+                'Marseille': 'marseille',
+                'OM': 'marseille',
+                'Olympique Lyonnais': 'lyon',
+                'Lyon': 'lyon',
+                'OL': 'lyon',
+                'AS Monaco': 'monaco',
+                'Monaco': 'monaco',
+                'OGC Nice': 'nice',
+                'Nice': 'nice',
+                'RC Lens': 'lens',
+                'Lens': 'lens',
+                'LOSC Lille': 'lille',
+                'Lille': 'lille',
+                'Stade Rennais': 'rennes',
+                'Rennes': 'rennes',
+                'FC Nantes': 'nantes',
+                'Nantes': 'nantes',
+                'RC Strasbourg': 'strasbourg',
+                'Strasbourg': 'strasbourg',
+                'Stade Brestois': 'brest',
+                'Brest': 'brest',
+                'Montpellier HSC': 'montpellier',
+                'Montpellier': 'montpellier',
+                'Stade de Reims': 'reims',
+                'Reims': 'reims',
+                'Maroc': 'maroc',
+                'Morocco': 'maroc'
+            };
+            
+            // Obtenir l'ID du club
+            let clubId = clubMapping[clubName] || clubName.toLowerCase().replace(/\s+/g, '-');
             
             // Clubs spéciaux avec leur propre page
-            const specialClubs = ['maroc', 'morocco'];
-            
-            if (specialClubs.includes(clubId)) {
+            if (clubId === 'maroc') {
                 window.location.href = 'equipes-maroc.html';
             } else {
                 // Tous les autres clubs utilisent equipes.html avec paramètre
