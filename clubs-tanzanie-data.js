@@ -2,56 +2,49 @@
 
 const equipesNationalesTanzanie = [
     {
-        nom: "E.N.A",
-        nomComplet: "Équipe Nationale A",
+        name: "E.N.A",
         description: "Équipe nationale senior masculine",
         selecteur: "Adel Amrouche",
         palmares: "CECAFA Cup 2023, Participation CAN",
         logo: "🇹🇿"
     },
     {
-        nom: "E.N. U23",
-        nomComplet: "Équipe Nationale U23",
+        name: "E.N. U23",
         description: "Équipe nationale des moins de 23 ans",
         selecteur: "Hemed Morocco",
         palmares: "CECAFA U23 Challenge Cup",
         logo: "🇹🇿"
     },
     {
-        nom: "E.N. U20",
-        nomComplet: "Équipe Nationale U20",
+        name: "E.N. U20",
         description: "Équipe nationale des moins de 20 ans",
         selecteur: "Juma Mgunda",
         palmares: "CECAFA U20 Championship",
         logo: "🇹🇿"
     },
     {
-        nom: "E.N. U17",
-        nomComplet: "Équipe Nationale U17",
+        name: "E.N. U17",
         description: "Équipe nationale des moins de 17 ans",
         selecteur: "Salum Mayanga",
         palmares: "Formation des futurs internationaux",
         logo: "🇹🇿"
     },
     {
-        nom: "FÉMININE",
-        nomComplet: "Équipe Nationale Féminine",
+        name: "FÉMININE",
         description: "Équipe nationale féminine senior",
         selecteur: "Bakari Shime",
         palmares: "CECAFA Women's Championship",
         logo: "🇹🇿"
     },
     {
-        nom: "FÉMININE U20",
-        nomComplet: "Équipe Nationale Féminine U20",
+        name: "FÉMININE U20",
         description: "Équipe nationale féminine des moins de 20 ans",
         selecteur: "TFF",
         palmares: "CECAFA Women's U20",
         logo: "🇹🇿"
     },
     {
-        nom: "FÉMININE U17",
-        nomComplet: "Équipe Nationale Féminine U17",
+        name: "FÉMININE U17",
         description: "Équipe nationale féminine des moins de 17 ans",
         selecteur: "TFF",
         palmares: "Qualification Coupe du Monde U17 2022",
@@ -61,7 +54,7 @@ const equipesNationalesTanzanie = [
 
 const clubsMasculinsTanzanie = [
     {
-        nom: "Young Africans SC",
+        name: "Young Africans SC",
         ville: "Dar es Salaam",
         stade: "Benjamin Mkapa Stadium",
         fondation: "1935",
@@ -69,7 +62,7 @@ const clubsMasculinsTanzanie = [
         logo: "assets/logos/tanzanie/young-africans.png"
     },
     {
-        nom: "Simba SC",
+        name: "Simba SC",
         ville: "Dar es Salaam",
         stade: "Benjamin Mkapa Stadium",
         fondation: "1936",
@@ -77,7 +70,7 @@ const clubsMasculinsTanzanie = [
         logo: "assets/logos/tanzanie/simba-sc.png"
     },
     {
-        nom: "Azam FC",
+        name: "Azam FC",
         ville: "Dar es Salaam",
         stade: "Chamazi Stadium",
         fondation: "2004",
@@ -85,7 +78,7 @@ const clubsMasculinsTanzanie = [
         logo: "assets/logos/tanzanie/azam-fc.png"
     },
     {
-        nom: "Coastal Union",
+        name: "Coastal Union",
         ville: "Tanga",
         stade: "Mkwakwani Stadium",
         fondation: "1974",
@@ -93,7 +86,7 @@ const clubsMasculinsTanzanie = [
         logo: "assets/logos/tanzanie/coastal-union.png"
     },
     {
-        nom: "JKT Tanzania",
+        name: "JKT Tanzania",
         ville: "Dar es Salaam",
         stade: "Uhuru Stadium",
         fondation: "1964",
@@ -101,7 +94,7 @@ const clubsMasculinsTanzanie = [
         logo: "assets/logos/tanzanie/jkt-tanzania.png"
     },
     {
-        nom: "Namungo FC",
+        name: "Namungo FC",
         ville: "Mtwara",
         stade: "Majaliwa Stadium",
         fondation: "2000",
@@ -109,7 +102,7 @@ const clubsMasculinsTanzanie = [
         logo: "⚽"
     },
     {
-        nom: "Geita Gold FC",
+        name: "Geita Gold FC",
         ville: "Geita",
         stade: "Kambarage Stadium",
         fondation: "2015",
@@ -117,7 +110,7 @@ const clubsMasculinsTanzanie = [
         logo: "⚽"
     },
     {
-        nom: "Kagera Sugar",
+        name: "Kagera Sugar",
         ville: "Kagera",
         stade: "Kaitaba Stadium",
         fondation: "1977",
@@ -128,7 +121,7 @@ const clubsMasculinsTanzanie = [
 
 const clubsFemininsTanzanie = [
     {
-        nom: "Simba Queens",
+        name: "Simba Queens",
         ville: "Dar es Salaam",
         stade: "Mkapa Stadium",
         fondation: "2016",
@@ -136,7 +129,7 @@ const clubsFemininsTanzanie = [
         logo: "assets/logos/tanzanie/simba-sc.png"
     },
     {
-        nom: "Yanga Princess",
+        name: "Yanga Princess",
         ville: "Dar es Salaam",
         stade: "Mkapa Stadium",
         fondation: "2017",
@@ -144,7 +137,7 @@ const clubsFemininsTanzanie = [
         logo: "assets/logos/tanzanie/young-africans.png"
     },
     {
-        nom: "JKT Queens",
+        name: "JKT Queens",
         ville: "Dar es Salaam",
         stade: "Uhuru Stadium",
         fondation: "2018",
@@ -152,7 +145,7 @@ const clubsFemininsTanzanie = [
         logo: "assets/logos/tanzanie/jkt-tanzania.png"
     },
     {
-        nom: "Azam Ladies",
+        name: "Azam Ladies",
         ville: "Dar es Salaam",
         stade: "Chamazi Stadium",
         fondation: "2019",

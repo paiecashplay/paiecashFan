@@ -1,40 +1,35 @@
 // Équipes nationales mauritaniennes
 const equipesNationalesMauritanie = [
     {
-        nom: "E.N.A",
-        nomComplet: "Équipe Nationale A",
+        name: "E.N.A",
         logo: "🇲🇷",
         description: "Équipe nationale senior masculine",
         selecteur: "Amir Abdou",
         palmares: "CAN 2019 (Participation), CAN 2021 (Participation)"
     },
     {
-        nom: "E.N. U23",
-        nomComplet: "Équipe Nationale U23",
+        name: "E.N. U23",
         logo: "🇲🇷",
         description: "Équipe nationale des moins de 23 ans",
         selecteur: "À définir",
         palmares: "En développement"
     },
     {
-        nom: "E.N. U20",
-        nomComplet: "Équipe Nationale U20",
+        name: "E.N. U20",
         logo: "🇲🇷",
         description: "Équipe nationale des moins de 20 ans",
         selecteur: "À définir",
         palmares: "Qualifications CAN U20"
     },
     {
-        nom: "E.N. U17",
-        nomComplet: "Équipe Nationale U17",
+        name: "E.N. U17",
         logo: "🇲🇷",
         description: "Équipe nationale des moins de 17 ans",
         selecteur: "À définir",
         palmares: "Formation des futurs internationaux"
     },
     {
-        nom: "FÉMININE",
-        nomComplet: "Équipe Nationale Féminine",
+        name: "FÉMININE",
         logo: "🇲🇷",
         description: "Équipe nationale féminine senior",
         selecteur: "À définir",
@@ -45,7 +40,7 @@ const equipesNationalesMauritanie = [
 // Clubs masculins mauritaniens (Super D1)
 const clubsMasculinsMauritanie = [
     {
-        nom: "FC Nouadhibou",
+        name: "FC Nouadhibou",
         ville: "Nouadhibou",
         logo: "assets/logos/mauritanie/fc-nouadhibou.png",
         stade: "Nouadhibou Municipal Stadium",
@@ -54,7 +49,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "AS Douanes",
+        name: "AS Douanes",
         ville: "Nouakchott",
         logo: "assets/logos/mauritanie/as-douanes.png",
         stade: "Cheikha Ould Boïdiya Stadium",
@@ -63,7 +58,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "Chemal FC",
+        name: "Chemal FC",
         ville: "Nouakchott",
         logo: "assets/logos/mauritanie/chemal-fc.png",
         stade: "Nouakchott Olympic Stadium",
@@ -72,7 +67,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "FC Tevragh-Zeina",
+        name: "FC Tevragh-Zeina",
         ville: "Nouakchott",
         logo: "⚽",
         stade: "Nouakchott Olympic Stadium",
@@ -81,7 +76,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "Nouakchott Kings",
+        name: "Nouakchott Kings",
         ville: "Nouakchott",
         logo: "👑",
         stade: "Nouakchott Olympic Stadium",
@@ -90,7 +85,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "AS Garde Nationale",
+        name: "AS Garde Nationale",
         ville: "Nouakchott",
         logo: "🛡️",
         stade: "Nouakchott Olympic Stadium",
@@ -99,7 +94,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "ASC SNIM",
+        name: "ASC SNIM",
         ville: "Nouadhibou",
         logo: "⚽",
         stade: "Nouadhibou Municipal Stadium",
@@ -108,7 +103,7 @@ const clubsMasculinsMauritanie = [
         ligue: "Super D1"
     },
     {
-        nom: "ASC Ksar",
+        name: "ASC Ksar",
         ville: "Nouakchott",
         logo: "🏰",
         stade: "Nouakchott Olympic Stadium",
@@ -121,7 +116,7 @@ const clubsMasculinsMauritanie = [
 // Clubs féminins mauritaniens
 const clubsFemininsMauritanie = [
     {
-        nom: "FC Nouadhibou Féminin",
+        name: "FC Nouadhibou Féminin",
         ville: "Nouadhibou",
         logo: "⚽",
         stade: "Nouadhibou Municipal Stadium",
@@ -130,7 +125,7 @@ const clubsFemininsMauritanie = [
         ligue: "Division 1 Féminine"
     },
     {
-        nom: "AS Douanes Féminin",
+        name: "AS Douanes Féminin",
         ville: "Nouakchott",
         logo: "⚽",
         stade: "Cheikha Ould Boïdiya Stadium",
@@ -139,7 +134,7 @@ const clubsFemininsMauritanie = [
         ligue: "Division 1 Féminine"
     },
     {
-        nom: "Chemal FC Féminin",
+        name: "Chemal FC Féminin",
         ville: "Nouakchott",
         logo: "⚽",
         stade: "Nouakchott Olympic Stadium",
@@ -148,7 +143,7 @@ const clubsFemininsMauritanie = [
         ligue: "Division 1 Féminine"
     },
     {
-        nom: "Nouakchott Kings Féminin",
+        name: "Nouakchott Kings Féminin",
         ville: "Nouakchott",
         logo: "👑",
         stade: "Nouakchott Olympic Stadium",

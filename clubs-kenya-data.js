@@ -1,40 +1,35 @@
 // Équipes nationales kényanes
 const equipesNationalesKenya = [
     {
-        nom: "Harambee Stars",
-        nomComplet: "Équipe Nationale A",
+        name: "Harambee Stars",
         logo: "🇰🇪",
         description: "Équipe nationale senior masculine",
         selecteur: "Engin Firat",
         palmares: "CAN 2019 (Participation), CECAFA Champions (7 fois)"
     },
     {
-        nom: "E.N. U23",
-        nomComplet: "Équipe Nationale U23",
+        name: "E.N. U23",
         logo: "🇰🇪",
         description: "Équipe nationale des moins de 23 ans",
         selecteur: "À définir",
         palmares: "Qualifications Olympiques"
     },
     {
-        nom: "E.N. U20",
-        nomComplet: "Équipe Nationale U20",
+        name: "E.N. U20",
         logo: "🇰🇪",
         description: "Équipe nationale des moins de 20 ans",
         selecteur: "À définir",
         palmares: "CECAFA U20 Champions"
     },
     {
-        nom: "E.N. U17",
-        nomComplet: "Équipe Nationale U17",
+        name: "E.N. U17",
         logo: "🇰🇪",
         description: "Équipe nationale des moins de 17 ans",
         selecteur: "À définir",
         palmares: "Formation des futurs internationaux"
     },
     {
-        nom: "FÉMININE",
-        nomComplet: "Harambee Starlets",
+        name: "FÉMININE",
         logo: "🇰🇪",
         description: "Équipe nationale féminine senior",
         selecteur: "Beldine Odemba",
@@ -45,7 +40,7 @@ const equipesNationalesKenya = [
 // Clubs masculins kényans (FKF Premier League)
 const clubsMasculinsKenya = [
     {
-        nom: "Gor Mahia",
+        name: "Gor Mahia",
         ville: "Nairobi",
         logo: "💚",
         stade: "Moi International Sports Centre",
@@ -54,7 +49,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "AFC Leopards",
+        name: "AFC Leopards",
         ville: "Nairobi",
         logo: "🐆",
         stade: "Nyayo National Stadium",
@@ -63,7 +58,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "Tusker FC",
+        name: "Tusker FC",
         ville: "Nairobi",
         logo: "🍺",
         stade: "Ruaraka Stadium",
@@ -72,7 +67,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "Kenya Police",
+        name: "Kenya Police",
         ville: "Nairobi",
         logo: "🚔",
         stade: "Nyayo National Stadium",
@@ -81,7 +76,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "Bandari FC",
+        name: "Bandari FC",
         ville: "Mombasa",
         logo: "⚓",
         stade: "Mbaraki Sports Club",
@@ -90,7 +85,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "Kakamega Homeboyz",
+        name: "Kakamega Homeboyz",
         ville: "Kakamega",
         logo: "⚽",
         stade: "Bukhungu Stadium",
@@ -99,7 +94,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "Kariobangi Sharks",
+        name: "Kariobangi Sharks",
         ville: "Nairobi",
         logo: "🦈",
         stade: "Kasarani Stadium",
@@ -108,7 +103,7 @@ const clubsMasculinsKenya = [
         ligue: "FKF Premier League"
     },
     {
-        nom: "KCB FC",
+        name: "KCB FC",
         ville: "Nairobi",
         logo: "🏦",
         stade: "Ruaraka Stadium",
@@ -119,9 +114,9 @@ const clubsMasculinsKenya = [
 ];
 
 // Clubs féminins kényans
-const clubsFemin insKenya = [
+const clubsFemininsKenya = [
     {
-        nom: "Vihiga Queens",
+        name: "Vihiga Queens",
         ville: "Vihiga",
         logo: "👑",
         stade: "Mumias Sports Complex",
@@ -130,7 +125,7 @@ const clubsFemin insKenya = [
         ligue: "Women's Premier League"
     },
     {
-        nom: "Thika Queens",
+        name: "Thika Queens",
         ville: "Thika",
         logo: "⚽",
         stade: "Thika Stadium",
@@ -139,7 +134,7 @@ const clubsFemin insKenya = [
         ligue: "Women's Premier League"
     },
     {
-        nom: "Gaspo Women",
+        name: "Gaspo Women",
         ville: "Nairobi",
         logo: "⚽",
         stade: "Camp Toyoyo",
@@ -148,7 +143,7 @@ const clubsFemin insKenya = [
         ligue: "Women's Premier League"
     },
     {
-        nom: "Ulinzi Starlets",
+        name: "Ulinzi Starlets",
         ville: "Nairobi",
         logo: "🛡️",
         stade: "Lang'ata Barracks",
