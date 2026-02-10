@@ -1736,7 +1736,23 @@
                 'Stade de Reims': 'reims',
                 'Reims': 'reims',
                 'Maroc': 'maroc',
-                'Morocco': 'maroc'
+                'MA': 'maroc',
+                'Tanzanie': 'tanzanie',
+                'Tanzania': 'tanzanie',
+                'Young Africans SC': 'tanzanie',
+                'Simba SC': 'tanzanie',
+                'Azam FC': 'tanzanie',
+                'Mauritanie': 'mauritanie',
+                'Mauritania': 'mauritanie',
+                'FC Nouadhibou': 'mauritanie',
+                'AS Douanes': 'mauritanie',
+                'Kenya': 'kenya',
+                'Gor Mahia': 'kenya',
+                'AFC Leopards': 'kenya',
+                'Ouganda': 'ouganda',
+                'Uganda': 'ouganda',
+                'KCCA FC': 'ouganda',
+                'Vipers SC': 'ouganda'
             };
             
             // Obtenir l'ID du club
@@ -1745,6 +1761,14 @@
             // Clubs spéciaux avec leur propre page
             if (clubId === 'maroc') {
                 window.location.href = 'equipes-maroc.html';
+            } else if (clubId === 'tanzanie') {
+                window.location.href = 'equipes-tanzanie.html';
+            } else if (clubId === 'mauritanie') {
+                window.location.href = 'equipes-mauritanie.html';
+            } else if (clubId === 'kenya') {
+                window.location.href = 'equipes-kenya.html';
+            } else if (clubId === 'ouganda') {
+                window.location.href = 'equipes-ouganda.html';
             } else {
                 // Tous les autres clubs utilisent equipes.html avec paramètre
                 window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}`;
