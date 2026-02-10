@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Super App v6.1 Complete</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- 🎬 STORIES CSS -->
+    <link rel="stylesheet" href="css/stories.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gold: #fbbf24;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* HEADER */
+        .app-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .club-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .header-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--secondary);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* LANG SELECTOR - CODE MINUSCULE */
+        .lang-display {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: lowercase !important;
+        }
+        
+        /* STORIES SECTION */
+        .stories-section {
+            padding: 15px 0 15px 15px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .stories-section::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            padding-right: 15px;
+        }
+        
+        .story-item {
+            flex-shrink: 0;
+            width: 70px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .story-ring {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--warning));
+        }
+        
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--background);
+            background-size: cover;
+            background-position: center;
+            background-color: var(--surface);
+        }
+        
+        .story-name {
+            font-size: 11px;
+            margin-top: 6px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+        
+        /* LEFT ACTION BAR - Gamification en haut */
+        .left-actions {
+            position: fixed;
+            left: 15px;
+            top: 45%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+        
+        .action-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .action-btn i {
+            font-size: 20px;
+            color: var(--text);
+        }
+        
+        .action-count {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        /* GAMIFICATION BUTTON - En haut à gauche */
+        .gamification-btn {
+            background: linear-gradient(135deg, var(--gold), var(--warning));
+            border-color: var(--gold);
+            animation: glowGold 2s infinite;
+        }
+        
+        @keyframes glowGold {
+            0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+        }
+        
+        .gamification-btn i {
+            color: #1a1a2e !important;
+        }
+        
+        .gamification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--background);
+        }
+        
+        /* BALANCE CARDS */
+        .balance-section {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        
+        .balance-label {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        
+        .balance-subtitle {
+            font-size: 10px;
+            opacity: 0.5;
+        }
+        
+        /* TRANSACTIONS EN TEMPS RÉEL */
+        .transactions-live {
+            padding: 0 20px 20px;
+        }
+        
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .transactions-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .transaction-item {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .transaction-time {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: 900;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--success);
+        }
+        
+        .transaction-amount.negative {
+            color: var(--secondary);
+        }
+        
+        /* CONTAINER */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* SECTIONS */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* TAB BAR */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px 0;
+            z-index: 1000;
+        }
+        
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        
+        .tab-item:active {
+            transform: scale(0.95);
+        }
+        
+        .tab-item i {
+            font-size: 22px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .tab-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .tab-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .tab-item.active .tab-label {
+            color: var(--primary);
+        }
+        
+        /* PROFIL SERVICES */
+        .profil-section {
+            padding: 20px;
+        }
+        
+        .service-group {
+            margin-bottom: 30px;
+        }
+        
+        .service-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .service-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .service-item {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .service-item:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .service-desc {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2f45 100%);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 450px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .modal-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .modal-item:hover {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .modal-item-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .modal-item-desc {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
+        .modal-item-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--success);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-left">
+            <div class="club-logo" id="headerLogo">⚽</div>
+            <div class="club-name" id="headerClubName">AS Monaco</div>
+        </div>
+        <div class="header-right">
+            <!-- 🌍 Sélecteur I18N (généré dynamiquement) -->
+            <div id="languageSelector" style="margin-right: 10px;"></div>
+            
+            <div class="header-btn" onclick="toggleLanguageDropdown()" title="Changer la langue">
+                <span id="langDisplay" style="font-size: 24px;">🇫🇷</span>
+            </div>
+            <div class="header-btn" onclick="openNotifications()">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge" id="notifCount">5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEFT ACTION BAR - Gamification en haut -->
+    <div class="left-actions">
+        <div class="action-btn gamification-btn" onclick="openGamification()">
+            <i class="fas fa-trophy"></i>
+            <div class="gamification-badge">🔥</div>
+        </div>
+        <div class="action-btn" onclick="handleLike()">
+            <i class="fas fa-heart"></i>
+            <span class="action-count">2.4K</span>
+        </div>
+        <div class="action-btn" onclick="handleShare()">
+            <i class="fas fa-share"></i>
+            <span class="action-count">856</span>
+        </div>
+        <div class="action-btn" onclick="handleSearch()">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- STORIES SECTION -->
+        <div class="stories-section">
+            <div class="stories-container" id="storiesContainer"></div>
+        </div>
+
+        <!-- SECTION ACCUEIL -->
+        <div class="section active" id="section-accueil">
+            <!-- BALANCE CARDS -->
+            <div class="balance-section">
+                <div class="balance-card">
+                    <div class="balance-label">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Compte Bancaire</span>
+                    </div>
+                    <div class="balance-amount">1 250,50 €</div>
+                    <div class="balance-subtitle">Compte courant principal</div>
+                </div>
+                
+                <div class="balance-card">
+                    <div class="balance-label">
+                        <i class="fas fa-wallet"></i>
+                        <span>Wallet Crypto</span>
+                    </div>
+                    <div class="balance-amount">250,00 €</div>
+                    <div class="balance-subtitle">USDC • 0x1234...5678</div>
+                </div>
+            </div>
+            
+            <!-- 🎬 STORIES TEMPS RÉEL -->
+            <div id="storiesDisplay"></div>
+            
+            <!-- TRANSACTIONS EN TEMPS RÉEL -->
+            <div class="transactions-live">
+                <div class="transactions-header">
+                    <div class="transactions-title">
+                        <div class="live-indicator"></div>
+                        <span>Transactions en temps réel</span>
+                    </div>
+                    <button onclick="showSection('transactions')" style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 700; font-size: 13px;">Voir tout</button>
+                </div>
+                <div id="transactionsContainer"></div>
+            </div>
+        </div>
+
+        <!-- SECTION TRANSACTIONS -->
+        <div class="section" id="section-transactions">
+            <div class="profil-section">
+                <h3 class="service-title">💸 Historique des Transactions</h3>
+                <div id="transactionsHistoryContainer"></div>
+            </div>
+        </div>
+
+        <!-- SECTION CHAT -->
+        <div class="section" id="section-chat">
+            <div class="profil-section">
+                <h3 class="service-title">💬 Conversations</h3>
+                <div class="service-list">
+                    <div class="service-item">
+                        <div class="service-icon">👤</div>
+                        <div class="service-info">
+                            <div class="service-name">Marc Dubois</div>
+                            <div class="service-desc">Salut! Tu vas au match samedi?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION IA -->
+        <div class="section" id="section-ia">
+            <div class="profil-section">
+                <h3 class="service-title">🤖 Intelligence Artificielle</h3>
+                <div class="service-list">
+                    <div class="service-item">
+                        <div class="service-icon">🔮</div>
+                        <div class="service-info">
+                            <div class="service-name">Prédiction Match</div>
+                            <div class="service-desc">Monaco 68% de chances de victoire</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION PROFIL -->
+        <div class="section" id="section-profil">
+            <div class="profil-section">
+                
+                <!-- FINANCE & WALLET -->
+                <div class="service-group">
+                    <h3 class="service-title">💰 Finance & Wallet</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="alert('Wallet : Gérer vos cryptos USDC, EURC')">
+                            <div class="service-icon">💳</div>
+                            <div class="service-info">
+                                <div class="service-name">Wallet</div>
+                                <div class="service-desc">Gérer vos cryptos</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="alert('Épargne : Économiser et investir avec rendement 5%')">
+                            <div class="service-icon">💰</div>
+                            <div class="service-info">
+                                <div class="service-name">Épargne</div>
+                                <div class="service-desc">Économiser et investir</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="alert('Cartes Prépayées : Visa, Mastercard disponibles')">
+                            <div class="service-icon">💎</div>
+                            <div class="service-info">
+                                <div class="service-name">Cartes Prépayées</div>
+                                <div class="service-desc">Visa, Mastercard</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SERVICES PREMIUM -->
+                <div class="service-group">
+                    <h3 class="service-title">🌟 Services Premium</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="openEsimService()">
+                            <div class="service-icon">📡</div>
+                            <div class="service-info">
+                                <div class="service-name">eSIM</div>
+                                <div class="service-desc">Forfaits data internationaux</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openShopService()">
+                            <div class="service-icon">🛍️</div>
+                            <div class="service-info">
+                                <div class="service-name">Shop</div>
+                                <div class="service-desc">Merchandising officiel</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openBilletsService()">
+                            <div class="service-icon">🎟️</div>
+                            <div class="service-info">
+                                <div class="service-name">Billets NFT</div>
+                                <div class="service-desc">Tickets blockchain</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMMUNAUTÉ -->
+                <div class="service-group">
+                    <h3 class="service-title">👥 Communauté</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="openLegendesService()">
+                            <div class="service-icon">⭐</div>
+                            <div class="service-info">
+                                <div class="service-name">Légendes du Club</div>
+                                <div class="service-desc">NFT ambassadeurs</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openJoueursService()">
+                            <div class="service-icon">⚽</div>
+                            <div class="service-info">
+                                <div class="service-name">Joueurs en Activité</div>
+                                <div class="service-desc">Effectif et stats</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openFansService()">
+                            <div class="service-icon">🏆</div>
+                            <div class="service-info">
+                                <div class="service-name">Fans Actifs</div>
+                                <div class="service-desc">Classement communauté</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🌍 AFRIQUE -->
+                <div class="service-group">
+                    <h3 class="service-title">🌍 Afrique</h3>
+                    <div class="service-list">
+                        <!-- MERCHANDISING OM AFRIQUE -->
+                        <div class="service-item" onclick="openAfriqueMerchandisingService()">
+                            <div class="service-icon">👕</div>
+                            <div class="service-info">
+                                <div class="service-name">Merchandising OM</div>
+                                <div class="service-desc">Maillots, écharpes - Paiement Mobile Money</div>
+                            </div>
+                        </div>
+                        
+                        <!-- AMBASSADEURS AFRICAINS NFT -->
+                        <div class="service-item" onclick="openAfriqueAmbassadeursNFTService()">
+                            <div class="service-icon">💎</div>
+                            <div class="service-info">
+                                <div class="service-name">Ambassadeurs NFT</div>
+                                <div class="service-desc">Drogba, Beye, Mbia - Cartes Collectors</div>
+                            </div>
+                        </div>
+                        
+                        <!-- MOBILE MONEY PAIEMENTS -->
+                        <div class="service-item" onclick="openAfriqueMobileMoneyService()">
+                            <div class="service-icon">📱</div>
+                            <div class="service-info">
+                                <div class="service-name">Mobile Money</div>
+                                <div class="service-desc">Orange, MTN, Moov, Wave</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriquePartenariatsService()">
+                            <div class="service-icon">🤝</div>
+                            <div class="service-info">
+                                <div class="service-name">Partenariats Africains</div>
+                                <div class="service-desc">Clubs et académies</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriqueSupportersService()">
+                            <div class="service-icon">🎺</div>
+                            <div class="service-info">
+                                <div class="service-name">Supporters Africains</div>
+                                <div class="service-desc">2.5M+ fans en Afrique</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriqueEventsService()">
+                            <div class="service-icon">🏆</div>
+                            <div class="service-info">
+                                <div class="service-name">Événements Africains</div>
+                                <div class="service-desc">Tournées et matchs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🎁 PARRAINAGE -->
+                <!-- 🎁 PARRAINAGE SIMPLIFIÉ -->
+                <div class="service-group" style="background: white; border: 2px solid #ff3366; border-radius: 16px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #ff3366; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        🎁 Parrainage
+                    </h3>
+                    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                        Invitez vos amis : <strong style="color: #ff3366;">10€ par filleul</strong> + <strong style="color: #ff3366;">-20% billets</strong>
+                    </p>
+                    
+                    <!-- Code de parrainage -->
+                    <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center;">
+                        <div style="color: #64748b; font-size: 0.8rem; margin-bottom: 5px;">Votre code</div>
+                        <div style="color: #1e293b; font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; font-family: 'Courier New', monospace;">FANCLUB2024</div>
+                        <button onclick="navigator.clipboard.writeText('FANCLUB2024'); alert('✅ Code copié !')" style="margin-top: 10px; padding: 8px 16px; background: #ff3366; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                            📋 Copier le code
+                        </button>
+                    </div>
+                    
+                    <!-- Partage réseaux sociaux -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="color: #64748b; font-size: 0.85rem; margin-bottom: 8px; font-weight: 500;">Partager sur :</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="window.open('https://wa.me/?text=Rejoins-moi sur PaieCashFan avec mon code FANCLUB2024 et gagne 10€ ! https://jphbvnok.gensparkspace.com', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #25D366; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">💬</span> WhatsApp
+                            </button>
+                            <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=https://jphbvnok.gensparkspace.com&quote=Rejoins-moi avec le code FANCLUB2024', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #1877F2; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">📘</span> Facebook
+                            </button>
+                            <button onclick="window.open('https://twitter.com/intent/tweet?text=Rejoins-moi sur PaieCashFan avec mon code FANCLUB2024 et gagne 10€ !&url=https://jphbvnok.gensparkspace.com', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #1DA1F2; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">🐦</span> X (Twitter)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="color: #94a3b8; font-size: 0.75rem; text-align: center; margin-top: 10px;">
+                        💡 Partagez votre code et gagnez 10€ par ami inscrit
+                    </div>
+                </div>
+
+                <!-- PARAMÈTRES -->
+                <div class="service-group">
+                    <h3 class="service-title">⚙️ Paramètres</h3>
+                    <div class="service-list">
+                        <div class="service-item">
+                            <div class="service-icon">🔐</div>
+                            <div class="service-info">
+                                <div class="service-name">Sécurité</div>
+                                <div class="service-desc">2FA, mot de passe</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="toggleLanguageDropdown()">
+                            <div class="service-icon">🌍</div>
+                            <div class="service-info">
+                                <div class="service-name">Langue</div>
+                                <div class="service-desc" id="currentLanguageDisplay">Français</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+        <div class="tab-item" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i>
+            <div class="tab-label">Accueil</div>
+        </div>
+        <div class="tab-item active" onclick="navigateToEquipes()">
+            <i class="fas fa-users"></i>
+            <div class="tab-label">Équipes</div>
+        </div>
+        <div class="tab-item" onclick="showSection('chat')">
+            <i class="fas fa-comments"></i>
+            <div class="tab-label">Chat</div>
+        </div>
+        <div class="tab-item" onclick="showSection('ia')">
+            <i class="fas fa-robot"></i>
+            <div class="tab-label">IA</div>
+        </div>
+        <div class="tab-item" onclick="showSection('profil')">
+            <i class="fas fa-user"></i>
+            <div class="tab-label">Profil</div>
+        </div>
+    </div>
+
+    <!-- MODAL GAMIFICATION -->
+    <div class="modal" id="gamificationModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('gamificationModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🏆 Gamification</div>
+                <p style="font-size: 14px; opacity: 0.7;">Gagnez en jouant et partageant</p>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">👤 Fan : Gagnez des PaieCash Coins</div>
+                    <div class="modal-item-desc">
+                        • Partagez une story : +5 PCC<br>
+                        • Likez un produit : +2 PCC<br>
+                        • Achetez un billet : +20 PCC<br>
+                        • Invitez un ami : +50 PCC
+                    </div>
+                    <span class="modal-item-badge">🎁 Récompenses actives</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">🏢 Sponsor : Visibilité & Engagement</div>
+                    <div class="modal-item-desc">
+                        • Vues story sponsor : Statistiques temps réel<br>
+                        • Interactions : Likes, partages, clics<br>
+                        • Conversions : Achats via sponsor<br>
+                        • ROI : Retour sur investissement mesuré
+                    </div>
+                    <span class="modal-item-badge">📊 Analytics en temps réel</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">🎯 Vos Stats</div>
+                    <div class="modal-item-desc">
+                        • PCC gagnés aujourd'hui : <strong>35 PCC</strong><br>
+                        • Partages ce mois : <strong>12 partages</strong><br>
+                        • Niveau : <strong>⭐ Gold Fan</strong><br>
+                        • Classement : <strong>#15 / 1,200 fans</strong>
+                    </div>
+                    <span class="modal-item-badge">🔥 Vous êtes actif!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTIFICATIONS -->
+    <div class="modal" id="notificationsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('notificationsModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🔔 Notifications</div>
+            </div>
+            <div class="modal-list" id="notificationsList"></div>
+        </div>
+    </div>
+
+    <!-- MODAL ESIM -->
+    <div class="modal" id="esimModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('esimModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">📡 eSIM Forfaits</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Europe eSIM</div>
+                    <div class="modal-item-desc">5GB • 30 jours • 30 pays</div>
+                    <span class="modal-item-badge">9,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Mondial eSIM</div>
+                    <div class="modal-item-desc">10GB • 30 jours • 150 pays</div>
+                    <span class="modal-item-badge">24,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Premium eSIM</div>
+                    <div class="modal-item-desc">20GB • 60 jours • Mondial</div>
+                    <span class="modal-item-badge">39,99 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SHOP -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('shopModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🛍️ Shop Officiel</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Maillot Domicile 2024/25</div>
+                    <div class="modal-item-desc">Tailles: S, M, L, XL, XXL</div>
+                    <span class="modal-item-badge">89,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Casquette Officielle</div>
+                    <div class="modal-item-desc">Logo brodé • Ajustable</div>
+                    <span class="modal-item-badge">24,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Écharpe Supporters</div>
+                    <div class="modal-item-desc">100% Acrylique • 150cm</div>
+                    <span class="modal-item-badge">19,99 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BILLETS -->
+    <div class="modal" id="billetsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('billetsModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🎟️ Billets NFT</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Monaco vs PSG</div>
+                    <div class="modal-item-desc">15 Jan 2025 • Stade Louis II</div>
+                    <span class="modal-item-badge">45 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Monaco vs OM</div>
+                    <div class="modal-item-desc">22 Jan 2025 • Stade Louis II</div>
+                    <span class="modal-item-badge">40 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LÉGENDES -->
+    <div class="modal" id="legendesModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('legendesModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">⭐ Légendes du Club</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Thierry Henry</div>
+                    <div class="modal-item-desc">500 NFT éditions • Henry for Kids Association</div>
+                    <span class="modal-item-badge">Disponible</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Kylian Mbappé</div>
+                    <div class="modal-item-desc">1000 NFT éditions • Inspired by KM Association</div>
+                    <span class="modal-item-badge">Disponible</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL JOUEURS -->
+    <div class="modal" id="joueursModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('joueursModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">⚽ Joueurs en Activité</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Wissam Ben Yedder</div>
+                    <div class="modal-item-desc">Attaquant • 15 buts • 8 passes</div>
+                    <span class="modal-item-badge">Note: 92/100</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Youssouf Fofana</div>
+                    <div class="modal-item-desc">Milieu • 3 buts • 12 passes</div>
+                    <span class="modal-item-badge">Note: 88/100</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FANS -->
+    <div class="modal" id="fansModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('fansModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🏆 Fans Actifs</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">#1 Marc Dubois</div>
+                    <div class="modal-item-desc">15,450 points • ⭐ Gold Fan</div>
+                    <span class="modal-item-badge">👑 Top Fan</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">#2 Sophie Martin</div>
+                    <div class="modal-item-desc">12,380 points • ⭐ Gold Fan</div>
+                    <span class="modal-item-badge">🔥 En feu</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">#15 Vous</div>
+                    <div class="modal-item-desc">6,240 points • ⚡ Silver Fan</div>
+                    <span class="modal-item-badge">Votre rang</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌍 Données fédérations CAF -->
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    
+    <!-- 🌍 Système I18N Multi-Langues - RÉACTIVÉ ✅ -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+
+    <script>
+        // État global
+        let currentLanguage = localStorage.getItem('paiecashfan_lang') || 'fr';
+        
+        // Stories data - DÉFILEMENT HORIZONTAL (pas de rotation)
+        const stories = [
+            {
+                id: 1,
+                name: 'AS Monaco',
+                avatar: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/AS_Monaco_FC_logo.svg/200px-AS_Monaco_FC_logo.svg.png',
+                type: 'club',
+                story: '⚽ Nouvelle saison 2025/2026 !'
+            },
+            {
+                id: 2,
+                name: 'Marc Dubois',
+                avatar: 'https://i.pravatar.cc/150?img=12',
+                type: 'fan',
+                story: '🔥 Au stade ce soir !'
+            },
+            {
+                id: 3,
+                name: 'Sophie Martin',
+                avatar: 'https://i.pravatar.cc/150?img=5',
+                type: 'fan',
+                story: '🎉 Supporter depuis 10 ans !'
+            },
+            {
+                id: 4,
+                name: 'Thomas Leroy',
+                avatar: 'https://i.pravatar.cc/150?img=33',
+                type: 'fan',
+                story: '👕 Nouveau maillot reçu !'
+            },
+            {
+                id: 5,
+                name: 'Julie Moreau',
+                avatar: 'https://i.pravatar.cc/150?img=9',
+                type: 'fan',
+                story: '📸 Photos du match !'
+            },
+            {
+                id: 6,
+                name: 'Ahmed Diallo',
+                avatar: 'https://i.pravatar.cc/150?img=51',
+                type: 'fan',
+                story: '🇸🇳 Supporter depuis Dakar !'
+            },
+            {
+                id: 7,
+                name: 'Emma Laurent',
+                avatar: 'https://i.pravatar.cc/150?img=47',
+                type: 'fan',
+                story: '💙 Fan depuis toujours !'
+            },
+            {
+                id: 8,
+                name: 'Lucas Bernard',
+                avatar: 'https://i.pravatar.cc/150?img=68',
+                type: 'fan',
+                story: '🏆 Champions !'
+            }
+        ];
+        
+        // Transactions data (temps réel simulé)
+        const transactions = [
+            { id: 1, type: 'received', name: 'Marc Dubois', amount: 20, time: 'Il y a 2 min', icon: '💸' },
+            { id: 2, type: 'sent', name: 'Billet Monaco vs PSG', amount: -45, time: 'Il y a 15 min', icon: '🎟️' },
+            { id: 3, type: 'received', name: 'Cashback Shop', amount: 5, time: 'Il y a 1h', icon: '🎁' },
+            { id: 4, type: 'sent', name: 'Maillot domicile', amount: -89.99, time: 'Il y a 2h', icon: '👕' },
+            { id: 5, type: 'received', name: 'Sophie Martin', amount: 10, time: 'Il y a 3h', icon: '💸' }
+        ];
+        
+        // Notifications data
+        const notifications = [
+            { id: 1, title: 'Nouveau message', desc: 'Marc Dubois vous a envoyé un message', time: '5 min', icon: '💬' },
+            { id: 2, title: 'Transaction reçue', desc: '+20 € de Marc Dubois', time: '2 min', icon: '💸' },
+            { id: 3, title: 'Match demain', desc: 'Monaco vs PSG à 21h', time: '1h', icon: '⚽' },
+            { id: 4, title: 'Nouveau produit', desc: 'Maillot 2024/25 disponible', time: '2h', icon: '👕' },
+            { id: 5, title: 'Cashback', desc: '+5 € de cashback Shop', time: '1h', icon: '🎁' }
+        ];
+        
+        // Langues supportées (codes en MINUSCULES)
+        const langs = {
+            'fr': 'Français',
+            'en': 'English',
+            'es': 'Español',
+            'de': 'Deutsch',
+            'it': 'Italiano',
+            'pt': 'Português',
+            'tr': 'Türkçe',
+            'ru': 'Русский',
+            'zh': '中文',
+            'ar': 'العربية',
+            'ja': '日本語'
+        };
+        
+        // Charger les stories (DÉFILEMENT HORIZONTAL)
+        function loadStories() {
+            const container = document.getElementById('storiesDisplay');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div style="overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 15px 0;">
+                    <div style="display: flex; gap: 12px; padding: 0 15px;">
+                        ${stories.map(story => `
+                            <div class="story-item" onclick="alert('📖 Story de ${story.name}\\n\\n${story.story}')" style="flex-shrink: 0; width: 70px; cursor: pointer; text-align: center;">
+                                <div class="story-ring" style="width: 70px; height: 70px; border-radius: 50%; padding: 3px; background: linear-gradient(45deg, #ff3366, #7c3aed, #fbbf24);">
+                                    <div class="story-avatar" style="width: 100%; height: 100%; border-radius: 50%; border: 3px solid white; background-image: url('${story.avatar}'); background-size: cover; background-position: center;"></div>
+                                </div>
+                                <div class="story-name" style="font-size: 11px; margin-top: 6px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b;">${story.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Charger les transactions temps réel
+        function loadTransactions() {
+            const container = document.getElementById('transactionsContainer');
+            const recentTransactions = transactions.slice(0, 3);
+            container.innerHTML = recentTransactions.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-icon">${t.icon}</div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${t.name}</div>
+                        <div class="transaction-time">${t.time}</div>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'received' ? 'positive' : 'negative'}">
+                        ${t.amount > 0 ? '+' : ''}${t.amount} €
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Charger l'historique complet
+        function loadTransactionsHistory() {
+            const container = document.getElementById('transactionsHistoryContainer');
+            container.innerHTML = transactions.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-icon">${t.icon}</div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${t.name}</div>
+                        <div class="transaction-time">${t.time}</div>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'received' ? 'positive' : 'negative'}">
+                        ${t.amount > 0 ? '+' : ''}${t.amount} €
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Charger les notifications
+        function loadNotifications() {
+            const container = document.getElementById('notificationsList');
+            container.innerHTML = notifications.map(n => `
+                <div class="modal-item">
+                    <div style="font-size: 24px; margin-bottom: 8px;">${n.icon}</div>
+                    <div class="modal-item-title">${n.title}</div>
+                    <div class="modal-item-desc">${n.desc}</div>
+                    <span class="modal-item-badge">${n.time}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(`section-${section}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (section === 'accueil') {
+                loadTransactions();
+            } else if (section === 'transactions') {
+                loadTransactionsHistory();
+            }
+        }
+        
+        // Toggle langue (AFFICHE SEULEMENT LE DRAPEAU + I18N)
+        function toggleLanguageDropdown() {
+            const langKeys = Object.keys(langs);
+            const currentIdx = langKeys.indexOf(currentLanguage);
+            const nextIdx = (currentIdx + 1) % langKeys.length;
+            currentLanguage = langKeys[nextIdx];
+            
+            localStorage.setItem('paiecashfan_lang', currentLanguage);
+            
+            // Afficher SEULEMENT le drapeau (pas le code)
+            const langFlags = {
+                fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹',
+                pt: '🇵🇹', tr: '🇹🇷', ru: '🇷🇺', zh: '🇨🇳', ar: '🇸🇦', ja: '🇯🇵'
+            };
+            document.getElementById('langDisplay').textContent = langFlags[currentLanguage];
+            document.getElementById('currentLanguageDisplay').textContent = langs[currentLanguage] + ' (' + currentLanguage + ')';
+        }
+        
+        // Ouvrir modals
+        function openGamification() {
+            document.getElementById('gamificationModal').classList.add('active');
+        }
+        
+        function openNotifications() {
+            loadNotifications();
+            document.getElementById('notificationsModal').classList.add('active');
+            document.getElementById('notifCount').textContent = '0';
+        }
+        
+        function openEsimService() {
+            document.getElementById('esimModal').classList.add('active');
+        }
+        
+        function openShopService() {
+            document.getElementById('shopModal').classList.add('active');
+        }
+        
+        function openBilletsService() {
+            document.getElementById('billetsModal').classList.add('active');
+        }
+        
+        function openLegendesService() {
+            document.getElementById('legendesModal').classList.add('active');
+        }
+        
+        function openJoueursService() {
+            document.getElementById('joueursModal').classList.add('active');
+        }
+        
+        function openFansService() {
+            document.getElementById('fansModal').classList.add('active');
+        }
+        
+        // ========== SERVICES AFRIQUE ==========
+        
+        // MERCHANDISING OM AFRIQUE avec PaieCash (Wallet + Carte Bancaire + Mobile Money)
+        function openAfriqueMerchandisingService() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">👕 Merchandising OM</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:8px;">🌍 Livraison en Afrique</div>
+                        <div style="color:#64748b;font-size:0.9rem;">Livraison gratuite dans 25+ pays africains</div>
+                    </div>
+                    
+                    <!-- PRODUITS -->
+                    <div style="display:grid;gap:12px;margin-bottom:20px;">
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">👕</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Maillot Domicile 2024/25</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Taille: S, M, L, XL, XXL</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">85€</div>
+                            </div>
+                        </div>
+                        
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">🧣</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Écharpe Officielle OM</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Droit Au But - Edition 2025</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">25€</div>
+                            </div>
+                        </div>
+                        
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">🧢</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Casquette OM Bleu Blanc</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Réglable - 100% Coton</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">30€</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MÉTHODES DE PAIEMENT -->
+                    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-weight:700;color:#166534;margin-bottom:12px;font-size:1.05rem;">💳 Paiement PaieCash</div>
+                        <div style="display:grid;gap:8px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="wallet" checked style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">💰 Wallet Crypto (USDC/EURC)</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="card" style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">💎 Carte Bancaire (Visa/Mastercard)</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="mobile" style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">📱 Mobile Money (Orange/MTN/Moov/Wave)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="alert('✅ Commande confirmée !\\n\\nVotre commande sera livrée sous 7-14 jours.\\n\\nMerci d\\'avoir choisi PaieCash pour votre paiement !')" style="width:100%;padding:16px;background:#ff3366;color:white;border:none;border-radius:12px;font-weight:700;font-size:1.05rem;cursor:pointer;">
+                        🛒 Commander maintenant
+                    </button>
+                    
+                    <div style="color:#64748b;font-size:0.8rem;text-align:center;margin-top:12px;">
+                        ✅ Paiement sécurisé • 🚚 Livraison suivie • 🔄 Retour 30 jours
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // AMBASSADEURS AFRICAINS NFT (Drogba, Beye, Mbia)
+        function openAfriqueAmbassadeursNFTService() {
+            const ambassadeurs = [
+                { nom: 'Didier Drogba', pays: '🇨🇮 Côte d\'Ivoire', periode: '2003-2004', followers: '13M', prix: '299', rarity: 'LEGENDARY' },
+                { nom: 'Habib Beye', pays: '🇸🇳 Sénégal', periode: '2007-2009', followers: '280K', prix: '89', rarity: 'RARE' },
+                { nom: 'Stéphane Mbia', pays: '🇨🇲 Cameroun', periode: '2009-2012', followers: '450K', prix: '129', rarity: 'EPIC' }
+            ];
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">💎 Ambassadeurs NFT</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;padding:16px;margin-bottom:20px;color:white;">
+                        <div style="font-weight:700;margin-bottom:8px;font-size:1.05rem;">🌟 Cartes Collectors NFT</div>
+                        <div style="font-size:0.9rem;opacity:0.95;">Possédez une carte NFT unique de vos légendes africaines préférées !</div>
+                    </div>
+                    
+                    <!-- AMBASSADEURS -->
+                    ${ambassadeurs.map(amb => `
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;background:${amb.rarity === 'LEGENDARY' ? 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' : amb.rarity === 'EPIC' ? 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'};color:${amb.rarity === 'LEGENDARY' ? '#1e293b' : 'white'};">
+                            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+                                <div>
+                                    <div style="font-weight:800;font-size:1.15rem;margin-bottom:4px;">⭐ ${amb.nom}</div>
+                                    <div style="font-size:0.85rem;opacity:0.9;">${amb.pays}</div>
+                                    <div style="font-size:0.8rem;opacity:0.8;margin-top:2px;">${amb.periode}</div>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.2);padding:4px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">
+                                    ${amb.rarity}
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-size:0.8rem;opacity:0.9;margin-bottom:2px;">👥 ${amb.followers} followers</div>
+                                </div>
+                                <button onclick="alert('🎉 NFT ${amb.nom} ajouté au panier !\\n\\nPrix: ${amb.prix}€\\n\\nPayez avec PaieCash Wallet, Carte ou Mobile Money')" style="padding:10px 20px;background:rgba(255,255,255,0.95);color:#1e293b;border:none;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                                    ${amb.prix}€
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <!-- AVANTAGES NFT -->
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-top:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:12px;">✨ Avantages NFT Exclusifs</div>
+                        <div style="display:grid;gap:8px;color:#64748b;font-size:0.85rem;">
+                            <div>🎁 Accès prioritaire aux événements avec l'ambassadeur</div>
+                            <div>📸 Meet & Greet exclusif lors des tournées africaines</div>
+                            <div>🎥 Vidéos personnalisées de votre légende</div>
+                            <div>🏆 Participez aux tirages au sort mensuels</div>
+                            <div>💰 Revendez votre NFT sur le marketplace</div>
+                        </div>
+                    </div>
+                    
+                    <div style="color:#64748b;font-size:0.8rem;text-align:center;margin-top:16px;">
+                        🔐 NFT sur blockchain • ✅ Authentification garantie • 💎 Propriété vérifiable
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function openAfriquePartenariatsService() {
+            alert('🌍 PARTENARIATS AFRICAINS\n\n' +
+                  '• 15 clubs partenaires en Afrique\n' +
+                  '• Académies au Sénégal, Côte d\'Ivoire, Cameroun\n' +
+                  '• Échanges de joueurs et formations\n' +
+                  '• Tournées pré-saison en Afrique\n\n' +
+                  '📍 Prochaine tournée : Été 2025');
+        }
+        
+        function openAfriqueSupportersService() {
+            alert('🎺 SUPPORTERS AFRICAINS\n\n' +
+                  '• 2.5M+ supporters en Afrique\n' +
+                  '• Clubs de supporters : Sénégal, Maroc, Algérie, Cameroun\n' +
+                  '• Événements de visionnage en direct\n' +
+                  '• Rencontres avec légendes du club\n\n' +
+                  '🏆 Communauté la plus active : Sénégal');
+        }
+        
+        function openAfriqueMobileMoneyService() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:450px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">📱 Mobile Money</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:8px;">💳 Paiement Mobile Money disponible</div>
+                        <div style="color:#64748b;font-size:0.9rem;">Payez vos billets, merchandising et NFT avec votre Mobile Money</div>
+                    </div>
+                    
+                    <!-- OPÉRATEURS -->
+                    <div style="display:grid;gap:12px;margin-bottom:20px;">
+                        <div style="border:2px solid #FF7900;border-radius:12px;padding:16px;background:#FFF5F0;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟠</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#FF7900;font-size:1.1rem;">Orange Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Disponible dans 18 pays</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #FFCB05;border-radius:12px;padding:16px;background:#FFFBF0;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟡</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#E4A300;font-size:1.1rem;">MTN Mobile Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Leader en Afrique</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #0055A4;border-radius:12px;padding:16px;background:#F0F5FF;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🔵</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#0055A4;font-size:1.1rem;">Moov Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Afrique de l'Ouest</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #21C275;border-radius:12px;padding:16px;background:#F0FDF7;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟢</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#21C275;font-size:1.1rem;">Wave</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Sénégal, Côte d'Ivoire</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;">
+                        <div style="font-weight:700;color:#166534;margin-bottom:8px;">💰 Avantages PaieCash</div>
+                        <div style="display:grid;gap:6px;color:#64748b;font-size:0.85rem;">
+                            <div>✅ Zéro frais de transaction</div>
+                            <div>✅ Conversion automatique en USDC</div>
+                            <div>✅ Paiement en temps réel</div>
+                            <div>✅ Support 24/7 en français</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function openAfriqueEventsService() {
+            alert('🏆 ÉVÉNEMENTS AFRICAINS\n\n' +
+                  'PROCHAINS ÉVÉNEMENTS:\n\n' +
+                  '⚽ Tournée Afrique de l\'Ouest - Juillet 2025\n' +
+                  '   • Dakar, Abidjan, Accra\n\n' +
+                  '🎉 Fan Fest Casablanca - Août 2025\n' +
+                  '   • Rencontre joueurs et légendes\n\n' +
+                  '🏟️ Match Exhibition Cameroun - Septembre 2025\n\n' +
+                  '🎫 Billets en prévente bientôt !');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Actions gauche
+        function handleLike() {
+            alert('❤️ J\'aime ajouté! +2 PCC gagnés');
+        }
+        
+        function handleShare() {
+            alert('📤 Partagé! +5 PCC gagnés');
+        }
+        
+        function handleSearch() {
+            const query = prompt('🔍 Rechercher:');
+            if (query) {
+                alert(`Recherche: "${query}"`);
+            }
+        }
+        
+        // Navigation vers les équipes spécifiques du club
+        function navigateToEquipes() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || 'Maroc';
+            
+            // Mapping des noms de clubs vers leurs identifiants
+            const clubMapping = {
+                'Paris SG': 'psg',
+                'Paris Saint-Germain': 'psg',
+                'PSG': 'psg',
+                'Olympique de Marseille': 'marseille',
+                'Marseille': 'marseille',
+                'OM': 'marseille',
+                'Olympique Lyonnais': 'lyon',
+                'Lyon': 'lyon',
+                'OL': 'lyon',
+                'AS Monaco': 'monaco',
+                'Monaco': 'monaco',
+                'OGC Nice': 'nice',
+                'Nice': 'nice',
+                'RC Lens': 'lens',
+                'Lens': 'lens',
+                'LOSC Lille': 'lille',
+                'Lille': 'lille',
+                'Stade Rennais': 'rennes',
+                'Rennes': 'rennes',
+                'FC Nantes': 'nantes',
+                'Nantes': 'nantes',
+                'RC Strasbourg': 'strasbourg',
+                'Strasbourg': 'strasbourg',
+                'Stade Brestois': 'brest',
+                'Brest': 'brest',
+                'Montpellier HSC': 'montpellier',
+                'Montpellier': 'montpellier',
+                'Stade de Reims': 'reims',
+                'Reims': 'reims',
+                  'Maroc': 'maroc',
+                'MA': 'maroc',
+                'Tanzanie': 'tanzanie',
+                'Tanzania': 'tanzanie',
+                'TZ': 'tanzanie',
+                'Mauritanie': 'mauritanie',
+                'Mauritania': 'mauritanie',
+                'MR': 'mauritanie',
+                'Kenya': 'kenya',
+                'KE': 'kenya',
+                'Ouganda': 'ouganda',
+                'Uganda': 'ouganda',
+                'UG': 'ouganda'
+            };
+            
+            // Obtenir l'ID du club
+            let clubId = clubMapping[clubName] || clubName.toLowerCase().replace(/\s+/g, '-');
+            
+            // Clubs spéciaux avec leur propre page
+            if (clubId === 'maroc') {
+                window.location.href = 'equipes-maroc.html';
+            } else {
+                // Tous les autres clubs utilisent equipes.html avec paramètre
+                window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}`;
+            }
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialiser I18N en premier
+            if (typeof initialiserMultiLangues === 'function') {
+                initialiserMultiLangues();
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || 'AS Monaco';
+            const clubLogo = urlParams.get('logo') || '⚽';
+            const league = urlParams.get('league') || '';
+            const sport = urlParams.get('sport') || '';
+            
+            document.getElementById('headerClubName').textContent = clubName;
+            
+            // Détecter si c'est une image ou un emoji
+            const headerLogoElement = document.getElementById('headerLogo');
+            const isImageLogo = clubLogo && (
+                clubLogo.includes('assets/') || 
+                clubLogo.includes('.png') || 
+                clubLogo.includes('.svg') || 
+                clubLogo.includes('.jpg')
+            );
+            
+            if (isImageLogo) {
+                // Afficher l'image
+                headerLogoElement.innerHTML = `<img src="${clubLogo}" alt="${clubName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                // Afficher l'emoji ou texte
+                headerLogoElement.textContent = clubLogo;
+            }
+            
+            // 🌍 Pour les fédérations : Garde le MÊME design que les clubs
+            // Seule différence : les sponsors changent (géré automatiquement)
+            
+            // Charger langue actuelle (AFFICHE SEULEMENT LE DRAPEAU)
+            const langFlags = {
+                fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹',
+                pt: '🇵🇹', tr: '🇹🇷', ru: '🇷🇺', zh: '🇨🇳', ar: '🇸🇦', ja: '🇯🇵'
+            };
+            document.getElementById('langDisplay').textContent = langFlags[currentLanguage];
+            document.getElementById('currentLanguageDisplay').textContent = langs[currentLanguage] + ' (' + currentLanguage + ')';
+            
+            loadStories();
+            loadTransactions();
+            
+            // Simuler nouvelles transactions en temps réel toutes les 30s
+            setInterval(() => {
+                console.log('📊 Mise à jour transactions temps réel...');
+                loadTransactions();
+            }, 30000);
+        });
+    </script>
+
+    <!-- 🎬 STORIES SYSTÈME -->
+    <script src="js/storiesManager.js"></script>
+    <script>
+        // Initialiser les stories au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof storiesManager !== 'undefined') {
+                console.log('🎬 Initialisation stories...');
+                storiesManager.loadAllStories();
+                storiesManager.startAutoPlay();
+                console.log('✅ Stories initialisées avec auto-scroll');
+            } else {
+                console.warn('⚠️ storiesManager non chargé');
+            }
+        });
+    </script>
+
+</body>
+</html>
