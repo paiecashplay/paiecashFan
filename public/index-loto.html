@@ -444,6 +444,9 @@
             <button class="tab" onclick="goToLigue2()" style="flex: 0 0 auto; padding: 15px 35px; font-size: 16px; border-width: 2px;">
                 <i class="fas fa-award"></i> <span>Ligue 2 BKT</span>
             </button>
+            <button class="tab" onclick="goToNational()" style="flex: 0 0 auto; padding: 15px 35px; font-size: 16px; border-width: 2px;">
+                <i class="fas fa-medal"></i> <span>National</span>
+            </button>
         </div>
     </div>
 
@@ -664,6 +667,11 @@
         // Navigate to Ligue 2
         function goToLigue2() {
             window.location.href = '/index-loto-ligue2.html';
+        }
+        
+        // Navigate to National
+        function goToNational() {
+            window.location.href = '/index-loto-national.html';
         }
         
         // Auth functions
