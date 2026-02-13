@@ -6,6 +6,7 @@
     <title>PaieCashFan - Super App Sport Mondiale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/i18n.css">
     <style>
         * {
             margin: 0;
@@ -458,6 +459,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Rechercher un club, une federation...">
                 </div>
+                <div id="languageSelector"></div>
                 <button class="btn btn-primary" onclick="goToWallet()">
                     <i class="fas fa-wallet"></i> Wallet
                 </button>
@@ -638,6 +640,14 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadFederations();
+            
+            // Initialize language selector
+            setTimeout(() => {
+                const langSelector = document.getElementById('languageSelector');
+                if (langSelector && window.i18n) {
+                    langSelector.appendChild(i18n.createLanguageSelector());
+                }
+            }, 500);
         });
 
         // LOTO Function
@@ -645,5 +655,6 @@
             alert('LOTO PaieCashFan\n\nFonctionnalite en cours de developpement.\nTentez votre chance pour gagner des PCC et des NFT exclusifs !\n\nProchainement disponible...');
         }
     </script>
+    <script src="/static/i18n.js"></script>
 </body>
 </html>
