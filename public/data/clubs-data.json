@@ -1,0 +1,318 @@
+{
+  "federations": {
+    "CAF": {
+      "id": "CAF",
+      "name": "Confederation Africaine de Football",
+      "region": "Africa",
+      "logo": "🌍",
+      "merchandising": true,
+      "clubs": {
+        "Maroc": {
+          "name": "Maroc",
+          "flag": "🇲🇦",
+          "league": "CAF",
+          "logo": "🇲🇦",
+          "colors": {"primary": "#c1272d", "secondary": "#006233"},
+          "sponsors": [
+            {"name": "Maroc Telecom", "type": "Sponsor Principal"},
+            {"name": "OCP Group", "type": "Partenaire Officiel"},
+            {"name": "Royal Air Maroc", "type": "Partenaire Transport"},
+            {"name": "Attijariwafa Bank", "type": "Partenaire Financier"}
+          ],
+          "stories": [
+            {"id": 1, "name": "Maroc", "type": "club", "story": "🇲🇦 Lions de l'Atlas !"},
+            {"id": 2, "name": "Hassan El", "type": "fan", "story": "🔥 Dima Maghrib !"}
+          ]
+        },
+        "Algerie": {
+          "name": "Algerie",
+          "flag": "🇩🇿",
+          "league": "CAF",
+          "logo": "🇩🇿",
+          "colors": {"primary": "#007229", "secondary": "#ffffff"},
+          "sponsors": [
+            {"name": "Mobilis", "type": "Sponsor Principal"},
+            {"name": "Sonatrach", "type": "Partenaire Energie"},
+            {"name": "Air Algerie", "type": "Partenaire Transport"}
+          ],
+          "stories": [
+            {"id": 1, "name": "Algerie", "type": "club", "story": "🇩🇿 Les Fennecs !"},
+            {"id": 2, "name": "Karim Ben", "type": "fan", "story": "🔥 Tahia El Djazair !"}
+          ]
+        },
+        "Senegal": {
+          "name": "Senegal",
+          "flag": "🇸🇳",
+          "league": "CAF",
+          "logo": "🇸🇳",
+          "colors": {"primary": "#00853f", "secondary": "#fdef42"},
+          "sponsors": [
+            {"name": "Orange Senegal", "type": "Sponsor Principal"},
+            {"name": "Sonatel", "type": "Partenaire Telecom"},
+            {"name": "Ecobank", "type": "Partenaire Financier"}
+          ],
+          "stories": [
+            {"id": 1, "name": "Senegal", "type": "club", "story": "🇸🇳 Lions de la Teranga !"},
+            {"id": 2, "name": "Moussa Dia", "type": "fan", "story": "🔥 Allez les Lions !"}
+          ]
+        },
+        "Nigeria": {
+          "name": "Nigeria",
+          "flag": "🇳🇬",
+          "league": "CAF",
+          "logo": "🇳🇬",
+          "colors": {"primary": "#008751", "secondary": "#ffffff"},
+          "sponsors": [
+            {"name": "MTN Nigeria", "type": "Sponsor Principal"},
+            {"name": "Access Bank", "type": "Partenaire Financier"},
+            {"name": "Coca-Cola", "type": "Partenaire Boisson"}
+          ],
+          "stories": [
+            {"id": 1, "name": "Nigeria", "type": "club", "story": "🇳🇬 Super Eagles !"},
+            {"id": 2, "name": "Chidi Eze", "type": "fan", "story": "🔥 Naija for life !"}
+          ]
+        },
+        "Cote d'Ivoire": {
+          "name": "Cote d'Ivoire",
+          "flag": "🇨🇮",
+          "league": "CAF",
+          "logo": "🇨🇮",
+          "colors": {"primary": "#ff8200", "secondary": "#009e60"},
+          "sponsors": [
+            {"name": "Orange CI", "type": "Sponsor Principal"},
+            {"name": "Petroci", "type": "Partenaire Energie"},
+            {"name": "NSIA Bank", "type": "Partenaire Financier"}
+          ],
+          "stories": [
+            {"id": 1, "name": "Cote d'Ivoire", "type": "club", "story": "🇨🇮 Les Elephants !"},
+            {"id": 2, "name": "Ange Kouame", "type": "fan", "story": "🔥 Go Les Elephants !"}
+          ]
+        }
+      }
+    },
+    "UEFA": {
+      "id": "UEFA",
+      "name": "Union of European Football Associations",
+      "region": "Europe",
+      "logo": "⚽",
+      "merchandising": false,
+      "clubs": {
+        "France": {
+          "name": "France",
+          "flag": "🇫🇷",
+          "league": "UEFA",
+          "logo": "🇫🇷",
+          "colors": {"primary": "#0055a4", "secondary": "#ffffff"},
+          "leagues": ["Ligue 1", "Ligue 2"],
+          "topClubs": [
+            {"name": "Paris Saint-Germain", "city": "Paris", "logo": "🔴🔵"},
+            {"name": "Olympique de Marseille", "city": "Marseille", "logo": "⚪🔵"},
+            {"name": "AS Monaco", "city": "Monaco", "logo": "🔴⚪"},
+            {"name": "Olympique Lyonnais", "city": "Lyon", "logo": "🔴🔵⚪"},
+            {"name": "Lille OSC", "city": "Lille", "logo": "🔴⚪"}
+          ]
+        },
+        "Espagne": {
+          "name": "Espagne",
+          "flag": "🇪🇸",
+          "league": "UEFA",
+          "logo": "🇪🇸",
+          "colors": {"primary": "#c8102e", "secondary": "#fbc531"},
+          "leagues": ["La Liga"],
+          "topClubs": [
+            {"name": "Real Madrid", "city": "Madrid", "logo": "⚪"},
+            {"name": "FC Barcelona", "city": "Barcelona", "logo": "🔵🔴"},
+            {"name": "Atletico Madrid", "city": "Madrid", "logo": "🔴⚪"},
+            {"name": "Sevilla FC", "city": "Sevilla", "logo": "⚪🔴"}
+          ]
+        },
+        "Angleterre": {
+          "name": "Angleterre",
+          "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+          "league": "UEFA",
+          "logo": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+          "colors": {"primary": "#ffffff", "secondary": "#d91a3d"},
+          "leagues": ["Premier League"],
+          "topClubs": [
+            {"name": "Manchester United", "city": "Manchester", "logo": "🔴"},
+            {"name": "Liverpool", "city": "Liverpool", "logo": "🔴"},
+            {"name": "Chelsea", "city": "London", "logo": "🔵"},
+            {"name": "Arsenal", "city": "London", "logo": "🔴⚪"},
+            {"name": "Manchester City", "city": "Manchester", "logo": "🔵⚪"}
+          ]
+        },
+        "Allemagne": {
+          "name": "Allemagne",
+          "flag": "🇩🇪",
+          "league": "UEFA",
+          "logo": "🇩🇪",
+          "colors": {"primary": "#000000", "secondary": "#d3122a"},
+          "leagues": ["Bundesliga"],
+          "topClubs": [
+            {"name": "Bayern Munich", "city": "Munich", "logo": "🔴⚪"},
+            {"name": "Borussia Dortmund", "city": "Dortmund", "logo": "🟡⚫"},
+            {"name": "RB Leipzig", "city": "Leipzig", "logo": "🔴⚪"}
+          ]
+        },
+        "Italie": {
+          "name": "Italie",
+          "flag": "🇮🇹",
+          "league": "UEFA",
+          "logo": "🇮🇹",
+          "colors": {"primary": "#0066cc", "secondary": "#ffffff"},
+          "leagues": ["Serie A"],
+          "topClubs": [
+            {"name": "Juventus", "city": "Turin", "logo": "⚫⚪"},
+            {"name": "Inter Milan", "city": "Milan", "logo": "🔵⚫"},
+            {"name": "AC Milan", "city": "Milan", "logo": "🔴⚫"},
+            {"name": "AS Roma", "city": "Rome", "logo": "🔴🟡"}
+          ]
+        }
+      }
+    },
+    "CONMEBOL": {
+      "id": "CONMEBOL",
+      "name": "Confederacion Sudamericana de Futbol",
+      "region": "South America",
+      "logo": "⚽",
+      "merchandising": false,
+      "clubs": {
+        "Bresil": {
+          "name": "Bresil",
+          "flag": "🇧🇷",
+          "league": "CONMEBOL",
+          "logo": "🇧🇷",
+          "colors": {"primary": "#009c3b", "secondary": "#ffdf00"},
+          "topClubs": [
+            {"name": "Flamengo", "city": "Rio de Janeiro", "logo": "🔴⚫"},
+            {"name": "Palmeiras", "city": "Sao Paulo", "logo": "🟢"},
+            {"name": "Corinthians", "city": "Sao Paulo", "logo": "⚫⚪"}
+          ]
+        },
+        "Argentine": {
+          "name": "Argentine",
+          "flag": "🇦🇷",
+          "league": "CONMEBOL",
+          "logo": "🇦🇷",
+          "colors": {"primary": "#74acdf", "secondary": "#ffffff"},
+          "topClubs": [
+            {"name": "Boca Juniors", "city": "Buenos Aires", "logo": "🔵🟡"},
+            {"name": "River Plate", "city": "Buenos Aires", "logo": "⚪🔴"},
+            {"name": "Racing Club", "city": "Avellaneda", "logo": "🔵⚪"}
+          ]
+        }
+      }
+    },
+    "CONCACAF": {
+      "id": "CONCACAF",
+      "name": "Confederation of North, Central America and Caribbean",
+      "region": "North America",
+      "logo": "⚽",
+      "merchandising": false,
+      "clubs": {
+        "USA": {
+          "name": "USA",
+          "flag": "🇺🇸",
+          "league": "CONCACAF",
+          "logo": "🇺🇸",
+          "colors": {"primary": "#b22234", "secondary": "#3c3b6e"},
+          "topClubs": [
+            {"name": "LA Galaxy", "city": "Los Angeles", "logo": "🔵🟡"},
+            {"name": "Seattle Sounders", "city": "Seattle", "logo": "🟢🔵"},
+            {"name": "Atlanta United", "city": "Atlanta", "logo": "🔴⚫"}
+          ]
+        },
+        "Mexique": {
+          "name": "Mexique",
+          "flag": "🇲🇽",
+          "league": "CONCACAF",
+          "logo": "🇲🇽",
+          "colors": {"primary": "#006847", "secondary": "#ce1126"},
+          "topClubs": [
+            {"name": "Club America", "city": "Mexico City", "logo": "🟡🔵"},
+            {"name": "Chivas Guadalajara", "city": "Guadalajara", "logo": "🔴⚪🔵"},
+            {"name": "Cruz Azul", "city": "Mexico City", "logo": "🔵"}
+          ]
+        }
+      }
+    },
+    "AFC": {
+      "id": "AFC",
+      "name": "Asian Football Confederation",
+      "region": "Asia",
+      "logo": "⚽",
+      "merchandising": false,
+      "clubs": {
+        "Japon": {
+          "name": "Japon",
+          "flag": "🇯🇵",
+          "league": "AFC",
+          "logo": "🇯🇵",
+          "colors": {"primary": "#bc002d", "secondary": "#ffffff"},
+          "topClubs": [
+            {"name": "Urawa Red Diamonds", "city": "Saitama", "logo": "🔴⚫"},
+            {"name": "Kashima Antlers", "city": "Kashima", "logo": "🔴"},
+            {"name": "Yokohama F. Marinos", "city": "Yokohama", "logo": "🔵🔴⚪"}
+          ]
+        },
+        "Coree du Sud": {
+          "name": "Coree du Sud",
+          "flag": "🇰🇷",
+          "league": "AFC",
+          "logo": "🇰🇷",
+          "colors": {"primary": "#cd2e3a", "secondary": "#0047a0"},
+          "topClubs": [
+            {"name": "Jeonbuk Motors", "city": "Jeonju", "logo": "🟢"},
+            {"name": "Ulsan Hyundai", "city": "Ulsan", "logo": "🔵⚫"}
+          ]
+        }
+      }
+    },
+    "OFC": {
+      "id": "OFC",
+      "name": "Oceania Football Confederation",
+      "region": "Oceania",
+      "logo": "⚽",
+      "merchandising": false,
+      "clubs": {
+        "Australie": {
+          "name": "Australie",
+          "flag": "🇦🇺",
+          "league": "OFC",
+          "logo": "🇦🇺",
+          "colors": {"primary": "#ffc627", "secondary": "#00843d"},
+          "topClubs": [
+            {"name": "Sydney FC", "city": "Sydney", "logo": "🔵"},
+            {"name": "Melbourne Victory", "city": "Melbourne", "logo": "🔵⚪"}
+          ]
+        },
+        "Nouvelle-Zelande": {
+          "name": "Nouvelle-Zelande",
+          "flag": "🇳🇿",
+          "league": "OFC",
+          "logo": "🇳🇿",
+          "colors": {"primary": "#000000", "secondary": "#ffffff"},
+          "topClubs": [
+            {"name": "Auckland City", "city": "Auckland", "logo": "🔵⚪"}
+          ]
+        }
+      }
+    }
+  },
+  "products": {
+    "CAF": {
+      "maillots": [
+        {"name": "Maillot Domicile", "price_eur": 75, "price_fcfa": 49200},
+        {"name": "Maillot Exterieur", "price_eur": 75, "price_fcfa": 49200},
+        {"name": "Maillot Entrainement", "price_eur": 55, "price_fcfa": 36080}
+      ],
+      "accessoires": [
+        {"name": "Echarpe Officielle", "price_eur": 20, "price_fcfa": 13120},
+        {"name": "Casquette Officielle", "price_eur": 18, "price_fcfa": 11808},
+        {"name": "Sac a Dos Officiel", "price_eur": 35, "price_fcfa": 22960},
+        {"name": "Drapeau 150x90cm", "price_eur": 15, "price_fcfa": 9840},
+        {"name": "Ballon Officiel", "price_eur": 25, "price_fcfa": 16400}
+      ]
+    }
+  }
+}
