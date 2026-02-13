@@ -1,0 +1,104 @@
+{
+  "lang": "ko",
+  "langName": "한국어",
+  "common": {
+    "back": "뒤로",
+    "loading": "로딩 중",
+    "search": "검색",
+    "wallet": "지갑",
+    "close": "닫기",
+    "save": "저장",
+    "cancel": "취소",
+    "confirm": "확인",
+    "error": "오류",
+    "success": "성공"
+  },
+  "home": {
+    "welcome": "PaieCashFan에 오신 것을 환영합니다",
+    "subtitle": "글로벌 스포츠 슈퍼 앱",
+    "description": "전 세계 수백만 팬과 함께하세요. 클럽을 지원하고, 결제를 관리하며, 궁극의 축구 경험을 즐기세요.",
+    "federations": "연맹",
+    "clubs": "클럽",
+    "activeFans": "활성 팬",
+    "support": "지원",
+    "searchPlaceholder": "연맹 검색...",
+    "allFederations": "모든 연맹",
+    "loadingFederations": "연맹 로딩 중..."
+  },
+  "federation": {
+    "stats": "통계",
+    "founded": "설립",
+    "members": "회원",
+    "region": "지역",
+    "clubs": "국가 클럽",
+    "loadingClubs": "클럽 로딩 중...",
+    "noClubs": "이 연맹의 클럽을 찾을 수 없습니다",
+    "viewApp": "앱 보기"
+  },
+  "club": {
+    "balance": "잔액",
+    "bankAccount": "은행 계좌",
+    "cryptoWallet": "암호화폐 지갑",
+    "stories": "스토리",
+    "transactions": "거래",
+    "realtime": "실시간",
+    "feed": "피드",
+    "shop": "상점",
+    "tickets": "티켓",
+    "rewards": "보상",
+    "profile": "프로필",
+    "home": "홈",
+    "teams": "팀",
+    "chat": "채팅",
+    "ai": "AI",
+    "addStory": "추가",
+    "noTransactions": "최근 거래 없음"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "운을 시험하여 큰 상을 받으세요!",
+    "shortSubtitle": "운을 시험하세요!",
+    "prize1": "1000 PCC",
+    "prize2": "독점 NFT",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "기능 개발 중.\nPCC와 독점 NFT를 획득하기 위해 운을 시험하세요!\n\n곧 출시..."
+  },
+  "caf": {
+    "title": "CAF - 아프리카 축구 연맹",
+    "description": "아프리카 축구 연맹(CAF)은 아프리카의 축구 관리 기관입니다.",
+    "federations": "연맹",
+    "regions": "지역",
+    "allRegions": "모든 지역",
+    "northAfrica": "북아프리카",
+    "westAfrica": "서아프리카",
+    "centralAfrica": "중앙아프리카",
+    "eastAfrica": "동아프리카",
+    "southernAfrica": "남아프리카",
+    "president": "회장",
+    "fifaMember": "FIFA 가입 이후"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - 남미 축구 연맹",
+    "description": "CONMEBOL은 남미의 국가 축구 협회 연맹입니다.",
+    "associations": "협회",
+    "copaAmerica": "코파 아메리카"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - 모든 권리 보유",
+    "version": "버전",
+    "cryptoPayments": "허용되는 암호화폐 결제: BTC, ETH, USDC, USDT"
+  },
+  "navigation": {
+    "home": "홈",
+    "federations": "연맹",
+    "clubs": "클럽",
+    "wallet": "지갑",
+    "profile": "프로필"
+  },
+  "errors": {
+    "loadingFailed": "데이터 로드 실패",
+    "networkError": "네트워크 오류. 다시 시도하세요.",
+    "notFound": "페이지를 찾을 수 없습니다"
+  }
+}

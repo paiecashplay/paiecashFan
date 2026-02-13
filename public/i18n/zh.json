@@ -1,0 +1,104 @@
+{
+  "lang": "zh",
+  "langName": "中文",
+  "common": {
+    "back": "返回",
+    "loading": "加载中",
+    "search": "搜索",
+    "wallet": "钱包",
+    "close": "关闭",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "error": "错误",
+    "success": "成功"
+  },
+  "home": {
+    "welcome": "欢迎来到 PaieCashFan",
+    "subtitle": "全球体育超级应用",
+    "description": "加入全球数百万球迷。支持您的俱乐部，管理您的支付，体验终极足球体验。",
+    "federations": "联合会",
+    "clubs": "俱乐部",
+    "activeFans": "活跃球迷",
+    "support": "支持",
+    "searchPlaceholder": "搜索联合会...",
+    "allFederations": "所有联合会",
+    "loadingFederations": "加载联合会中..."
+  },
+  "federation": {
+    "stats": "统计",
+    "founded": "成立",
+    "members": "成员",
+    "region": "地区",
+    "clubs": "国家俱乐部",
+    "loadingClubs": "加载俱乐部中...",
+    "noClubs": "未找到该联合会的俱乐部",
+    "viewApp": "查看应用"
+  },
+  "club": {
+    "balance": "余额",
+    "bankAccount": "银行账户",
+    "cryptoWallet": "加密钱包",
+    "stories": "动态",
+    "transactions": "交易",
+    "realtime": "实时",
+    "feed": "动态",
+    "shop": "商店",
+    "tickets": "门票",
+    "rewards": "奖励",
+    "profile": "个人资料",
+    "home": "首页",
+    "teams": "球队",
+    "chat": "聊天",
+    "ai": "AI",
+    "addStory": "添加",
+    "noTransactions": "无最近交易"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "试试运气，赢取大奖！",
+    "shortSubtitle": "试试运气！",
+    "prize1": "1000 PCC",
+    "prize2": "专属 NFT",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "功能开发中。\n试试运气赢取 PCC 和专属 NFT！\n\n即将推出..."
+  },
+  "caf": {
+    "title": "CAF - 非洲足球联合会",
+    "description": "非洲足球联合会（CAF）是非洲足球的管理机构。",
+    "federations": "联合会",
+    "regions": "地区",
+    "allRegions": "所有地区",
+    "northAfrica": "北非",
+    "westAfrica": "西非",
+    "centralAfrica": "中非",
+    "eastAfrica": "东非",
+    "southernAfrica": "南非",
+    "president": "主席",
+    "fifaMember": "FIFA 成员自"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - 南美足球联合会",
+    "description": "CONMEBOL 是南美洲国家足球协会的联合会。",
+    "associations": "协会",
+    "copaAmerica": "美洲杯"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - 保留所有权利",
+    "version": "版本",
+    "cryptoPayments": "接受的加密货币支付：BTC、ETH、USDC、USDT"
+  },
+  "navigation": {
+    "home": "首页",
+    "federations": "联合会",
+    "clubs": "俱乐部",
+    "wallet": "钱包",
+    "profile": "个人资料"
+  },
+  "errors": {
+    "loadingFailed": "加载数据失败",
+    "networkError": "网络错误。请重试。",
+    "notFound": "未找到页面"
+  }
+}

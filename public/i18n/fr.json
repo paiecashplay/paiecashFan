@@ -1,0 +1,104 @@
+{
+  "lang": "fr",
+  "langName": "Français",
+  "common": {
+    "back": "Retour",
+    "loading": "Chargement",
+    "search": "Rechercher",
+    "wallet": "Wallet",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "error": "Erreur",
+    "success": "Succès"
+  },
+  "home": {
+    "welcome": "Bienvenue sur PaieCashFan",
+    "subtitle": "La Super App Mondiale du Sport",
+    "description": "Rejoignez des millions de fans à travers le monde. Soutenez votre club, gérez vos paiements et vivez l'expérience ultime du football.",
+    "federations": "Fédérations",
+    "clubs": "Clubs",
+    "activeFans": "Fans actifs",
+    "support": "Support",
+    "searchPlaceholder": "Rechercher une fédération...",
+    "allFederations": "Toutes les Fédérations",
+    "loadingFederations": "Chargement des fédérations..."
+  },
+  "federation": {
+    "stats": "Statistiques",
+    "founded": "Fondée",
+    "members": "Membres",
+    "region": "Région",
+    "clubs": "Clubs Nationaux",
+    "loadingClubs": "Chargement des clubs...",
+    "noClubs": "Aucun club trouvé pour cette fédération",
+    "viewApp": "Voir l'application"
+  },
+  "club": {
+    "balance": "Solde",
+    "bankAccount": "Compte Bancaire",
+    "cryptoWallet": "Wallet Crypto",
+    "stories": "Stories",
+    "transactions": "Transactions",
+    "realtime": "Temps réel",
+    "feed": "Fil d'actualité",
+    "shop": "Shop",
+    "tickets": "Billets",
+    "rewards": "Récompenses",
+    "profile": "Profil",
+    "home": "Accueil",
+    "teams": "Équipes",
+    "chat": "Chat",
+    "ai": "IA",
+    "addStory": "Ajouter",
+    "noTransactions": "Aucune transaction récente"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "Tentez votre chance pour gagner gros !",
+    "shortSubtitle": "Tentez votre chance !",
+    "prize1": "1000 PCC",
+    "prize2": "NFT Exclusifs",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "Fonctionnalité en cours de développement.\nTentez votre chance pour gagner des PCC et des NFT exclusifs !\n\nProchainement disponible..."
+  },
+  "caf": {
+    "title": "CAF - Confédération Africaine de Football",
+    "description": "La Confédération Africaine de Football (CAF) est l'instance dirigeante du football en Afrique.",
+    "federations": "Fédérations",
+    "regions": "Régions",
+    "allRegions": "Toutes les régions",
+    "northAfrica": "Afrique du Nord",
+    "westAfrica": "Afrique de l'Ouest",
+    "centralAfrica": "Afrique Centrale",
+    "eastAfrica": "Afrique de l'Est",
+    "southernAfrica": "Afrique Australe",
+    "president": "Président",
+    "fifaMember": "Membre FIFA depuis"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - Confédération Sudaméricaine de Football",
+    "description": "La CONMEBOL est la confédération des associations nationales de football d'Amérique du Sud.",
+    "associations": "Associations",
+    "copaAmerica": "Copa América"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - Tous droits réservés",
+    "version": "Version",
+    "cryptoPayments": "Paiements cryptos acceptés : BTC, ETH, USDC, USDT"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "federations": "Fédérations",
+    "clubs": "Clubs",
+    "wallet": "Wallet",
+    "profile": "Profil"
+  },
+  "errors": {
+    "loadingFailed": "Échec du chargement des données",
+    "networkError": "Erreur réseau. Veuillez réessayer.",
+    "notFound": "Page non trouvée"
+  }
+}

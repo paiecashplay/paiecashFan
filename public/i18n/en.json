@@ -1,0 +1,104 @@
+{
+  "lang": "en",
+  "langName": "English",
+  "common": {
+    "back": "Back",
+    "loading": "Loading",
+    "search": "Search",
+    "wallet": "Wallet",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "error": "Error",
+    "success": "Success"
+  },
+  "home": {
+    "welcome": "Welcome to PaieCashFan",
+    "subtitle": "The Global Sports Super App",
+    "description": "Join millions of fans worldwide. Support your club, manage your payments and experience the ultimate football experience.",
+    "federations": "Federations",
+    "clubs": "Clubs",
+    "activeFans": "Active Fans",
+    "support": "Support",
+    "searchPlaceholder": "Search for a federation...",
+    "allFederations": "All Federations",
+    "loadingFederations": "Loading federations..."
+  },
+  "federation": {
+    "stats": "Statistics",
+    "founded": "Founded",
+    "members": "Members",
+    "region": "Region",
+    "clubs": "National Clubs",
+    "loadingClubs": "Loading clubs...",
+    "noClubs": "No clubs found for this federation",
+    "viewApp": "View App"
+  },
+  "club": {
+    "balance": "Balance",
+    "bankAccount": "Bank Account",
+    "cryptoWallet": "Crypto Wallet",
+    "stories": "Stories",
+    "transactions": "Transactions",
+    "realtime": "Real-time",
+    "feed": "Feed",
+    "shop": "Shop",
+    "tickets": "Tickets",
+    "rewards": "Rewards",
+    "profile": "Profile",
+    "home": "Home",
+    "teams": "Teams",
+    "chat": "Chat",
+    "ai": "AI",
+    "addStory": "Add",
+    "noTransactions": "No recent transactions"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "Try your luck to win big!",
+    "shortSubtitle": "Try your luck!",
+    "prize1": "1000 PCC",
+    "prize2": "Exclusive NFTs",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "Feature under development.\nTry your luck to win PCC and exclusive NFTs!\n\nComing soon..."
+  },
+  "caf": {
+    "title": "CAF - African Football Confederation",
+    "description": "The Confederation of African Football (CAF) is the governing body of football in Africa.",
+    "federations": "Federations",
+    "regions": "Regions",
+    "allRegions": "All Regions",
+    "northAfrica": "North Africa",
+    "westAfrica": "West Africa",
+    "centralAfrica": "Central Africa",
+    "eastAfrica": "East Africa",
+    "southernAfrica": "Southern Africa",
+    "president": "President",
+    "fifaMember": "FIFA Member since"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - South American Football Confederation",
+    "description": "CONMEBOL is the confederation of national football associations in South America.",
+    "associations": "Associations",
+    "copaAmerica": "Copa América"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - All rights reserved",
+    "version": "Version",
+    "cryptoPayments": "Crypto payments accepted: BTC, ETH, USDC, USDT"
+  },
+  "navigation": {
+    "home": "Home",
+    "federations": "Federations",
+    "clubs": "Clubs",
+    "wallet": "Wallet",
+    "profile": "Profile"
+  },
+  "errors": {
+    "loadingFailed": "Failed to load data",
+    "networkError": "Network error. Please try again.",
+    "notFound": "Page not found"
+  }
+}

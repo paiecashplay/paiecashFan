@@ -1,0 +1,104 @@
+{
+  "lang": "nl",
+  "langName": "Nederlands",
+  "common": {
+    "back": "Terug",
+    "loading": "Laden",
+    "search": "Zoeken",
+    "wallet": "Portemonnee",
+    "close": "Sluiten",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "error": "Fout",
+    "success": "Succes"
+  },
+  "home": {
+    "welcome": "Welkom bij PaieCashFan",
+    "subtitle": "De Wereldwijde Sport Super App",
+    "description": "Sluit je aan bij miljoenen fans over de hele wereld. Steun je club, beheer je betalingen en beleef de ultieme voetbalervaring.",
+    "federations": "Federaties",
+    "clubs": "Clubs",
+    "activeFans": "Actieve Fans",
+    "support": "Ondersteuning",
+    "searchPlaceholder": "Zoek een federatie...",
+    "allFederations": "Alle Federaties",
+    "loadingFederations": "Federaties laden..."
+  },
+  "federation": {
+    "stats": "Statistieken",
+    "founded": "Opgericht",
+    "members": "Leden",
+    "region": "Regio",
+    "clubs": "Nationale Clubs",
+    "loadingClubs": "Clubs laden...",
+    "noClubs": "Geen clubs gevonden voor deze federatie",
+    "viewApp": "App Bekijken"
+  },
+  "club": {
+    "balance": "Saldo",
+    "bankAccount": "Bankrekening",
+    "cryptoWallet": "Crypto Portemonnee",
+    "stories": "Verhalen",
+    "transactions": "Transacties",
+    "realtime": "Realtime",
+    "feed": "Feed",
+    "shop": "Winkel",
+    "tickets": "Tickets",
+    "rewards": "Beloningen",
+    "profile": "Profiel",
+    "home": "Home",
+    "teams": "Teams",
+    "chat": "Chat",
+    "ai": "AI",
+    "addStory": "Toevoegen",
+    "noTransactions": "Geen recente transacties"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "Probeer je geluk om groot te winnen!",
+    "shortSubtitle": "Probeer je geluk!",
+    "prize1": "1000 PCC",
+    "prize2": "Exclusieve NFTs",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "Functie in ontwikkeling.\nProbeer je geluk om PCC en exclusieve NFTs te winnen!\n\nBinnenkort beschikbaar..."
+  },
+  "caf": {
+    "title": "CAF - Afrikaanse Voetbalconfederatie",
+    "description": "De Afrikaanse Voetbalconfederatie (CAF) is het bestuursorgaan van voetbal in Afrika.",
+    "federations": "Federaties",
+    "regions": "Regio's",
+    "allRegions": "Alle Regio's",
+    "northAfrica": "Noord-Afrika",
+    "westAfrica": "West-Afrika",
+    "centralAfrica": "Centraal-Afrika",
+    "eastAfrica": "Oost-Afrika",
+    "southernAfrica": "Zuidelijk Afrika",
+    "president": "President",
+    "fifaMember": "FIFA-lid sinds"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - Zuid-Amerikaanse Voetbalconfederatie",
+    "description": "CONMEBOL is de confederatie van nationale voetbalverenigingen in Zuid-Amerika.",
+    "associations": "Verenigingen",
+    "copaAmerica": "Copa América"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - Alle rechten voorbehouden",
+    "version": "Versie",
+    "cryptoPayments": "Geaccepteerde crypto-betalingen: BTC, ETH, USDC, USDT"
+  },
+  "navigation": {
+    "home": "Home",
+    "federations": "Federaties",
+    "clubs": "Clubs",
+    "wallet": "Portemonnee",
+    "profile": "Profiel"
+  },
+  "errors": {
+    "loadingFailed": "Laden van gegevens mislukt",
+    "networkError": "Netwerkfout. Probeer het opnieuw.",
+    "notFound": "Pagina niet gevonden"
+  }
+}

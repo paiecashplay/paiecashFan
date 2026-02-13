@@ -1,0 +1,105 @@
+{
+  "lang": "ar",
+  "langName": "العربية",
+  "direction": "rtl",
+  "common": {
+    "back": "رجوع",
+    "loading": "جار التحميل",
+    "search": "بحث",
+    "wallet": "المحفظة",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "error": "خطأ",
+    "success": "نجح"
+  },
+  "home": {
+    "welcome": "مرحبا بك في PaieCashFan",
+    "subtitle": "التطبيق الرياضي العالمي الخارق",
+    "description": "انضم إلى ملايين المشجعين حول العالم. ادعم ناديك، وأدر مدفوعاتك واستمتع بتجربة كرة القدم المثالية.",
+    "federations": "الاتحادات",
+    "clubs": "الأندية",
+    "activeFans": "المشجعون النشطون",
+    "support": "الدعم",
+    "searchPlaceholder": "البحث عن اتحاد...",
+    "allFederations": "جميع الاتحادات",
+    "loadingFederations": "جار تحميل الاتحادات..."
+  },
+  "federation": {
+    "stats": "الإحصائيات",
+    "founded": "تأسس",
+    "members": "الأعضاء",
+    "region": "المنطقة",
+    "clubs": "الأندية الوطنية",
+    "loadingClubs": "جار تحميل الأندية...",
+    "noClubs": "لم يتم العثور على أندية لهذا الاتحاد",
+    "viewApp": "عرض التطبيق"
+  },
+  "club": {
+    "balance": "الرصيد",
+    "bankAccount": "حساب بنكي",
+    "cryptoWallet": "محفظة التشفير",
+    "stories": "القصص",
+    "transactions": "المعاملات",
+    "realtime": "الوقت الفعلي",
+    "feed": "الأخبار",
+    "shop": "المتجر",
+    "tickets": "التذاكر",
+    "rewards": "المكافآت",
+    "profile": "الملف الشخصي",
+    "home": "الرئيسية",
+    "teams": "الفرق",
+    "chat": "الدردشة",
+    "ai": "الذكاء الاصطناعي",
+    "addStory": "إضافة",
+    "noTransactions": "لا توجد معاملات حديثة"
+  },
+  "loto": {
+    "title": "LOTO PaieCashFan",
+    "subtitle": "جرب حظك للفوز بجوائز كبيرة!",
+    "shortSubtitle": "جرب حظك!",
+    "prize1": "1000 PCC",
+    "prize2": "NFT حصرية",
+    "prize2Short": "NFT",
+    "alertTitle": "LOTO PaieCashFan",
+    "alertMessage": "الميزة قيد التطوير.\nجرب حظك للفوز بـ PCC و NFT حصرية!\n\nقريبًا..."
+  },
+  "caf": {
+    "title": "CAF - الاتحاد الأفريقي لكرة القدم",
+    "description": "الاتحاد الأفريقي لكرة القدم (CAF) هو الهيئة الإدارية لكرة القدم في أفريقيا.",
+    "federations": "الاتحادات",
+    "regions": "المناطق",
+    "allRegions": "جميع المناطق",
+    "northAfrica": "شمال أفريقيا",
+    "westAfrica": "غرب أفريقيا",
+    "centralAfrica": "وسط أفريقيا",
+    "eastAfrica": "شرق أفريقيا",
+    "southernAfrica": "جنوب أفريقيا",
+    "president": "الرئيس",
+    "fifaMember": "عضو FIFA منذ"
+  },
+  "conmebol": {
+    "title": "CONMEBOL - اتحاد أمريكا الجنوبية لكرة القدم",
+    "description": "CONMEBOL هو اتحاد الجمعيات الوطنية لكرة القدم في أمريكا الجنوبية.",
+    "associations": "الجمعيات",
+    "copaAmerica": "كوبا أمريكا"
+  },
+  "footer": {
+    "copyright": "© 2026 PaieCashFan - جميع الحقوق محفوظة",
+    "version": "الإصدار",
+    "cryptoPayments": "مدفوعات التشفير المقبولة: BTC, ETH, USDC, USDT"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "federations": "الاتحادات",
+    "clubs": "الأندية",
+    "wallet": "المحفظة",
+    "profile": "الملف الشخصي"
+  },
+  "errors": {
+    "loadingFailed": "فشل تحميل البيانات",
+    "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+    "notFound": "الصفحة غير موجودة"
+  }
+}
