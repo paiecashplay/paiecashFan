@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PaieCashFan - Ligue 2 BKT 2025/2026</title>
+    <title>PaieCashFan - National 3 2025/2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/i18n.css">
@@ -23,6 +23,9 @@
             --text-white: #ffffff;
             --text-gray: #8b93b0;
             --orange: #f97316;
+            --blue: #3b82f6;
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
         }
         
         body {
@@ -170,8 +173,8 @@
         }
         
         .tab.active {
-            background: linear-gradient(135deg, var(--orange), #ea580c);
-            border-color: var(--orange);
+            background: linear-gradient(135deg, var(--violet), #7c3aed);
+            border-color: var(--violet);
         }
         
         .tab:hover {
@@ -185,10 +188,11 @@
             padding: 0 40px;
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
         
         .league-btn {
-            padding: 12px 30px;
+            padding: 10px 24px;
             border-radius: 25px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.1);
@@ -198,19 +202,19 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 14px;
         }
         
         .league-btn:hover {
             transform: translateY(-2px);
-            border-color: var(--orange);
+            border-color: var(--violet);
         }
         
         .league-btn.active {
-            background: linear-gradient(135deg, var(--orange), #ea580c);
-            border-color: var(--orange);
-            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+            background: linear-gradient(135deg, var(--violet), #7c3aed);
+            border-color: var(--violet);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
         
         /* Content Section */
@@ -268,7 +272,7 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: linear-gradient(135deg, var(--orange), #ea580c);
+            background: linear-gradient(135deg, var(--violet), #7c3aed);
             color: white;
             width: 36px;
             height: 36px;
@@ -278,7 +282,7 @@
             justify-content: center;
             font-weight: 800;
             font-size: 14px;
-            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
         }
         
         .club-header {
@@ -292,7 +296,7 @@
             width: 60px;
             height: 60px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--orange), #ea580c);
+            background: linear-gradient(135deg, var(--violet), #7c3aed);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -329,7 +333,7 @@
         }
         
         .club-stat i {
-            color: var(--orange);
+            color: var(--violet);
         }
         
         .loading {
@@ -385,7 +389,7 @@
     
     <!-- Hero Section -->
     <section class="hero">
-        <h1>Ligue 2 BKT</h1>
+        <h1>National 3</h1>
         <p>Championnat de France de Football - Saison 2025/2026</p>
     </section>
     
@@ -403,9 +407,9 @@
             <i class="fas fa-trophy"></i>
             <span>Ligue 1</span>
         </button>
-        <button class="league-btn active">
+        <button class="league-btn" onclick="goToLigue2()">
             <i class="fas fa-award"></i>
-            <span>Ligue 2 BKT</span>
+            <span>Ligue 2</span>
         </button>
         <button class="league-btn" onclick="goToNational()">
             <i class="fas fa-medal"></i>
@@ -414,6 +418,10 @@
         <button class="league-btn" onclick="goToNational2()">
             <i class="fas fa-ribbon"></i>
             <span>National 2</span>
+        </button>
+        <button class="league-btn active">
+            <i class="fas fa-certificate"></i>
+            <span>National 3</span>
         </button>
     </div>
     
@@ -439,11 +447,11 @@
     <!-- Content Section -->
     <section class="content-section">
         <h2 class="section-title">
-            <i class="fas fa-flag" style="color: var(--orange);"></i>
-            <span>Ligue 2 BKT - Saison 2025/2026</span>
+            <i class="fas fa-flag" style="color: var(--violet);"></i>
+            <span>National 3 - Saison 2025/2026</span>
         </h2>
         <div class="section-subtitle">
-            <i class="fas fa-info-circle"></i> 20 clubs au total - Classement actuel
+            <i class="fas fa-info-circle"></i> 14 clubs au total - Classement actuel (Groupe Sud-Ouest)
         </div>
         
         <div id="clubsContainer" class="clubs-grid">
@@ -465,32 +473,26 @@
     <script>
         const API_BASE = window.location.origin;
         
-        // French Ligue 2 clubs - Saison 2025/2026
-        const ligue2Clubs = [
-            { id: 'troyes', name: 'ESTAC Troyes', city: 'Troyes', fans: '21K', icon: 'fa-flag', position: 1 },
-            { id: 'redstar', name: 'Red Star FC', city: 'Paris', fans: '20K', icon: 'fa-star', position: 2 },
-            { id: 'reims', name: 'Stade de Reims', city: 'Reims', fans: '32K', icon: 'fa-champagne-glasses', position: 3 },
-            { id: 'lemans', name: 'Le Mans FC', city: 'Le Mans', fans: '15K', icon: 'fa-car', position: 4 },
-            { id: 'dunkerque', name: 'USL Dunkerque', city: 'Dunkerque', fans: '14K', icon: 'fa-ship', position: 5 },
-            { id: 'saintetienne', name: 'AS Saint-Etienne', city: 'Saint-Etienne', fans: '76K', icon: 'fa-shield', position: 6 },
-            { id: 'pau', name: 'Pau FC', city: 'Pau', fans: '13K', icon: 'fa-mountain-city', position: 7 },
-            { id: 'annecy', name: 'FC Annecy', city: 'Annecy', fans: '12K', icon: 'fa-mountain', position: 8 },
-            { id: 'guingamp', name: 'EA Guingamp', city: 'Guingamp', fans: '17K', icon: 'fa-clover', position: 9 },
-            { id: 'rodez', name: 'Rodez AF', city: 'Rodez', fans: '12K', icon: 'fa-futbol', position: 10 },
-            { id: 'montpellier', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun', position: 11 },
-            { id: 'grenoble', name: 'Grenoble Foot 38', city: 'Grenoble', fans: '13K', icon: 'fa-mountain-sun', position: 12 },
-            { id: 'boulogne', name: 'US Boulogne', city: 'Boulogne', fans: '10K', icon: 'fa-anchor', position: 13 },
-            { id: 'nancy', name: 'AS Nancy', city: 'Nancy', fans: '19K', icon: 'fa-crown', position: 14 },
-            { id: 'clermont', name: 'Clermont Foot', city: 'Clermont-Ferrand', fans: '16K', icon: 'fa-volcano', position: 15 },
-            { id: 'amiens', name: 'Amiens SC', city: 'Amiens', fans: '18K', icon: 'fa-shield-alt', position: 16 },
-            { id: 'laval', name: 'Stade Lavallois', city: 'Laval', fans: '11K', icon: 'fa-leaf', position: 17 },
-            { id: 'bastia', name: 'SC Bastia', city: 'Bastia', fans: '15K', icon: 'fa-island-tropical', position: 18 },
-            { id: 'bordeaux', name: 'Girondins de Bordeaux', city: 'Bordeaux', fans: '62K', icon: 'fa-wine-glass', position: 19 },
-            { id: 'caen', name: 'SM Caen', city: 'Caen', fans: '28K', icon: 'fa-horse', position: 20 }
+        // French National 3 clubs - Saison 2025/2026 (Groupe Sud-Ouest)
+        const national3Clubs = [
+            { id: 'canet', name: 'Canet Roussillon FC', city: 'Canet-en-Roussillon', fans: '3K', icon: 'fa-umbrella-beach', position: 1 },
+            { id: 'tarbes', name: 'Tarbes Pyrenees Foot', city: 'Tarbes', fans: '4K', icon: 'fa-mountain', position: 2 },
+            { id: 'onet', name: 'Onet-Le-Chateau', city: 'Onet-le-Chateau', fans: '2K', icon: 'fa-castle', position: 3 },
+            { id: 'anglet', name: 'Anglet Genets FC', city: 'Anglet', fans: '3K', icon: 'fa-wave-square', position: 4 },
+            { id: 'colomiers', name: 'US Colomiers', city: 'Colomiers', fans: '4K', icon: 'fa-rocket', position: 5 },
+            { id: 'arcachon', name: 'FC Arcachon', city: 'Arcachon', fans: '3K', icon: 'fa-sailboat', position: 6 },
+            { id: 'castanet', name: 'Castanet Tolosan FC', city: 'Castanet-Tolosan', fans: '2K', icon: 'fa-tree', position: 7 },
+            { id: 'pau2', name: 'Pau FC B', city: 'Pau', fans: '2K', icon: 'fa-mountain-city', position: 8 },
+            { id: 'agde', name: 'Agde FC', city: 'Agde', fans: '3K', icon: 'fa-sun', position: 9 },
+            { id: 'toulouse2', name: 'Toulouse FC B', city: 'Toulouse', fans: '3K', icon: 'fa-heart', position: 10 },
+            { id: 'legecapferret', name: 'Lege-Cap-Ferret', city: 'Lege-Cap-Ferret', fans: '2K', icon: 'fa-anchor', position: 11 },
+            { id: 'blagnac', name: 'Blagnac FC', city: 'Blagnac', fans: '3K', icon: 'fa-plane', position: 12 },
+            { id: 'alberes', name: 'Alberes Argeles', city: 'Argeles-sur-Mer', fans: '2K', icon: 'fa-hills-cliff', position: 13 },
+            { id: 'cestas', name: 'Cestas Sag', city: 'Cestas', fans: '2K', icon: 'fa-seedling', position: 14 }
         ];
         
-        let allClubs = [...ligue2Clubs];
-        let filteredClubs = [...ligue2Clubs];
+        let allClubs = [...national3Clubs];
+        let filteredClubs = [...national3Clubs];
         
         // Render clubs
         function renderClubs(clubs) {
@@ -555,13 +557,18 @@
         function goToClub(clubId) {
             const club = allClubs.find(c => c.id === clubId);
             if (club) {
-                window.location.href = `/app-universal-simple.html?club=${club.name}&logo=⚽&sport=Football&league=Ligue+2+BKT`;
+                window.location.href = `/app-universal-simple.html?club=${encodeURIComponent(club.name)}&logo=⚽&sport=Football&league=National+3`;
             }
         }
         
         // Navigate to Ligue 1
         function goToLigue1() {
             window.location.href = '/index-loto.html';
+        }
+        
+        // Navigate to Ligue 2
+        function goToLigue2() {
+            window.location.href = '/index-loto-ligue2.html';
         }
         
         // Navigate to National
@@ -574,20 +581,8 @@
             window.location.href = '/index-loto-national2.html';
         }
         
-        // Navigate to National 3
-        function goToNational3() {
-            window.location.href = '/index-loto-national3.html';
-        }
-        
-
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-        // Navigate to National 3
-        function goToNational3() {
-            window.location.href = '/index-loto-national3.html';
-        }
-        
-
             // Initialize i18n
             if (window.i18n) {
                 await i18n.init();
@@ -622,7 +617,7 @@
                     const tabType = tab.dataset.tab;
                     
                     if (tabType === 'france') {
-                        // Stay on current page (Ligue 2)
+                        // Stay on current page (National 3)
                         tabs.forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
                     } else {
