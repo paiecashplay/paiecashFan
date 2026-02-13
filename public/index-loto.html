@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Connectez-vous à votre équipe préférée</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/i18n.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --turquoise: #1abc9c;
+            --purple: #6b5dd3;
+            --dark-navy: #1a1d2e;
+            --dark-card: #252837;
+            --green: #10b981;
+            --text-white: #ffffff;
+            --text-gray: #8b93b0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--turquoise) 0%, var(--purple) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-white);
+        }
+        
+        .lang-selector {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-white);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .btn-login {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-white);
+        }
+        
+        .btn-signup {
+            background: var(--green);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 40px 40px;
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+        }
+        
+        .search-bar {
+            background: var(--dark-navy);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 18px 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .search-bar i {
+            color: var(--text-gray);
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-white);
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .search-bar input::placeholder {
+            color: var(--text-gray);
+        }
+        
+        /* Promo Cards Section */
+        .promo-section {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        .promo-card {
+            background: var(--dark-card);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .promo-content {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .promo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .promo-text h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .promo-text p {
+            font-size: 14px;
+            color: var(--green);
+            font-weight: 600;
+        }
+        
+        .promo-btn {
+            background: var(--green);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            padding: 0 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, var(--green), #059669);
+            border-color: var(--green);
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Content Section */
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 60px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title img {
+            width: 40px;
+            height: 28px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark-navy);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-gray);
+            margin-top: 80px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .promo-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .promo-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <h1 class="logo-text">PaieCashFan</h1>
+            <select class="lang-selector">
+                <option value="fr">fr</option>
+                <option value="en">en</option>
+                <option value="es">es</option>
+            </select>
+        </div>
+        
+        <div class="auth-buttons">
+            <button class="btn btn-login">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </button>
+            <button class="btn btn-signup">
+                <i class="fas fa-user-plus"></i> Inscription
+            </button>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>PaieCashFan</h1>
+        <p>Connectez-vous à votre équipe préférée</p>
+    </section>
+    
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Rechercher une équipe, un club, une fédération...">
+        </div>
+    </div>
+    
+    <!-- Promo Cards -->
+    <section class="promo-section">
+        <div class="promo-card">
+            <div class="promo-content">
+                <div class="promo-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="promo-text">
+                    <h3>Cartes Prépayées PaieCash</h3>
+                    <p>Jusqu'à 10% cashback • Sans frais • Instantané</p>
+                </div>
+            </div>
+            <button class="promo-btn">Commander</button>
+        </div>
+        
+        <div class="promo-card">
+            <div class="promo-content">
+                <div class="promo-icon">
+                    <i class="fas fa-sim-card"></i>
+                </div>
+                <div class="promo-text">
+                    <h3>eSIM PaieCash</h3>
+                    <p>120+ pays • 4G/5G • Activation QR Instantanée</p>
+                </div>
+            </div>
+            <button class="promo-btn">Découvrir</button>
+        </div>
+    </section>
+    
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="tab active">
+            <i class="fas fa-futbol"></i> Football France
+        </button>
+        <button class="tab">
+            <i class="fas fa-trophy"></i> Autres Sports
+        </button>
+        <button class="tab">
+            <i class="fas fa-globe-europe"></i> EU Football Européen
+        </button>
+        <button class="tab">
+            <i class="fas fa-flag"></i> Fédérations
+        </button>
+        <button class="tab">
+            <i class="fas fa-star"></i> Événements
+        </button>
+    </nav>
+    
+    <!-- Content Section -->
+    <section class="content-section">
+        <h2 class="section-title">
+            <span style="font-size: 40px;">🇫🇷</span>
+            Ligue 1
+        </h2>
+        
+        <div id="federationsContainer" class="loading">
+            <p>Chargement des fédérations...</p>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 PaieCashFan - Tous droits réservés</p>
+        <p style="margin-top: 10px; font-size: 14px;">Paiements cryptos acceptés : BTC, ETH, USDC, USDT</p>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script src="/static/i18n.js"></script>
+    <script>
+        const API_BASE = window.location.origin;
+        
+        // Load federations
+        async function loadFederations() {
+            try {
+                const response = await axios.get(`${API_BASE}/data/clubs-data.json`);
+                const data = response.data;
+                
+                if (!data.federations) {
+                    document.getElementById('federationsContainer').innerHTML = 
+                        '<p>Aucune fédération trouvée</p>';
+                    return;
+                }
+                
+                const federations = Object.entries(data.federations);
+                const container = document.getElementById('federationsContainer');
+                
+                container.innerHTML = federations.map(([key, fed]) => `
+                    <div class="federation-card" onclick="goToFederation('${key}')">
+                        <div class="federation-logo">
+                            ${fed.logo ? `<img src="${fed.logo}" alt="${fed.fullName}">` : 
+                              `<i class="fas fa-flag"></i>`}
+                        </div>
+                        <div class="federation-info">
+                            <h3>${fed.fullName}</h3>
+                            <p>${fed.region}</p>
+                            <div class="federation-stats">
+                                <span><i class="fas fa-futbol"></i> ${Object.keys(fed.clubs || {}).length} clubs</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading federations:', error);
+                document.getElementById('federationsContainer').innerHTML = 
+                    '<p>Erreur lors du chargement des fédérations</p>';
+            }
+        }
+        
+        // Navigate to federation
+        function goToFederation(fedId) {
+            window.location.href = `/federation.html?fed=${fedId}`;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFederations();
+            
+            // Initialize language selector
+            setTimeout(() => {
+                const langSelector = document.getElementById('languageSelector');
+                if (langSelector && window.i18n) {
+                    langSelector.appendChild(i18n.createLanguageSelector());
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
