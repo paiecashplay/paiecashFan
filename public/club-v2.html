@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1a2332 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .club-badge {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        
+        .club-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+        
+        .language-select {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Balance Cards */
+        .balance-container {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+        }
+        
+        .balance-card {
+            flex: 1;
+            min-width: 250px;
+            background: linear-gradient(135deg, #2d1b69 0%, #1e1444 100%);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+        }
+        
+        .balance-card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .balance-footer {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Stories */
+        .stories-container {
+            padding: 15px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stories-list {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .story-item {
+            flex-shrink: 0;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .story-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .story-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Transactions Section */
+        .transactions-section {
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .see-all {
+            color: var(--primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .transactions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .transaction-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .transaction-item:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .transaction-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .transaction-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .nav-list {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-item i {
+            font-size: 22px;
+        }
+        
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        /* Feed Section */
+        .feed-section {
+            padding: 20px;
+        }
+        
+        .feed-post {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .post-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .post-info {
+            flex: 1;
+        }
+        
+        .post-author {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .post-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .post-action:hover {
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .balance-container {
+                flex-direction: column;
+            }
+            
+            .balance-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center;">
+                <div class="club-badge" id="clubBadge">CL</div>
+                <span class="club-name" id="clubName">Chili</span>
+            </div>
+            <select class="language-select">
+                <option>FR</option>
+                <option>EN</option>
+                <option>ES</option>
+            </select>
+        </div>
+    </header>
+    
+    <!-- Balance Cards -->
+    <div class="balance-container">
+        <div class="balance-card">
+            <div class="balance-card-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="balance-label">Compte Bancaire</div>
+            <div class="balance-amount">1250,50 €</div>
+            <div class="balance-footer">Compte courant principal</div>
+        </div>
+        
+        <div class="balance-card">
+            <div class="balance-card-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="balance-label">Wallet Crypto</div>
+            <div class="balance-amount">250,00 €</div>
+            <div class="balance-footer">USDC • 04234...5678</div>
+        </div>
+    </div>
+    
+    <!-- Stories -->
+    <div class="stories-container">
+        <div class="stories-list" id="storiesList">
+            <div class="story-item">
+                <div class="story-avatar">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="story-name">Ajouter</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transactions Section -->
+    <div class="transactions-section">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="live-indicator"></span>
+                Transactions en temps reel
+            </div>
+            <div class="see-all">voir tout</div>
+        </div>
+        
+        <div class="transactions-list" id="transactionsList">
+            <div class="transaction-item">
+                <div class="transaction-avatar">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-name">Marc Dubois</div>
+                    <div class="transaction-time">il y a 2 min</div>
+                </div>
+                <div class="transaction-amount">+20 €</div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="transaction-avatar" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-name">Achat Maillot</div>
+                    <div class="transaction-time">il y a 15 min</div>
+                </div>
+                <div class="transaction-amount" style="color: var(--danger);">-75 €</div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="transaction-avatar">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-name">Reward PCC</div>
+                    <div class="transaction-time">il y a 1h</div>
+                </div>
+                <div class="transaction-amount">+50 PCC</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feed Section -->
+    <div class="feed-section">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-newspaper"></i>
+                Feed
+            </div>
+        </div>
+        
+        <div class="feed-post">
+            <div class="post-header">
+                <div class="post-avatar">
+                    <i class="fas fa-futbol"></i>
+                </div>
+                <div class="post-info">
+                    <div class="post-author"><span id="feedClubName">Chili</span> <i class="fas fa-check-circle" style="color: var(--primary);"></i></div>
+                    <div class="post-time">il y a 3h</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Grande victoire aujourd'hui ! Merci à tous les supporters ! 🎉⚽
+            </div>
+            <div class="post-actions">
+                <div class="post-action">
+                    <i class="fas fa-heart"></i>
+                    <span>2.4k</span>
+                </div>
+                <div class="post-action">
+                    <i class="fas fa-comment"></i>
+                    <span>342</span>
+                </div>
+                <div class="post-action">
+                    <i class="fas fa-share"></i>
+                    <span>89</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-list">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Equipes</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>IA</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profil</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE = '/api';
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubCode = urlParams.get('club') || 'cl';
+        const clubName = urlParams.get('name') || 'Chili';
+        const fedName = urlParams.get('fed') || 'CONMEBOL';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update club name
+            document.getElementById('clubName').textContent = clubName;
+            document.getElementById('feedClubName').textContent = clubName;
+            document.getElementById('clubBadge').textContent = clubCode.toUpperCase().substring(0, 2);
+            document.title = `${clubName} - PaieCashFan`;
+            
+            // Load stories
+            loadStories();
+            
+            // Simulate real-time transactions
+            simulateRealtimeTransactions();
+        });
+        
+        async function loadStories() {
+            try {
+                const response = await axios.get(`${API_BASE}/stories?club=${clubName}`);
+                const stories = response.data.stories || [];
+                
+                const storiesList = document.getElementById('storiesList');
+                const addStoryItem = storiesList.querySelector('.story-item');
+                
+                stories.forEach(story => {
+                    const storyItem = document.createElement('div');
+                    storyItem.className = 'story-item';
+                    storyItem.innerHTML = `
+                        <div class="story-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="story-name">${story.name}</div>
+                    `;
+                    storiesList.appendChild(storyItem);
+                });
+            } catch (error) {
+                console.log('Stories not available:', error);
+            }
+        }
+        
+        function simulateRealtimeTransactions() {
+            const names = ['Sophie Martin', 'Pierre Leroy', 'Claire Dubois', 'Jean Bernard'];
+            const types = [
+                { icon: 'fa-arrow-up', name: 'names[i]', type: 'receive', color: 'success' },
+                { icon: 'fa-shopping-bag', name: 'Achat', type: 'purchase', color: 'primary' },
+                { icon: 'fa-gift', name: 'Reward', type: 'reward', color: 'warning' }
+            ];
+            
+            setInterval(() => {
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                const randomAmount = (Math.random() * 100).toFixed(2);
+                
+                const transactionsList = document.getElementById('transactionsList');
+                const newTransaction = document.createElement('div');
+                newTransaction.className = 'transaction-item';
+                newTransaction.style.animation = 'slideIn 0.3s ease';
+                newTransaction.innerHTML = `
+                    <div class="transaction-avatar" style="background: linear-gradient(135deg, var(--${randomType.color}), var(--${randomType.color}-dark));">
+                        <i class="fas ${randomType.icon}"></i>
+                    </div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${randomName}</div>
+                        <div class="transaction-time">à l'instant</div>
+                    </div>
+                    <div class="transaction-amount" style="color: var(--success);">+${randomAmount} €</div>
+                `;
+                
+                transactionsList.prepend(newTransaction);
+                
+                // Keep only last 5 transactions
+                if (transactionsList.children.length > 5) {
+                    transactionsList.removeChild(transactionsList.lastChild);
+                }
+            }, 10000); // Every 10 seconds
+        }
+    </script>
+</body>
+</html>
