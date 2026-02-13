@@ -551,7 +551,7 @@
         <div class="header-content">
             <div class="club-info">
                 <div class="club-logo" id="clubLogo">
-                    <i class="fas fa-futbol"></i>
+                    <span id="clubLogoIcon"><i class="fas fa-futbol"></i></span>
                 </div>
                 <div class="club-details">
                     <h1 id="clubName">Club</h1>
@@ -659,23 +659,56 @@
     <script>
         const API_BASE = '/api';
         const urlParams = new URLSearchParams(window.location.search);
-        const clubId = urlParams.get('club') || 'ma';
-        const clubName = urlParams.get('name') || 'Maroc';
+        const clubId = urlParams.get('club') || 'Maroc';
+        const clubName = urlParams.get('name') || clubId;
         const federation = urlParams.get('fed') || 'CAF';
         
+        let clubsData = null;
+        let currentClub = null;
+        
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadClubsData();
             initClub();
             loadStories();
             loadFeed();
             loadBalance();
         });
         
+        // Load Clubs Data from JSON
+        async function loadClubsData() {
+            try {
+                const response = await fetch('/data/clubs-data.json');
+                clubsData = await response.json();
+                
+                // Find current club
+                if (clubsData.federations[federation] && clubsData.federations[federation].clubs[clubId]) {
+                    currentClub = clubsData.federations[federation].clubs[clubId];
+                    console.log('Club data loaded:', currentClub);
+                } else {
+                    console.warn('Club not found in data, using defaults');
+                }
+            } catch (error) {
+                console.error('Error loading clubs data:', error);
+            }
+        }
+        
         // Initialize Club Info
         function initClub() {
-            document.getElementById('clubName').textContent = clubName;
+            document.getElementById('clubName').textContent = currentClub ? currentClub.name : clubName;
             document.getElementById('clubFederation').textContent = federation;
-            document.title = `PaieCashFan - ${clubName}`;
+            
+            if (currentClub && currentClub.logo) {
+                document.getElementById('clubLogoIcon').textContent = currentClub.logo;
+            }
+            
+            document.title = `PaieCashFan - ${currentClub ? currentClub.name : clubName}`;
+            
+            // Apply club colors if available
+            if (currentClub && currentClub.colors) {
+                document.documentElement.style.setProperty('--club-primary', currentClub.colors.primary);
+                document.documentElement.style.setProperty('--club-secondary', currentClub.colors.secondary);
+            }
         }
         
         // Load Balance
@@ -694,8 +727,22 @@
         // Load Stories
         async function loadStories() {
             try {
-                const response = await axios.get(`${API_BASE}/stories?club=${encodeURIComponent(clubName)}`);
-                const { stories } = response.data;
+                let stories = [];
+                
+                // Use club-specific stories if available
+                if (currentClub && currentClub.stories) {
+                    stories = currentClub.stories.map(s => ({
+                        id: s.id,
+                        name: s.name,
+                        type: s.type,
+                        avatar: null,
+                        isLive: s.type === 'club'
+                    }));
+                } else {
+                    // Fallback to API
+                    const response = await axios.get(`${API_BASE}/stories?club=${encodeURIComponent(clubName)}`);
+                    stories = response.data.stories || [];
+                }
                 
                 const container = document.getElementById('storiesList');
                 container.innerHTML = stories.map(story => `
