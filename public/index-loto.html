@@ -480,26 +480,26 @@
     <script>
         const API_BASE = window.location.origin;
         
-        // French Ligue 1 clubs
+        // French Ligue 1 clubs - Saison 2025/2026
         const ligue1Clubs = [
-            { id: 'psg', name: 'Paris Saint-Germain', city: 'Paris', fans: '125K', icon: 'fa-star' },
-            { id: 'om', name: 'Olympique de Marseille', city: 'Marseille', fans: '98K', icon: 'fa-water' },
-            { id: 'ol', name: 'Olympique Lyonnais', city: 'Lyon', fans: '87K', icon: 'fa-crown' },
-            { id: 'asse', name: 'AS Saint-Etienne', city: 'Saint-Etienne', fans: '76K', icon: 'fa-shield' },
-            { id: 'asm', name: 'AS Monaco', city: 'Monaco', fans: '71K', icon: 'fa-gem' },
-            { id: 'losc', name: 'LOSC Lille', city: 'Lille', fans: '65K', icon: 'fa-paw' },
-            { id: 'ogcn', name: 'OGC Nice', city: 'Nice', fans: '58K', icon: 'fa-dove' },
-            { id: 'rcl', name: 'RC Lens', city: 'Lens', fans: '54K', icon: 'fa-bolt' },
-            { id: 'srfc', name: 'Stade Rennais FC', city: 'Rennes', fans: '49K', icon: 'fa-fire' },
-            { id: 'fcn', name: 'FC Nantes', city: 'Nantes', fans: '45K', icon: 'fa-anchor' },
-            { id: 'girondins', name: 'FC Girondins Bordeaux', city: 'Bordeaux', fans: '42K', icon: 'fa-wine-bottle' },
-            { id: 'montpellier', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun' },
-            { id: 'strasbourg', name: 'RC Strasbourg', city: 'Strasbourg', fans: '35K', icon: 'fa-mountain' },
-            { id: 'reims', name: 'Stade de Reims', city: 'Reims', fans: '32K', icon: 'fa-champagne-glasses' },
-            { id: 'brest', name: 'Stade Brestois', city: 'Brest', fans: '28K', icon: 'fa-ship' },
-            { id: 'toulouse', name: 'Toulouse FC', city: 'Toulouse', fans: '26K', icon: 'fa-heart' },
-            { id: 'angers', name: 'Angers SCO', city: 'Angers', fans: '24K', icon: 'fa-leaf' },
-            { id: 'auxerre', name: 'AJ Auxerre', city: 'Auxerre', fans: '22K', icon: 'fa-tree' }
+            { id: 'psg', name: 'Paris SG', city: 'Paris', fans: '125K', icon: 'fa-star', position: 1 },
+            { id: 'lens', name: 'RC Lens', city: 'Lens', fans: '68K', icon: 'fa-bolt', position: 2 },
+            { id: 'lyon', name: 'Olympique Lyonnais', city: 'Lyon', fans: '87K', icon: 'fa-crown', position: 3 },
+            { id: 'marseille', name: 'Olympique de Marseille', city: 'Marseille', fans: '98K', icon: 'fa-water', position: 4 },
+            { id: 'rennes', name: 'Stade Rennais FC', city: 'Rennes', fans: '52K', icon: 'fa-fire', position: 5 },
+            { id: 'lille', name: 'LOSC Lille', city: 'Lille', fans: '65K', icon: 'fa-paw', position: 6 },
+            { id: 'strasbourg', name: 'RC Strasbourg', city: 'Strasbourg', fans: '38K', icon: 'fa-mountain', position: 7 },
+            { id: 'toulouse', name: 'Toulouse FC', city: 'Toulouse', fans: '32K', icon: 'fa-heart', position: 8 },
+            { id: 'angers', name: 'Angers SCO', city: 'Angers', fans: '28K', icon: 'fa-leaf', position: 9 },
+            { id: 'monaco', name: 'AS Monaco', city: 'Monaco', fans: '71K', icon: 'fa-gem', position: 10 },
+            { id: 'lorient', name: 'FC Lorient', city: 'Lorient', fans: '26K', icon: 'fa-fish', position: 11 },
+            { id: 'brest', name: 'Stade Brestois', city: 'Brest', fans: '29K', icon: 'fa-ship', position: 12 },
+            { id: 'lehavre', name: 'Le Havre AC', city: 'Le Havre', fans: '24K', icon: 'fa-anchor', position: 13 },
+            { id: 'nice', name: 'OGC Nice', city: 'Nice', fans: '58K', icon: 'fa-dove', position: 14 },
+            { id: 'parisfc', name: 'Paris FC', city: 'Paris', fans: '22K', icon: 'fa-building', position: 15 },
+            { id: 'auxerre', name: 'AJ Auxerre', city: 'Auxerre', fans: '25K', icon: 'fa-tree', position: 16 },
+            { id: 'nantes', name: 'FC Nantes', city: 'Nantes', fans: '45K', icon: 'fa-feather', position: 17 },
+            { id: 'metz', name: 'FC Metz', city: 'Metz', fans: '30K', icon: 'fa-dragon', position: 18 }
         ];
         
         let allClubs = [...ligue1Clubs];
