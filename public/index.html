@@ -510,9 +510,11 @@
         
         // Go to Federation
         function goToFederation(fedId) {
-            // Redirect to dedicated CAF page
+            // Redirect to dedicated pages
             if (fedId === 'CAF') {
                 window.location.href = '/caf.html';
+            } else if (fedId === 'CONMEBOL') {
+                window.location.href = '/conmebol.html';
             } else {
                 window.location.href = `/federation.html?fed=${fedId}`;
             }
