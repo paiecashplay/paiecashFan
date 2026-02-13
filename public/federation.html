@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Federation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --background: #0f0f23;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1a2332 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .fed-info {
+            flex: 1;
+        }
+        
+        .fed-name {
+            font-size: 24px;
+            font-weight: 800;
+        }
+        
+        .fed-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+        
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .club-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .club-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--success);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
+        }
+        
+        .club-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .club-flag {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .club-details h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .club-details p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--success);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="fed-info">
+                <h1 class="fed-name" id="fedName">Federation</h1>
+                <p class="fed-desc" id="fedDesc">Chargement...</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h2 class="section-title">
+            <i class="fas fa-flag"></i> Clubs Nationaux
+        </h2>
+        
+        <div id="clubsContainer" class="loading">
+            <div class="spinner"></div>
+            <p>Chargement des clubs...</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE = '/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const fedId = urlParams.get('fed') || 'caf';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFederation();
+            loadClubs();
+        });
+        
+        // Load Federation Info
+        async function loadFederation() {
+            try {
+                const response = await axios.get(`${API_BASE}/federations`);
+                const { federations } = response.data;
+                const fed = federations.find(f => f.id === fedId);
+                
+                if (fed) {
+                    document.getElementById('fedName').textContent = fed.name;
+                    document.getElementById('fedDesc').textContent = fed.fullName;
+                    document.title = `PaieCashFan - ${fed.name}`;
+                }
+            } catch (error) {
+                console.error('Error loading federation:', error);
+            }
+        }
+        
+        // Load Clubs
+        async function loadClubs() {
+            try {
+                const response = await axios.get(`${API_BASE}/federations/${fedId}/clubs`);
+                const { clubs } = response.data;
+                
+                const container = document.getElementById('clubsContainer');
+                
+                if (!clubs || clubs.length === 0) {
+                    container.className = '';
+                    container.innerHTML = '<p>Aucun club disponible</p>';
+                    return;
+                }
+                
+                container.className = 'clubs-grid';
+                container.innerHTML = clubs.map(club => `
+                    <div class="club-card" onclick="goToClub('${club.id}', '${club.name}')">
+                        <div class="club-header">
+                            <div class="club-flag">
+                                ${club.flag || '<i class="fas fa-flag"></i>'}
+                            </div>
+                            <div class="club-details">
+                                <h3>${club.name}</h3>
+                                <p>${club.region || club.type}</p>
+                            </div>
+                        </div>
+                        ${fedId === 'caf' 
+                            ? '<span class="badge badge-success"><i class="fas fa-shopping-bag"></i> Merchandising</span>' 
+                            : '<span class="badge badge-warning"><i class="fas fa-clock"></i> Bientot</span>'
+                        }
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading clubs:', error);
+                const container = document.getElementById('clubsContainer');
+                container.className = '';
+                container.innerHTML = '<p style="color: var(--danger);">Erreur lors du chargement</p>';
+            }
+        }
+        
+        // Go to Club
+        function goToClub(clubId, clubName) {
+            if (fedId === 'caf') {
+                window.location.href = `/club.html?club=${clubId}&name=${encodeURIComponent(clubName)}&fed=${fedId.toUpperCase()}`;
+            } else {
+                alert('Merchandising bientot disponible pour ' + clubName);
+            }
+        }
+        
+        // Go Back
+        function goBack() {
+            window.location.href = '/index.html';
+        }
+    </script>
+</body>
+</html>

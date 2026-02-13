@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1a2332 100%);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .club-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .club-logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .club-details h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .club-details p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .balance-badge {
+            background: linear-gradient(135deg, var(--success), #059669);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .icon-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        /* Gamification Section */
+        .gamification {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .gamification::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .game-card {
+            flex-shrink: 0;
+            width: 120px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--success);
+        }
+        
+        .game-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 28px;
+        }
+        
+        .game-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        /* Stories Section */
+        .stories-container {
+            padding: 15px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stories-list {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .story-item {
+            flex-shrink: 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .story-item:active {
+            transform: scale(0.95);
+        }
+        
+        .story-avatar-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin-bottom: 8px;
+        }
+        
+        .story-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--warning));
+            padding: 3px;
+        }
+        
+        .story-ring-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--background);
+            padding: 3px;
+        }
+        
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            overflow: hidden;
+        }
+        
+        .story-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .story-live-badge {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            border: 2px solid var(--background);
+        }
+        
+        .story-name {
+            font-size: 12px;
+            font-weight: 600;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Feed Section */
+        .feed-container {
+            padding: 0 20px 20px;
+        }
+        
+        .feed-post {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            gap: 12px;
+        }
+        
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            overflow: hidden;
+        }
+        
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .post-info {
+            flex: 1;
+        }
+        
+        .post-author {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .verified-badge {
+            color: var(--success);
+        }
+        
+        .post-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .post-content {
+            padding: 0 15px 15px;
+            line-height: 1.6;
+        }
+        
+        .post-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-btn.liked {
+            color: var(--danger);
+        }
+        
+        .post-reward {
+            background: linear-gradient(135deg, var(--success), #059669);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .reward-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+        }
+        
+        /* Modal Merchandising */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--success);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .product-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .balance-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .game-card {
+                width: 100px;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="club-info">
+                <div class="club-logo" id="clubLogo">
+                    <i class="fas fa-futbol"></i>
+                </div>
+                <div class="club-details">
+                    <h1 id="clubName">Club</h1>
+                    <p id="clubFederation">Federation</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="balance-badge">
+                    <i class="fas fa-coins"></i> <span id="pccBalance">1,247.50</span> PCC
+                </div>
+                <button class="icon-btn" onclick="openNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Gamification Section -->
+    <div class="gamification">
+        <div class="game-card" onclick="openShop()">
+            <div class="game-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="game-label">Shop</div>
+        </div>
+        
+        <div class="game-card" id="lotoCard" onclick="openLoto()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="fas fa-dice"></i>
+            </div>
+            <div class="game-label">LOTO</div>
+        </div>
+        
+        <div class="game-card" onclick="openTickets()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div class="game-label">Billets</div>
+        </div>
+        
+        <div class="game-card" onclick="openRewards()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="game-label">Recompenses</div>
+        </div>
+    </div>
+    
+    <!-- Stories Section -->
+    <div class="stories-container">
+        <div class="stories-list" id="storiesList">
+            <!-- Loaded dynamically -->
+        </div>
+    </div>
+    
+    <!-- Feed Section -->
+    <div class="feed-container" id="feedContainer">
+        <!-- Loaded dynamically -->
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="/club.html" class="nav-item active">
+            <i class="fas fa-star"></i>
+            <span>Club</span>
+        </a>
+        <a href="/wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        <a href="/shop.html" class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Shop</span>
+        </a>
+        <a href="/profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+    
+    <!-- Modal Merchandising -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Merchandising Officiel</h2>
+                <button class="close-btn" onclick="closeShop()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="product-grid" id="productGrid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE = '/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubId = urlParams.get('club') || 'ma';
+        const clubName = urlParams.get('name') || 'Maroc';
+        const federation = urlParams.get('fed') || 'CAF';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initClub();
+            loadStories();
+            loadFeed();
+            loadBalance();
+        });
+        
+        // Initialize Club Info
+        function initClub() {
+            document.getElementById('clubName').textContent = clubName;
+            document.getElementById('clubFederation').textContent = federation;
+            document.title = `PaieCashFan - ${clubName}`;
+        }
+        
+        // Load Balance
+        async function loadBalance() {
+            try {
+                const response = await axios.get(`${API_BASE}/wallet/balance`);
+                const { balance } = response.data;
+                if (balance && balance.pcc) {
+                    document.getElementById('pccBalance').textContent = balance.pcc.toLocaleString('fr-FR');
+                }
+            } catch (error) {
+                console.error('Error loading balance:', error);
+            }
+        }
+        
+        // Load Stories
+        async function loadStories() {
+            try {
+                const response = await axios.get(`${API_BASE}/stories?club=${encodeURIComponent(clubName)}`);
+                const { stories } = response.data;
+                
+                const container = document.getElementById('storiesList');
+                container.innerHTML = stories.map(story => `
+                    <div class="story-item" onclick="viewStory('${story.id}')">
+                        <div class="story-avatar-container">
+                            <div class="story-ring">
+                                <div class="story-ring-inner">
+                                    <div class="story-avatar">
+                                        ${story.avatar ? `<img src="${story.avatar}" alt="${story.name}">` : '<i class="fas fa-user"></i>'}
+                                    </div>
+                                </div>
+                            </div>
+                            ${story.isLive ? '<div class="story-live-badge">LIVE</div>' : ''}
+                        </div>
+                        <div class="story-name">${story.name}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading stories:', error);
+            }
+        }
+        
+        // Load Feed
+        async function loadFeed() {
+            try {
+                const response = await axios.get(`${API_BASE}/feed?club=${encodeURIComponent(clubName)}`);
+                const { posts } = response.data;
+                
+                const container = document.getElementById('feedContainer');
+                container.innerHTML = posts.map(post => `
+                    <div class="feed-post">
+                        <div class="post-header">
+                            <div class="post-avatar">
+                                ${post.clubAvatar ? `<img src="${post.clubAvatar}" alt="${post.club}">` : ''}
+                            </div>
+                            <div class="post-info">
+                                <div class="post-author">
+                                    ${post.club}
+                                    ${post.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                                </div>
+                                <div class="post-time">${post.timestamp}</div>
+                            </div>
+                        </div>
+                        <div class="post-content">${post.content}</div>
+                        ${post.image ? `<img src="${post.image}" alt="Post image" class="post-image">` : ''}
+                        <div class="post-actions">
+                            <button class="action-btn" onclick="likePost('${post.id}')">
+                                <i class="fas fa-heart"></i>
+                                <span>${post.likes}</span>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-comment"></i>
+                                <span>${post.comments}</span>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-share"></i>
+                                <span>${post.shares}</span>
+                            </button>
+                        </div>
+                        <div class="post-reward">
+                            <div class="reward-text">
+                                <i class="fas fa-gift"></i> Vous avez gagne +${post.pccReward} PCC !
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading feed:', error);
+            }
+        }
+        
+        // Like Post
+        async function likePost(postId) {
+            try {
+                await axios.post(`${API_BASE}/interactions/track`, {
+                    type: 'LIKE',
+                    campaignId: 'POST_' + postId,
+                    sponsorId: 'sponsor_' + clubId,
+                    postId
+                });
+                
+                alert('Like enregistre ! +0.01 PCC gagne');
+                loadBalance();
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        }
+        
+        // View Story
+        function viewStory(storyId) {
+            alert('Story vue ! +0.005 PCC gagne');
+        }
+        
+        // Open Shop Modal
+        async function openShop() {
+            const modal = document.getElementById('shopModal');
+            modal.classList.add('active');
+            
+            try {
+                const response = await axios.get(`${API_BASE}/clubs/${clubId}/merchandising`);
+                const { products } = response.data;
+                
+                const grid = document.getElementById('productGrid');
+                grid.innerHTML = products.map(product => `
+                    <div class="product-card" onclick="buyProduct('${product.id}', ${product.price.eur})">
+                        <div class="product-image">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price.eur} EUR</div>
+                        <button class="btn btn-primary">Acheter</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+        
+        // Close Shop Modal
+        function closeShop() {
+            document.getElementById('shopModal').classList.remove('active');
+        }
+        
+        // Buy Product
+        async function buyProduct(productId, price) {
+            if (confirm(`Acheter ce produit pour ${price} EUR ?`)) {
+                try {
+                    await axios.post(`${API_BASE}/merchandising/purchase`, {
+                        productId,
+                        clubId,
+                        quantity: 1,
+                        paymentMethod: 'PaieCash'
+                    });
+                    
+                    alert('Achat reussi ! +' + (price * 0.05).toFixed(2) + ' PCC cashback');
+                    closeShop();
+                    loadBalance();
+                } catch (error) {
+                    console.error('Error buying product:', error);
+                    alert('Erreur lors de l\'achat');
+                }
+            }
+        }
+        
+        // Open LOTO
+        function openLoto() {
+            alert('LOTO - Fonctionnalite en cours de developpement. Tentez votre chance pour gagner des PCC et des NFT exclusifs !');
+        }
+        
+        // Open Tickets
+        function openTickets() {
+            window.location.href = '/tickets.html?club=' + encodeURIComponent(clubName);
+        }
+        
+        // Open Rewards
+        function openRewards() {
+            alert('Recompenses - Vous avez 2845 PCC. Echangez-les contre des produits exclusifs !');
+        }
+        
+        // Open Notifications
+        function openNotifications() {
+            alert('Notifications - 3 nouvelles notifications');
+        }
+        
+        // Close modal on outside click
+        document.getElementById('shopModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'shopModal') {
+                closeShop();
+            }
+        });
+    </script>
+</body>
+</html>
