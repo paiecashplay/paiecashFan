@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PaieCashFan - Super App Sport Mondiale</title>
+    <title>PaieCashFan - 85 Clubs de Football Français</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/i18n.css">
@@ -159,234 +159,215 @@
             margin-bottom: 40px;
         }
         
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
+        /* Security Features */
+        .security-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
         }
         
-        .stat-card {
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .security-card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 36px;
-            font-weight: 900;
-            color: var(--success);
-            margin-bottom: 10px;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        /* Federations Section */
-        /* LOTO Section */
-        .loto-section {
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-
-        .loto-card {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             border-radius: 20px;
-            padding: 2.5rem 3rem;
+            padding: 30px;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-            min-width: 350px;
+            transition: all 0.3s;
         }
-
-        .loto-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+        
+        .security-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--success);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
         }
-
-        .loto-icon {
-            width: 90px;
-            height: 90px;
-            background: rgba(255, 255, 255, 0.2);
+        
+        .security-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 45px;
-            animation: rotate 3s linear infinite;
+            font-size: 36px;
+            margin: 0 auto 20px;
         }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        
+        .security-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
-
-        .loto-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        
+        .security-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
-
-        .loto-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 1.5rem;
-        }
-
-        .loto-prizes {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .loto-prize {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 0.6rem 1.2rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .loto-prize i {
-            margin-right: 0.5rem;
-        }
-
-        .federations {
+        
+        /* League Tabs */
+        .league-tabs {
             max-width: 1200px;
-            margin: 50px auto;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .league-tab {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+        
+        .league-tab:hover, .league-tab.active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+        }
+        
+        .league-tab.all.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+        }
+        
+        .league-tab.ligue1.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+        }
+        
+        .league-tab.ligue2.active {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-color: #f97316;
+        }
+        
+        .league-tab.national.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+        }
+        
+        .league-tab.national2.active {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border-color: #6366f1;
+        }
+        
+        .league-tab.national3.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-color: #8b5cf6;
+        }
+        
+        /* Clubs Section */
+        .clubs-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
             padding: 0 20px;
         }
         
         .section-title {
             font-size: 32px;
             font-weight: 800;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
             margin-bottom: 30px;
-            display: flex;
-            align-items: center;
+        }
+        
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
         
-        .section-title i {
-            color: var(--success);
-        }
-        
-        .federation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-        
-        .federation-card {
+        .club-item {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .federation-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--success);
-            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
-        }
-        
-        .federation-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--success));
-        }
-        
-        .federation-header {
+            border-radius: 15px;
+            padding: 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .federation-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 15px;
+        .club-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--success);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .club-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 20px;
+            flex-shrink: 0;
         }
         
-        .federation-info h3 {
-            font-size: 24px;
+        .club-badge.ligue1 {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .club-badge.ligue2 {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        
+        .club-badge.national {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .club-badge.national2 {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+        }
+        
+        .club-badge.national3 {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .club-info {
+            flex: 1;
+        }
+        
+        .club-name {
             font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 14px;
+            margin-bottom: 3px;
         }
         
-        .federation-info p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .federation-stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-        }
-        
-        .federation-stat {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .federation-stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--success);
-        }
-        
-        .federation-stat-label {
+        .club-city {
             font-size: 12px;
             color: var(--text-secondary);
         }
         
-        .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
+        .club-fans {
             font-size: 11px;
-            font-weight: 600;
-            margin-top: 15px;
-        }
-        
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
             color: var(--success);
-            border: 1px solid var(--success);
-        }
-        
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-            border: 1px solid var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 3px;
         }
         
         /* Footer */
@@ -399,43 +380,22 @@
             color: var(--text-secondary);
         }
         
-        /* Loading Spinner */
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: var(--text-secondary);
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--border);
-            border-top-color: var(--success);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .hero h2 {
                 font-size: 32px;
             }
             
-            .hero p {
-                font-size: 16px;
-            }
-            
             .search-bar {
                 width: 200px;
             }
             
-            .federation-grid {
+            .security-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .league-tabs {
+                flex-direction: column;
             }
         }
     </style>
@@ -457,7 +417,7 @@
             <div class="header-actions">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Rechercher un club, une federation...">
+                    <input type="text" id="searchInput" placeholder="Rechercher un club...">
                 </div>
                 <div id="languageSelector"></div>
                 <button class="btn btn-primary" onclick="goToWallet()">
@@ -469,177 +429,260 @@
     
     <!-- Hero Section -->
     <section class="hero">
-        <h2>Bienvenue sur PaieCashFan</h2>
-        <p>La Super App qui connecte les fans de sport du monde entier</p>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number">212</div>
-                <div class="stat-label">Federations</div>
+        <h2>85 Clubs de Football Français</h2>
+        <p>Paiements sécurisés par stablecoin et blockchain</p>
+    </section>
+    
+    <!-- Security Features -->
+    <section class="security-section">
+        <div class="security-grid">
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Stablecoin USDC/USDT</h3>
+                <p>Transactions instantanées sans volatilité. Garantie 1:1 avec le dollar pour une stabilité maximale.</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">500+</div>
-                <div class="stat-label">Clubs</div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-wallet"></i></div>
+                <h3>Wallet Sécurisé</h3>
+                <p>Votre portefeuille crypto protégé par chiffrement de niveau bancaire. Vous gardez le contrôle total.</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">1.2M</div>
-                <div class="stat-label">Fans Actifs</div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-certificate"></i></div>
+                <h3>NFT Exclusifs</h3>
+                <p>Collectionnez des NFT uniques de vos clubs préférés. Propriété vérifiable sur blockchain.</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Support</div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-lock"></i></div>
+                <h3>Sécurité Blockchain</h3>
+                <p>Transactions transparentes et immuables. Technologie éprouvée Ethereum et Polygon.</p>
             </div>
         </div>
     </section>
     
-    <!-- LOTO Section -->
-    <section class="loto-section">
-        <div class="loto-card" onclick="openLoto()">
-            <div class="loto-icon">
-                <i class="fas fa-dice"></i>
-            </div>
-            <div class="loto-title">LOTO PaieCashFan</div>
-            <div class="loto-subtitle">Tentez votre chance pour gagner gros !</div>
-            <div class="loto-prizes">
-                <div class="loto-prize">
-                    <i class="fas fa-coins"></i> 1000 PCC
-                </div>
-                <div class="loto-prize">
-                    <i class="fas fa-trophy"></i> NFT Exclusifs
-                </div>
-                <div class="loto-prize">
-                    <i class="fas fa-gift"></i> Recompenses
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- League Tabs -->
+    <div class="league-tabs">
+        <button class="league-tab all active" onclick="filterLeague('all', event)">
+            <i class="fas fa-futbol"></i> Toutes (85)
+        </button>
+        <button class="league-tab ligue1" onclick="filterLeague('ligue1', event)">
+            <i class="fas fa-trophy"></i> Ligue 1 (18)
+        </button>
+        <button class="league-tab ligue2" onclick="filterLeague('ligue2', event)">
+            <i class="fas fa-award"></i> Ligue 2 (20)
+        </button>
+        <button class="league-tab national" onclick="filterLeague('national', event)">
+            <i class="fas fa-medal"></i> National (17)
+        </button>
+        <button class="league-tab national2" onclick="filterLeague('national2', event)">
+            <i class="fas fa-ribbon"></i> National 2 (16)
+        </button>
+        <button class="league-tab national3" onclick="filterLeague('national3', event)">
+            <i class="fas fa-certificate"></i> National 3 (14)
+        </button>
+    </div>
     
-    <!-- Federations Section -->
-    <section class="federations">
-        <h2 class="section-title">
-            <i class="fas fa-globe"></i>
-            Federations Internationales
-        </h2>
-        
-        <div id="federationsContainer" class="loading">
-            <div class="spinner"></div>
-            <p>Chargement des federations...</p>
-        </div>
+    <!-- Clubs Grid -->
+    <section class="clubs-section">
+        <h2 class="section-title" id="sectionTitle">Tous les Clubs</h2>
+        <p class="section-subtitle" id="sectionSubtitle">85 clubs disponibles</p>
+        <div class="clubs-grid" id="clubsGrid"></div>
     </section>
     
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 PaieCashFan. Tous droits reserves.</p>
+        <p>&copy; 2026 PaieCashFan - Paiements cryptos : BTC, ETH, USDC, USDT</p>
         <p style="margin-top: 10px; font-size: 12px;">
-            Version 8.0.0 | Cree avec passion pour les fans de sport
+            Version 10.0 - Football Français
         </p>
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     <script>
-        let clubsData = null;
+        const allClubs = [
+            // Ligue 1 (18)
+            {league: 'ligue1', name: 'Paris SG', city: 'Paris', fans: '125K', icon: 'fa-star'},
+            {league: 'ligue1', name: 'Olympique Marseille', city: 'Marseille', fans: '98K', icon: 'fa-water'},
+            {league: 'ligue1', name: 'Olympique Lyonnais', city: 'Lyon', fans: '87K', icon: 'fa-crown'},
+            {league: 'ligue1', name: 'AS Monaco', city: 'Monaco', fans: '71K', icon: 'fa-gem'},
+            {league: 'ligue1', name: 'RC Lens', city: 'Lens', fans: '68K', icon: 'fa-bolt'},
+            {league: 'ligue1', name: 'LOSC Lille', city: 'Lille', fans: '65K', icon: 'fa-paw'},
+            {league: 'ligue1', name: 'OGC Nice', city: 'Nice', fans: '58K', icon: 'fa-dove'},
+            {league: 'ligue1', name: 'Stade Rennais', city: 'Rennes', fans: '52K', icon: 'fa-fire'},
+            {league: 'ligue1', name: 'Toulouse FC', city: 'Toulouse', fans: '48K', icon: 'fa-heart'},
+            {league: 'ligue1', name: 'FC Nantes', city: 'Nantes', fans: '45K', icon: 'fa-feather'},
+            {league: 'ligue1', name: 'RC Strasbourg', city: 'Strasbourg', fans: '42K', icon: 'fa-mountain'},
+            {league: 'ligue1', name: 'Stade Brestois', city: 'Brest', fans: '38K', icon: 'fa-ship'},
+            {league: 'ligue1', name: 'AJ Auxerre', city: 'Auxerre', fans: '35K', icon: 'fa-tree'},
+            {league: 'ligue1', name: 'FC Metz', city: 'Metz', fans: '32K', icon: 'fa-dragon'},
+            {league: 'ligue1', name: 'Angers SCO', city: 'Angers', fans: '28K', icon: 'fa-leaf'},
+            {league: 'ligue1', name: 'Le Havre AC', city: 'Le Havre', fans: '25K', icon: 'fa-anchor'},
+            {league: 'ligue1', name: 'Paris FC', city: 'Paris', fans: '22K', icon: 'fa-building'},
+            {league: 'ligue1', name: 'FC Lorient', city: 'Lorient', fans: '18K', icon: 'fa-fish'},
+            
+            // Ligue 2 (20)
+            {league: 'ligue2', name: 'AS Saint-Etienne', city: 'Saint-Etienne', fans: '76K', icon: 'fa-shield'},
+            {league: 'ligue2', name: 'Girondins Bordeaux', city: 'Bordeaux', fans: '62K', icon: 'fa-wine-glass'},
+            {league: 'ligue2', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun'},
+            {league: 'ligue2', name: 'Stade de Reims', city: 'Reims', fans: '32K', icon: 'fa-champagne-glasses'},
+            {league: 'ligue2', name: 'SM Caen', city: 'Caen', fans: '28K', icon: 'fa-horse'},
+            {league: 'ligue2', name: 'ESTAC Troyes', city: 'Troyes', fans: '21K', icon: 'fa-flag'},
+            {league: 'ligue2', name: 'Red Star FC', city: 'Paris', fans: '20K', icon: 'fa-star'},
+            {league: 'ligue2', name: 'AS Nancy', city: 'Nancy', fans: '19K', icon: 'fa-crown'},
+            {league: 'ligue2', name: 'Amiens SC', city: 'Amiens', fans: '18K', icon: 'fa-shield-alt'},
+            {league: 'ligue2', name: 'EA Guingamp', city: 'Guingamp', fans: '17K', icon: 'fa-clover'},
+            {league: 'ligue2', name: 'Clermont Foot', city: 'Clermont', fans: '16K', icon: 'fa-volcano'},
+            {league: 'ligue2', name: 'SC Bastia', city: 'Bastia', fans: '15K', icon: 'fa-island-tropical'},
+            {league: 'ligue2', name: 'Le Mans FC', city: 'Le Mans', fans: '15K', icon: 'fa-car'},
+            {league: 'ligue2', name: 'USL Dunkerque', city: 'Dunkerque', fans: '14K', icon: 'fa-ship'},
+            {league: 'ligue2', name: 'Pau FC', city: 'Pau', fans: '13K', icon: 'fa-mountain-city'},
+            {league: 'ligue2', name: 'Grenoble Foot 38', city: 'Grenoble', fans: '13K', icon: 'fa-mountain-sun'},
+            {league: 'ligue2', name: 'FC Annecy', city: 'Annecy', fans: '12K', icon: 'fa-mountain'},
+            {league: 'ligue2', name: 'Rodez AF', city: 'Rodez', fans: '12K', icon: 'fa-futbol'},
+            {league: 'ligue2', name: 'Stade Lavallois', city: 'Laval', fans: '11K', icon: 'fa-leaf'},
+            {league: 'ligue2', name: 'US Boulogne', city: 'Boulogne', fans: '10K', icon: 'fa-anchor'},
+            
+            // National (17)
+            {league: 'national', name: 'FC Rouen', city: 'Rouen', fans: '22K', icon: 'fa-chess-rook'},
+            {league: 'national', name: 'Dijon FCO', city: 'Dijon', fans: '20K', icon: 'fa-wine-bottle'},
+            {league: 'national', name: 'FC Sochaux', city: 'Sochaux', fans: '19K', icon: 'fa-industry'},
+            {league: 'national', name: 'Valenciennes FC', city: 'Valenciennes', fans: '17K', icon: 'fa-hammer'},
+            {league: 'national', name: 'US Orleans', city: 'Orleans', fans: '15K', icon: 'fa-landmark'},
+            {league: 'national', name: 'LB Chateauroux', city: 'Chateauroux', fans: '14K', icon: 'fa-castle'},
+            {league: 'national', name: 'US Concarneau', city: 'Concarneau', fans: '13K', icon: 'fa-fish'},
+            {league: 'national', name: 'Le Puy Foot 43', city: 'Le Puy', fans: '12K', icon: 'fa-mountain'},
+            {league: 'national', name: 'FC Versailles', city: 'Versailles', fans: '12K', icon: 'fa-chess-king'},
+            {league: 'national', name: 'FC Aubagne', city: 'Aubagne', fans: '11K', icon: 'fa-sun'},
+            {league: 'national', name: 'Fleury 91', city: 'Fleury', fans: '11K', icon: 'fa-rocket'},
+            {league: 'national', name: 'FC Villefranche', city: 'Villefranche', fans: '10K', icon: 'fa-grapes'},
+            {league: 'national', name: 'Paris 13 Atletico', city: 'Paris', fans: '10K', icon: 'fa-star'},
+            {league: 'national', name: 'Bourg-en-Bresse', city: 'Bourg', fans: '9K', icon: 'fa-church'},
+            {league: 'national', name: 'US Quevilly-Rouen', city: 'Quevilly', fans: '9K', icon: 'fa-anchor'},
+            {league: 'national', name: 'Stade Briochin', city: 'Saint-Brieuc', fans: '8K', icon: 'fa-ship'},
+            {league: 'national', name: 'SM Caen', city: 'Caen', fans: '8K', icon: 'fa-horse'},
+            
+            // National 2 (16)
+            {league: 'national2', name: 'La Roche VF', city: 'La Roche', fans: '11K', icon: 'fa-sailboat'},
+            {league: 'national2', name: 'Girondins Bordeaux B', city: 'Bordeaux', fans: '10K', icon: 'fa-wine-glass'},
+            {league: 'national2', name: 'Aviron Bayonnais', city: 'Bayonne', fans: '9K', icon: 'fa-water'},
+            {league: 'national2', name: 'Les Herbiers VF', city: 'Les Herbiers', fans: '9K', icon: 'fa-leaf'},
+            {league: 'national2', name: 'US Avranches', city: 'Avranches', fans: '8K', icon: 'fa-fort-awesome'},
+            {league: 'national2', name: 'US Saint-Malo', city: 'Saint-Malo', fans: '8K', icon: 'fa-anchor'},
+            {league: 'national2', name: 'Angouleme Charente', city: 'Angouleme', fans: '8K', icon: 'fa-tower-observation'},
+            {league: 'national2', name: 'FC Lorient B', city: 'Lorient', fans: '7K', icon: 'fa-fish'},
+            {league: 'national2', name: 'Chateaubriant Volt', city: 'Chateaubriant', fans: '7K', icon: 'fa-chess-knight'},
+            {league: 'national2', name: 'Stade Poitevin', city: 'Poitiers', fans: '7K', icon: 'fa-church'},
+            {league: 'national2', name: 'Saumur FC', city: 'Saumur', fans: '7K', icon: 'fa-horse-head'},
+            {league: 'national2', name: 'US Montlouis', city: 'Montlouis', fans: '6K', icon: 'fa-bridge'},
+            {league: 'national2', name: 'Dinan Lehon', city: 'Dinan', fans: '6K', icon: 'fa-archway'},
+            {league: 'national2', name: 'Stade Chauray', city: 'Chauray', fans: '6K', icon: 'fa-seedling'},
+            {league: 'national2', name: 'FC Locmine', city: 'Locmine', fans: '6K', icon: 'fa-tree'},
+            {league: 'national2', name: 'US Granville', city: 'Granville', fans: '5K', icon: 'fa-ship'},
+            
+            // National 3 (14)
+            {league: 'national3', name: 'Canet Roussillon', city: 'Canet', fans: '5K', icon: 'fa-umbrella-beach'},
+            {league: 'national3', name: 'Tarbes Pyrenees', city: 'Tarbes', fans: '4K', icon: 'fa-mountain'},
+            {league: 'national3', name: 'Onet-Le-Chateau', city: 'Onet', fans: '4K', icon: 'fa-castle'},
+            {league: 'national3', name: 'Anglet Genets', city: 'Anglet', fans: '4K', icon: 'fa-wave-square'},
+            {league: 'national3', name: 'US Colomiers', city: 'Colomiers', fans: '3K', icon: 'fa-rocket'},
+            {league: 'national3', name: 'FC Arcachon', city: 'Arcachon', fans: '3K', icon: 'fa-sailboat'},
+            {league: 'national3', name: 'Castanet Tolosan', city: 'Castanet', fans: '3K', icon: 'fa-tree'},
+            {league: 'national3', name: 'Pau FC B', city: 'Pau', fans: '2K', icon: 'fa-mountain-city'},
+            {league: 'national3', name: 'Agde FC', city: 'Agde', fans: '2K', icon: 'fa-sun'},
+            {league: 'national3', name: 'Toulouse FC B', city: 'Toulouse', fans: '2K', icon: 'fa-heart'},
+            {league: 'national3', name: 'Lege-Cap-Ferret', city: 'Lege', fans: '2K', icon: 'fa-anchor'},
+            {league: 'national3', name: 'Blagnac FC', city: 'Blagnac', fans: '2K', icon: 'fa-plane'},
+            {league: 'national3', name: 'Alberes Argeles', city: 'Argeles', fans: '2K', icon: 'fa-hills-cliff'},
+            {league: 'national3', name: 'Cestas Sag', city: 'Cestas', fans: '2K', icon: 'fa-seedling'}
+        ];
         
-        // Load Federations from JSON file
-        async function loadFederations() {
-            try {
-                const response = await fetch('/data/clubs-data.json');
-                clubsData = await response.json();
-                
-                const container = document.getElementById('federationsContainer');
-                const federations = clubsData.federations;
-                
-                if (!federations) {
-                    container.innerHTML = '<p>Aucune federation disponible</p>';
-                    return;
-                }
-                
-                // Convert federations object to array
-                const fedArray = Object.keys(federations).map(key => ({
-                    id: key,
-                    name: key,
-                    fullName: federations[key].name,
-                    region: federations[key].region,
-                    logo: federations[key].logo,
-                    clubsCount: Object.keys(federations[key].clubs || {}).length,
-                    merchandisingEnabled: federations[key].merchandising
-                }));
-                
-                container.className = 'federation-grid';
-                container.innerHTML = fedArray.map(fed => `
-                    <div class="federation-card" onclick="goToFederation('${fed.id}')">
-                        <div class="federation-header">
-                            <div class="federation-icon">${fed.logo}</div>
-                            <div class="federation-info">
-                                <h3>${fed.name}</h3>
-                                <p>${fed.fullName}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="federation-stats">
-                            <div class="federation-stat">
-                                <div class="federation-stat-value">${fed.clubsCount}</div>
-                                <div class="federation-stat-label">Clubs</div>
-                            </div>
-                            <div class="federation-stat">
-                                <div class="federation-stat-value">${fed.region}</div>
-                                <div class="federation-stat-label">Region</div>
-                            </div>
-                        </div>
-                        
-                        ${fed.merchandisingEnabled 
-                            ? '<span class="badge badge-success"><i class="fas fa-shopping-bag"></i> Merchandising Actif</span>' 
-                            : '<span class="badge badge-warning"><i class="fas fa-clock"></i> Bientot Disponible</span>'
-                        }
+        let currentFilter = 'all';
+        
+        function renderClubs() {
+            const grid = document.getElementById('clubsGrid');
+            const filtered = currentFilter === 'all' ? allClubs : allClubs.filter(c => c.league === currentFilter);
+            
+            grid.innerHTML = filtered.map(club => `
+                <div class="club-item" onclick="goToClub('${club.league}', '${club.name}')">
+                    <div class="club-badge ${club.league}">
+                        <i class="fas ${club.icon}"></i>
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error loading federations:', error);
-                const container = document.getElementById('federationsContainer');
-                container.className = '';
-                container.innerHTML = `
-                    <div style="text-align: center; color: var(--danger);">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <p>Erreur lors du chargement des federations</p>
-                        <button class="btn btn-primary" onclick="loadFederations()" style="margin-top: 20px;">
-                            <i class="fas fa-redo"></i> Reessayer
-                        </button>
+                    <div class="club-info">
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-city">${club.city}</div>
+                        <div class="club-fans">
+                            <i class="fas fa-users"></i> ${club.fans}
+                        </div>
                     </div>
-                `;
+                </div>
+            `).join('');
+            
+            // Update title
+            const titles = {
+                all: 'Tous les Clubs',
+                ligue1: 'Ligue 1',
+                ligue2: 'Ligue 2 BKT',
+                national: 'National',
+                national2: 'National 2',
+                national3: 'National 3'
+            };
+            document.getElementById('sectionTitle').textContent = titles[currentFilter];
+            document.getElementById('sectionSubtitle').textContent = `${filtered.length} clubs disponibles`;
+        }
+        
+        function filterLeague(league, event) {
+            currentFilter = league;
+            renderClubs();
+            
+            // Update active tab
+            document.querySelectorAll('.league-tab').forEach(tab => tab.classList.remove('active'));
+            if (event && event.target) {
+                event.target.closest('.league-tab').classList.add('active');
             }
         }
         
-        // Go to Federation
-        function goToFederation(fedId) {
-            // Redirect to dedicated pages
-            if (fedId === 'CAF') {
-                window.location.href = '/caf.html';
-            } else if (fedId === 'CONMEBOL') {
-                window.location.href = '/conmebol.html';
-            } else {
-                window.location.href = `/federation.html?fed=${fedId}`;
-            }
+        function goToClub(league, clubName) {
+            const pages = {
+                ligue1: '/index-loto.html',
+                ligue2: '/index-loto-ligue2.html',
+                national: '/index-loto-national.html',
+                national2: '/index-loto-national2.html',
+                national3: '/index-loto-national3.html'
+            };
+            window.location.href = pages[league];
         }
         
-        // Go to Wallet
         function goToWallet() {
             window.location.href = '/wallet.html';
         }
         
-        // Search
+        // Search functionality
         document.getElementById('searchInput')?.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.federation-card');
+            const filtered = allClubs.filter(club => 
+                club.name.toLowerCase().includes(query) || 
+                club.city.toLowerCase().includes(query)
+            );
             
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
-            });
+            const grid = document.getElementById('clubsGrid');
+            grid.innerHTML = filtered.map(club => `
+                <div class="club-item" onclick="goToClub('${club.league}', '${club.name}')">
+                    <div class="club-badge ${club.league}">
+                        <i class="fas ${club.icon}"></i>
+                    </div>
+                    <div class="club-info">
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-city">${club.city}</div>
+                        <div class="club-fans">
+                            <i class="fas fa-users"></i> ${club.fans}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         });
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadFederations();
+            renderClubs();
             
             // Initialize language selector
             setTimeout(() => {
@@ -649,11 +692,6 @@
                 }
             }, 500);
         });
-
-        // LOTO Function
-        function openLoto() {
-            window.location.href = '/loto.html';
-        }
     </script>
     <script src="/static/i18n.js"></script>
 </body>
