@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - 85 Clubs de Football Français</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --turquoise: #1abc9c;
+            --purple: #6b5dd3;
+            --dark-navy: #1a1d2e;
+            --dark-card: #252837;
+            --green: #10b981;
+            --orange: #f97316;
+            --blue: #3b82f6;
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --text-white: #ffffff;
+            --text-gray: #8b93b0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--turquoise) 0%, var(--purple) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+        
+        .header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 40px 40px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        /* Security Features */
+        .security-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 40px;
+        }
+        
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .security-card {
+            background: var(--dark-card);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .security-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px;
+        }
+        
+        .security-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .security-card p {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+        
+        /* League Tabs */
+        .league-tabs {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .league-tab {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .league-tab:hover, .league-tab.active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+        }
+        
+        .league-tab.ligue1.active { background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; }
+        .league-tab.ligue2.active { background: linear-gradient(135deg, #f97316, #ea580c); border-color: #f97316; }
+        .league-tab.national.active { background: linear-gradient(135deg, #3b82f6, #2563eb); border-color: #3b82f6; }
+        .league-tab.national2.active { background: linear-gradient(135deg, #6366f1, #4f46e5); border-color: #6366f1; }
+        .league-tab.national3.active { background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-color: #8b5cf6; }
+        
+        /* Clubs Section */
+        .clubs-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 40px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-gray);
+            margin-bottom: 30px;
+        }
+        
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .club-item {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .club-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .club-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .club-badge.ligue1 { background: linear-gradient(135deg, #10b981, #059669); }
+        .club-badge.ligue2 { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .club-badge.national { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .club-badge.national2 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .club-badge.national3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        
+        .club-info {
+            flex: 1;
+        }
+        
+        .club-name {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .club-city {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        
+        .footer {
+            background: var(--dark-navy);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-gray);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .security-grid { grid-template-columns: 1fr; }
+            .league-tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo-text">PaieCashFan</h1>
+    </header>
+    
+    <section class="hero">
+        <h1>85 Clubs de Football Français</h1>
+        <p>Paiements sécurisés par stablecoin et blockchain</p>
+    </section>
+    
+    <!-- Security Features -->
+    <section class="security-section">
+        <div class="security-grid">
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Stablecoin USDC/USDT</h3>
+                <p>Transactions instantanées sans volatilité. Garantie 1:1 avec le dollar pour une stabilité maximale.</p>
+            </div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-wallet"></i></div>
+                <h3>Wallet Sécurisé</h3>
+                <p>Votre portefeuille crypto protégé par chiffrement de niveau bancaire. Vous gardez le contrôle total.</p>
+            </div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-certificate"></i></div>
+                <h3>NFT Exclusifs</h3>
+                <p>Collectionnez des NFT uniques de vos clubs préférés. Propriété vérifiable sur blockchain.</p>
+            </div>
+            <div class="security-card">
+                <div class="security-icon"><i class="fas fa-lock"></i></div>
+                <h3>Sécurité Blockchain</h3>
+                <p>Transactions transparentes et immuables. Technologie éprouvée Ethereum et Polygon.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- League Tabs -->
+    <div class="league-tabs">
+        <button class="league-tab ligue1 active" onclick="filterLeague('all')">
+            <i class="fas fa-futbol"></i> Toutes (85)
+        </button>
+        <button class="league-tab ligue1" onclick="filterLeague('ligue1')">
+            <i class="fas fa-trophy"></i> Ligue 1 (18)
+        </button>
+        <button class="league-tab ligue2" onclick="filterLeague('ligue2')">
+            <i class="fas fa-award"></i> Ligue 2 (20)
+        </button>
+        <button class="league-tab national" onclick="filterLeague('national')">
+            <i class="fas fa-medal"></i> National (17)
+        </button>
+        <button class="league-tab national2" onclick="filterLeague('national2')">
+            <i class="fas fa-ribbon"></i> National 2 (16)
+        </button>
+        <button class="league-tab national3" onclick="filterLeague('national3')">
+            <i class="fas fa-certificate"></i> National 3 (14)
+        </button>
+    </div>
+    
+    <!-- Clubs Grid -->
+    <section class="clubs-section">
+        <h2 class="section-title" id="sectionTitle">Tous les Clubs</h2>
+        <p class="section-subtitle" id="sectionSubtitle">85 clubs disponibles</p>
+        <div class="clubs-grid" id="clubsGrid"></div>
+    </section>
+    
+    <footer class="footer">
+        <p>&copy; 2026 PaieCashFan - Paiements cryptos : BTC, ETH, USDC, USDT</p>
+    </footer>
+    
+    <script>
+        const allClubs = [
+            // Ligue 1 (18)
+            {league: 'ligue1', name: 'Paris SG', city: 'Paris', icon: 'fa-star'},
+            {league: 'ligue1', name: 'RC Lens', city: 'Lens', icon: 'fa-bolt'},
+            {league: 'ligue1', name: 'Olympique Lyonnais', city: 'Lyon', icon: 'fa-crown'},
+            {league: 'ligue1', name: 'Olympique Marseille', city: 'Marseille', icon: 'fa-water'},
+            {league: 'ligue1', name: 'Stade Rennais', city: 'Rennes', icon: 'fa-fire'},
+            {league: 'ligue1', name: 'LOSC Lille', city: 'Lille', icon: 'fa-paw'},
+            {league: 'ligue1', name: 'RC Strasbourg', city: 'Strasbourg', icon: 'fa-mountain'},
+            {league: 'ligue1', name: 'Toulouse FC', city: 'Toulouse', icon: 'fa-heart'},
+            {league: 'ligue1', name: 'Angers SCO', city: 'Angers', icon: 'fa-leaf'},
+            {league: 'ligue1', name: 'AS Monaco', city: 'Monaco', icon: 'fa-gem'},
+            {league: 'ligue1', name: 'FC Lorient', city: 'Lorient', icon: 'fa-fish'},
+            {league: 'ligue1', name: 'Stade Brestois', city: 'Brest', icon: 'fa-ship'},
+            {league: 'ligue1', name: 'Le Havre AC', city: 'Le Havre', icon: 'fa-anchor'},
+            {league: 'ligue1', name: 'OGC Nice', city: 'Nice', icon: 'fa-dove'},
+            {league: 'ligue1', name: 'Paris FC', city: 'Paris', icon: 'fa-building'},
+            {league: 'ligue1', name: 'AJ Auxerre', city: 'Auxerre', icon: 'fa-tree'},
+            {league: 'ligue1', name: 'FC Nantes', city: 'Nantes', icon: 'fa-feather'},
+            {league: 'ligue1', name: 'FC Metz', city: 'Metz', icon: 'fa-dragon'},
+            
+            // Ligue 2 (20)
+            {league: 'ligue2', name: 'ESTAC Troyes', city: 'Troyes', icon: 'fa-flag'},
+            {league: 'ligue2', name: 'Red Star FC', city: 'Paris', icon: 'fa-star'},
+            {league: 'ligue2', name: 'Stade de Reims', city: 'Reims', icon: 'fa-champagne-glasses'},
+            {league: 'ligue2', name: 'Le Mans FC', city: 'Le Mans', icon: 'fa-car'},
+            {league: 'ligue2', name: 'USL Dunkerque', city: 'Dunkerque', icon: 'fa-ship'},
+            {league: 'ligue2', name: 'AS Saint-Etienne', city: 'Saint-Etienne', icon: 'fa-shield'},
+            {league: 'ligue2', name: 'Pau FC', city: 'Pau', icon: 'fa-mountain-city'},
+            {league: 'ligue2', name: 'FC Annecy', city: 'Annecy', icon: 'fa-mountain'},
+            {league: 'ligue2', name: 'EA Guingamp', city: 'Guingamp', icon: 'fa-clover'},
+            {league: 'ligue2', name: 'Rodez AF', city: 'Rodez', icon: 'fa-futbol'},
+            {league: 'ligue2', name: 'Montpellier HSC', city: 'Montpellier', icon: 'fa-sun'},
+            {league: 'ligue2', name: 'Grenoble Foot 38', city: 'Grenoble', icon: 'fa-mountain-sun'},
+            {league: 'ligue2', name: 'US Boulogne', city: 'Boulogne', icon: 'fa-anchor'},
+            {league: 'ligue2', name: 'AS Nancy', city: 'Nancy', icon: 'fa-crown'},
+            {league: 'ligue2', name: 'Clermont Foot', city: 'Clermont', icon: 'fa-volcano'},
+            {league: 'ligue2', name: 'Amiens SC', city: 'Amiens', icon: 'fa-shield-alt'},
+            {league: 'ligue2', name: 'Stade Lavallois', city: 'Laval', icon: 'fa-leaf'},
+            {league: 'ligue2', name: 'SC Bastia', city: 'Bastia', icon: 'fa-island-tropical'},
+            {league: 'ligue2', name: 'Girondins Bordeaux', city: 'Bordeaux', icon: 'fa-wine-glass'},
+            {league: 'ligue2', name: 'SM Caen', city: 'Caen', icon: 'fa-horse'},
+            
+            // National (17)
+            {league: 'national', name: 'FC Rouen', city: 'Rouen', icon: 'fa-chess-rook'},
+            {league: 'national', name: 'Dijon FCO', city: 'Dijon', icon: 'fa-wine-bottle'},
+            {league: 'national', name: 'FC Sochaux', city: 'Sochaux', icon: 'fa-industry'},
+            {league: 'national', name: 'US Orleans', city: 'Orleans', icon: 'fa-landmark'},
+            {league: 'national', name: 'Le Puy Foot 43', city: 'Le Puy', icon: 'fa-mountain'},
+            {league: 'national', name: 'FC Versailles', city: 'Versailles', icon: 'fa-chess-king'},
+            {league: 'national', name: 'FC Aubagne', city: 'Aubagne', icon: 'fa-sun'},
+            {league: 'national', name: 'Fleury 91', city: 'Fleury', icon: 'fa-rocket'},
+            {league: 'national', name: 'SM Caen', city: 'Caen', icon: 'fa-horse'},
+            {league: 'national', name: 'US Concarneau', city: 'Concarneau', icon: 'fa-fish'},
+            {league: 'national', name: 'FC Villefranche', city: 'Villefranche', icon: 'fa-grapes'},
+            {league: 'national', name: 'Valenciennes FC', city: 'Valenciennes', icon: 'fa-hammer'},
+            {league: 'national', name: 'Paris 13 Atletico', city: 'Paris', icon: 'fa-star'},
+            {league: 'national', name: 'LB Chateauroux', city: 'Chateauroux', icon: 'fa-castle'},
+            {league: 'national', name: 'Bourg-en-Bresse', city: 'Bourg', icon: 'fa-church'},
+            {league: 'national', name: 'US Quevilly-Rouen', city: 'Quevilly', icon: 'fa-anchor'},
+            {league: 'national', name: 'Stade Briochin', city: 'Saint-Brieuc', icon: 'fa-ship'},
+            
+            // National 2 (16)
+            {league: 'national2', name: 'La Roche VF', city: 'La Roche', icon: 'fa-sailboat'},
+            {league: 'national2', name: 'Girondins Bordeaux', city: 'Bordeaux', icon: 'fa-wine-glass'},
+            {league: 'national2', name: 'Aviron Bayonnais', city: 'Bayonne', icon: 'fa-water'},
+            {league: 'national2', name: 'Les Herbiers VF', city: 'Les Herbiers', icon: 'fa-leaf'},
+            {league: 'national2', name: 'US Avranches', city: 'Avranches', icon: 'fa-fort-awesome'},
+            {league: 'national2', name: 'US Saint-Malo', city: 'Saint-Malo', icon: 'fa-anchor'},
+            {league: 'national2', name: 'Angouleme Charente', city: 'Angouleme', icon: 'fa-tower-observation'},
+            {league: 'national2', name: 'FC Lorient B', city: 'Lorient', icon: 'fa-fish'},
+            {league: 'national2', name: 'Chateaubriant Volt', city: 'Chateaubriant', icon: 'fa-chess-knight'},
+            {league: 'national2', name: 'Stade Poitevin', city: 'Poitiers', icon: 'fa-church'},
+            {league: 'national2', name: 'Saumur FC', city: 'Saumur', icon: 'fa-horse-head'},
+            {league: 'national2', name: 'US Montlouis', city: 'Montlouis', icon: 'fa-bridge'},
+            {league: 'national2', name: 'Dinan Lehon', city: 'Dinan', icon: 'fa-archway'},
+            {league: 'national2', name: 'Stade Chauray', city: 'Chauray', icon: 'fa-seedling'},
+            {league: 'national2', name: 'FC Locmine', city: 'Locmine', icon: 'fa-tree'},
+            {league: 'national2', name: 'US Granville', city: 'Granville', icon: 'fa-ship'},
+            
+            // National 3 (14)
+            {league: 'national3', name: 'Canet Roussillon', city: 'Canet', icon: 'fa-umbrella-beach'},
+            {league: 'national3', name: 'Tarbes Pyrenees', city: 'Tarbes', icon: 'fa-mountain'},
+            {league: 'national3', name: 'Onet-Le-Chateau', city: 'Onet', icon: 'fa-castle'},
+            {league: 'national3', name: 'Anglet Genets', city: 'Anglet', icon: 'fa-wave-square'},
+            {league: 'national3', name: 'US Colomiers', city: 'Colomiers', icon: 'fa-rocket'},
+            {league: 'national3', name: 'FC Arcachon', city: 'Arcachon', icon: 'fa-sailboat'},
+            {league: 'national3', name: 'Castanet Tolosan', city: 'Castanet', icon: 'fa-tree'},
+            {league: 'national3', name: 'Pau FC B', city: 'Pau', icon: 'fa-mountain-city'},
+            {league: 'national3', name: 'Agde FC', city: 'Agde', icon: 'fa-sun'},
+            {league: 'national3', name: 'Toulouse FC B', city: 'Toulouse', icon: 'fa-heart'},
+            {league: 'national3', name: 'Lege-Cap-Ferret', city: 'Lege', icon: 'fa-anchor'},
+            {league: 'national3', name: 'Blagnac FC', city: 'Blagnac', icon: 'fa-plane'},
+            {league: 'national3', name: 'Alberes Argeles', city: 'Argeles', icon: 'fa-hills-cliff'},
+            {league: 'national3', name: 'Cestas Sag', city: 'Cestas', icon: 'fa-seedling'}
+        ];
+        
+        let currentFilter = 'all';
+        
+        function renderClubs() {
+            const grid = document.getElementById('clubsGrid');
+            const filtered = currentFilter === 'all' ? allClubs : allClubs.filter(c => c.league === currentFilter);
+            
+            grid.innerHTML = filtered.map(club => `
+                <div class="club-item" onclick="goToClub('${club.league}', '${club.name}')">
+                    <div class="club-badge ${club.league}">
+                        <i class="fas ${club.icon}"></i>
+                    </div>
+                    <div class="club-info">
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-city">${club.city}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update title
+            const titles = {
+                all: 'Tous les Clubs (85)',
+                ligue1: 'Ligue 1 (18 clubs)',
+                ligue2: 'Ligue 2 BKT (20 clubs)',
+                national: 'National (17 clubs)',
+                national2: 'National 2 (16 clubs)',
+                national3: 'National 3 (14 clubs)'
+            };
+            document.getElementById('sectionTitle').textContent = titles[currentFilter];
+            document.getElementById('sectionSubtitle').textContent = `${filtered.length} clubs disponibles`;
+        }
+        
+        function filterLeague(league) {
+            currentFilter = league;
+            renderClubs();
+            
+            // Update active tab
+            document.querySelectorAll('.league-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.league-tab').classList.add('active');
+        }
+        
+        function goToClub(league, clubName) {
+            const pages = {
+                ligue1: '/index-loto.html',
+                ligue2: '/index-loto-ligue2.html',
+                national: '/index-loto-national.html',
+                national2: '/index-loto-national2.html',
+                national3: '/index-loto-national3.html'
+            };
+            window.location.href = pages[league];
+        }
+        
+        // Initialize
+        renderClubs();
+    </script>
+</body>
+</html>
