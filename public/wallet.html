@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - PaieCashFan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --turquoise: #1abc9c;
+            --purple: #6b5dd3;
+            --dark-navy: #1a1d2e;
+            --dark-card: #252837;
+            --green: #10b981;
+            --text-white: #ffffff;
+            --text-gray: #8b93b0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--turquoise) 0%, var(--purple) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .wallet-card {
+            background: var(--dark-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .balance-section {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--green);
+            margin-bottom: 5px;
+        }
+        
+        .balance-currency {
+            font-size: 16px;
+            color: var(--text-gray);
+        }
+        
+        .wallet-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
+        }
+        
+        .action-btn i {
+            font-size: 20px;
+        }
+        
+        .crypto-section {
+            margin-top: 30px;
+        }
+        
+        .crypto-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .crypto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .crypto-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .crypto-name {
+            font-weight: 600;
+        }
+        
+        .crypto-symbol {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+        
+        .crypto-balance {
+            text-align: right;
+        }
+        
+        .crypto-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .crypto-value {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        
+        <div class="header">
+            <h1><i class="fas fa-wallet"></i> Mon Wallet</h1>
+            <p>Gerez vos cryptomonnaies et paiements</p>
+        </div>
+        
+        <div class="wallet-card">
+            <div class="balance-section">
+                <div class="balance-label">Solde Total</div>
+                <div class="balance-amount">250.00</div>
+                <div class="balance-currency">EUR</div>
+            </div>
+            
+            <div class="wallet-actions">
+                <button class="action-btn" onclick="alert('Depot en cours de developpement')">
+                    <i class="fas fa-arrow-down"></i>
+                    Deposer
+                </button>
+                <button class="action-btn" onclick="alert('Retrait en cours de developpement')">
+                    <i class="fas fa-arrow-up"></i>
+                    Retirer
+                </button>
+                <button class="action-btn" onclick="alert('Envoi en cours de developpement')">
+                    <i class="fas fa-paper-plane"></i>
+                    Envoyer
+                </button>
+                <button class="action-btn" onclick="alert('Reception en cours de developpement')">
+                    <i class="fas fa-qrcode"></i>
+                    Recevoir
+                </button>
+            </div>
+        </div>
+        
+        <div class="wallet-card">
+            <div class="crypto-section">
+                <div class="crypto-title">Mes Cryptomonnaies</div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <i class="fab fa-bitcoin"></i>
+                        </div>
+                        <div>
+                            <div class="crypto-name">Bitcoin</div>
+                            <div class="crypto-symbol">BTC</div>
+                        </div>
+                    </div>
+                    <div class="crypto-balance">
+                        <div class="crypto-amount">0.00325 BTC</div>
+                        <div class="crypto-value">~125.00 EUR</div>
+                    </div>
+                </div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <i class="fab fa-ethereum"></i>
+                        </div>
+                        <div>
+                            <div class="crypto-name">Ethereum</div>
+                            <div class="crypto-symbol">ETH</div>
+                        </div>
+                    </div>
+                    <div class="crypto-balance">
+                        <div class="crypto-amount">0.085 ETH</div>
+                        <div class="crypto-value">~100.00 EUR</div>
+                    </div>
+                </div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <div class="crypto-name">USD Coin</div>
+                            <div class="crypto-symbol">USDC</div>
+                        </div>
+                    </div>
+                    <div class="crypto-balance">
+                        <div class="crypto-amount">25.00 USDC</div>
+                        <div class="crypto-value">~25.00 EUR</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

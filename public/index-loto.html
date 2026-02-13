@@ -383,10 +383,10 @@
         </div>
         
         <div class="auth-buttons">
-            <button class="btn btn-login">
+            <button class="btn btn-login" onclick="goToLogin()">
                 <i class="fas fa-sign-in-alt"></i> <span data-i18n="auth.login">Se connecter</span>
             </button>
-            <button class="btn btn-signup">
+            <button class="btn btn-signup" onclick="goToSignup()">
                 <i class="fas fa-user-plus"></i> <span data-i18n="auth.signup">Inscription</span>
             </button>
         </div>
@@ -418,7 +418,7 @@
                     <p data-i18n="promo.prepaid_desc">Jusqu'a 10% cashback - Sans frais - Instantane</p>
                 </div>
             </div>
-            <button class="promo-btn" data-i18n="promo.order_cta">Commander</button>
+            <button class="promo-btn" data-i18n="promo.order_cta" onclick="orderCard()">Commander</button>
         </div>
         
         <div class="promo-card">
@@ -431,7 +431,7 @@
                     <p data-i18n="promo.esim_desc">120+ pays - 4G/5G - Activation QR Instantanee</p>
                 </div>
             </div>
-            <button class="promo-btn" data-i18n="promo.discover_cta">Decouvrir</button>
+            <button class="promo-btn" data-i18n="promo.discover_cta" onclick="discoverESIM()">Decouvrir</button>
         </div>
     </section>
     
@@ -601,18 +601,62 @@
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
                     const tabType = tab.dataset.tab;
+                    
                     if (tabType === 'france') {
+                        // Stay on current page, just refresh clubs
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
                         allClubs = [...ligue1Clubs];
                         filteredClubs = [...ligue1Clubs];
                         renderClubs(filteredClubs);
+                    } else {
+                        // Navigate to other sections
+                        navigateToTab(tabType);
                     }
                 });
             });
         });
+    
+        function openLoto() {
+            window.location.href = '/loto.html';
+        }
+        
+        // Wallet function
+        function goToWallet() {
+            window.location.href = '/wallet.html';
+        }
+        
+        // Auth functions
+        function goToLogin() {
+            alert('Fonctionnalite Login en cours de developpement');
+        }
+        
+        function goToSignup() {
+            alert('Fonctionnalite Inscription en cours de developpement');
+        }
+        
+        // Promo functions
+        function orderCard() {
+            alert('Commande de carte en cours de developpement');
+        }
+        
+        function discoverESIM() {
+            alert('Decouverte eSIM en cours de developpement');
+        }
+        
+        // Navigation tabs functions
+        function navigateToTab(tabType) {
+            if (tabType === 'sports') {
+                alert('Autres Sports - En cours de developpement');
+            } else if (tabType === 'europe') {
+                alert('Football Europeen - En cours de developpement');
+            } else if (tabType === 'federations') {
+                window.location.href = '/index.html';
+            } else if (tabType === 'events') {
+                alert('Evenements - En cours de developpement');
+            }
+        }
     </script>
 </body>
 </html>
