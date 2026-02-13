@@ -9,7 +9,192 @@ import type {
 const app = new Hono()
 
 // Enable CORS
-app.use('/*', cors())
+app.use('/api/*', cors())
+
+// ==========================================
+// FEDERATIONS API (NEW - NO EMOJIS)
+// ==========================================
+
+app.get('/api/federations', (c) => {
+  const federations = [
+    {
+      id: 'caf',
+      name: 'CAF',
+      fullName: 'Confederation Africaine de Football',
+      flag: 'AF',
+      region: 'Africa',
+      clubsCount: 54,
+      merchandisingEnabled: true
+    },
+    {
+      id: 'uefa',
+      name: 'UEFA',
+      fullName: 'Union of European Football Associations',
+      flag: 'EU',
+      region: 'Europe',
+      clubsCount: 55,
+      merchandisingEnabled: false
+    },
+    {
+      id: 'conmebol',
+      name: 'CONMEBOL',
+      fullName: 'Confederacion Sudamericana de Futbol',
+      flag: 'SA',
+      region: 'South America',
+      clubsCount: 10,
+      merchandisingEnabled: false
+    },
+    {
+      id: 'concacaf',
+      name: 'CONCACAF',
+      fullName: 'Confederation of North, Central America and Caribbean',
+      flag: 'NA',
+      region: 'North America',
+      clubsCount: 35,
+      merchandisingEnabled: false
+    },
+    {
+      id: 'afc',
+      name: 'AFC',
+      fullName: 'Asian Football Confederation',
+      flag: 'AS',
+      region: 'Asia',
+      clubsCount: 47,
+      merchandisingEnabled: false
+    },
+    {
+      id: 'ofc',
+      name: 'OFC',
+      fullName: 'Oceania Football Confederation',
+      flag: 'OC',
+      region: 'Oceania',
+      clubsCount: 11,
+      merchandisingEnabled: false
+    }
+  ]
+  
+  return c.json({ success: true, federations })
+})
+
+app.get('/api/federations/:fedId/clubs', (c) => {
+  const fedId = c.req.param('fedId')
+  
+  const clubsData: Record<string, any[]> = {
+    caf: [
+      { id: 'ma', name: 'Maroc', flag: 'MA', type: 'national', region: 'North Africa' },
+      { id: 'dz', name: 'Algerie', flag: 'DZ', type: 'national', region: 'North Africa' },
+      { id: 'eg', name: 'Egypte', flag: 'EG', type: 'national', region: 'North Africa' },
+      { id: 'tn', name: 'Tunisie', flag: 'TN', type: 'national', region: 'North Africa' },
+      { id: 'sn', name: 'Senegal', flag: 'SN', type: 'national', region: 'West Africa' },
+      { id: 'ci', name: 'Cote d\'Ivoire', flag: 'CI', type: 'national', region: 'West Africa' },
+      { id: 'ng', name: 'Nigeria', flag: 'NG', type: 'national', region: 'West Africa' },
+      { id: 'gh', name: 'Ghana', flag: 'GH', type: 'national', region: 'West Africa' },
+      { id: 'cm', name: 'Cameroun', flag: 'CM', type: 'national', region: 'Central Africa' },
+      { id: 'za', name: 'Afrique du Sud', flag: 'ZA', type: 'national', region: 'Southern Africa' }
+    ],
+    uefa: [
+      { id: 'fr', name: 'France', flag: 'FR', type: 'national', region: 'Western Europe' },
+      { id: 'es', name: 'Espagne', flag: 'ES', type: 'national', region: 'Southern Europe' },
+      { id: 'de', name: 'Allemagne', flag: 'DE', type: 'national', region: 'Western Europe' },
+      { id: 'it', name: 'Italie', flag: 'IT', type: 'national', region: 'Southern Europe' },
+      { id: 'gb-eng', name: 'Angleterre', flag: 'GB', type: 'national', region: 'Northern Europe' },
+      { id: 'pt', name: 'Portugal', flag: 'PT', type: 'national', region: 'Southern Europe' }
+    ],
+    conmebol: [
+      { id: 'br', name: 'Bresil', flag: 'BR', type: 'national', region: 'South America' },
+      { id: 'ar', name: 'Argentine', flag: 'AR', type: 'national', region: 'South America' },
+      { id: 'uy', name: 'Uruguay', flag: 'UY', type: 'national', region: 'South America' }
+    ]
+  }
+  
+  const clubs = clubsData[fedId] || []
+  
+  return c.json({ success: true, federation: fedId, clubs })
+})
+
+// ==========================================
+// CLUBS & MERCHANDISING (NO EMOJIS)
+// ==========================================
+
+app.get('/api/clubs/:clubId', (c) => {
+  const clubId = c.req.param('clubId')
+  
+  const club = {
+    id: clubId,
+    name: 'Maroc',
+    flag: 'MA',
+    federation: 'CAF',
+    type: 'national',
+    colors: {
+      primary: '#FF0000',
+      secondary: '#007A33'
+    },
+    sponsors: [
+      { name: 'ONMT', type: 'Principal', logo: 'ONMT' },
+      { name: 'Maroc Telecom', type: 'Partenaire Officiel', logo: 'IAM' }
+    ],
+    stats: {
+      fans: 15000000,
+      products: 25,
+      revenue: 5000000
+    }
+  }
+  
+  return c.json({ success: true, club })
+})
+
+app.get('/api/clubs/:clubId/merchandising', (c) => {
+  const clubId = c.req.param('clubId')
+  
+  const products = [
+    {
+      id: 'jersey-home',
+      name: 'Maillot Domicile 2026',
+      category: 'jersey',
+      price: { eur: 79.99, fcfa: 52479 },
+      stock: 150,
+      image: '/static/images/jersey-home.jpg',
+      hot: true
+    },
+    {
+      id: 'scarf',
+      name: 'Echarpe Officielle',
+      category: 'accessories',
+      price: { eur: 19.99, fcfa: 13113 },
+      stock: 300,
+      image: '/static/images/scarf.jpg'
+    },
+    {
+      id: 'cap',
+      name: 'Casquette Officielle',
+      category: 'accessories',
+      price: { eur: 17.99, fcfa: 11801 },
+      stock: 200,
+      image: '/static/images/cap.jpg'
+    }
+  ]
+  
+  return c.json({ success: true, clubId, products })
+})
+
+app.post('/api/merchandising/purchase', async (c) => {
+  const body = await c.req.json()
+  const { productId, clubId, quantity, paymentMethod } = body
+  
+  const order = {
+    success: true,
+    orderId: `ORD-${Date.now()}`,
+    productId,
+    clubId,
+    quantity,
+    total: { eur: 79.99 * quantity, fcfa: 52479 * quantity },
+    paymentMethod,
+    status: 'pending',
+    timestamp: new Date().toISOString()
+  }
+  
+  return c.json(order)
+})
 
 // ==========================================
 // AUTH ENDPOINTS (2)
@@ -56,10 +241,10 @@ app.get('/api/wallet/balance', (c) => {
     pcc: 1247.50,
     eur: 1247.50,
     stablecoins: {
-      OMC: 50.00,  // Olympique de Marseille Coin
-      PSC: 75.00,  // Paris Saint-Germain Coin
-      LOSC: 25.00, // Lille OSC Coin
-      ASC: 30.00   // AS Monaco Coin
+      OMC: 50.00,
+      PSC: 75.00,
+      LOSC: 25.00,
+      ASC: 30.00
     }
   }
   
@@ -93,7 +278,7 @@ app.get('/api/wallet/transactions', (c) => {
       amount: 20.00,
       currency: 'EUR',
       timestamp: new Date(Date.now() - 86400000).toISOString(),
-      description: 'Envoi à @JeanMartin'
+      description: 'Envoi a @JeanMartin'
     }
   ]
   
@@ -110,7 +295,7 @@ app.post('/api/wallet/send', async (c) => {
     amount,
     currency,
     timestamp: new Date().toISOString(),
-    description: `Envoi à ${recipient}`
+    description: `Envoi a ${recipient}`
   }
   
   return c.json({ success: true, transaction })
@@ -126,14 +311,14 @@ app.post('/api/wallet/deposit', async (c) => {
     amount,
     currency,
     timestamp: new Date().toISOString(),
-    description: `Dépôt de ${amount} ${currency}`
+    description: `Depot de ${amount} ${currency}`
   }
   
   return c.json({ success: true, transaction })
 })
 
 // ==========================================
-// STORIES & FEED ENDPOINTS (3)
+// STORIES & FEED ENDPOINTS (3 - NO EMOJIS)
 // ==========================================
 
 app.get('/api/stories', (c) => {
@@ -153,7 +338,7 @@ app.get('/api/stories', (c) => {
       type: 'fan',
       name: 'Sophie Martin',
       avatar: 'https://i.pravatar.cc/150?img=1',
-      content: `⚽ Quelle victoire hier soir ! ${club} est de retour au sommet !`,
+      content: `Quelle victoire hier soir ! ${club} est de retour au sommet !`,
       timestamp: '3h',
       likes: 245,
       views: 1203
@@ -163,7 +348,7 @@ app.get('/api/stories', (c) => {
       type: 'fan',
       name: 'Thomas Dupont',
       avatar: 'https://i.pravatar.cc/150?img=12',
-      content: `🎟️ J'ai mes billets pour le prochain match de ${club} !`,
+      content: `J'ai mes billets pour le prochain match de ${club} !`,
       timestamp: '5h',
       likes: 189,
       views: 892
@@ -173,7 +358,7 @@ app.get('/api/stories', (c) => {
       type: 'sponsor',
       name: 'Maroc Tourisme',
       avatar: 'https://i.pravatar.cc/150?img=50',
-      content: '🌍 Découvrez le Maroc avec -30% sur les séjours !',
+      content: 'Decouvrez le Maroc avec -30% sur les sejours !',
       timestamp: '1h',
       likes: 521,
       views: 2134
@@ -192,7 +377,7 @@ app.get('/api/feed', (c) => {
     type: 'PAYS',
     logo: 'https://i.pravatar.cc/50?img=50',
     campaignId: 'MAROC_2025',
-    campaignName: 'Découvrez le Maroc'
+    campaignName: 'Decouvrez le Maroc'
   }
   
   const posts: Post[] = [
@@ -200,7 +385,7 @@ app.get('/api/feed', (c) => {
       id: 'post-1',
       club: club,
       clubAvatar: 'https://i.pravatar.cc/150?img=70',
-      content: `📢 Nouveau partenariat exclusif entre ${club} et Maroc Tourisme ! Découvrez nos offres spéciales pour les fans.`,
+      content: `Nouveau partenariat exclusif entre ${club} et Maroc Tourisme ! Decouvrez nos offres speciales pour les fans.`,
       image: 'https://picsum.photos/800/600?random=1',
       timestamp: '2h',
       likes: 2456,
@@ -214,7 +399,7 @@ app.get('/api/feed', (c) => {
       id: 'post-2',
       club: club,
       clubAvatar: 'https://i.pravatar.cc/150?img=70',
-      content: `🔴 LIVE SHOPPING ! Nouveau maillot ${club} 2025-2026 disponible maintenant avec 10% cashback !`,
+      content: `LIVE SHOPPING ! Nouveau maillot ${club} 2025-2026 disponible maintenant avec 10% cashback !`,
       image: 'https://picsum.photos/800/600?random=2',
       timestamp: '5h',
       likes: 3892,
@@ -263,9 +448,9 @@ app.get('/api/esim/plans', (c) => {
     {
       id: 'europe-unlimited',
       name: 'Europe Unlimited',
-      data: 'Illimité',
+      data: 'Illimite',
       duration: '30 jours',
-      coverage: '35 pays européens',
+      coverage: '35 pays europeens',
       price: 29.99
     },
     {
@@ -337,7 +522,7 @@ app.get('/api/shop/products', (c) => {
     },
     {
       id: 'prod-2',
-      name: `Écharpe ${club} Officielle`,
+      name: `Echarpe ${club} Officielle`,
       price: 24.99,
       image: 'https://picsum.photos/400/400?random=11',
       category: 'accessoires',
@@ -414,7 +599,7 @@ app.get('/api/tickets/events', (c) => {
       id: 'event-1',
       title: `${club} vs PSG`,
       date: new Date(Date.now() + 7 * 24 * 3600000).toISOString(),
-      venue: 'Orange Vélodrome',
+      venue: 'Orange Velodrome',
       club,
       competition: 'Ligue 1',
       price: 89.99,
@@ -424,7 +609,7 @@ app.get('/api/tickets/events', (c) => {
       id: 'event-2',
       title: `${club} vs Monaco`,
       date: new Date(Date.now() + 14 * 24 * 3600000).toISOString(),
-      venue: 'Orange Vélodrome',
+      venue: 'Orange Velodrome',
       club,
       competition: 'Ligue 1',
       price: 69.99,
@@ -525,14 +710,14 @@ app.get('/api/ai/recommendations', (c) => {
       id: 2,
       type: 'product',
       title: 'Nouveau maillot OM 2025',
-      description: 'Basé sur vos achats précédents',
+      description: 'Base sur vos achats precedents',
       confidence: 0.87
     },
     {
       id: 3,
       type: 'event',
       title: 'Rencontre avec Drogba',
-      description: 'Événement exclusif pour fans VIP',
+      description: 'Evenement exclusif pour fans VIP',
       confidence: 0.78
     }
   ]
@@ -571,7 +756,7 @@ app.get('/api/ai/predictions', (c) => {
 app.get('/api/health', (c) => {
   return c.json({
     status: 'ok',
-    version: '7.0.0',
+    version: '8.0.0',
     timestamp: new Date().toISOString(),
     services: {
       auth: 'ok',
@@ -599,283 +784,12 @@ app.get('/api/stats', (c) => {
 })
 
 // ==========================================
-// MAIN APP PAGE
+// MAIN ROUTES - SERVE HTML
 // ==========================================
 
+// Redirect root to index.html
 app.get('/', (c) => {
-  const club = c.req.query('club') || 'Olympique de Marseille'
-  const logo = c.req.query('logo') || '⚽'
-  
-  return c.html(`
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PaieCashFan - ${club}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-                font-family: 'Inter', sans-serif; 
-                background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
-                color: white;
-                overflow-x: hidden;
-            }
-            
-            /* Header Sticky */
-            .header {
-                position: sticky;
-                top: 0;
-                z-index: 50;
-                background: rgba(10, 14, 26, 0.95);
-                backdrop-filter: blur(10px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 15px 20px;
-            }
-            
-            /* Stories Horizontal Scroll */
-            .stories-container {
-                display: flex;
-                gap: 15px;
-                padding: 20px;
-                overflow-x: auto;
-                scrollbar-width: none;
-            }
-            .stories-container::-webkit-scrollbar { display: none; }
-            
-            .story-item {
-                flex-shrink: 0;
-                width: 80px;
-                text-align: center;
-                cursor: pointer;
-                transition: transform 0.2s;
-            }
-            .story-item:hover { transform: scale(1.05); }
-            
-            .story-avatar {
-                width: 70px;
-                height: 70px;
-                border-radius: 50%;
-                background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-                padding: 3px;
-                margin: 0 auto 8px;
-                position: relative;
-            }
-            .story-avatar.live {
-                background: linear-gradient(45deg, #ff0000, #ff4400);
-                animation: pulse 2s infinite;
-            }
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
-            .story-avatar img {
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                border: 3px solid #0a0e1a;
-                object-fit: cover;
-            }
-            
-            /* Feed Post */
-            .feed-post {
-                background: rgba(26, 34, 50, 0.8);
-                border-radius: 15px;
-                margin: 20px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            /* Bottom Nav */
-            .bottom-nav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(10, 14, 26, 0.95);
-                backdrop-filter: blur(10px);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-                display: flex;
-                justify-content: space-around;
-                padding: 12px 0;
-                z-index: 50;
-            }
-            .nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-                color: rgba(255, 255, 255, 0.6);
-                text-decoration: none;
-                font-size: 12px;
-                padding: 8px 15px;
-                border-radius: 8px;
-            }
-            .nav-item:hover, .nav-item.active {
-                color: #10b981;
-                background: rgba(16, 185, 129, 0.1);
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Header -->
-        <div class="header">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                        ${logo}
-                    </div>
-                    <div>
-                        <h1 style="font-size: 18px; font-weight: 700;">${club}</h1>
-                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">PaieCashFan</p>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 8px 16px; border-radius: 8px; font-weight: 600;">
-                        1,247.50 PCC
-                    </div>
-                    <i class="fas fa-bell" style="font-size: 22px; cursor: pointer;"></i>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Stories -->
-        <div class="stories-container" id="storiesContainer">
-            <!-- Loaded dynamically -->
-        </div>
-        
-        <!-- Feed -->
-        <div id="feedContainer">
-            <!-- Loaded dynamically -->
-        </div>
-        
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-            <a href="/" class="nav-item active">
-                <i class="fas fa-home" style="font-size: 22px;"></i>
-                <span>Accueil</span>
-            </a>
-            <a href="/wallet" class="nav-item">
-                <i class="fas fa-wallet" style="font-size: 22px;"></i>
-                <span>Wallet</span>
-            </a>
-            <a href="/shop" class="nav-item">
-                <i class="fas fa-shopping-bag" style="font-size: 22px;"></i>
-                <span>Shop</span>
-            </a>
-            <a href="/tickets" class="nav-item">
-                <i class="fas fa-ticket-alt" style="font-size: 22px;"></i>
-                <span>Billets</span>
-            </a>
-            <a href="/profile" class="nav-item">
-                <i class="fas fa-user" style="font-size: 22px;"></i>
-                <span>Profil</span>
-            </a>
-        </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script>
-            const clubName = '${club}';
-            const API_BASE = '/api';
-            
-            // Load Stories
-            async function loadStories() {
-                try {
-                    const response = await axios.get(\`\${API_BASE}/stories?club=\${encodeURIComponent(clubName)}\`);
-                    const { stories } = response.data;
-                    
-                    const container = document.getElementById('storiesContainer');
-                    container.innerHTML = stories.map(story => \`
-                        <div class="story-item" onclick="viewStory('\${story.id}')">
-                            <div class="story-avatar \${story.isLive ? 'live' : ''}">
-                                <img src="\${story.avatar}" alt="\${story.name}">
-                                \${story.isLive ? '<div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #ff0000; color: white; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 10px; border: 2px solid #0a0e1a;">LIVE</div>' : ''}
-                            </div>
-                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.8);">\${story.name}</div>
-                        </div>
-                    \`).join('');
-                } catch (error) {
-                    console.error('Error loading stories:', error);
-                }
-            }
-            
-            // Load Feed
-            async function loadFeed() {
-                try {
-                    const response = await axios.get(\`\${API_BASE}/feed?club=\${encodeURIComponent(clubName)}\`);
-                    const { posts } = response.data;
-                    
-                    const container = document.getElementById('feedContainer');
-                    container.innerHTML = posts.map(post => \`
-                        <div class="feed-post">
-                            <div style="display: flex; align-items: center; padding: 15px; gap: 12px;">
-                                <img src="\${post.clubAvatar}" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2);">
-                                <div>
-                                    <h3 style="font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                                        \${post.club}
-                                        \${post.verified ? '<i class="fas fa-check-circle" style="color: #10b981;"></i>' : ''}
-                                    </h3>
-                                    <div style="font-size: 13px; color: rgba(255, 255, 255, 0.5);">\${post.timestamp}</div>
-                                </div>
-                            </div>
-                            <div style="padding: 0 15px 15px;">
-                                <p style="margin-bottom: 12px;">\${post.content}</p>
-                            </div>
-                            <img src="\${post.image}" style="width: 100%; height: auto; display: block;">
-                            <div style="display: flex; justify-content: space-around; padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                                <button onclick="likePost('\${post.id}')" style="background: none; border: none; color: #ff4458; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 8px;">
-                                    <i class="fas fa-heart"></i>
-                                    <span>\${post.likes}</span>
-                                </button>
-                                <button style="background: none; border: none; color: #4a9eff; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 8px;">
-                                    <i class="fas fa-comment"></i>
-                                    <span>\${post.comments}</span>
-                                </button>
-                                <button style="background: none; border: none; color: #10b981; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 8px;">
-                                    <i class="fas fa-share"></i>
-                                    <span>\${post.shares}</span>
-                                </button>
-                            </div>
-                            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;">
-                                <div style="font-size: 14px; font-weight: 600;">🎉 Vous avez gagné +\${post.pccReward} PCC !</div>
-                            </div>
-                        </div>
-                    \`).join('');
-                } catch (error) {
-                    console.error('Error loading feed:', error);
-                }
-            }
-            
-            // Like Post
-            async function likePost(postId) {
-                try {
-                    await axios.post(\`\${API_BASE}/interactions/track\`, {
-                        type: 'LIKE',
-                        campaignId: 'POST_' + postId,
-                        sponsorId: 'sponsor_maroc',
-                        postId
-                    });
-                    alert('❤️ +0.01 PCC gagné !');
-                } catch (error) {
-                    console.error('Error liking post:', error);
-                }
-            }
-            
-            // View Story
-            function viewStory(storyId) {
-                alert('📖 Story affichée ! +0.005 PCC gagné');
-            }
-            
-            // Initialize
-            loadStories();
-            loadFeed();
-        </script>
-    </body>
-    </html>
-  `)
+  return c.redirect('/index.html')
 })
 
 export default app
