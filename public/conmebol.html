@@ -244,6 +244,77 @@
             box-shadow: 0 4px 12px rgba(238, 39, 55, 0.4);
         }
 
+        /* LOTO Section */
+        .loto-section {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .loto-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 20px;
+            padding: 2rem 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+            min-width: 300px;
+        }
+
+        .loto-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+        }
+
+        .loto-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 40px;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loto-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .loto-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+
+        .loto-prizes {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .loto-prize {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+        }
+
         .footer {
             text-align: center;
             padding: 2rem;
@@ -303,6 +374,25 @@
             <div class="stat-box">
                 <div class="stat-number">47</div>
                 <div class="stat-label">Copa America</div>
+            </div>
+        </div>
+
+        <!-- LOTO Section -->
+        <div class="loto-section">
+            <div class="loto-card" onclick="openLoto()">
+                <div class="loto-icon">
+                    <i class="fas fa-dice"></i>
+                </div>
+                <div class="loto-title">LOTO PaieCashFan</div>
+                <div class="loto-subtitle">Tentez votre chance pour gagner gros !</div>
+                <div class="loto-prizes">
+                    <div class="loto-prize">
+                        <i class="fas fa-coins"></i> 1000 PCC
+                    </div>
+                    <div class="loto-prize">
+                        <i class="fas fa-trophy"></i> NFT Exclusifs
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -441,6 +531,11 @@
         window.addEventListener('DOMContentLoaded', () => {
             renderCountries();
         });
+
+        // LOTO Function
+        function openLoto() {
+            alert('LOTO PaieCashFan\n\nFonctionnalite en cours de developpement.\nTentez votre chance pour gagner des PCC et des NFT exclusifs !\n\nProchainement disponible...');
+        }
     </script>
 </body>
 </html>
