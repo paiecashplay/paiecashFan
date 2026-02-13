@@ -137,77 +137,48 @@
             color: var(--text-secondary);
         }
         
-        /* LOTO Section */
-        .loto-section {
+        /* Gamification Section */
+        .gamification {
             display: flex;
-            justify-content: center;
-            padding: 0 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 10px;
         }
-
-        .loto-card {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            border-radius: 20px;
-            padding: 1.5rem 2.5rem;
+        
+        .gamification::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .game-card {
+            min-width: 80px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
-            width: 100%;
-            max-width: 400px;
+            transition: transform 0.2s ease;
         }
-
-        .loto-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+        
+        .game-card:hover {
+            transform: translateY(-5px);
         }
-
-        .loto-icon {
+        
+        .game-icon {
             width: 60px;
             height: 60px;
-            background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 30px;
-            animation: rotate 3s linear infinite;
+            margin: 0 auto 8px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
         }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .loto-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .loto-subtitle {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 1rem;
-        }
-
-        .loto-prizes {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .loto-prize {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 0.4rem 0.8rem;
-            border-radius: 10px;
-            font-size: 0.85rem;
+        
+        .game-label {
+            font-size: 13px;
             font-weight: 600;
-            color: white;
+            color: var(--text-secondary);
         }
 
         /* Stories */
@@ -508,22 +479,34 @@
         </div>
     </div>
     
-    <!-- LOTO Section -->
-    <div class="loto-section">
-        <div class="loto-card" onclick="openLoto()">
-            <div class="loto-icon">
+    <!-- Gamification Section -->
+    <div class="gamification">
+        <div class="game-card" onclick="openShop()">
+            <div class="game-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="game-label">Shop</div>
+        </div>
+        
+        <div class="game-card" onclick="openTickets()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div class="game-label">Billets</div>
+        </div>
+        
+        <div class="game-card" onclick="openRewards()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="game-label">Récompenses</div>
+        </div>
+        
+        <div class="game-card" onclick="openLoto()">
+            <div class="game-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
                 <i class="fas fa-dice"></i>
             </div>
-            <div class="loto-title">LOTO PaieCashFan</div>
-            <div class="loto-subtitle">Tentez votre chance !</div>
-            <div class="loto-prizes">
-                <div class="loto-prize">
-                    <i class="fas fa-coins"></i> 1000 PCC
-                </div>
-                <div class="loto-prize">
-                    <i class="fas fa-trophy"></i> NFT
-                </div>
-            </div>
+            <div class="game-label">LOTO</div>
         </div>
     </div>
     
@@ -734,6 +717,19 @@
                     transactionsList.removeChild(transactionsList.lastChild);
                 }
             }, 10000); // Every 10 seconds
+        }
+
+        // Gamification Functions
+        function openShop() {
+            alert('Shop PaieCashFan\n\nMerchandising officiel du club.\nMaillots, accessoires, produits derives...\n\nProchainement disponible...');
+        }
+        
+        function openTickets() {
+            alert('Billets\n\nReservation billets matchs.\nAbonnements saison, places VIP...\n\nProchainement disponible...');
+        }
+        
+        function openRewards() {
+            alert('Recompenses\n\nProgramme fidelite fans.\nPoints, badges, NFT exclusifs...\n\nProchainement disponible...');
         }
 
         // LOTO Function
