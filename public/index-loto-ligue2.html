@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PaieCashFan - Connectez-vous à votre équipe préférée</title>
+    <title>PaieCashFan - Ligue 2 BKT 2025/2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/i18n.css">
@@ -22,6 +22,7 @@
             --green: #10b981;
             --text-white: #ffffff;
             --text-gray: #8b93b0;
+            --orange: #f97316;
         }
         
         body {
@@ -144,71 +145,6 @@
             color: var(--text-gray);
         }
         
-        /* Promo Cards Section */
-        .promo-section {
-            max-width: 1200px;
-            margin: 0 auto 50px;
-            padding: 0 40px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-        
-        .promo-card {
-            background: var(--dark-card);
-            border-radius: 16px;
-            padding: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .promo-content {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .promo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--turquoise), var(--purple));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-        
-        .promo-text h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .promo-text p {
-            font-size: 14px;
-            color: var(--green);
-            font-weight: 600;
-        }
-        
-        .promo-btn {
-            background: var(--green);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .promo-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-        
         /* Navigation Tabs */
         .nav-tabs {
             max-width: 1200px;
@@ -234,12 +170,47 @@
         }
         
         .tab.active {
-            background: linear-gradient(135deg, var(--green), #059669);
-            border-color: var(--green);
+            background: linear-gradient(135deg, var(--orange), #ea580c);
+            border-color: var(--orange);
         }
         
         .tab:hover {
             transform: translateY(-2px);
+        }
+        
+        /* League Selector */
+        .league-selector {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 40px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .league-btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .league-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--orange);
+        }
+        
+        .league-btn.active {
+            background: linear-gradient(135deg, var(--orange), #ea580c);
+            border-color: var(--orange);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
         }
         
         /* Content Section */
@@ -263,6 +234,13 @@
             height: 28px;
         }
         
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-gray);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
         /* Clubs Grid */
         .clubs-grid {
             display: grid;
@@ -278,11 +256,29 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
         
         .club-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .club-position {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--orange), #ea580c);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
         }
         
         .club-header {
@@ -296,7 +292,7 @@
             width: 60px;
             height: 60px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            background: linear-gradient(135deg, var(--orange), #ea580c);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -333,7 +329,7 @@
         }
         
         .club-stat i {
-            color: var(--green);
+            color: var(--orange);
         }
         
         .loading {
@@ -359,17 +355,12 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .promo-section {
-                grid-template-columns: 1fr;
-            }
-            
             .hero h1 {
                 font-size: 36px;
             }
             
-            .promo-card {
+            .league-selector {
                 flex-direction: column;
-                text-align: center;
             }
         }
     </style>
@@ -394,59 +385,30 @@
     
     <!-- Hero Section -->
     <section class="hero">
-        <h1 data-i18n="app.name">PaieCashFan</h1>
-        <p data-i18n="home.subtitle">Connectez-vous a votre equipe preferee</p>
+        <h1>Ligue 2 BKT</h1>
+        <p>Championnat de France de Football - Saison 2025/2026</p>
     </section>
     
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" data-i18n-placeholder="search.placeholder" placeholder="Rechercher une equipe, un club, une federation...">
+            <input type="text" id="searchInput" data-i18n-placeholder="search.placeholder" placeholder="Rechercher un club, une ville...">
         </div>
     </div>
-    
-    <!-- Promo Cards -->
-    <section class="promo-section">
-        <div class="promo-card">
-            <div class="promo-content">
-                <div class="promo-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="promo-text">
-                    <h3 data-i18n="promo.prepaid_cards">Cartes Prepayees PaieCash</h3>
-                    <p data-i18n="promo.prepaid_desc">Jusqu'a 10% cashback - Sans frais - Instantane</p>
-                </div>
-            </div>
-            <button class="promo-btn" data-i18n="promo.order_cta" onclick="orderCard()">Commander</button>
-        </div>
-        
-        <div class="promo-card">
-            <div class="promo-content">
-                <div class="promo-icon">
-                    <i class="fas fa-sim-card"></i>
-                </div>
-                <div class="promo-text">
-                    <h3 data-i18n="promo.esim_title">eSIM PaieCash</h3>
-                    <p data-i18n="promo.esim_desc">120+ pays - 4G/5G - Activation QR Instantanee</p>
-                </div>
-            </div>
-            <button class="promo-btn" data-i18n="promo.discover_cta" onclick="discoverESIM()">Decouvrir</button>
-        </div>
-    </section>
     
     <!-- League Selector -->
-    <div class="search-container" style="max-width: 1200px; margin: 0 auto 30px; padding: 0 40px;">
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <button class="tab active" style="flex: 0 0 auto; padding: 15px 35px; font-size: 16px; border-width: 2px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
-                <i class="fas fa-trophy"></i> <span>Ligue 1</span>
-            </button>
-            <button class="tab" onclick="goToLigue2()" style="flex: 0 0 auto; padding: 15px 35px; font-size: 16px; border-width: 2px;">
-                <i class="fas fa-award"></i> <span>Ligue 2 BKT</span>
-            </button>
-        </div>
+    <div class="league-selector">
+        <button class="league-btn" onclick="goToLigue1()">
+            <i class="fas fa-trophy"></i>
+            <span>Ligue 1</span>
+        </button>
+        <button class="league-btn active">
+            <i class="fas fa-award"></i>
+            <span>Ligue 2 BKT</span>
+        </button>
     </div>
-
+    
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
         <button class="tab active" data-tab="france">
@@ -469,9 +431,12 @@
     <!-- Content Section -->
     <section class="content-section">
         <h2 class="section-title">
-            <i class="fas fa-flag" style="color: var(--green);"></i>
-            <span data-i18n="leagues.ligue1">Ligue 1</span>
+            <i class="fas fa-flag" style="color: var(--orange);"></i>
+            <span>Ligue 2 BKT - Saison 2025/2026</span>
         </h2>
+        <div class="section-subtitle">
+            <i class="fas fa-info-circle"></i> 20 clubs au total - Classement actuel
+        </div>
         
         <div id="clubsContainer" class="clubs-grid">
             <div class="loading">
@@ -492,52 +457,32 @@
     <script>
         const API_BASE = window.location.origin;
         
-        // French Ligue 1 clubs - Saison 2025/2026
-        const ligue1Clubs = [
-            { id: 'psg', name: 'Paris SG', city: 'Paris', fans: '125K', icon: 'fa-star', position: 1 },
-            { id: 'lens', name: 'RC Lens', city: 'Lens', fans: '68K', icon: 'fa-bolt', position: 2 },
-            { id: 'lyon', name: 'Olympique Lyonnais', city: 'Lyon', fans: '87K', icon: 'fa-crown', position: 3 },
-            { id: 'marseille', name: 'Olympique de Marseille', city: 'Marseille', fans: '98K', icon: 'fa-water', position: 4 },
-            { id: 'rennes', name: 'Stade Rennais FC', city: 'Rennes', fans: '52K', icon: 'fa-fire', position: 5 },
-            { id: 'lille', name: 'LOSC Lille', city: 'Lille', fans: '65K', icon: 'fa-paw', position: 6 },
-            { id: 'strasbourg', name: 'RC Strasbourg', city: 'Strasbourg', fans: '38K', icon: 'fa-mountain', position: 7 },
-            { id: 'toulouse', name: 'Toulouse FC', city: 'Toulouse', fans: '32K', icon: 'fa-heart', position: 8 },
-            { id: 'angers', name: 'Angers SCO', city: 'Angers', fans: '28K', icon: 'fa-leaf', position: 9 },
-            { id: 'monaco', name: 'AS Monaco', city: 'Monaco', fans: '71K', icon: 'fa-gem', position: 10 },
-            { id: 'lorient', name: 'FC Lorient', city: 'Lorient', fans: '26K', icon: 'fa-fish', position: 11 },
-            { id: 'brest', name: 'Stade Brestois', city: 'Brest', fans: '29K', icon: 'fa-ship', position: 12 },
-            { id: 'lehavre', name: 'Le Havre AC', city: 'Le Havre', fans: '24K', icon: 'fa-anchor', position: 13 },
-            { id: 'nice', name: 'OGC Nice', city: 'Nice', fans: '58K', icon: 'fa-dove', position: 14 },
-            { id: 'parisfc', name: 'Paris FC', city: 'Paris', fans: '22K', icon: 'fa-building', position: 15 },
-            { id: 'auxerre', name: 'AJ Auxerre', city: 'Auxerre', fans: '25K', icon: 'fa-tree', position: 16 },
-            { id: 'nantes', name: 'FC Nantes', city: 'Nantes', fans: '45K', icon: 'fa-feather', position: 17 },
-            { id: 'metz', name: 'FC Metz', city: 'Metz', fans: '30K', icon: 'fa-dragon', position: 18 }
-        ];
-        
-        // French Ligue 2 clubs - Saison 2025/2026 (ordre alphabetique)
+        // French Ligue 2 clubs - Saison 2025/2026
         const ligue2Clubs = [
-            { id: 'amiens', name: 'Amiens SC', city: 'Amiens', fans: '18K', icon: 'fa-shield-alt', position: 16 },
-            { id: 'annecy', name: 'FC Annecy', city: 'Annecy', fans: '12K', icon: 'fa-mountain', position: 8 },
-            { id: 'bastia', name: 'SC Bastia', city: 'Bastia', fans: '15K', icon: 'fa-island-tropical', position: 18 },
-            { id: 'boulogne', name: 'US Boulogne', city: 'Boulogne', fans: '10K', icon: 'fa-anchor', position: 13 },
-            { id: 'clermont', name: 'Clermont Foot', city: 'Clermont-Ferrand', fans: '16K', icon: 'fa-volcano', position: 15 },
-            { id: 'dunkerque', name: 'USL Dunkerque', city: 'Dunkerque', fans: '14K', icon: 'fa-ship', position: 5 },
-            { id: 'grenoble', name: 'Grenoble Foot 38', city: 'Grenoble', fans: '13K', icon: 'fa-mountain-sun', position: 12 },
-            { id: 'guingamp', name: 'EA Guingamp', city: 'Guingamp', fans: '17K', icon: 'fa-clover', position: 9 },
-            { id: 'laval', name: 'Stade Lavallois', city: 'Laval', fans: '11K', icon: 'fa-leaf', position: 17 },
-            { id: 'lemans', name: 'Le Mans FC', city: 'Le Mans', fans: '15K', icon: 'fa-car', position: 4 },
-            { id: 'montpellier', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun', position: 11 },
-            { id: 'nancy', name: 'AS Nancy', city: 'Nancy', fans: '19K', icon: 'fa-crown', position: 14 },
-            { id: 'pau', name: 'Pau FC', city: 'Pau', fans: '13K', icon: 'fa-mountain-city', position: 7 },
+            { id: 'troyes', name: 'ESTAC Troyes', city: 'Troyes', fans: '21K', icon: 'fa-flag', position: 1 },
             { id: 'redstar', name: 'Red Star FC', city: 'Paris', fans: '20K', icon: 'fa-star', position: 2 },
             { id: 'reims', name: 'Stade de Reims', city: 'Reims', fans: '32K', icon: 'fa-champagne-glasses', position: 3 },
-            { id: 'rodez', name: 'Rodez AF', city: 'Rodez', fans: '12K', icon: 'fa-futbol', position: 10 },
+            { id: 'lemans', name: 'Le Mans FC', city: 'Le Mans', fans: '15K', icon: 'fa-car', position: 4 },
+            { id: 'dunkerque', name: 'USL Dunkerque', city: 'Dunkerque', fans: '14K', icon: 'fa-ship', position: 5 },
             { id: 'saintetienne', name: 'AS Saint-Etienne', city: 'Saint-Etienne', fans: '76K', icon: 'fa-shield', position: 6 },
-            { id: 'troyes', name: 'ESTAC Troyes', city: 'Troyes', fans: '21K', icon: 'fa-flag', position: 1 }
+            { id: 'pau', name: 'Pau FC', city: 'Pau', fans: '13K', icon: 'fa-mountain-city', position: 7 },
+            { id: 'annecy', name: 'FC Annecy', city: 'Annecy', fans: '12K', icon: 'fa-mountain', position: 8 },
+            { id: 'guingamp', name: 'EA Guingamp', city: 'Guingamp', fans: '17K', icon: 'fa-clover', position: 9 },
+            { id: 'rodez', name: 'Rodez AF', city: 'Rodez', fans: '12K', icon: 'fa-futbol', position: 10 },
+            { id: 'montpellier', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun', position: 11 },
+            { id: 'grenoble', name: 'Grenoble Foot 38', city: 'Grenoble', fans: '13K', icon: 'fa-mountain-sun', position: 12 },
+            { id: 'boulogne', name: 'US Boulogne', city: 'Boulogne', fans: '10K', icon: 'fa-anchor', position: 13 },
+            { id: 'nancy', name: 'AS Nancy', city: 'Nancy', fans: '19K', icon: 'fa-crown', position: 14 },
+            { id: 'clermont', name: 'Clermont Foot', city: 'Clermont-Ferrand', fans: '16K', icon: 'fa-volcano', position: 15 },
+            { id: 'amiens', name: 'Amiens SC', city: 'Amiens', fans: '18K', icon: 'fa-shield-alt', position: 16 },
+            { id: 'laval', name: 'Stade Lavallois', city: 'Laval', fans: '11K', icon: 'fa-leaf', position: 17 },
+            { id: 'bastia', name: 'SC Bastia', city: 'Bastia', fans: '15K', icon: 'fa-island-tropical', position: 18 },
+            { id: 'bordeaux', name: 'Girondins de Bordeaux', city: 'Bordeaux', fans: '62K', icon: 'fa-wine-glass', position: 19 },
+            { id: 'caen', name: 'SM Caen', city: 'Caen', fans: '28K', icon: 'fa-horse', position: 20 }
         ];
         
-        let allClubs = [...ligue1Clubs];
-        let filteredClubs = [...ligue1Clubs];
+        let allClubs = [...ligue2Clubs];
+        let filteredClubs = [...ligue2Clubs];
         
         // Render clubs
         function renderClubs(clubs) {
@@ -556,6 +501,7 @@
             
             container.innerHTML = clubs.map(club => `
                 <div class="club-card" onclick="goToClub('${club.id}')">
+                    <div class="club-position">${club.position}</div>
                     <div class="club-header">
                         <div class="club-logo">
                             <i class="fas ${club.icon}"></i>
@@ -599,7 +545,15 @@
         
         // Navigate to club
         function goToClub(clubId) {
-            window.location.href = `/club.html?club=${clubId}`;
+            const club = allClubs.find(c => c.id === clubId);
+            if (club) {
+                window.location.href = `/app-universal-simple.html?club=${club.name}&logo=⚽&sport=Football&league=Ligue+2+BKT`;
+            }
+        }
+        
+        // Navigate to Ligue 1
+        function goToLigue1() {
+            window.location.href = '/index-loto.html';
         }
         
         // Initialize
@@ -638,33 +592,15 @@
                     const tabType = tab.dataset.tab;
                     
                     if (tabType === 'france') {
-                        // Stay on current page, just refresh clubs
+                        // Stay on current page (Ligue 2)
                         tabs.forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
-                        allClubs = [...ligue1Clubs];
-                        filteredClubs = [...ligue1Clubs];
-                        renderClubs(filteredClubs);
                     } else {
-                        // Navigate to other sections
                         navigateToTab(tabType);
                     }
                 });
             });
         });
-    
-        function openLoto() {
-            window.location.href = '/loto.html';
-        }
-        
-        // Wallet function
-        function goToWallet() {
-            window.location.href = '/wallet.html';
-        }
-        
-        // Navigate to Ligue 2
-        function goToLigue2() {
-            window.location.href = '/index-loto-ligue2.html';
-        }
         
         // Auth functions
         function goToLogin() {
@@ -673,15 +609,6 @@
         
         function goToSignup() {
             alert('Fonctionnalite Inscription en cours de developpement');
-        }
-        
-        // Promo functions
-        function orderCard() {
-            alert('Commande de carte en cours de developpement');
-        }
-        
-        function discoverESIM() {
-            alert('Decouverte eSIM en cours de developpement');
         }
         
         // Navigation tabs functions
