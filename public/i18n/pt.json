@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "pt",
   "langName": "Português",
   "common": {
@@ -13,9 +16,14 @@
     "error": "Erro",
     "success": "Sucesso"
   },
+  "auth": {
+    "login": "Entrar",
+    "signup": "Inscrever-se",
+    "logout": "Sair"
+  },
   "home": {
     "welcome": "Bem-vindo ao PaieCashFan",
-    "subtitle": "O Super App Mundial de Esportes",
+    "subtitle": "Conecte-se ao seu time favorito",
     "description": "Junte-se a milhões de fãs em todo o mundo. Apoie seu clube, gerencie seus pagamentos e viva a experiência definitiva do futebol.",
     "federations": "Federações",
     "clubs": "Clubes",
@@ -52,7 +60,8 @@
     "chat": "Chat",
     "ai": "IA",
     "addStory": "Adicionar",
-    "noTransactions": "Nenhuma transação recente"
+    "noTransactions": "Nenhuma transação recente",
+    "follow": "Seguir"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +96,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - Todos os direitos reservados",
     "version": "Versão",
-    "cryptoPayments": "Pagamentos cripto aceitos: BTC, ETH, USDC, USDT"
+    "cryptoPayments": "Pagamentos cripto aceitos: BTC, ETH, USDC, USDT",
+    "crypto_accepted": "Pagamentos crypto aceitos: BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "Início",
@@ -100,5 +110,27 @@
     "loadingFailed": "Falha ao carregar dados",
     "networkError": "Erro de rede. Tente novamente.",
     "notFound": "Página não encontrada"
+  },
+  "search": {
+    "placeholder": "Pesquisar equipe, clube, federação...",
+    "no_results": "Nenhum resultado encontrado"
+  },
+  "promo": {
+    "prepaid_cards": "Cartões Pré-pagos PaieCash",
+    "prepaid_desc": "Até 10% cashback - Sem taxas - Instantâneo",
+    "esim_title": "eSIM PaieCash",
+    "esim_desc": "120+ países - 4G/5G - Ativação QR Instantânea",
+    "order_cta": "Pedir",
+    "discover_cta": "Descobrir"
+  },
+  "tabs": {
+    "football_france": "Futebol Francês",
+    "other_sports": "Outros Esportes",
+    "european_football": "Futebol Europeu",
+    "federations": "Federações",
+    "events": "Eventos"
+  },
+  "leagues": {
+    "ligue1": "Ligue 1"
   }
 }

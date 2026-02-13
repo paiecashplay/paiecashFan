@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "nl",
   "langName": "Nederlands",
   "common": {
@@ -13,9 +16,14 @@
     "error": "Fout",
     "success": "Succes"
   },
+  "auth": {
+    "login": "Inloggen",
+    "signup": "Registreren",
+    "logout": "Uitloggen"
+  },
   "home": {
     "welcome": "Welkom bij PaieCashFan",
-    "subtitle": "De Wereldwijde Sport Super App",
+    "subtitle": "Verbind met je favoriete team",
     "description": "Sluit je aan bij miljoenen fans over de hele wereld. Steun je club, beheer je betalingen en beleef de ultieme voetbalervaring.",
     "federations": "Federaties",
     "clubs": "Clubs",
@@ -52,7 +60,8 @@
     "chat": "Chat",
     "ai": "AI",
     "addStory": "Toevoegen",
-    "noTransactions": "Geen recente transacties"
+    "noTransactions": "Geen recente transacties",
+    "follow": "Volgen"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +96,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - Alle rechten voorbehouden",
     "version": "Versie",
-    "cryptoPayments": "Geaccepteerde crypto-betalingen: BTC, ETH, USDC, USDT"
+    "cryptoPayments": "Geaccepteerde crypto-betalingen: BTC, ETH, USDC, USDT",
+    "crypto_accepted": "Crypto-betalingen geaccepteerd: BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "Home",
@@ -100,5 +110,27 @@
     "loadingFailed": "Laden van gegevens mislukt",
     "networkError": "Netwerkfout. Probeer het opnieuw.",
     "notFound": "Pagina niet gevonden"
+  },
+  "search": {
+    "placeholder": "Zoek team, club, federatie...",
+    "no_results": "Geen resultaten gevonden"
+  },
+  "promo": {
+    "prepaid_cards": "PaieCash Prepaid Kaarten",
+    "prepaid_desc": "Tot 10% cashback - Geen kosten - Direct",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+ landen - 4G/5G - QR Direct Activering",
+    "order_cta": "Bestellen",
+    "discover_cta": "Ontdekken"
+  },
+  "tabs": {
+    "football_france": "Frans Voetbal",
+    "other_sports": "Andere Sporten",
+    "european_football": "Europees Voetbal",
+    "federations": "Federaties",
+    "events": "Evenementen"
+  },
+  "leagues": {
+    "ligue1": "Ligue 1"
   }
 }

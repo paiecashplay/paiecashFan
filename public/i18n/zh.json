@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "zh",
   "langName": "中文",
   "common": {
@@ -13,9 +16,14 @@
     "error": "错误",
     "success": "成功"
   },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "logout": "退出"
+  },
   "home": {
     "welcome": "欢迎来到 PaieCashFan",
-    "subtitle": "全球体育超级应用",
+    "subtitle": "连接您最喜欢的球队",
     "description": "加入全球数百万球迷。支持您的俱乐部，管理您的支付，体验终极足球体验。",
     "federations": "联合会",
     "clubs": "俱乐部",
@@ -52,7 +60,8 @@
     "chat": "聊天",
     "ai": "AI",
     "addStory": "添加",
-    "noTransactions": "无最近交易"
+    "noTransactions": "无最近交易",
+    "follow": "关注"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +96,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - 保留所有权利",
     "version": "版本",
-    "cryptoPayments": "接受的加密货币支付：BTC、ETH、USDC、USDT"
+    "cryptoPayments": "接受的加密货币支付：BTC、ETH、USDC、USDT",
+    "crypto_accepted": "接受加密货币支付：BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "首页",
@@ -100,5 +110,27 @@
     "loadingFailed": "加载数据失败",
     "networkError": "网络错误。请重试。",
     "notFound": "未找到页面"
+  },
+  "search": {
+    "placeholder": "搜索球队、俱乐部、联合会...",
+    "no_results": "未找到结果"
+  },
+  "promo": {
+    "prepaid_cards": "PaieCash 预付卡",
+    "prepaid_desc": "高达10%返现 - 无费用 - 即时",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+国家 - 4G/5G - 即时二维码激活",
+    "order_cta": "订购",
+    "discover_cta": "发现"
+  },
+  "tabs": {
+    "football_france": "法国足球",
+    "other_sports": "其他运动",
+    "european_football": "欧洲足球",
+    "federations": "联合会",
+    "events": "活动"
+  },
+  "leagues": {
+    "ligue1": "法国甲级联赛"
   }
 }

@@ -1,0 +1,23 @@
+{
+  "app": {"name": "PaieCashFan"},
+  "auth": {"login": "Iniciar sesión", "signup": "Registrarse", "logout": "Cerrar sesión"},
+  "search": {"placeholder": "Buscar un equipo, club, federación...", "no_results": "No se encontraron resultados"},
+  "promo": {
+    "prepaid_cards": "Tarjetas Prepagadas PaieCash",
+    "prepaid_desc": "Hasta 10% cashback - Sin comisiones - Instantáneo",
+    "esim_title": "eSIM PaieCash",
+    "esim_desc": "120+ países - 4G/5G - Activación QR Instantánea",
+    "order_cta": "Pedir",
+    "discover_cta": "Descubrir"
+  },
+  "tabs": {
+    "football_france": "Fútbol Francés",
+    "other_sports": "Otros Deportes",
+    "european_football": "Fútbol Europeo",
+    "federations": "Federaciones",
+    "events": "Eventos"
+  },
+  "leagues": {"ligue1": "Ligue 1"},
+  "club_follow": "Seguir",
+  "footer_crypto_accepted": "Pagos cripto aceptados: BTC, ETH, USDC, USDT"
+}

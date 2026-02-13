@@ -1,6 +1,9 @@
 {
   "lang": "fr",
   "langName": "Français",
+  "app": {
+    "name": "PaieCashFan"
+  },
   "common": {
     "back": "Retour",
     "loading": "Chargement",
@@ -13,9 +16,14 @@
     "error": "Erreur",
     "success": "Succès"
   },
+  "auth": {
+    "login": "Se connecter",
+    "signup": "Inscription",
+    "logout": "Déconnexion"
+  },
   "home": {
     "welcome": "Bienvenue sur PaieCashFan",
-    "subtitle": "La Super App Mondiale du Sport",
+    "subtitle": "Connectez-vous à votre équipe préférée",
     "description": "Rejoignez des millions de fans à travers le monde. Soutenez votre club, gérez vos paiements et vivez l'expérience ultime du football.",
     "federations": "Fédérations",
     "clubs": "Clubs",
@@ -24,6 +32,28 @@
     "searchPlaceholder": "Rechercher une fédération...",
     "allFederations": "Toutes les Fédérations",
     "loadingFederations": "Chargement des fédérations..."
+  },
+  "search": {
+    "placeholder": "Rechercher une équipe, un club, une fédération...",
+    "no_results": "Aucun résultat trouvé"
+  },
+  "promo": {
+    "prepaid_cards": "Cartes Prépayées PaieCash",
+    "prepaid_desc": "Jusqu'à 10% cashback - Sans frais - Instantané",
+    "esim_title": "eSIM PaieCash",
+    "esim_desc": "120+ pays - 4G/5G - Activation QR Instantanée",
+    "order_cta": "Commander",
+    "discover_cta": "Découvrir"
+  },
+  "tabs": {
+    "football_france": "Football France",
+    "other_sports": "Autres Sports",
+    "european_football": "EU Football Européen",
+    "federations": "Fédérations",
+    "events": "Événements"
+  },
+  "leagues": {
+    "ligue1": "Ligue 1"
   },
   "federation": {
     "stats": "Statistiques",
@@ -52,7 +82,8 @@
     "chat": "Chat",
     "ai": "IA",
     "addStory": "Ajouter",
-    "noTransactions": "Aucune transaction récente"
+    "noTransactions": "Aucune transaction récente",
+    "follow": "Suivre"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +118,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - Tous droits réservés",
     "version": "Version",
-    "cryptoPayments": "Paiements cryptos acceptés : BTC, ETH, USDC, USDT"
+    "cryptoPayments": "Paiements cryptos acceptés : BTC, ETH, USDC, USDT",
+    "crypto_accepted": "Paiements cryptos acceptés : BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "Accueil",

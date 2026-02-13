@@ -1,6 +1,9 @@
 {
   "lang": "en",
   "langName": "English",
+  "app": {
+    "name": "PaieCashFan"
+  },
   "common": {
     "back": "Back",
     "loading": "Loading",
@@ -13,9 +16,14 @@
     "error": "Error",
     "success": "Success"
   },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
   "home": {
     "welcome": "Welcome to PaieCashFan",
-    "subtitle": "The Global Sports Super App",
+    "subtitle": "Connect to your favorite team",
     "description": "Join millions of fans worldwide. Support your club, manage your payments and experience the ultimate football experience.",
     "federations": "Federations",
     "clubs": "Clubs",
@@ -24,6 +32,28 @@
     "searchPlaceholder": "Search for a federation...",
     "allFederations": "All Federations",
     "loadingFederations": "Loading federations..."
+  },
+  "search": {
+    "placeholder": "Search for a team, club, federation...",
+    "no_results": "No results found"
+  },
+  "promo": {
+    "prepaid_cards": "PaieCash Prepaid Cards",
+    "prepaid_desc": "Up to 10% cashback - No fees - Instant",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+ countries - 4G/5G - Instant QR Activation",
+    "order_cta": "Order",
+    "discover_cta": "Discover"
+  },
+  "tabs": {
+    "football_france": "French Football",
+    "other_sports": "Other Sports",
+    "european_football": "European Football",
+    "federations": "Federations",
+    "events": "Events"
+  },
+  "leagues": {
+    "ligue1": "Ligue 1"
   },
   "federation": {
     "stats": "Statistics",
@@ -52,7 +82,8 @@
     "chat": "Chat",
     "ai": "AI",
     "addStory": "Add",
-    "noTransactions": "No recent transactions"
+    "noTransactions": "No recent transactions",
+    "follow": "Follow"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +118,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - All rights reserved",
     "version": "Version",
-    "cryptoPayments": "Crypto payments accepted: BTC, ETH, USDC, USDT"
+    "cryptoPayments": "Crypto payments accepted: BTC, ETH, USDC, USDT",
+    "crypto_accepted": "Crypto payments accepted: BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "Home",

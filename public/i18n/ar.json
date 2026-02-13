@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "ar",
   "langName": "العربية",
   "direction": "rtl",
@@ -14,9 +17,14 @@
     "error": "خطأ",
     "success": "نجح"
   },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "signup": "التسجيل",
+    "logout": "تسجيل الخروج"
+  },
   "home": {
     "welcome": "مرحبا بك في PaieCashFan",
-    "subtitle": "التطبيق الرياضي العالمي الخارق",
+    "subtitle": "اتصل بفريقك المفضل",
     "description": "انضم إلى ملايين المشجعين حول العالم. ادعم ناديك، وأدر مدفوعاتك واستمتع بتجربة كرة القدم المثالية.",
     "federations": "الاتحادات",
     "clubs": "الأندية",
@@ -53,7 +61,8 @@
     "chat": "الدردشة",
     "ai": "الذكاء الاصطناعي",
     "addStory": "إضافة",
-    "noTransactions": "لا توجد معاملات حديثة"
+    "noTransactions": "لا توجد معاملات حديثة",
+    "follow": "متابعة"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -88,7 +97,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - جميع الحقوق محفوظة",
     "version": "الإصدار",
-    "cryptoPayments": "مدفوعات التشفير المقبولة: BTC, ETH, USDC, USDT"
+    "cryptoPayments": "مدفوعات التشفير المقبولة: BTC, ETH, USDC, USDT",
+    "crypto_accepted": "المدفوعات المشفرة مقبولة: BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -101,5 +111,27 @@
     "loadingFailed": "فشل تحميل البيانات",
     "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
     "notFound": "الصفحة غير موجودة"
+  },
+  "search": {
+    "placeholder": "ابحث عن فريق، نادي، اتحاد...",
+    "no_results": "لم يتم العثور على نتائج"
+  },
+  "promo": {
+    "prepaid_cards": "بطاقات PaieCash المدفوعة مسبقاً",
+    "prepaid_desc": "حتى 10٪ استرداد نقدي - بدون رسوم - فوري",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+ دولة - 4G/5G - تفعيل QR فوري",
+    "order_cta": "اطلب",
+    "discover_cta": "اكتشف"
+  },
+  "tabs": {
+    "football_france": "كرة القدم الفرنسية",
+    "other_sports": "رياضات أخرى",
+    "european_football": "كرة القدم الأوروبية",
+    "federations": "الاتحادات",
+    "events": "الأحداث"
+  },
+  "leagues": {
+    "ligue1": "الدوري الفرنسي 1"
   }
 }

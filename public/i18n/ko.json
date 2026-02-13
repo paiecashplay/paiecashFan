@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "ko",
   "langName": "한국어",
   "common": {
@@ -13,9 +16,14 @@
     "error": "오류",
     "success": "성공"
   },
+  "auth": {
+    "login": "로그인",
+    "signup": "가입",
+    "logout": "로그아웃"
+  },
   "home": {
     "welcome": "PaieCashFan에 오신 것을 환영합니다",
-    "subtitle": "글로벌 스포츠 슈퍼 앱",
+    "subtitle": "좋아하는 팀과 연결하세요",
     "description": "전 세계 수백만 팬과 함께하세요. 클럽을 지원하고, 결제를 관리하며, 궁극의 축구 경험을 즐기세요.",
     "federations": "연맹",
     "clubs": "클럽",
@@ -52,7 +60,8 @@
     "chat": "채팅",
     "ai": "AI",
     "addStory": "추가",
-    "noTransactions": "최근 거래 없음"
+    "noTransactions": "최근 거래 없음",
+    "follow": "팔로우"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +96,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - 모든 권리 보유",
     "version": "버전",
-    "cryptoPayments": "허용되는 암호화폐 결제: BTC, ETH, USDC, USDT"
+    "cryptoPayments": "허용되는 암호화폐 결제: BTC, ETH, USDC, USDT",
+    "crypto_accepted": "암호화폐 결제 가능: BTC, ETH, USDC, USDT"
   },
   "navigation": {
     "home": "홈",
@@ -100,5 +110,27 @@
     "loadingFailed": "데이터 로드 실패",
     "networkError": "네트워크 오류. 다시 시도하세요.",
     "notFound": "페이지를 찾을 수 없습니다"
+  },
+  "search": {
+    "placeholder": "팀, 클럽, 연맹 검색...",
+    "no_results": "결과를 찾을 수 없습니다"
+  },
+  "promo": {
+    "prepaid_cards": "PaieCash 선불 카드",
+    "prepaid_desc": "최대 10% 캐시백 - 수수료 없음 - 즉시",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+ 국가 - 4G/5G - QR 즉시 활성화",
+    "order_cta": "주문",
+    "discover_cta": "발견"
+  },
+  "tabs": {
+    "football_france": "프랑스 축구",
+    "other_sports": "기타 스포츠",
+    "european_football": "유럽 축구",
+    "federations": "연맹",
+    "events": "이벤트"
+  },
+  "leagues": {
+    "ligue1": "리그 1"
   }
 }

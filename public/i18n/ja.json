@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "PaieCashFan"
+  },
   "lang": "ja",
   "langName": "日本語",
   "common": {
@@ -13,9 +16,14 @@
     "error": "エラー",
     "success": "成功"
   },
+  "auth": {
+    "login": "ログイン",
+    "signup": "新規登録",
+    "logout": "ログアウト"
+  },
   "home": {
     "welcome": "PaieCashFanへようこそ",
-    "subtitle": "グローバルスポーツスーパーアプリ",
+    "subtitle": "お気に入りのチームとつながる",
     "description": "世界中の何百万人ものファンに参加しましょう。クラブをサポートし、支払いを管理し、究極のサッカー体験を楽しみましょう。",
     "federations": "連盟",
     "clubs": "クラブ",
@@ -52,7 +60,8 @@
     "chat": "チャット",
     "ai": "AI",
     "addStory": "追加",
-    "noTransactions": "最近の取引はありません"
+    "noTransactions": "最近の取引はありません",
+    "follow": "フォロー"
   },
   "loto": {
     "title": "LOTO PaieCashFan",
@@ -87,7 +96,8 @@
   "footer": {
     "copyright": "© 2026 PaieCashFan - 全著作権所有",
     "version": "バージョン",
-    "cryptoPayments": "受け入れる暗号通貨：BTC、ETH、USDC、USDT"
+    "cryptoPayments": "受け入れる暗号通貨：BTC、ETH、USDC、USDT",
+    "crypto_accepted": "暗号通貨決済対応：BTC、ETH、USDC、USDT"
   },
   "navigation": {
     "home": "ホーム",
@@ -100,5 +110,27 @@
     "loadingFailed": "データの読み込みに失敗しました",
     "networkError": "ネットワークエラー。もう一度お試しください。",
     "notFound": "ページが見つかりません"
+  },
+  "search": {
+    "placeholder": "チーム、クラブ、連盟を検索...",
+    "no_results": "結果が見つかりませんでした"
+  },
+  "promo": {
+    "prepaid_cards": "PaieCash プリペイドカード",
+    "prepaid_desc": "最大10%キャッシュバック - 手数料なし - 即時",
+    "esim_title": "PaieCash eSIM",
+    "esim_desc": "120+か国 - 4G/5G - QR即時アクティベーション",
+    "order_cta": "注文",
+    "discover_cta": "発見"
+  },
+  "tabs": {
+    "football_france": "フランスサッカー",
+    "other_sports": "その他のスポーツ",
+    "european_football": "ヨーロッパサッカー",
+    "federations": "連盟",
+    "events": "イベント"
+  },
+  "leagues": {
+    "ligue1": "リーグ1"
   }
 }

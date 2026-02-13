@@ -263,6 +263,91 @@
             height: 28px;
         }
         
+        /* Clubs Grid */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .club-card {
+            background: var(--dark-card);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .club-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .club-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .club-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--turquoise), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .club-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 5px;
+        }
+        
+        .club-info p {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+        
+        .club-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .club-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+        
+        .club-stat i {
+            color: var(--green);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-gray);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-gray);
+        }
+        
         /* Footer */
         .footer {
             background: var(--dark-navy);
@@ -293,35 +378,31 @@
     <!-- Header -->
     <header class="header">
         <div class="logo-section">
-            <h1 class="logo-text">PaieCashFan</h1>
-            <select class="lang-selector">
-                <option value="fr">fr</option>
-                <option value="en">en</option>
-                <option value="es">es</option>
-            </select>
+            <h1 class="logo-text" data-i18n="app.name">PaieCashFan</h1>
+            <div id="languageSelector"></div>
         </div>
         
         <div class="auth-buttons">
             <button class="btn btn-login">
-                <i class="fas fa-sign-in-alt"></i> Se connecter
+                <i class="fas fa-sign-in-alt"></i> <span data-i18n="auth.login">Se connecter</span>
             </button>
             <button class="btn btn-signup">
-                <i class="fas fa-user-plus"></i> Inscription
+                <i class="fas fa-user-plus"></i> <span data-i18n="auth.signup">Inscription</span>
             </button>
         </div>
     </header>
     
     <!-- Hero Section -->
     <section class="hero">
-        <h1>PaieCashFan</h1>
-        <p>Connectez-vous à votre équipe préférée</p>
+        <h1 data-i18n="app.name">PaieCashFan</h1>
+        <p data-i18n="home.subtitle">Connectez-vous a votre equipe preferee</p>
     </section>
     
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Rechercher une équipe, un club, une fédération...">
+            <input type="text" id="searchInput" data-i18n-placeholder="search.placeholder" placeholder="Rechercher une equipe, un club, une federation...">
         </div>
     </div>
     
@@ -333,11 +414,11 @@
                     <i class="fas fa-credit-card"></i>
                 </div>
                 <div class="promo-text">
-                    <h3>Cartes Prépayées PaieCash</h3>
-                    <p>Jusqu'à 10% cashback • Sans frais • Instantané</p>
+                    <h3 data-i18n="promo.prepaid_cards">Cartes Prepayees PaieCash</h3>
+                    <p data-i18n="promo.prepaid_desc">Jusqu'a 10% cashback - Sans frais - Instantane</p>
                 </div>
             </div>
-            <button class="promo-btn">Commander</button>
+            <button class="promo-btn" data-i18n="promo.order_cta">Commander</button>
         </div>
         
         <div class="promo-card">
@@ -346,49 +427,52 @@
                     <i class="fas fa-sim-card"></i>
                 </div>
                 <div class="promo-text">
-                    <h3>eSIM PaieCash</h3>
-                    <p>120+ pays • 4G/5G • Activation QR Instantanée</p>
+                    <h3 data-i18n="promo.esim_title">eSIM PaieCash</h3>
+                    <p data-i18n="promo.esim_desc">120+ pays - 4G/5G - Activation QR Instantanee</p>
                 </div>
             </div>
-            <button class="promo-btn">Découvrir</button>
+            <button class="promo-btn" data-i18n="promo.discover_cta">Decouvrir</button>
         </div>
     </section>
     
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
-        <button class="tab active">
-            <i class="fas fa-futbol"></i> Football France
+        <button class="tab active" data-tab="france">
+            <i class="fas fa-futbol"></i> <span data-i18n="tabs.football_france">Football France</span>
         </button>
-        <button class="tab">
-            <i class="fas fa-trophy"></i> Autres Sports
+        <button class="tab" data-tab="sports">
+            <i class="fas fa-trophy"></i> <span data-i18n="tabs.other_sports">Autres Sports</span>
         </button>
-        <button class="tab">
-            <i class="fas fa-globe-europe"></i> EU Football Européen
+        <button class="tab" data-tab="europe">
+            <i class="fas fa-globe-europe"></i> <span data-i18n="tabs.european_football">EU Football Europeen</span>
         </button>
-        <button class="tab">
-            <i class="fas fa-flag"></i> Fédérations
+        <button class="tab" data-tab="federations">
+            <i class="fas fa-flag"></i> <span data-i18n="tabs.federations">Federations</span>
         </button>
-        <button class="tab">
-            <i class="fas fa-star"></i> Événements
+        <button class="tab" data-tab="events">
+            <i class="fas fa-star"></i> <span data-i18n="tabs.events">Evenements</span>
         </button>
     </nav>
     
     <!-- Content Section -->
     <section class="content-section">
         <h2 class="section-title">
-            <span style="font-size: 40px;">🇫🇷</span>
-            Ligue 1
+            <i class="fas fa-flag" style="color: var(--green);"></i>
+            <span data-i18n="leagues.ligue1">Ligue 1</span>
         </h2>
         
-        <div id="federationsContainer" class="loading">
-            <p>Chargement des fédérations...</p>
+        <div id="clubsContainer" class="clubs-grid">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <p data-i18n="loading">Chargement...</p>
+            </div>
         </div>
     </section>
     
     <!-- Footer -->
     <footer class="footer">
-        <p>© 2026 PaieCashFan - Tous droits réservés</p>
-        <p style="margin-top: 10px; font-size: 14px;">Paiements cryptos acceptés : BTC, ETH, USDC, USDT</p>
+        <p data-i18n="footer.copyright">&copy; 2026 PaieCashFan - Tous droits reserves</p>
+        <p style="margin-top: 10px; font-size: 14px;" data-i18n="footer.crypto_accepted">Paiements cryptos acceptes : BTC, ETH, USDC, USDT</p>
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
@@ -396,59 +480,138 @@
     <script>
         const API_BASE = window.location.origin;
         
-        // Load federations
-        async function loadFederations() {
-            try {
-                const response = await axios.get(`${API_BASE}/data/clubs-data.json`);
-                const data = response.data;
-                
-                if (!data.federations) {
-                    document.getElementById('federationsContainer').innerHTML = 
-                        '<p>Aucune fédération trouvée</p>';
-                    return;
-                }
-                
-                const federations = Object.entries(data.federations);
-                const container = document.getElementById('federationsContainer');
-                
-                container.innerHTML = federations.map(([key, fed]) => `
-                    <div class="federation-card" onclick="goToFederation('${key}')">
-                        <div class="federation-logo">
-                            ${fed.logo ? `<img src="${fed.logo}" alt="${fed.fullName}">` : 
-                              `<i class="fas fa-flag"></i>`}
+        // French Ligue 1 clubs
+        const ligue1Clubs = [
+            { id: 'psg', name: 'Paris Saint-Germain', city: 'Paris', fans: '125K', icon: 'fa-star' },
+            { id: 'om', name: 'Olympique de Marseille', city: 'Marseille', fans: '98K', icon: 'fa-water' },
+            { id: 'ol', name: 'Olympique Lyonnais', city: 'Lyon', fans: '87K', icon: 'fa-crown' },
+            { id: 'asse', name: 'AS Saint-Etienne', city: 'Saint-Etienne', fans: '76K', icon: 'fa-shield' },
+            { id: 'asm', name: 'AS Monaco', city: 'Monaco', fans: '71K', icon: 'fa-gem' },
+            { id: 'losc', name: 'LOSC Lille', city: 'Lille', fans: '65K', icon: 'fa-paw' },
+            { id: 'ogcn', name: 'OGC Nice', city: 'Nice', fans: '58K', icon: 'fa-dove' },
+            { id: 'rcl', name: 'RC Lens', city: 'Lens', fans: '54K', icon: 'fa-bolt' },
+            { id: 'srfc', name: 'Stade Rennais FC', city: 'Rennes', fans: '49K', icon: 'fa-fire' },
+            { id: 'fcn', name: 'FC Nantes', city: 'Nantes', fans: '45K', icon: 'fa-anchor' },
+            { id: 'girondins', name: 'FC Girondins Bordeaux', city: 'Bordeaux', fans: '42K', icon: 'fa-wine-bottle' },
+            { id: 'montpellier', name: 'Montpellier HSC', city: 'Montpellier', fans: '38K', icon: 'fa-sun' },
+            { id: 'strasbourg', name: 'RC Strasbourg', city: 'Strasbourg', fans: '35K', icon: 'fa-mountain' },
+            { id: 'reims', name: 'Stade de Reims', city: 'Reims', fans: '32K', icon: 'fa-champagne-glasses' },
+            { id: 'brest', name: 'Stade Brestois', city: 'Brest', fans: '28K', icon: 'fa-ship' },
+            { id: 'toulouse', name: 'Toulouse FC', city: 'Toulouse', fans: '26K', icon: 'fa-heart' },
+            { id: 'angers', name: 'Angers SCO', city: 'Angers', fans: '24K', icon: 'fa-leaf' },
+            { id: 'auxerre', name: 'AJ Auxerre', city: 'Auxerre', fans: '22K', icon: 'fa-tree' }
+        ];
+        
+        let allClubs = [...ligue1Clubs];
+        let filteredClubs = [...ligue1Clubs];
+        
+        // Render clubs
+        function renderClubs(clubs) {
+            const container = document.getElementById('clubsContainer');
+            
+            if (clubs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px; color: var(--text-gray);"></i>
+                        <p data-i18n="search.no_results">Aucun resultat trouve</p>
+                    </div>
+                `;
+                if (window.i18n) i18n.translatePage();
+                return;
+            }
+            
+            container.innerHTML = clubs.map(club => `
+                <div class="club-card" onclick="goToClub('${club.id}')">
+                    <div class="club-header">
+                        <div class="club-logo">
+                            <i class="fas ${club.icon}"></i>
                         </div>
-                        <div class="federation-info">
-                            <h3>${fed.fullName}</h3>
-                            <p>${fed.region}</p>
-                            <div class="federation-stats">
-                                <span><i class="fas fa-futbol"></i> ${Object.keys(fed.clubs || {}).length} clubs</span>
-                            </div>
+                        <div class="club-info">
+                            <h3>${club.name}</h3>
+                            <p><i class="fas fa-map-marker-alt"></i> ${club.city}</p>
                         </div>
                     </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading federations:', error);
-                document.getElementById('federationsContainer').innerHTML = 
-                    '<p>Erreur lors du chargement des fédérations</p>';
-            }
+                    <div class="club-stats">
+                        <div class="club-stat">
+                            <i class="fas fa-users"></i>
+                            <span>${club.fans}</span>
+                        </div>
+                        <div class="club-stat">
+                            <i class="fas fa-trophy"></i>
+                            <span data-i18n="club.follow">Suivre</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (window.i18n) i18n.translatePage();
         }
         
-        // Navigate to federation
-        function goToFederation(fedId) {
-            window.location.href = `/federation.html?fed=${fedId}`;
+        // Search functionality
+        function handleSearch(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredClubs = [...allClubs];
+            } else {
+                filteredClubs = allClubs.filter(club => 
+                    club.name.toLowerCase().includes(searchTerm) ||
+                    club.city.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderClubs(filteredClubs);
+        }
+        
+        // Navigate to club
+        function goToClub(clubId) {
+            window.location.href = `/club.html?club=${clubId}`;
         }
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFederations();
-            
-            // Initialize language selector
-            setTimeout(() => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n
+            if (window.i18n) {
+                await i18n.init();
+                
+                // Add language selector
                 const langSelector = document.getElementById('languageSelector');
-                if (langSelector && window.i18n) {
+                if (langSelector) {
                     langSelector.appendChild(i18n.createLanguageSelector());
                 }
-            }, 500);
+                
+                // Listen for language changes
+                window.addEventListener('languageChanged', () => {
+                    i18n.translatePage();
+                });
+            }
+            
+            // Render clubs
+            renderClubs(filteredClubs);
+            
+            // Setup search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    handleSearch(e.target.value);
+                });
+            }
+            
+            // Setup tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const tabType = tab.dataset.tab;
+                    if (tabType === 'france') {
+                        allClubs = [...ligue1Clubs];
+                        filteredClubs = [...ligue1Clubs];
+                        renderClubs(filteredClubs);
+                    }
+                });
+            });
         });
     </script>
 </body>
