@@ -212,83 +212,80 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     <script>
-        const API_BASE = '/api';
+        let clubsData = null;
         const urlParams = new URLSearchParams(window.location.search);
-        const fedId = urlParams.get('fed') || 'caf';
+        const fedId = urlParams.get('fed') || 'CAF';
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadFederation();
-            loadClubs();
         });
         
-        // Load Federation Info
+        // Load Federation Info and Clubs from JSON
         async function loadFederation() {
             try {
-                const response = await axios.get(`${API_BASE}/federations`);
-                const { federations } = response.data;
-                const fed = federations.find(f => f.id === fedId);
+                const response = await fetch('/data/clubs-data.json');
+                clubsData = await response.json();
                 
-                if (fed) {
-                    document.getElementById('fedName').textContent = fed.name;
-                    document.getElementById('fedDesc').textContent = fed.fullName;
-                    document.title = `PaieCashFan - ${fed.name}`;
-                }
-            } catch (error) {
-                console.error('Error loading federation:', error);
-            }
-        }
-        
-        // Load Clubs
-        async function loadClubs() {
-            try {
-                const response = await axios.get(`${API_BASE}/federations/${fedId}/clubs`);
-                const { clubs } = response.data;
+                const federation = clubsData.federations[fedId];
                 
-                const container = document.getElementById('clubsContainer');
-                
-                if (!clubs || clubs.length === 0) {
-                    container.className = '';
-                    container.innerHTML = '<p>Aucun club disponible</p>';
+                if (!federation) {
+                    document.getElementById('fedName').textContent = 'Federation inconnue';
+                    document.getElementById('fedDesc').textContent = 'Cette federation n\'existe pas';
+                    document.getElementById('clubsContainer').innerHTML = '<p>Federation non trouvee</p>';
                     return;
                 }
                 
-                container.className = 'clubs-grid';
-                container.innerHTML = clubs.map(club => `
-                    <div class="club-card" onclick="goToClub('${club.id}', '${club.name}')">
+                // Update header
+                document.getElementById('fedName').textContent = fedId;
+                document.getElementById('fedDesc').textContent = federation.name + ' - ' + federation.region;
+                document.title = `PaieCashFan - ${fedId}`;
+                
+                // Display clubs
+                displayClubs(federation);
+                
+            } catch (error) {
+                console.error('Error loading federation:', error);
+                document.getElementById('clubsContainer').innerHTML = '<p style="color: var(--danger);">Erreur lors du chargement</p>';
+            }
+        }
+        
+        // Display Clubs
+        function displayClubs(federation) {
+            const container = document.getElementById('clubsContainer');
+            const clubs = federation.clubs;
+            
+            if (!clubs || Object.keys(clubs).length === 0) {
+                container.className = '';
+                container.innerHTML = '<p>Aucun club disponible</p>';
+                return;
+            }
+            
+            container.className = 'clubs-grid';
+            container.innerHTML = Object.keys(clubs).map(clubKey => {
+                const club = clubs[clubKey];
+                return `
+                    <div class="club-card" onclick="goToClub('${clubKey}', '${club.name}')">
                         <div class="club-header">
-                            <div class="club-flag">
-                                ${club.flag || '<i class="fas fa-flag"></i>'}
-                            </div>
+                            <div class="club-flag">${club.flag || club.logo}</div>
                             <div class="club-details">
                                 <h3>${club.name}</h3>
-                                <p>${club.region || club.type}</p>
+                                <p>${club.league}</p>
                             </div>
                         </div>
-                        ${fedId === 'caf' 
+                        ${federation.merchandising 
                             ? '<span class="badge badge-success"><i class="fas fa-shopping-bag"></i> Merchandising</span>' 
                             : '<span class="badge badge-warning"><i class="fas fa-clock"></i> Bientot</span>'
                         }
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error loading clubs:', error);
-                const container = document.getElementById('clubsContainer');
-                container.className = '';
-                container.innerHTML = '<p style="color: var(--danger);">Erreur lors du chargement</p>';
-            }
+                `;
+            }).join('');
         }
         
         // Go to Club
-        function goToClub(clubId, clubName) {
-            if (fedId === 'caf') {
-                window.location.href = `/club.html?club=${clubId}&name=${encodeURIComponent(clubName)}&fed=${fedId.toUpperCase()}`;
-            } else {
-                alert('Merchandising bientot disponible pour ' + clubName);
-            }
+        function goToClub(clubKey, clubName) {
+            window.location.href = `/club.html?club=${clubKey}&fed=${fedId}`;
         }
         
         // Go Back
