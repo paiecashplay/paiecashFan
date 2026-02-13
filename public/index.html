@@ -510,7 +510,12 @@
         
         // Go to Federation
         function goToFederation(fedId) {
-            window.location.href = `/federation.html?fed=${fedId}`;
+            // Redirect to dedicated CAF page
+            if (fedId === 'CAF') {
+                window.location.href = '/caf.html';
+            } else {
+                window.location.href = `/federation.html?fed=${fedId}`;
+            }
         }
         
         // Go to Wallet

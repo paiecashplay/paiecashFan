@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAF - Confederation Africaine de Football</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --caf-primary: #00A651;
+            --caf-secondary: #FFC627;
+            --bg-dark: #0a0e1a;
+            --bg-card: #1a1f2e;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00A651 0%, #FFC627 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 166, 81, 0.3);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-5px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            color: white;
+            padding: 1.5rem 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .filters-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .caf-filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid #00A651;
+            border-radius: 25px;
+            color: #00A651;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .caf-filter-btn:hover,
+        .caf-filter-btn.active {
+            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .caf-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .caf-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00A651 0%, #FFC627 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .caf-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .caf-card:hover {
+            transform: translateY(-8px);
+            border-color: #00A651;
+            box-shadow: 0 12px 40px rgba(0, 166, 81, 0.3);
+        }
+
+        .caf-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .caf-card-flag {
+            font-size: 2.5rem;
+        }
+
+        .caf-card-info {
+            flex: 1;
+        }
+
+        .caf-card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .caf-card-code {
+            font-size: 0.85rem;
+            color: #00A651;
+            font-weight: 600;
+        }
+
+        .caf-card-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .caf-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.3rem 0;
+        }
+
+        .caf-detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .caf-region-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #FFC627 0%, #FF9800 100%);
+            color: #1a1f2e;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .caf-app-link {
+            display: block;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .caf-app-link:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                position: static;
+                transform: none;
+                margin-bottom: 1rem;
+                display: inline-flex;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stat-box {
+                padding: 1rem 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <h1><i class="fas fa-globe-africa"></i> CAF - Confederation Africaine de Football</h1>
+        <p>54 Federations Membres • 5 Regions • Fondee en 1957</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-number">54</div>
+                <div class="stat-label">Federations</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Regions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">1957</div>
+                <div class="stat-label">Fondation</div>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <button class="caf-filter-btn active" onclick="filterRegion('all')">
+                Toutes les regions
+            </button>
+            <button class="caf-filter-btn" onclick="filterRegion('Afrique du Nord')">
+                Afrique du Nord
+            </button>
+            <button class="caf-filter-btn" onclick="filterRegion('Afrique de l\'Ouest')">
+                Afrique de l'Ouest
+            </button>
+            <button class="caf-filter-btn" onclick="filterRegion('Afrique Centrale')">
+                Afrique Centrale
+            </button>
+            <button class="caf-filter-btn" onclick="filterRegion('Afrique de l\'Est')">
+                Afrique de l'Est
+            </button>
+            <button class="caf-filter-btn" onclick="filterRegion('Afrique Australe')">
+                Afrique Australe
+            </button>
+        </div>
+
+        <div id="caf-grid" class="grid"></div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 PaieCashFan - Tous droits reserves</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE = '/api';
+        let currentFilter = 'all';
+        let allFederations = [];
+
+        // Donnees CAF completes (54 federations)
+        const cafData = [
+            // Afrique du Nord (7)
+            {name: 'Algerie', code: 'ALG', flag: '🇩🇿', region: 'Afrique du Nord', president: 'Walid Sadi', founded: '1962', fifaMember: '1963'},
+            {name: 'Egypte', code: 'EGY', flag: '🇪🇬', region: 'Afrique du Nord', president: 'Ahmed Megahed', founded: '1921', fifaMember: '1923'},
+            {name: 'Libye', code: 'LBY', flag: '🇱🇾', region: 'Afrique du Nord', president: 'Abdulhakim Al-Shalmani', founded: '1962', fifaMember: '1964'},
+            {name: 'Maroc', code: 'MAR', flag: '🇲🇦', region: 'Afrique du Nord', president: 'Fouzi Lekjaa', founded: '1955', fifaMember: '1960'},
+            {name: 'Tunisie', code: 'TUN', flag: '🇹🇳', region: 'Afrique du Nord', president: 'Wadii Jarii', founded: '1957', fifaMember: '1960'},
+            {name: 'Mauritanie', code: 'MTN', flag: '🇲🇷', region: 'Afrique du Nord', president: 'Ahmed Yahya', founded: '1961', fifaMember: '1964'},
+            {name: 'Soudan', code: 'SDN', flag: '🇸🇩', region: 'Afrique du Nord', president: 'Mutasim Gaafar', founded: '1936', fifaMember: '1948'},
+            
+            // Afrique de l'Ouest (16)
+            {name: 'Benin', code: 'BEN', flag: '🇧🇯', region: 'Afrique de l\'Ouest', president: 'Anjorin Moucharafou', founded: '1962', fifaMember: '1964'},
+            {name: 'Burkina Faso', code: 'BFA', flag: '🇧🇫', region: 'Afrique de l\'Ouest', president: 'Lazare Bansse', founded: '1960', fifaMember: '1964'},
+            {name: 'Cap-Vert', code: 'CPV', flag: '🇨🇻', region: 'Afrique de l\'Ouest', president: 'Mario Semedo', founded: '1982', fifaMember: '1986'},
+            {name: 'Cote d\'Ivoire', code: 'CIV', flag: '🇨🇮', region: 'Afrique de l\'Ouest', president: 'Idriss Diallo', founded: '1960', fifaMember: '1960'},
+            {name: 'Gambie', code: 'GAM', flag: '🇬🇲', region: 'Afrique de l\'Ouest', president: 'Lamin Kaba Bajo', founded: '1952', fifaMember: '1966'},
+            {name: 'Ghana', code: 'GHA', flag: '🇬🇭', region: 'Afrique de l\'Ouest', president: 'Kurt Okraku', founded: '1957', fifaMember: '1958'},
+            {name: 'Guinee', code: 'GUI', flag: '🇬🇳', region: 'Afrique de l\'Ouest', president: 'Mamadou Antonio Souare', founded: '1959', fifaMember: '1961'},
+            {name: 'Guinee-Bissau', code: 'GNB', flag: '🇬🇼', region: 'Afrique de l\'Ouest', president: 'Nascimento Gomes', founded: '1974', fifaMember: '1986'},
+            {name: 'Liberia', code: 'LBR', flag: '🇱🇷', region: 'Afrique de l\'Ouest', president: 'Mustapha Raji', founded: '1936', fifaMember: '1962'},
+            {name: 'Mali', code: 'MLI', flag: '🇲🇱', region: 'Afrique de l\'Ouest', president: 'Mamoutou Toure', founded: '1960', fifaMember: '1962'},
+            {name: 'Niger', code: 'NIG', flag: '🇳🇪', region: 'Afrique de l\'Ouest', president: 'Daouda Azaoua', founded: '1961', fifaMember: '1964'},
+            {name: 'Nigeria', code: 'NGA', flag: '🇳🇬', region: 'Afrique de l\'Ouest', president: 'Ibrahim Gusau', founded: '1945', fifaMember: '1959'},
+            {name: 'Senegal', code: 'SEN', flag: '🇸🇳', region: 'Afrique de l\'Ouest', president: 'Augustin Senghor', founded: '1960', fifaMember: '1962'},
+            {name: 'Sierra Leone', code: 'SLE', flag: '🇸🇱', region: 'Afrique de l\'Ouest', president: 'Thomas Daddy Brima', founded: '1960', fifaMember: '1967'},
+            {name: 'Togo', code: 'TOG', flag: '🇹🇬', region: 'Afrique de l\'Ouest', president: 'Guy Akpovi', founded: '1960', fifaMember: '1962'},
+            
+            // Afrique Centrale (8)
+            {name: 'Cameroun', code: 'CMR', flag: '🇨🇲', region: 'Afrique Centrale', president: 'Samuel Eto\'o', founded: '1959', fifaMember: '1962'},
+            {name: 'Centrafrique', code: 'CTA', flag: '🇨🇫', region: 'Afrique Centrale', president: 'Patrice-Edouard Ngaissona', founded: '1961', fifaMember: '1963'},
+            {name: 'Congo', code: 'CGO', flag: '🇨🇬', region: 'Afrique Centrale', president: 'Jean Guy Blaise Mayolas', founded: '1962', fifaMember: '1962'},
+            {name: 'RD Congo', code: 'COD', flag: '🇨🇩', region: 'Afrique Centrale', president: 'Constant Omari', founded: '1919', fifaMember: '1962'},
+            {name: 'Gabon', code: 'GAB', flag: '🇬🇦', region: 'Afrique Centrale', president: 'Pierre Alain Mounguengui', founded: '1962', fifaMember: '1963'},
+            {name: 'Guinee Equatoriale', code: 'GEQ', flag: '🇬🇶', region: 'Afrique Centrale', president: 'Gustavo Ndong Edu', founded: '1975', fifaMember: '1986'},
+            {name: 'Tchad', code: 'CHA', flag: '🇹🇩', region: 'Afrique Centrale', president: 'Moctar Mahamoud', founded: '1962', fifaMember: '1964'},
+            {name: 'Sao Tome-et-Principe', code: 'STP', flag: '🇸🇹', region: 'Afrique Centrale', president: 'Adilson Vaz da Conceicao', founded: '1975', fifaMember: '1986'},
+            
+            // Afrique de l'Est (13)
+            {name: 'Burundi', code: 'BDI', flag: '🇧🇮', region: 'Afrique de l\'Est', president: 'Reverien Ndikuriyo', founded: '1948', fifaMember: '1972'},
+            {name: 'Comores', code: 'COM', flag: '🇰🇲', region: 'Afrique de l\'Est', president: 'Ahmed Athouman Ali', founded: '1979', fifaMember: '2005'},
+            {name: 'Djibouti', code: 'DJI', flag: '🇩🇯', region: 'Afrique de l\'Est', president: 'Souleiman Hassan Waberi', founded: '1977', fifaMember: '1994'},
+            {name: 'Erythree', code: 'ERI', flag: '🇪🇷', region: 'Afrique de l\'Est', president: 'Teame Zemichael', founded: '1996', fifaMember: '1998'},
+            {name: 'Ethiopie', code: 'ETH', flag: '🇪🇹', region: 'Afrique de l\'Est', president: 'Esayas Jira', founded: '1943', fifaMember: '1953'},
+            {name: 'Kenya', code: 'KEN', flag: '🇰🇪', region: 'Afrique de l\'Est', president: 'Nick Mwendwa', founded: '1960', fifaMember: '1960'},
+            {name: 'Madagascar', code: 'MAD', flag: '🇲🇬', region: 'Afrique de l\'Est', president: 'Alfred Randriamanampisoa', founded: '1961', fifaMember: '1962'},
+            {name: 'Malawi', code: 'MWI', flag: '🇲🇼', region: 'Afrique de l\'Est', president: 'Walter Nyamilandu', founded: '1966', fifaMember: '1967'},
+            {name: 'Ouganda', code: 'UGA', flag: '🇺🇬', region: 'Afrique de l\'Est', president: 'Moses Magogo', founded: '1924', fifaMember: '1959'},
+            {name: 'Rwanda', code: 'RWA', flag: '🇷🇼', region: 'Afrique de l\'Est', president: 'Olivier Mugabo Nizeyimana', founded: '1972', fifaMember: '1976'},
+            {name: 'Somalie', code: 'SOM', flag: '🇸🇴', region: 'Afrique de l\'Est', president: 'Abdiqani Said Arab', founded: '1951', fifaMember: '1962'},
+            {name: 'Soudan du Sud', code: 'SSD', flag: '🇸🇸', region: 'Afrique de l\'Est', president: 'Augustino Maduot', founded: '2011', fifaMember: '2012'},
+            {name: 'Tanzanie', code: 'TAN', flag: '🇹🇿', region: 'Afrique de l\'Est', president: 'Wallace Karia', founded: '1930', fifaMember: '1964'},
+            
+            // Afrique Australe (10)
+            {name: 'Afrique du Sud', code: 'RSA', flag: '🇿🇦', region: 'Afrique Australe', president: 'Danny Jordaan', founded: '1991', fifaMember: '1992'},
+            {name: 'Angola', code: 'ANG', flag: '🇦🇴', region: 'Afrique Australe', president: 'Artur de Almeida', founded: '1979', fifaMember: '1980'},
+            {name: 'Botswana', code: 'BOT', flag: '🇧🇼', region: 'Afrique Australe', president: 'Maclean Letshwiti', founded: '1970', fifaMember: '1978'},
+            {name: 'Eswatini', code: 'SWZ', flag: '🇸🇿', region: 'Afrique Australe', president: 'Frederick Mngomezulu', founded: '1968', fifaMember: '1978'},
+            {name: 'Lesotho', code: 'LES', flag: '🇱🇸', region: 'Afrique Australe', president: 'Salemane Phafane', founded: '1932', fifaMember: '1964'},
+            {name: 'Maurice', code: 'MRI', flag: '🇲🇺', region: 'Afrique Australe', president: 'Rajeev Gopy', founded: '1952', fifaMember: '1962'},
+            {name: 'Mozambique', code: 'MOZ', flag: '🇲🇿', region: 'Afrique Australe', president: 'Feizal Sidat', founded: '1975', fifaMember: '1978'},
+            {name: 'Namibie', code: 'NAM', flag: '🇳🇦', region: 'Afrique Australe', president: 'Ranga Haikali', founded: '1990', fifaMember: '1992'},
+            {name: 'Zambie', code: 'ZAM', flag: '🇿🇲', region: 'Afrique Australe', president: 'Andrew Kamanga', founded: '1929', fifaMember: '1964'},
+            {name: 'Zimbabwe', code: 'ZIM', flag: '🇿🇼', region: 'Afrique Australe', president: 'Felton Kamambo', founded: '1965', fifaMember: '1965'}
+        ];
+
+        function createCAFCard(fed) {
+            return `
+                <div class="caf-card" data-region="${fed.region}">
+                    <span class="caf-region-badge">${fed.region}</span>
+                    <div class="caf-card-header">
+                        <div class="caf-card-flag">${fed.flag}</div>
+                        <div class="caf-card-info">
+                            <div class="caf-card-name">${fed.name}</div>
+                            <div class="caf-card-code">${fed.code}</div>
+                        </div>
+                    </div>
+                    <div class="caf-card-details">
+                        <div class="caf-detail-row">
+                            <span class="caf-detail-label">President:</span>
+                            <span>${fed.president}</span>
+                        </div>
+                        <div class="caf-detail-row">
+                            <span class="caf-detail-label">Fondation:</span>
+                            <span>${fed.founded}</span>
+                        </div>
+                        <div class="caf-detail-row">
+                            <span class="caf-detail-label">Membre FIFA:</span>
+                            <span>${fed.fifaMember}</span>
+                        </div>
+                    </div>
+                    <a href="/club.html?club=${fed.code.toLowerCase()}&name=${encodeURIComponent(fed.name)}&fed=CAF" class="caf-app-link">
+                        <i class="fas fa-rocket"></i> Voir l'application
+                    </a>
+                </div>
+            `;
+        }
+
+        function renderFederations(filter = 'all') {
+            const grid = document.getElementById('caf-grid');
+            const filtered = filter === 'all' 
+                ? cafData 
+                : cafData.filter(f => f.region === filter);
+            
+            grid.innerHTML = filtered.map(createCAFCard).join('');
+        }
+
+        function filterRegion(region) {
+            currentFilter = region;
+            
+            // Update active button
+            document.querySelectorAll('.caf-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderFederations(region);
+        }
+
+        // Initial render
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFederations('all');
+        });
+    </script>
+</body>
+</html>
