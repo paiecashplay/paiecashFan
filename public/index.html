@@ -850,14 +850,8 @@
         
         // Navigation functions
         function goToClub(league, clubName) {
-            const pages = {
-                ligue1: '/index-loto.html',
-                ligue2: '/index-loto-ligue2.html',
-                national: '/index-loto-national.html',
-                national2: '/index-loto-national2.html',
-                national3: '/index-loto-national3.html'
-            };
-            window.location.href = pages[league];
+            // Redirect to universal app with club context
+            window.location.href = `/app-universal-simple.html?club=${encodeURIComponent(clubName)}&league=${league}`;
         }
         
         function goToFederation(fedId) {
