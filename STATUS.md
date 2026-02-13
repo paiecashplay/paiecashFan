@@ -57,13 +57,16 @@
 
 ## Ce Qui Est EN COURS
 
-### 3. Interface Club App (En cours)
-- Stories horizontales Instagram-style
-- Feed social avec posts et sponsors
-- Merchandising modal dynamique
-- **LOTO** - A ajouter sous le logo rond de Gamification
-- Systeme FOMO avec cashback PCC
-- Envoi d'argent avec PIN
+### 3. Interface Club App (TERMINE - Phase 2)
+- ✅ Stories horizontales Instagram-style
+- ✅ Feed social avec posts et sponsors
+- ✅ Merchandising modal dynamique
+- ✅ **LOTO** - Ajoute sous le logo rond de Gamification
+- ✅ Systeme FOMO avec cashback PCC
+- ✅ Envoi d'argent avec PIN
+- ✅ Interface federation.html pour lister clubs
+- ✅ Page club.html complete avec toutes fonctionnalites
+- **SANS EMOJIS** - 100% compatible Vercel
 
 ---
 
@@ -120,6 +123,9 @@
 ## URLs
 
 - **Local Dev** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai
+- **Index Principal** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/index.html
+- **Federation CAF** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/federation.html?fed=caf
+- **Club Maroc** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/club.html?club=ma&name=Maroc&fed=CAF
 - **API Health** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/health
 - **API Federations** : https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/federations
 
@@ -226,5 +232,5 @@ dad9f20 - Initial commit - PaieCashFan v7.0 rebuild
 
 ---
 
-**Statut Global** : 2/10 taches completees (20%)  
-**Prochaine Milestone** : Interface Club Complete + LOTO (Target: Fin Phase 3)
+**Statut Global** : 3/10 taches completees (30%)  
+**Prochaine Milestone** : Services Progressifs (Wallet, eSIM, Shop, Tickets) - Phase 4
