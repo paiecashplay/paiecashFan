@@ -660,334 +660,883 @@
             margin-top: 8px;
         }
         
-        /* ========== LOTO MODAL ========== */
-        .loto-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        /* ========== LOTO MODAL SYSTEM ========== */
+.loto-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.loto-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.loto-modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    border-radius: 24px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loto-screen {
+    padding: 24px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loto-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.loto-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.loto-back {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.loto-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-4px);
+}
+
+/* ========== PAGE D'ACCUEIL ========== */
+.loto-home-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.loto-home-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: #10b981;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(16, 185, 129, 0.5);
+}
+
+.loto-home-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.loto-charity {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-bottom: 8px;
+}
+
+.loto-charity i {
+    color: #ef4444;
+}
+
+.loto-charity span {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.loto-charity-detail {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+/* Streak Section */
+.loto-streak {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.streak-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.streak-header i {
+    color: #f59e0b;
+}
+
+.streak-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+}
+
+.streak-countdown {
+    font-size: 20px;
+    font-weight: 900;
+    color: #f59e0b;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.streak-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.streak-day {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.streak-day.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+}
+
+.day-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.day-status {
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+}
+
+/* Game Options */
+.loto-game-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.game-option-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-option-card:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+    border-color: #10b981;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+}
+
+.game-option-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.game-option-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.game-option-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.game-option-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 12px;
+    color: #1a1a2e;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-option-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4);
+}
+
+.loto-rules {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.loto-rules:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.loto-rules i {
+    color: #10b981;
+}
+
+.loto-rules span {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+/* ========== MODE SCRATCH ========== */
+.scratch-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #10b981;
+    text-align: center;
+    margin-bottom: 24px;
+    margin-top: 40px;
+}
+
+.scratch-tickets {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.scratch-ticket-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.scratch-ticket-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #10b981;
+    transform: translateX(4px);
+}
+
+.scratch-ticket-card.popular {
+    border-color: #fbbf24;
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+}
+
+.ticket-badge {
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a1a2e;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ticket-icon {
+    font-size: 32px;
+}
+
+.ticket-price {
+    font-size: 24px;
+    font-weight: 900;
+    color: #10b981;
+    min-width: 80px;
+}
+
+.ticket-bonus {
+    font-size: 14px;
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.ticket-info {
+    flex: 1;
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+.ticket-chances {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.scratch-buy-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}
+
+.scratch-buy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+}
+
+.scratch-balance {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 12px;
+}
+
+/* Scratch Card */
+.scratch-card-container {
+    text-align: center;
+}
+
+.scratch-timer {
+    font-size: 24px;
+    font-weight: 900;
+    color: #fbbf24;
+    margin-bottom: 16px;
+}
+
+.scratch-ticket-info {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: white;
+}
+
+.scratch-canvas {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    border-radius: 16px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.scratch-instruction {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    margin-top: 16px;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Result */
+.scratch-result {
+    text-align: center;
+}
+
+.result-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.result-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #fbbf24;
+    margin-bottom: 16px;
+}
+
+.result-amount {
+    font-size: 48px;
+    font-weight: 900;
+    color: #10b981;
+    margin-bottom: 8px;
+}
+
+.result-currency {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 24px;
+}
+
+.result-details {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    color: white;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-row.total {
+    font-size: 18px;
+    font-weight: 900;
+    color: #10b981;
+}
+
+.result-multiplier {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.result-balance {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.result-charity {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+}
+
+.result-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.result-btn {
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.result-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.result-btn.primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+    grid-column: 1 / -1;
+}
+
+/* ========== MODE LOTO CHIFFRES ========== */
+.numbers-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #10b981;
+    text-align: center;
+    margin-bottom: 12px;
+    margin-top: 40px;
+}
+
+.numbers-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.numbers-gains-table {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.gain-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gain-item.highlight {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+    border-color: #fbbf24;
+}
+
+.gain-item span {
+    display: block;
+    font-size: 14px;
+    color: #10b981;
+    margin-top: 4px;
+}
+
+.numbers-selection {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.numbers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.numbers-header span {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+.numbers-random-btn {
+    padding: 8px 16px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.numbers-random-btn:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+.numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.number-btn {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.number-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #10b981;
+}
+
+.number-btn.selected {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+    transform: scale(1.1);
+}
+
+.numbers-add-line-btn {
+    width: 100%;
+    padding: 14px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    border-radius: 12px;
+    color: #10b981;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.numbers-add-line-btn:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+.numbers-lines {
+    margin-bottom: 24px;
+}
+
+.numbers-lines h3 {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.empty-lines {
+    text-align: center;
+    padding: 24px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+}
+
+.line-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.line-numbers {
+    display: flex;
+    gap: 8px;
+}
+
+.line-number {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.line-remove {
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.numbers-footer {
+    text-align: center;
+}
+
+.numbers-cost {
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.numbers-play-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    margin-bottom: 12px;
+}
+
+.numbers-play-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.numbers-play-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+}
+
+.numbers-charity {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.numbers-result {
+    text-align: center;
+}
+
+.winning-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.winning-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a2e;
+    font-weight: 900;
+    font-size: 20px;
+    animation: popIn 0.5s ease-out;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.user-lines-result {
+    margin: 24px 0;
+}
+
+.result-message {
+    margin: 24px 0;
+}
+
+.result-message h3 {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ef4444;
+    margin-bottom: 8px;
+}
+
+.result-message p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .loto-modal-content {
+        max-height: 95vh;
+    }
+    
+    .loto-home-title {
+        font-size: 28px;
+    }
+    
+    .loto-game-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .streak-calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+    
+    .streak-day {
+        padding: 8px 4px;
+    }
+    
+    .numbers-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+    
+    .number-btn {
+        font-size: 14px;
+    }
+    
+    .result-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-btn.primary {
+        grid-column: 1;
+    }
+}
+
         
-        .loto-modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-        }
-        
-        .loto-modal-content {
-            position: relative;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .loto-header {
-            background: linear-gradient(135deg, #FF6B35, #F7931E);
-            padding: 24px;
-            border-radius: 24px 24px 0 0;
-            position: relative;
-        }
-        
-        .loto-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .loto-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-        
-        .loto-header-content {
-            text-align: center;
-        }
-        
-        .loto-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        
-        .loto-title {
-            font-size: 28px;
-            font-weight: 900;
-            color: white;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-        
-        .loto-subtitle {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-        
-        .loto-draw-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .draw-info-item {
-            text-align: center;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .draw-info-item.highlight {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-        
-        .draw-info-label {
-            font-size: 18px;
-            font-weight: 900;
-            color: #10b981;
-            margin-bottom: 4px;
-        }
-        
-        .draw-info-item.highlight .draw-info-label {
-            font-size: 24px;
-        }
-        
-        .draw-info-value {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .loto-tickets {
-            padding: 20px;
-            display: grid;
-            gap: 12px;
-        }
-        
-        .loto-ticket-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .loto-ticket-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 107, 53, 0.5);
-            transform: translateY(-2px);
-        }
-        
-        .loto-ticket-card.selected {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(247, 147, 30, 0.2));
-            border-color: #FF6B35;
-            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
-        }
-        
-        .ticket-price {
-            font-size: 32px;
-            font-weight: 900;
-            color: #FF6B35;
-            min-width: 80px;
-        }
-        
-        .loto-ticket-card.selected .ticket-price {
-            color: #F7931E;
-        }
-        
-        .ticket-info {
-            flex: 1;
-        }
-        
-        .ticket-label {
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-        }
-        
-        .ticket-chances {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .ticket-popular {
-            position: absolute;
-            top: -8px;
-            right: 12px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a1a2e;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-        }
-        
-        .loto-play-btn {
-            width: calc(100% - 40px);
-            margin: 0 20px 20px;
-            padding: 18px;
-            background: linear-gradient(135deg, #FF6B35, #F7931E);
-            border: none;
-            border-radius: 16px;
-            color: white;
-            font-size: 18px;
-            font-weight: 900;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
-            letter-spacing: 1px;
-        }
-        
-        .loto-play-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(255, 107, 53, 0.5);
-        }
-        
-        .supercagnotte-section {
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.15));
-            padding: 24px;
-            margin: 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(220, 38, 38, 0.3);
-        }
-        
-        .supercagnotte-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .supercagnotte-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #dc2626, #ef4444);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-        
-        .supercagnotte-title {
-            font-size: 24px;
-            font-weight: 900;
-            color: white;
-            margin-bottom: 8px;
-        }
-        
-        .supercagnotte-desc {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.5;
-        }
-        
-        .supercagnotte-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        
-        .stat-item i {
-            font-size: 24px;
-            color: #FF6B35;
-            margin-bottom: 8px;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 900;
-            color: white;
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-        }
-        
-        .prizes-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        
-        .prize-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .prize-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-        
-        .prize-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-        }
-        
-        .prize-value {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 480px) {
-            .loto-modal-content {
-                max-height: 95vh;
-            }
-            
-            .loto-title {
-                font-size: 22px;
-            }
             
             .ticket-price {
                 font-size: 24px;
@@ -1024,23 +1573,23 @@
 
     <!-- LEFT ACTION BAR - Gamification en haut -->
     <div class="left-actions">
-        <div class="action-btn gamification-btn" onclick="openGamification()">
+        <div class="action-btn gamification-btn" onclick="openGamification()" title="Gamification">
             <i class="fas fa-trophy"></i>
             <div class="gamification-badge">🔥</div>
         </div>
-        <div class="action-btn loto-btn" onclick="openLoto()">
+        <div class="action-btn loto-btn" onclick="openLoto()" title="Loto">
             <i class="fas fa-dice"></i>
             <div class="loto-badge">1</div>
         </div>
-        <div class="action-btn" onclick="handleLike()">
+        <div class="action-btn" onclick="handleLike()" title="J'aime">
             <i class="fas fa-heart"></i>
             <span class="action-count">2.4K</span>
         </div>
-        <div class="action-btn" onclick="handleShare()">
+        <div class="action-btn" onclick="handleShare()" title="Partager">
             <i class="fas fa-share"></i>
             <span class="action-count">856</span>
         </div>
-        <div class="action-btn" onclick="handleSearch()">
+        <div class="action-btn" onclick="handleSearch()" title="Rechercher">
             <i class="fas fa-search"></i>
         </div>
     </div>
@@ -1573,76 +2122,490 @@
 
     <!-- 🎲 LOTO FUNCTIONS -->
     <script>
-        // Variables globales LOTO
-        let selectedLotoTicket = 100; // Par défaut 100€
+        // ========== LOTO SYSTEM - VARIABLES GLOBALES ==========
+let selectedLotoTicket = 100;
+let userBalance = 500; // PCC
+let selectedScratchPrice = 25;
+let selectedScratchCount = 3;
+let selectedNumbers = [];
+let userLines = [];
+let scratchCanvas, scratchCtx;
+
+// ========== NAVIGATION ==========
+
+// Ouvrir la modal LOTO (page d'accueil)
+function openLoto() {
+    const modal = document.getElementById('lotoModal');
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
+    
+    // Afficher la modal et la page d'accueil
+    modal.style.display = 'flex';
+    document.getElementById('lotoHome').style.display = 'block';
+    document.getElementById('lotoScratch').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'none';
+    
+    document.body.style.overflow = 'hidden';
+    
+    // Démarrer le compte à rebours
+    startLotoCountdown();
+}
+
+// Fermer la modal LOTO
+function closeLoto() {
+    const modal = document.getElementById('lotoModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Réinitialiser
+    backToLotoHome();
+}
+
+// Retour à la page d'accueil
+function backToLotoHome() {
+    document.getElementById('lotoHome').style.display = 'block';
+    document.getElementById('lotoScratch').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'none';
+    
+    // Réinitialiser les états
+    resetScratchMode();
+    resetNumbersMode();
+}
+
+// Ouvrir le mode SCRATCH
+function openScratchMode() {
+    document.getElementById('lotoHome').style.display = 'none';
+    document.getElementById('lotoScratch').style.display = 'block';
+    document.getElementById('scratchTicketSelection').style.display = 'block';
+    document.getElementById('scratchCardContainer').style.display = 'none';
+    document.getElementById('scratchResult').style.display = 'none';
+    
+    // Mettre à jour le solde
+    document.getElementById('userBalance').textContent = userBalance;
+}
+
+// Ouvrir le mode LOTTO NUMBERS
+function openNumbersMode() {
+    document.getElementById('lotoHome').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'block';
+    
+    // Générer la grille de numéros
+    generateNumbersGrid();
+    updateNumbersDisplay();
+}
+
+// ========== COMPTE À REBOURS ==========
+function startLotoCountdown() {
+    const countdownEl = document.getElementById('lotoCountdown');
+    if (!countdownEl) return;
+    
+    // Calculer le temps jusqu'au prochain dimanche 21h
+    const now = new Date();
+    const nextDraw = new Date();
+    nextDraw.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7));
+    nextDraw.setHours(21, 0, 0, 0);
+    
+    function updateCountdown() {
+        const now = new Date();
+        const diff = nextDraw - now;
         
-        // Ouvrir la modal LOTO
-        function openLoto() {
-            const modal = document.getElementById('lotoModal');
-            const clubName = document.getElementById('headerClubName').textContent;
-            document.getElementById('lotoClubName').textContent = clubName;
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            
-            // Animation d'entrée
-            setTimeout(() => {
-                modal.querySelector('.loto-modal-content').style.animation = 'slideUp 0.4s ease-out';
-            }, 10);
+        if (diff <= 0) {
+            countdownEl.textContent = '00:00:00';
+            return;
         }
         
-        // Fermer la modal LOTO
-        function closeLoto() {
-            const modal = document.getElementById('lotoModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         
-        // Sélectionner un ticket
-        function selectLotoTicket(price) {
-            selectedLotoTicket = price;
-            
-            // Retirer la classe selected de tous les tickets
-            document.querySelectorAll('.loto-ticket-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Ajouter la classe selected au ticket cliqué
-            event.currentTarget.classList.add('selected');
-        }
+        countdownEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+// ========== MODE SCRATCH ==========
+
+function selectScratchTicket(price, count) {
+    selectedScratchPrice = price;
+    selectedScratchCount = count;
+    
+    // Mettre à jour l'affichage
+    document.getElementById('scratchPrice').textContent = price;
+    
+    // Retirer la classe selected
+    document.querySelectorAll('.scratch-ticket-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Ajouter au ticket cliqué
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+    }
+}
+
+function buyScratchTicket() {
+    if (userBalance < selectedScratchPrice) {
+        alert('❌ Solde insuffisant !');
+        return;
+    }
+    
+    // Déduire le montant
+    userBalance -= selectedScratchPrice;
+    
+    // Afficher la carte à gratter
+    document.getElementById('scratchTicketSelection').style.display = 'none';
+    document.getElementById('scratchCardContainer').style.display = 'block';
+    
+    // Mettre à jour les infos
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('scratchClubName').textContent = clubName;
+    document.getElementById('scratchTicketCount').textContent = selectedScratchCount;
+    document.getElementById('scratchCost').textContent = selectedScratchPrice;
+    
+    // Initialiser le canvas
+    initScratchCanvas();
+    
+    // Démarrer le timer
+    startScratchTimer();
+}
+
+function initScratchCanvas() {
+    scratchCanvas = document.getElementById('scratchCanvas');
+    if (!scratchCanvas) return;
+    
+    scratchCtx = scratchCanvas.getContext('2d');
+    
+    // Définir la taille
+    const rect = scratchCanvas.getBoundingClientRect();
+    scratchCanvas.width = rect.width * 2;
+    scratchCanvas.height = rect.height * 2;
+    scratchCtx.scale(2, 2);
+    
+    // Dessiner le fond (récompense)
+    scratchCtx.fillStyle = 'linear-gradient(135deg, #10b981, #059669)';
+    scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+    
+    // Dessiner la couche à gratter
+    const gradient = scratchCtx.createLinearGradient(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    gradient.addColorStop(0, '#fbbf24');
+    gradient.addColorStop(1, '#10b981');
+    scratchCtx.fillStyle = gradient;
+    scratchCtx.fillRect(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    
+    // Ajouter le texte
+    scratchCtx.fillStyle = 'white';
+    scratchCtx.font = 'bold 24px Arial';
+    scratchCtx.textAlign = 'center';
+    scratchCtx.textBaseline = 'middle';
+    scratchCtx.fillText('TAP TO SCRATCH', scratchCanvas.width / 4, scratchCanvas.height / 4);
+    
+    // Événements de grattage
+    let isScratching = false;
+    
+    scratchCanvas.addEventListener('mousedown', () => isScratching = true);
+    scratchCanvas.addEventListener('mouseup', () => isScratching = false);
+    scratchCanvas.addEventListener('mousemove', scratch);
+    scratchCanvas.addEventListener('touchstart', () => isScratching = true);
+    scratchCanvas.addEventListener('touchend', () => isScratching = false);
+    scratchCanvas.addEventListener('touchmove', scratch);
+}
+
+function scratch(e) {
+    if (!scratchCtx) return;
+    
+    const rect = scratchCanvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    
+    scratchCtx.globalCompositeOperation = 'destination-out';
+    scratchCtx.beginPath();
+    scratchCtx.arc(x, y, 20, 0, Math.PI * 2);
+    scratchCtx.fill();
+}
+
+function startScratchTimer() {
+    let seconds = 6;
+    const timerEl = document.getElementById('scratchTimer');
+    
+    const interval = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds + 's';
         
-        // Jouer au LOTO
-        function playLoto() {
-            const clubName = document.getElementById('headerClubName').textContent;
-            
-            // Animation du bouton
-            const btn = event.currentTarget;
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                btn.style.transform = 'scale(1)';
-            }, 100);
-            
-            // Afficher un message de confirmation
-            alert(`🎲 Ticket de ${selectedLotoTicket}€ acheté pour ${clubName} !\n\n✅ Votre participation est enregistrée\n🎯 Tirage : Dimanche 21h00\n🎉 Bonne chance !`);
-            
-            // Fermer la modal
-            closeLoto();
+        if (seconds <= 0) {
+            clearInterval(interval);
+            showScratchResult();
         }
-        
-        // Animation de slide up
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+    }, 1000);
+}
+
+function showScratchResult() {
+    // Cacher le canvas
+    document.getElementById('scratchCardContainer').style.display = 'none';
+    
+    // Calculer le gain (aléatoire)
+    const multipliers = [0, 0, 0, 1, 1, 2, 2, 3, 5];
+    const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+    const winAmount = selectedScratchPrice * multiplier;
+    
+    // Mettre à jour le solde
+    userBalance += winAmount;
+    
+    // Afficher le résultat
+    document.getElementById('scratchResult').style.display = 'block';
+    document.getElementById('scratchWinAmount').textContent = winAmount;
+    document.getElementById('resultCost').textContent = selectedScratchPrice + ' PCC';
+    document.getElementById('resultMultiplier').textContent = 'x' + multiplier;
+    document.getElementById('resultTotal').textContent = '+' + winAmount + ' PCC';
+    document.getElementById('resultNewBalance').textContent = userBalance + ' PCC';
+}
+
+function playScratchAgain() {
+    resetScratchMode();
+    openScratchMode();
+}
+
+function resetScratchMode() {
+    selectedScratchPrice = 25;
+    selectedScratchCount = 3;
+}
+
+// ========== MODE LOTTO NUMBERS ==========
+
+function generateNumbersGrid() {
+    const grid = document.getElementById('numbersGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    for (let i = 1; i <= 49; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'number-btn';
+        btn.textContent = i;
+        btn.onclick = () => toggleNumber(i);
+        grid.appendChild(btn);
+    }
+}
+
+function toggleNumber(num) {
+    const index = selectedNumbers.indexOf(num);
+    
+    if (index > -1) {
+        // Désélectionner
+        selectedNumbers.splice(index, 1);
+    } else {
+        // Sélectionner (max 5)
+        if (selectedNumbers.length >= 5) {
+            alert('❌ Vous ne pouvez sélectionner que 5 numéros !');
+            return;
+        }
+        selectedNumbers.push(num);
+    }
+    
+    updateNumbersDisplay();
+}
+
+function randomNumbers() {
+    selectedNumbers = [];
+    
+    while (selectedNumbers.length < 5) {
+        const num = Math.floor(Math.random() * 49) + 1;
+        if (!selectedNumbers.includes(num)) {
+            selectedNumbers.push(num);
+        }
+    }
+    
+    selectedNumbers.sort((a, b) => a - b);
+    updateNumbersDisplay();
+}
+
+function updateNumbersDisplay() {
+    // Mettre à jour le compteur
+    document.getElementById('selectedCount').textContent = selectedNumbers.length;
+    
+    // Mettre à jour les boutons
+    document.querySelectorAll('.number-btn').forEach(btn => {
+        const num = parseInt(btn.textContent);
+        if (selectedNumbers.includes(num)) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+    
+    // Mettre à jour le bouton d'ajout
+    const addBtn = document.querySelector('.numbers-add-line-btn');
+    if (addBtn) {
+        addBtn.innerHTML = `<i class="fas fa-plus"></i> Ajouter la ligne (${selectedNumbers.length}/5)`;
+        addBtn.disabled = selectedNumbers.length !== 5;
+    }
+}
+
+function addNumberLine() {
+    if (selectedNumbers.length !== 5) {
+        alert('❌ Vous devez sélectionner exactement 5 numéros !');
+        return;
+    }
+    
+    // Ajouter la ligne
+    userLines.push([...selectedNumbers]);
+    selectedNumbers = [];
+    
+    updateNumbersDisplay();
+    updateLinesDisplay();
+    updateNumbersCost();
+}
+
+function updateLinesDisplay() {
+    const container = document.getElementById('numbersLines');
+    if (!container) return;
+    
+    if (userLines.length === 0) {
+        container.innerHTML = '<h3>Vos lignes</h3><div class="empty-lines">Aucune ligne ajoutée</div>';
+        return;
+    }
+    
+    let html = '<h3>Vos lignes</h3>';
+    userLines.forEach((line, index) => {
+        html += `
+            <div class="line-item">
+                <div class="line-numbers">
+                    ${line.map(num => `<div class="line-number">${num}</div>`).join('')}
+                </div>
+                <i class="fas fa-times line-remove" onclick="removeLine(${index})"></i>
+            </div>
         `;
-        document.head.appendChild(style);
+    });
+    
+    container.innerHTML = html;
+}
+
+function removeLine(index) {
+    userLines.splice(index, 1);
+    updateLinesDisplay();
+    updateNumbersCost();
+}
+
+function updateNumbersCost() {
+    const cost = userLines.length * 10; // 10 PCC par ligne
+    document.getElementById('numbersTotalCost').textContent = cost;
+    
+    const playBtn = document.querySelector('.numbers-play-btn');
+    if (playBtn) {
+        playBtn.disabled = userLines.length === 0;
+    }
+}
+
+function playNumbersLoto() {
+    if (userLines.length === 0) {
+        alert('❌ Ajoutez au moins une ligne !');
+        return;
+    }
+    
+    const cost = userLines.length * 10;
+    if (userBalance < cost) {
+        alert('❌ Solde insuffisant !');
+        return;
+    }
+    
+    // Déduire le coût
+    userBalance -= cost;
+    
+    // Cacher la sélection
+    document.querySelector('.numbers-selection').style.display = 'none';
+    document.querySelector('.numbers-lines').style.display = 'none';
+    document.querySelector('.numbers-footer').style.display = 'none';
+    
+    // Afficher le résultat
+    document.getElementById('numbersResult').style.display = 'block';
+    
+    // Générer les numéros gagnants
+    const winningNumbers = [];
+    while (winningNumbers.length < 5) {
+        const num = Math.floor(Math.random() * 49) + 1;
+        if (!winningNumbers.includes(num)) {
+            winningNumbers.push(num);
+        }
+    }
+    winningNumbers.sort((a, b) => a - b);
+    
+    // Afficher les numéros gagnants
+    const winningContainer = document.getElementById('winningNumbers');
+    winningContainer.innerHTML = winningNumbers.map(num => 
+        `<div class="winning-number">${num}</div>`
+    ).join('');
+    
+    // Vérifier les lignes
+    let totalWin = 0;
+    let bestMatch = 0;
+    
+    userLines.forEach(line => {
+        const matches = line.filter(num => winningNumbers.includes(num)).length;
+        if (matches > bestMatch) bestMatch = matches;
+        
+        // Calculer les gains
+        const multipliers = {1: 2, 2: 5, 3: 25, 4: 500, 5: 50000};
+        if (multipliers[matches]) {
+            totalWin += cost * multipliers[matches] / userLines.length;
+        }
+    });
+    
+    // Mettre à jour le solde
+    userBalance += totalWin;
+    
+    // Afficher le message
+    const messageEl = document.getElementById('numbersResultMessage');
+    if (bestMatch >= 3) {
+        messageEl.innerHTML = `
+            <h3>FÉLICITATIONS, VOUS GAGNEZ !</h3>
+            <p>Vous avez trouvé ${bestMatch} numéros !</p>
+            <div class="result-amount">+${Math.floor(totalWin)}</div>
+            <div class="result-currency">PaieCash Coins</div>
+        `;
+    } else {
+        messageEl.innerHTML = `
+            <h3>PAS CETTE FOIS...</h3>
+            <p>Tentez votre chance au prochain tirage !</p>
+        `;
+    }
+    
+    document.getElementById('numbersNewBalance').textContent = userBalance;
+}
+
+function playNumbersAgain() {
+    resetNumbersMode();
+    openNumbersMode();
+}
+
+function resetNumbersMode() {
+    selectedNumbers = [];
+    userLines = [];
+    
+    // Réafficher les sections
+    const selection = document.querySelector('.numbers-selection');
+    const lines = document.querySelector('.numbers-lines');
+    const footer = document.querySelector('.numbers-footer');
+    
+    if (selection) selection.style.display = 'block';
+    if (lines) lines.style.display = 'block';
+    if (footer) footer.style.display = 'block';
+}
+
+// ========== AUTRES FONCTIONS ==========
+
+function toggleRules() {
+    alert('📖 RÈGLES DU JEU\n\n🎲 SCRATCH: Grattez pour révéler vos gains instantanés\n\n# LOTO CHIFFRES: Choisissez 5 numéros et tentez de gagner le jackpot\n\n🤍 1% des gains sont reversés aux œuvres caritatives du club');
+}
+
+function viewSuperJackpot() {
+    alert('🌟 SUPER JACKPOT\n\n🏠 Une maison (250K€)\n✈️ 11 voyages VIP\n👕 Maillots signés\n🎟️ Places VIP saison complète');
+}
+
+function shareResult() {
+    alert('🔗 Partage en cours...\n\nFonctionnalité à venir !');
+}
+
     </script>
 
     <script>
@@ -2280,112 +3243,291 @@
     </script>
 
     <!-- 🎲 MODAL LOTO -->
+    <!-- LOTO MODAL SYSTEM -->
     <div id="lotoModal" class="loto-modal" style="display: none;">
         <div class="loto-modal-overlay" onclick="closeLoto()"></div>
         <div class="loto-modal-content">
-            <!-- Header -->
-            <div class="loto-header">
+            
+            <!-- ÉCRAN 1: PAGE D'ACCUEIL -->
+            <div id="lotoHome" class="loto-screen">
                 <button class="loto-close" onclick="closeLoto()">
                     <i class="fas fa-times"></i>
                 </button>
-                <div class="loto-header-content">
-                    <div class="loto-icon">🎲</div>
-                    <h2 class="loto-title">LOTO <span id="lotoClubName">AS Saint-Étienne</span></h2>
-                    <p class="loto-subtitle">🤍 1% des gains → Œuvres caritatives</p>
+                
+                <div class="loto-home-header">
+                    <h1 class="loto-home-title" id="lotoHomeClubName">SAINT-ÉTIENNE</h1>
+                    <p class="loto-home-desc">Achetez vos tickets de loterie et tentez de gagner des récompenses exclusives : billets, merchandising, expériences VIP !</p>
+                    <div class="loto-charity">
+                        <i class="fas fa-heart"></i>
+                        <span>1% des gains vers les actions sociales du club</span>
+                    </div>
+                    <p class="loto-charity-detail">Voyages enfants, écoles, femmes football, équipements sportifs</p>
+                </div>
+
+                <!-- Start your streak -->
+                <div class="loto-streak">
+                    <div class="streak-header">
+                        <i class="fas fa-fire"></i>
+                        <span>Lancez votre série !</span>
+                    </div>
+                    <p class="streak-subtitle">Jouez aujourd'hui pour continuer votre série !</p>
+                    <div class="streak-countdown" id="lotoCountdown">01:05:27</div>
+                    
+                    <div class="streak-calendar">
+                        <div class="streak-day">
+                            <div class="day-label">Lun</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Mar</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Mer</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Jeu</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Ven</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Sam</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day active">
+                            <div class="day-label">Dim</div>
+                            <div class="day-status">▶</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 Options de jeu -->
+                <div class="loto-game-options">
+                    <div class="game-option-card" onclick="openScratchMode()">
+                        <div class="game-option-icon">✨</div>
+                        <h3 class="game-option-title">SCRATCH</h3>
+                        <p class="game-option-desc">Achetez un ticket et grattez pour révéler vos récompenses : billets, merchandising, expériences VIP !</p>
+                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                    </div>
+                    
+                    <div class="game-option-card" onclick="openNumbersMode()">
+                        <div class="game-option-icon">#</div>
+                        <h3 class="game-option-title">LOTO CHIFFRES</h3>
+                        <p class="game-option-desc">Choisissez 5 numéros de 1 à 49 et tentez de remporter le jackpot !</p>
+                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                    </div>
+                </div>
+
+                <!-- Game Rules -->
+                <div class="loto-rules" onclick="toggleRules()">
+                    <i class="fas fa-book"></i>
+                    <span>Règles du jeu</span>
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
 
-            <!-- Tirage Info -->
-            <div class="loto-draw-info">
-                <div class="draw-info-item">
-                    <div class="draw-info-label">DIM</div>
-                    <div class="draw-info-value">15 Fév</div>
+            <!-- ÉCRAN 2: MODE SCRATCH -->
+            <div id="lotoScratch" class="loto-screen" style="display: none;">
+                <button class="loto-back" onclick="backToLotoHome()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="loto-close" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 class="scratch-title">MODE SCRATCH</h2>
+                
+                <!-- Ticket Selection -->
+                <div class="scratch-tickets" id="scratchTicketSelection">
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(10, 1)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">10 PCC</div>
+                        <div class="ticket-info">1 ticket</div>
+                        <div class="ticket-chances">chances: 1/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card popular" onclick="selectScratchTicket(25, 3)">
+                        <div class="ticket-badge">⭐ POPULAIRE</div>
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">25 PCC</div>
+                        <div class="ticket-bonus">⚡ +50%</div>
+                        <div class="ticket-info">3 tickets</div>
+                        <div class="ticket-chances">chances: 3/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(50, 6)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">50 PCC</div>
+                        <div class="ticket-bonus">⚡ x2</div>
+                        <div class="ticket-info">6 tickets</div>
+                        <div class="ticket-chances">chances: 6/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(100, 15)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">100 PCC</div>
+                        <div class="ticket-bonus">⚡ x3</div>
+                        <div class="ticket-info">15 tickets</div>
+                        <div class="ticket-chances">chances: 15/1000</div>
+                    </div>
+                    <button class="scratch-buy-btn" onclick="buyScratchTicket()">
+                        <i class="fas fa-ticket-alt"></i> ACHETER & GRATTER - <span id="scratchPrice">25</span> PCC
+                    </button>
+                    <p class="scratch-balance">Votre solde: <span id="userBalance">500</span> PCC</p>
                 </div>
-                <div class="draw-info-item">
-                    <div class="draw-info-label">21:00</div>
-                    <div class="draw-info-value">Heure du tirage</div>
+
+                <!-- Scratch Card -->
+                <div class="scratch-card-container" id="scratchCardContainer" style="display: none;">
+                    <div class="scratch-timer" id="scratchTimer">6s</div>
+                    <div class="scratch-ticket-info">
+                        <i class="fas fa-ticket-alt"></i> VOTRE TICKET
+                        <div><span id="scratchClubName">Saint-Étienne</span> — <span id="scratchTicketCount">3</span> tickets</div>
+                        <div>Coût du ticket: <span id="scratchCost">25</span> PCC</div>
+                    </div>
+                    
+                    <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
+                    <div class="scratch-instruction">TAP TO SCRATCH</div>
                 </div>
-                <div class="draw-info-item highlight">
-                    <div class="draw-info-label">8K€</div>
-                    <div class="draw-info-value">Jackpot actuel</div>
+
+                <!-- Result -->
+                <div class="scratch-result" id="scratchResult" style="display: none;">
+                    <div class="result-icon">🏆</div>
+                    <h2 class="result-title">FÉLICITATIONS, VOUS GAGNEZ !</h2>
+                    <div class="result-amount">+<span id="scratchWinAmount">50</span></div>
+                    <div class="result-currency">PaieCash Coins</div>
+                    
+                    <div class="result-details">
+                        <div class="result-row">
+                            <span>🎫 Coût du ticket</span>
+                            <span id="resultCost">25 PCC</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Multiplicateur</span>
+                            <span class="result-multiplier" id="resultMultiplier">x2</span>
+                        </div>
+                        <div class="result-row total">
+                            <span>Total gagné</span>
+                            <span class="result-total" id="resultTotal">+50 PCC</span>
+                        </div>
+                    </div>
+
+                    <div class="result-balance">
+                        <i class="fas fa-chart-line"></i> Nouveau solde: <span id="resultNewBalance">525</span> PCC
+                    </div>
+                    <div class="result-charity">
+                        <i class="fas fa-heart"></i> 0 PCC donnés à des œuvres caritatives — Total donné aux actions sociales: 0 PCC
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="result-btn primary" onclick="playScratchAgain()">
+                            <i class="fas fa-redo"></i> REJOUER
+                        </button>
+                        <button class="result-btn" onclick="backToLotoHome()">
+                            <i class="fas fa-home"></i> Accueil
+                        </button>
+                        <button class="result-btn" onclick="viewSuperJackpot()">
+                            <i class="fas fa-star"></i> SUPER JACKPOT
+                        </button>
+                        <button class="result-btn" onclick="shareResult()">
+                            <i class="fas fa-share"></i> Partager
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Ticket Options -->
-            <div class="loto-tickets">
-                <div class="loto-ticket-card" onclick="selectLotoTicket(1)">
-                    <div class="ticket-price">1€</div>
-                    <div class="ticket-info">
-                        <div class="ticket-label">1 ticket</div>
-                        <div class="ticket-chances">1 chance sur 1000</div>
-                    </div>
+            <!-- ÉCRAN 3: MODE LOTO CHIFFRES -->
+            <div id="lotoNumbers" class="loto-screen" style="display: none;">
+                <button class="loto-back" onclick="backToLotoHome()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="loto-close" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 class="numbers-title"># LOTO CHIFFRES</h2>
+                <p class="numbers-subtitle">Choisissez 5 numéros de 1 à 49 et tentez de remporter le jackpot !</p>
+
+                <!-- Gains Table -->
+                <div class="numbers-gains-table">
+                    <div class="gain-item">1/5 <span>x2</span></div>
+                    <div class="gain-item">2/5 <span>x5</span></div>
+                    <div class="gain-item">3/5 <span>x25</span></div>
+                    <div class="gain-item highlight">4/5 <span>x500</span></div>
+                    <div class="gain-item highlight">5/5 <span>x50K</span></div>
                 </div>
-                <div class="loto-ticket-card" onclick="selectLotoTicket(10)">
-                    <div class="ticket-price">10€</div>
-                    <div class="ticket-info">
-                        <div class="ticket-label">15 tickets</div>
-                        <div class="ticket-chances">15 chances - Bonus +50%</div>
+
+                <!-- Number Grid -->
+                <div class="numbers-selection">
+                    <div class="numbers-header">
+                        <span>Choisissez vos numéros (<span id="selectedCount">0</span>/5)</span>
+                        <button class="numbers-random-btn" onclick="randomNumbers()">
+                            <i class="fas fa-random"></i> Aléatoire
+                        </button>
                     </div>
+                    
+                    <div class="numbers-grid" id="numbersGrid">
+                        <!-- Généré par JavaScript -->
+                    </div>
+
+                    <button class="numbers-add-line-btn" onclick="addNumberLine()">
+                        <i class="fas fa-plus"></i> Ajouter la ligne (0/5)
+                    </button>
                 </div>
-                <div class="loto-ticket-card selected" onclick="selectLotoTicket(100)">
-                    <div class="ticket-price">100€</div>
-                    <div class="ticket-info">
-                        <div class="ticket-label">200 tickets</div>
-                        <div class="ticket-chances">200 chances - Bonus x2</div>
+
+                <!-- User Lines -->
+                <div class="numbers-lines" id="numbersLines">
+                    <h3>Vos lignes</h3>
+                    <div class="empty-lines">Aucune ligne ajoutée</div>
+                </div>
+
+                <!-- Play Button -->
+                <div class="numbers-footer">
+                    <div class="numbers-cost">Coût total: <span id="numbersTotalCost">0</span> PCC</div>
+                    <button class="numbers-play-btn" onclick="playNumbersLoto()" disabled>
+                        <i class="fas fa-play"></i> LANCER LE TIRAGE
+                    </button>
+                    <p class="numbers-charity">
+                        <i class="fas fa-heart"></i> 1% de chaque mise est reversé aux œuvres caritatives du club
+                    </p>
+                </div>
+
+                <!-- Result -->
+                <div class="numbers-result" id="numbersResult" style="display: none;">
+                    <h2 class="result-title">TIRAGE EN COURS</h2>
+                    <p class="result-subtitle">Les numéros gagnants sont révélés...</p>
+                    
+                    <div class="winning-numbers" id="winningNumbers">
+                        <!-- Généré par JavaScript -->
                     </div>
-                    <div class="ticket-popular">⭐ POPULAIRE</div>
+
+                    <div class="user-lines-result" id="userLinesResult">
+                        <!-- Généré par JavaScript -->
+                    </div>
+
+                    <div class="result-message" id="numbersResultMessage">
+                        <h3>PAS CETTE FOIS...</h3>
+                        <p>Tentez votre chance au prochain tirage !</p>
+                    </div>
+
+                    <div class="result-balance">
+                        Nouveau solde: <span id="numbersNewBalance">490</span> PCC
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="result-btn primary" onclick="playNumbersAgain()">
+                            <i class="fas fa-redo"></i> REJOUER
+                        </button>
+                        <button class="result-btn" onclick="backToLotoHome()">
+                            <i class="fas fa-home"></i> Accueil
+                        </button>
+                        <button class="result-btn" onclick="shareResult()">
+                            <i class="fas fa-share"></i> Partager
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Play Button -->
-            <button class="loto-play-btn" onclick="playLoto()">
-                ▶ JOUER MAINTENANT
-            </button>
-
-            <!-- Supercagnotte Section -->
-            <div class="supercagnotte-section">
-                <div class="supercagnotte-header">
-                    <span class="supercagnotte-badge">⭐ SUPERCAGNOTTE MONDIALE</span>
-                    <h3 class="supercagnotte-title">Gagnez des lots exceptionnels !</h3>
-                    <p class="supercagnotte-desc">Participez à la supercagnotte mondiale et tentez de remporter des expériences uniques</p>
-                </div>
-
-                <div class="supercagnotte-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-users"></i>
-                        <div class="stat-value">8,742</div>
-                        <div class="stat-label">participants</div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-globe"></i>
-                        <div class="stat-value">142</div>
-                        <div class="stat-label">pays</div>
-                    </div>
-                </div>
-
-                <div class="prizes-grid">
-                    <div class="prize-card">
-                        <div class="prize-icon">🏠</div>
-                        <div class="prize-title">Une maison</div>
-                        <div class="prize-value">Valeur 250K€</div>
-                    </div>
-                    <div class="prize-card">
-                        <div class="prize-icon">✈️</div>
-                        <div class="prize-title">11 voyages VIP</div>
-                        <div class="prize-value">+ hospitalités clubs</div>
-                    </div>
-                    <div class="prize-card">
-                        <div class="prize-icon">👕</div>
-                        <div class="prize-title">Maillot signé</div>
-                        <div class="prize-value">11 joueurs - 1,000€</div>
-                    </div>
-                    <div class="prize-card">
-                        <div class="prize-icon">🎟️</div>
-                        <div class="prize-title">Places VIP</div>
-                        <div class="prize-value">Saison complète</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
