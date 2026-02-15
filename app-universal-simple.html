@@ -2253,6 +2253,20 @@ const clubThemes = {
         accent: '#5F259F',
         glow: 'rgba(95, 37, 159, 0.4)'
     },
+    'PARIS SG': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'BREST': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
     // Clubs africains
     'TANZANIE': {
         primary: '#1EB53A',
@@ -2282,6 +2296,35 @@ const clubThemes = {
         accent: '#FCDC04',
         glow: 'rgba(252, 220, 4, 0.4)'
     },
+    // Clubs marocains
+    'WYDAD': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'WYDAD CASABLANCA': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'RAJA': {
+        primary: '#006633',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #006633, #004D26)',
+        accent: '#006633',
+        glow: 'rgba(0, 102, 51, 0.4)'
+    },
+    'RAJA CASABLANCA': {
+        primary: '#006633',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #006633, #004D26)',
+        accent: '#006633',
+        glow: 'rgba(0, 102, 51, 0.4)'
+    },
     // Thème par défaut
     'DEFAULT': {
         primary: '#10b981',
@@ -2294,7 +2337,33 @@ const clubThemes = {
 
 // Appliquer le thème du club
 function applyClubTheme(clubName) {
-    const theme = clubThemes[clubName.toUpperCase()] || clubThemes['DEFAULT'];
+    // Normaliser le nom du club
+    let normalizedName = clubName.toUpperCase().trim();
+    
+    // Essayer de trouver le thème avec différentes variantes
+    let theme = clubThemes[normalizedName];
+    
+    // Si non trouvé, essayer sans espaces ni caractères spéciaux
+    if (!theme) {
+        const simplifiedName = normalizedName.replace(/[\s-]/g, '');
+        theme = clubThemes[simplifiedName];
+    }
+    
+    // Si non trouvé, essayer de trouver une correspondance partielle
+    if (!theme) {
+        for (const key in clubThemes) {
+            if (normalizedName.includes(key) || key.includes(normalizedName)) {
+                theme = clubThemes[key];
+                break;
+            }
+        }
+    }
+    
+    // Si toujours non trouvé, utiliser le thème par défaut
+    if (!theme) {
+        theme = clubThemes['DEFAULT'];
+    }
+    
     const root = document.documentElement;
     
     // Appliquer les variables CSS
