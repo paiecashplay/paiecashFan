@@ -661,6 +661,14 @@
         }
         
         /* ========== LOTO MODAL SYSTEM ========== */
+:root {
+    --loto-primary: var(--loto-primary);
+    --loto-secondary: var(--loto-secondary);
+    --loto-gradient: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    --loto-accent: var(--loto-primary);
+    --loto-glow: var(--loto-glow);
+}
+
 .loto-modal {
     position: fixed;
     top: 0;
@@ -769,10 +777,10 @@
 .loto-home-title {
     font-size: 36px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
     margin-bottom: 16px;
     letter-spacing: 2px;
-    text-shadow: 0 2px 10px rgba(16, 185, 129, 0.5);
+    text-shadow: 0 2px 10px var(--loto-glow);
 }
 
 .loto-home-desc {
@@ -829,7 +837,7 @@
 }
 
 .streak-header i {
-    color: #f59e0b;
+    color: var(--loto-secondary);
 }
 
 .streak-subtitle {
@@ -841,7 +849,7 @@
 .streak-countdown {
     font-size: 20px;
     font-weight: 900;
-    color: #f59e0b;
+    color: var(--loto-secondary);
     text-align: center;
     margin-bottom: 16px;
 }
@@ -861,8 +869,8 @@
 }
 
 .streak-day.active {
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-color: #10b981;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
 }
 
 .day-label {
@@ -886,8 +894,8 @@
 }
 
 .game-option-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-    border: 2px solid rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--loto-glow), rgba(5, 150, 105, 0.1));
+    border: 2px solid var(--loto-glow);
     border-radius: 16px;
     padding: 20px;
     text-align: center;
@@ -896,10 +904,10 @@
 }
 
 .game-option-card:hover {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-    border-color: #10b981;
+    background: linear-gradient(135deg, var(--loto-glow), rgba(5, 150, 105, 0.2));
+    border-color: var(--loto-primary);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 8px 24px var(--loto-glow);
 }
 
 .game-option-icon {
@@ -925,7 +933,7 @@
 .game-option-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
     border: none;
     border-radius: 12px;
     color: #1a1a2e;
@@ -957,7 +965,7 @@
 }
 
 .loto-rules i {
-    color: #10b981;
+    color: var(--loto-primary);
 }
 
 .loto-rules span {
@@ -970,7 +978,7 @@
 .scratch-title {
     font-size: 28px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
     text-align: center;
     margin-bottom: 24px;
     margin-top: 40px;
@@ -997,12 +1005,12 @@
 
 .scratch-ticket-card:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: #10b981;
+    border-color: var(--loto-primary);
     transform: translateX(4px);
 }
 
 .scratch-ticket-card.popular {
-    border-color: #fbbf24;
+    border-color: var(--loto-secondary);
     box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
 }
 
@@ -1010,7 +1018,7 @@
     position: absolute;
     top: -8px;
     right: 12px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
     color: #1a1a2e;
     padding: 4px 12px;
     border-radius: 12px;
@@ -1025,13 +1033,13 @@
 .ticket-price {
     font-size: 24px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
     min-width: 80px;
 }
 
 .ticket-bonus {
     font-size: 14px;
-    color: #fbbf24;
+    color: var(--loto-secondary);
     font-weight: 700;
 }
 
@@ -1050,7 +1058,7 @@
 .scratch-buy-btn {
     width: 100%;
     padding: 18px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
     border: none;
     border-radius: 16px;
     color: white;
@@ -1058,12 +1066,12 @@
     font-weight: 900;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 24px var(--loto-glow);
 }
 
 .scratch-buy-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 12px 32px var(--loto-glow);
 }
 
 .scratch-balance {
@@ -1081,7 +1089,7 @@
 .scratch-timer {
     font-size: 24px;
     font-weight: 900;
-    color: #fbbf24;
+    color: var(--loto-secondary);
     margin-bottom: 16px;
 }
 
@@ -1125,14 +1133,14 @@
 .result-title {
     font-size: 24px;
     font-weight: 900;
-    color: #fbbf24;
+    color: var(--loto-secondary);
     margin-bottom: 16px;
 }
 
 .result-amount {
     font-size: 48px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
     margin-bottom: 8px;
 }
 
@@ -1165,11 +1173,11 @@
 .result-row.total {
     font-size: 18px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
 }
 
 .result-multiplier {
-    color: #fbbf24;
+    color: var(--loto-secondary);
     font-weight: 700;
 }
 
@@ -1209,8 +1217,8 @@
 }
 
 .result-btn.primary {
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-color: #10b981;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
     grid-column: 1 / -1;
 }
 
@@ -1218,7 +1226,7 @@
 .numbers-title {
     font-size: 28px;
     font-weight: 900;
-    color: #10b981;
+    color: var(--loto-primary);
     text-align: center;
     margin-bottom: 12px;
     margin-top: 40px;
@@ -1251,13 +1259,13 @@
 
 .gain-item.highlight {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
-    border-color: #fbbf24;
+    border-color: var(--loto-secondary);
 }
 
 .gain-item span {
     display: block;
     font-size: 14px;
-    color: #10b981;
+    color: var(--loto-primary);
     margin-top: 4px;
 }
 
@@ -1283,10 +1291,10 @@
 
 .numbers-random-btn {
     padding: 8px 16px;
-    background: rgba(16, 185, 129, 0.2);
-    border: 1px solid #10b981;
+    background: var(--loto-glow);
+    border: 1px solid var(--loto-primary);
     border-radius: 8px;
-    color: #10b981;
+    color: var(--loto-primary);
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -1294,7 +1302,7 @@
 }
 
 .numbers-random-btn:hover {
-    background: rgba(16, 185, 129, 0.3);
+    background: var(--loto-glow);
 }
 
 .numbers-grid {
@@ -1318,22 +1326,22 @@
 
 .number-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: #10b981;
+    border-color: var(--loto-primary);
 }
 
 .number-btn.selected {
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-color: #10b981;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
     transform: scale(1.1);
 }
 
 .numbers-add-line-btn {
     width: 100%;
     padding: 14px;
-    background: rgba(16, 185, 129, 0.2);
-    border: 1px solid #10b981;
+    background: var(--loto-glow);
+    border: 1px solid var(--loto-primary);
     border-radius: 12px;
-    color: #10b981;
+    color: var(--loto-primary);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -1341,7 +1349,7 @@
 }
 
 .numbers-add-line-btn:hover {
-    background: rgba(16, 185, 129, 0.3);
+    background: var(--loto-glow);
 }
 
 .numbers-lines {
@@ -1379,7 +1387,7 @@
 .line-number {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1409,7 +1417,7 @@
 .numbers-play-btn {
     width: 100%;
     padding: 18px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
     border: none;
     border-radius: 16px;
     color: white;
@@ -1417,7 +1425,7 @@
     font-weight: 900;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 24px var(--loto-glow);
     margin-bottom: 12px;
 }
 
@@ -1428,7 +1436,7 @@
 
 .numbers-play-btn:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 12px 32px var(--loto-glow);
 }
 
 .numbers-charity {
@@ -1450,7 +1458,7 @@
 .winning-number {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2131,6 +2139,172 @@ let selectedNumbers = [];
 let userLines = [];
 let scratchCanvas, scratchCtx;
 
+// ========== THÈMES DE CLUBS ==========
+const clubThemes = {
+    'MARSEILLE': {
+        primary: '#0D9CDB',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0D9CDB, #0A7AB8)',
+        accent: '#00B4D8',
+        glow: 'rgba(13, 156, 219, 0.4)'
+    },
+    'PARIS': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'PSG': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'MONACO': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#FFD700',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'LYON': {
+        primary: '#DA020E',
+        secondary: '#003A70',
+        gradient: 'linear-gradient(135deg, #DA020E, #003A70)',
+        accent: '#DA020E',
+        glow: 'rgba(218, 2, 14, 0.4)'
+    },
+    'LILLE': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'RENNES': {
+        primary: '#E30613',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #E30613, #8B0000)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'NICE': {
+        primary: '#E30613',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #E30613, #8B0000)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'LENS': {
+        primary: '#FFC300',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #FFC300, #E30613)',
+        accent: '#FFC300',
+        glow: 'rgba(255, 195, 0, 0.4)'
+    },
+    'NANTES': {
+        primary: '#FFC300',
+        secondary: '#006633',
+        gradient: 'linear-gradient(135deg, #FFC300, #006633)',
+        accent: '#FFC300',
+        glow: 'rgba(255, 195, 0, 0.4)'
+    },
+    'SAINT-ÉTIENNE': {
+        primary: '#009639',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #009639, #007A2E)',
+        accent: '#009639',
+        glow: 'rgba(0, 150, 57, 0.4)'
+    },
+    'BORDEAUX': {
+        primary: '#003A70',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #003A70, #002550)',
+        accent: '#003A70',
+        glow: 'rgba(0, 58, 112, 0.4)'
+    },
+    'MONTPELLIER': {
+        primary: '#0066CC',
+        secondary: '#FF6600',
+        gradient: 'linear-gradient(135deg, #0066CC, #FF6600)',
+        accent: '#FF6600',
+        glow: 'rgba(0, 102, 204, 0.4)'
+    },
+    'STRASBOURG': {
+        primary: '#0066CC',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066CC, #004C99)',
+        accent: '#0066CC',
+        glow: 'rgba(0, 102, 204, 0.4)'
+    },
+    'REIMS': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'TOULOUSE': {
+        primary: '#5F259F',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #5F259F, #461C75)',
+        accent: '#5F259F',
+        glow: 'rgba(95, 37, 159, 0.4)'
+    },
+    // Clubs africains
+    'TANZANIE': {
+        primary: '#1EB53A',
+        secondary: '#FCD116',
+        gradient: 'linear-gradient(135deg, #1EB53A, #FCD116)',
+        accent: '#1EB53A',
+        glow: 'rgba(30, 181, 58, 0.4)'
+    },
+    'MAURITANIE': {
+        primary: '#006233',
+        secondary: '#FFC72C',
+        gradient: 'linear-gradient(135deg, #006233, #FFC72C)',
+        accent: '#FFC72C',
+        glow: 'rgba(0, 98, 51, 0.4)'
+    },
+    'KENYA': {
+        primary: '#006600',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #006600, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(0, 102, 0, 0.4)'
+    },
+    'OUGANDA': {
+        primary: '#FCDC04',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #FCDC04, #E30613)',
+        accent: '#FCDC04',
+        glow: 'rgba(252, 220, 4, 0.4)'
+    },
+    // Thème par défaut
+    'DEFAULT': {
+        primary: '#10b981',
+        secondary: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #10b981, #059669)',
+        accent: '#10b981',
+        glow: 'rgba(16, 185, 129, 0.4)'
+    }
+};
+
+// Appliquer le thème du club
+function applyClubTheme(clubName) {
+    const theme = clubThemes[clubName.toUpperCase()] || clubThemes['DEFAULT'];
+    const root = document.documentElement;
+    
+    // Appliquer les variables CSS
+    root.style.setProperty('--loto-primary', theme.primary);
+    root.style.setProperty('--loto-secondary', theme.secondary);
+    root.style.setProperty('--loto-gradient', theme.gradient);
+    root.style.setProperty('--loto-accent', theme.accent);
+    root.style.setProperty('--loto-glow', theme.glow);
+}
+
 // ========== NAVIGATION ==========
 
 // Ouvrir la modal LOTO (page d'accueil)
@@ -2138,6 +2312,9 @@ function openLoto() {
     const modal = document.getElementById('lotoModal');
     const clubName = document.getElementById('headerClubName').textContent;
     document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
+    
+    // Appliquer le thème du club
+    applyClubTheme(clubName);
     
     // Afficher la modal et la page d'accueil
     modal.style.display = 'flex';
