@@ -2403,6 +2403,9 @@ function closeLoto() {
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
     
+    // Arrêter les confettis
+    stopConfetti();
+    
     // Réinitialiser
     backToLotoHome();
 }
@@ -2605,6 +2608,11 @@ function showScratchResult() {
     document.getElementById('resultMultiplier').textContent = 'x' + multiplier;
     document.getElementById('resultTotal').textContent = '+' + winAmount + ' PCC';
     document.getElementById('resultNewBalance').textContent = userBalance + ' PCC';
+    
+    // Lancer les confettis si gain
+    if (winAmount > 0) {
+        startConfetti();
+    }
 }
 
 function playScratchAgain() {
@@ -2616,6 +2624,138 @@ function resetScratchMode() {
     selectedScratchPrice = 25;
     selectedScratchCount = 3;
 }
+
+// ========== ANIMATION DE CONFETTIS ==========
+
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+class Confetti {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 10 + 5;
+        this.speedY = Math.random() * 3 + 2;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 10;
+        
+        // Couleurs dynamiques basées sur le thème du club
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-primary').trim();
+        const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-secondary').trim();
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-accent').trim();
+        
+        const colors = [
+            primaryColor,
+            secondaryColor,
+            accentColor,
+            '#FFD700', // Or
+            '#FF6B6B', // Rouge
+            '#4ECDC4', // Cyan
+            '#95E1D3', // Vert menthe
+            '#F38181'  // Rose
+        ];
+        
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.opacity = 1;
+    }
+    
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+        this.speedY += 0.1; // Gravité
+        
+        // Fade out progressif
+        if (this.y > window.innerHeight - 100) {
+            this.opacity -= 0.02;
+        }
+    }
+    
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        
+        // Dessiner un rectangle (confetti)
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 2);
+        
+        ctx.restore();
+    }
+}
+
+function createConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Créer 150 confettis
+    confettiParticles = [];
+    for (let i = 0; i < 150; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * -0.5; // Commencer au-dessus de l'écran
+        confettiParticles.push(new Confetti(x, y));
+    }
+}
+
+function animateConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Mettre à jour et dessiner chaque confetti
+    confettiParticles = confettiParticles.filter(confetti => {
+        confetti.update();
+        confetti.draw(ctx);
+        return confetti.opacity > 0; // Garder seulement les confettis visibles
+    });
+    
+    // Continuer l'animation si des confettis sont encore visibles
+    if (confettiParticles.length > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+    } else {
+        stopConfetti();
+    }
+}
+
+function startConfetti() {
+    // Arrêter l'animation précédente si elle existe
+    stopConfetti();
+    
+    // Créer et lancer les confettis
+    createConfetti();
+    animateConfetti();
+}
+
+function stopConfetti() {
+    if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+    }
+    
+    const canvas = document.getElementById('confettiCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    confettiParticles = [];
+}
+
+// Redimensionner le canvas quand la fenêtre change de taille
+window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confettiCanvas');
+    if (canvas && confettiParticles.length > 0) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+});
 
 // ========== MODE LOTTO NUMBERS ==========
 
@@ -2809,6 +2949,8 @@ function playNumbersLoto() {
             <div class="result-amount">+${Math.floor(totalWin)}</div>
             <div class="result-currency">PaieCash Coins</div>
         `;
+        // Lancer les confettis
+        startConfetti();
     } else {
         messageEl.innerHTML = `
             <h3>PAS CETTE FOIS...</h3>
@@ -3491,6 +3633,7 @@ function shareResult() {
     <!-- 🎲 MODAL LOTO -->
     <!-- LOTO MODAL SYSTEM -->
     <div id="lotoModal" class="loto-modal" style="display: none;">
+        <canvas id="confettiCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
         <div class="loto-modal-overlay" onclick="closeLoto()"></div>
         <div class="loto-modal-content">
             
