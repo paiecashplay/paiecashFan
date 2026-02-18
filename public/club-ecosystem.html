@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AS Saint-Étienne - Écosystème Fan</title>
+    <title id="pageTitle">PaieCashFan - Club</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -28,7 +28,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--dark-bg);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2332 100%);
             color: var(--text);
             min-height: 100vh;
         }
@@ -104,6 +104,52 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
         
+        .language-selector {
+            position: relative;
+        }
+        
+        .language-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .language-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px;
+            min-width: 150px;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            z-index: 1001;
+        }
+        
+        .language-dropdown.show {
+            display: block;
+        }
+        
+        .language-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .language-option:hover, .language-option.active {
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
         /* Sidebar Gamification */
         .sidebar {
             position: fixed;
@@ -145,25 +191,11 @@
             position: relative;
         }
         
-        .sidebar-icon.loto {
-            background: linear-gradient(135deg, var(--loto-orange), #d97706);
-        }
-        
-        .sidebar-icon.trophy {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        }
-        
-        .sidebar-icon.heart {
-            background: linear-gradient(135deg, #ec4899, #be185d);
-        }
-        
-        .sidebar-icon.share {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-        
-        .sidebar-icon.search {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-        }
+        .sidebar-icon.loto { background: linear-gradient(135deg, var(--loto-orange), #d97706); }
+        .sidebar-icon.trophy { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .sidebar-icon.heart { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .sidebar-icon.share { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .sidebar-icon.search { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         
         .sidebar-value {
             font-size: 11px;
@@ -231,9 +263,7 @@
             z-index: 1;
         }
         
-        .loto-title-section {
-            flex: 1;
-        }
+        .loto-title-section { flex: 1; }
         
         .loto-title {
             display: flex;
@@ -276,9 +306,7 @@
             gap: 8px;
         }
         
-        .loto-stats {
-            text-align: right;
-        }
+        .loto-stats { text-align: right; }
         
         .loto-jackpot {
             font-size: 48px;
@@ -296,6 +324,48 @@
         .loto-participants {
             font-size: 16px;
             font-weight: 700;
+        }
+        
+        /* Timer */
+        .timer-section {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timer-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .timer-block {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            min-width: 80px;
+        }
+        
+        .timer-value {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        
+        .timer-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
         
         /* Price Options */
@@ -367,188 +437,80 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
         
-        /* Upcoming Draw */
-        .upcoming-draw {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-        }
-        
-        .upcoming-draw h3 {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            display: flex;
+        /* Game Rules Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
         
-        .draw-info {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-        }
+        .modal.show { display: flex; }
         
-        .draw-item {
-            flex: 1;
-        }
-        
-        .draw-value {
-            font-size: 32px;
-            font-weight: 900;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .draw-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        /* Supercagnotte Section */
-        .supercagnotte {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
+        .modal-content {
+            background: var(--card-bg);
             border-radius: 24px;
-            padding: 35px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.4);
+            padding: 40px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
             position: relative;
-            overflow: hidden;
         }
         
-        .supercagnotte::before {
-            content: '';
+        .modal-close {
             position: absolute;
-            top: -30%;
-            left: -10%;
-            width: 250px;
-            height: 250px;
+            top: 20px;
+            right: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-        
-        .supercagnotte-header {
-            position: relative;
-            z-index: 1;
-            margin-bottom: 25px;
-        }
-        
-        .supercagnotte-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .supercagnotte h2 {
-            font-size: 36px;
-            font-weight: 900;
-            margin-bottom: 15px;
-        }
-        
-        .supercagnotte-prizes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .super-prize {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-        }
-        
-        .super-prize-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-        
-        .super-prize-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .super-prize-value {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        /* Notifications Section */
-        .notifications-section {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-        }
-        
-        .notifications-section h3 {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .notification-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .notification-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        
-        .notification-icon {
+            border: none;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
         }
         
-        .notification-content {
-            flex: 1;
+        .modal-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 20px;
         }
         
-        .notification-title {
-            font-size: 14px;
+        .rule-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .rule-number {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .rule-title {
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 3px;
+            margin-bottom: 8px;
         }
         
-        .notification-text {
-            font-size: 12px;
+        .rule-desc {
+            font-size: 14px;
             color: var(--text-secondary);
+            line-height: 1.6;
         }
         
-        .notification-time {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-        
-        /* Partners Map */
+        /* Partners Section */
         .partners-section {
             background: var(--card-bg);
             border-radius: 20px;
@@ -566,27 +528,10 @@
             gap: 10px;
         }
         
-        .partners-map {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .map-placeholder {
-            text-align: center;
-            color: var(--text-secondary);
-        }
-        
         .partners-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
-            margin-top: 20px;
         }
         
         .partner-card {
@@ -628,26 +573,12 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding-left: 20px;
-            }
-            
-            .sidebar {
-                display: none;
-            }
-            
-            .price-options {
-                grid-template-columns: 1fr;
-            }
-            
-            .loto-header {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .loto-stats {
-                text-align: left;
-            }
+            .container { padding-left: 20px; }
+            .sidebar { display: none; }
+            .price-options { grid-template-columns: 1fr; }
+            .loto-header { flex-direction: column; gap: 20px; }
+            .loto-stats { text-align: left; }
+            .timer-display { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -657,29 +588,54 @@
         <div class="header-content">
             <div class="club-badge">
                 <div class="club-logo">
-                    <i class="fas fa-shield"></i>
+                    <i class="fas fa-shield" id="clubIcon"></i>
                 </div>
                 <div class="club-info">
-                    <h1>AS Saint-Étienne</h1>
-                    <p>Ligue 2 BKT - Écosystème Fan</p>
+                    <h1 id="clubName">Loading...</h1>
+                    <p id="clubLeague">Loading...</p>
                 </div>
             </div>
             
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="window.location.href='/'">
-                    <i class="fas fa-home"></i> Accueil
+                    <i class="fas fa-home"></i> <span data-i18n="home">Accueil</span>
                 </button>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" onclick="window.location.href='/wallet.html'">
                     <i class="fas fa-wallet"></i> Wallet
                 </button>
-                <button class="btn btn-primary">FR</button>
+                <div class="language-selector">
+                    <div class="language-btn" onclick="toggleLanguageDropdown()">
+                        <span id="currentLang">FR</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="language-dropdown" id="languageDropdown">
+                        <div class="language-option active" onclick="changeLanguage('fr')">
+                            Français
+                        </div>
+                        <div class="language-option" onclick="changeLanguage('en')">
+                            English
+                        </div>
+                        <div class="language-option" onclick="changeLanguage('es')">
+                            Español
+                        </div>
+                        <div class="language-option" onclick="changeLanguage('pt')">
+                            Português
+                        </div>
+                        <div class="language-option" onclick="changeLanguage('ar')">
+                            العربية
+                        </div>
+                        <div class="language-option" onclick="changeLanguage('zh')">
+                            中文
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
     
     <!-- Sidebar Gamification -->
     <div class="sidebar">
-        <div class="sidebar-item" onclick="scrollToLoto()">
+        <div class="sidebar-item" onclick="scrollToSection('lotoSection')">
             <div class="sidebar-icon loto">
                 <i class="fas fa-dice"></i>
                 <div class="notification-dot">1</div>
@@ -687,28 +643,28 @@
             <div class="sidebar-value">LOTO</div>
         </div>
         
-        <div class="sidebar-item">
+        <div class="sidebar-item" onclick="showGamification('points')">
             <div class="sidebar-icon trophy">
                 <i class="fas fa-trophy"></i>
             </div>
             <div class="sidebar-value">2.4K</div>
         </div>
         
-        <div class="sidebar-item">
+        <div class="sidebar-item" onclick="showGamification('likes')">
             <div class="sidebar-icon heart">
                 <i class="fas fa-heart"></i>
             </div>
             <div class="sidebar-value">856</div>
         </div>
         
-        <div class="sidebar-item">
+        <div class="sidebar-item" onclick="showGamification('share')">
             <div class="sidebar-icon share">
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="sidebar-value">+12</div>
         </div>
         
-        <div class="sidebar-item">
+        <div class="sidebar-item" onclick="scrollToSection('partnersSection')">
             <div class="sidebar-icon search">
                 <i class="fas fa-search"></i>
             </div>
@@ -726,22 +682,45 @@
                             <i class="fas fa-dice"></i>
                         </div>
                         <div>
-                            <h2>LOTO AS Saint-Étienne</h2>
+                            <h2 id="lotoTitle">LOTO PaieCashFan</h2>
                             <div class="loto-charity">
                                 <i class="fas fa-heart"></i>
-                                1% des gains → Œuvres caritatives
+                                <span data-i18n="charity">1% des gains → Œuvres caritatives</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="loto-stats">
-                    <div class="loto-jackpot">8,000€</div>
+                    <div class="loto-jackpot" id="jackpotAmount">8,000€</div>
                     <div class="loto-next-draw">
-                        <i class="fas fa-clock"></i> Prochain tirage : Dimanche 21h
+                        <i class="fas fa-clock"></i> <span data-i18n="nextDraw">Prochain tirage</span>: <span id="drawDate">Dimanche 21h</span>
                     </div>
                     <div class="loto-participants">
-                        <i class="fas fa-users"></i> 8,742 participants
+                        <i class="fas fa-users"></i> <span id="participantCount">8,742</span> <span data-i18n="participants">participants</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timer -->
+            <div class="timer-section">
+                <div class="timer-title" data-i18n="timeRemaining">Temps restant avant le tirage</div>
+                <div class="timer-display">
+                    <div class="timer-block">
+                        <div class="timer-value" id="timerDays">02</div>
+                        <div class="timer-label" data-i18n="days">jours</div>
+                    </div>
+                    <div class="timer-block">
+                        <div class="timer-value" id="timerHours">15</div>
+                        <div class="timer-label" data-i18n="hours">heures</div>
+                    </div>
+                    <div class="timer-block">
+                        <div class="timer-value" id="timerMinutes">42</div>
+                        <div class="timer-label" data-i18n="minutes">minutes</div>
+                    </div>
+                    <div class="timer-block">
+                        <div class="timer-value" id="timerSeconds">18</div>
+                        <div class="timer-label" data-i18n="seconds">secondes</div>
                     </div>
                 </div>
             </div>
@@ -750,189 +729,343 @@
                 <div class="price-card" onclick="selectPrice(1)">
                     <div class="price-value">1€</div>
                     <div class="price-label">1 ticket</div>
-                    <div class="price-chances">1 chance sur 1000</div>
+                    <div class="price-chances">1 chance / 1000</div>
                 </div>
                 
                 <div class="price-card selected" onclick="selectPrice(10)">
                     <div class="price-value">10€</div>
                     <div class="price-label">15 tickets</div>
-                    <div class="price-chances">15 chances - Bonus +50%</div>
+                    <div class="price-chances">Bonus +50%</div>
                 </div>
                 
                 <div class="price-card" onclick="selectPrice(100)">
                     <div class="price-value">100€</div>
                     <div class="price-label">200 tickets</div>
-                    <div class="price-chances">200 chances - Bonus x2</div>
+                    <div class="price-chances">Bonus x2</div>
                 </div>
             </div>
             
-            <button class="loto-cta" onclick="playLoto()">
-                <i class="fas fa-play"></i> JOUER MAINTENANT
+            <button class="loto-cta" onclick="showGameRules()">
+                <i class="fas fa-play"></i> <span data-i18n="playNow">JOUER MAINTENANT</span>
             </button>
         </div>
         
-        <!-- Upcoming Draw -->
-        <div class="upcoming-draw">
-            <h3>
-                <i class="fas fa-calendar-alt"></i>
-                Tirage de la semaine
-            </h3>
-            <div class="draw-info">
-                <div class="draw-item">
-                    <div class="draw-value">DIM</div>
-                    <div class="draw-label">15 Fév</div>
-                </div>
-                <div class="draw-item">
-                    <div class="draw-value">21:00</div>
-                    <div class="draw-label">Heure du tirage</div>
-                </div>
-                <div class="draw-item">
-                    <div class="draw-value">8K€</div>
-                    <div class="draw-label">Jackpot actuel</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Supercagnotte Section -->
-        <div class="supercagnotte">
-            <div class="supercagnotte-header">
-                <div class="supercagnotte-badge">
-                    <i class="fas fa-star"></i> SUPERCAGNOTTE MONDIALE
-                </div>
-                <h2>Gagnez des lots exceptionnels !</h2>
-                <p style="font-size: 14px; opacity: 0.95; margin-bottom: 25px;">
-                    Participez à la supercagnotte mondiale et tentez de remporter des expériences uniques
-                </p>
-            </div>
-            
-            <div class="supercagnotte-prizes">
-                <div class="super-prize">
-                    <div class="super-prize-icon">🏠</div>
-                    <div class="super-prize-title">Une maison</div>
-                    <div class="super-prize-value">Valeur 250K€</div>
-                </div>
-                
-                <div class="super-prize">
-                    <div class="super-prize-icon">✈️</div>
-                    <div class="super-prize-title">11 voyages VIP</div>
-                    <div class="super-prize-value">+ hospitalités clubs</div>
-                </div>
-                
-                <div class="super-prize">
-                    <div class="super-prize-icon">👕</div>
-                    <div class="super-prize-title">Maillot signé</div>
-                    <div class="super-prize-value">11 joueurs - 1,000€</div>
-                </div>
-                
-                <div class="super-prize">
-                    <div class="super-prize-icon">🎟️</div>
-                    <div class="super-prize-title">Places VIP</div>
-                    <div class="super-prize-value">Saison complète</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Notifications Section -->
-        <div class="notifications-section">
-            <h3>
-                <i class="fas fa-bell"></i>
-                Notifications & Actualités
-            </h3>
-            
-            <div class="notification-item">
-                <div class="notification-icon">
-                    <i class="fas fa-dice"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">N'oubliez pas de jouer !</div>
-                    <div class="notification-text">Le tirage a lieu dimanche à 21h. Tentez votre chance !</div>
-                </div>
-                <div class="notification-time">Il y a 2h</div>
-            </div>
-            
-            <div class="notification-item">
-                <div class="notification-icon">
-                    <i class="fas fa-futbol"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">Match AS Saint-Étienne vs RC Lens</div>
-                    <div class="notification-text">Samedi 16 Fév - 20h45 au Stade Geoffroy-Guichard</div>
-                </div>
-                <div class="notification-time">Il y a 5h</div>
-            </div>
-            
-            <div class="notification-item">
-                <div class="notification-icon">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">Œuvre caritative de la semaine</div>
-                    <div class="notification-text">Construction d'une école au Sénégal - 1,200€ collectés</div>
-                </div>
-                <div class="notification-time">Il y a 1j</div>
-            </div>
-        </div>
-        
-        <!-- Partners Map -->
-        <div class="partners-section">
+        <!-- Partners Section -->
+        <div class="partners-section" id="partnersSection">
             <h3>
                 <i class="fas fa-map-marker-alt"></i>
-                Partenaires près de vous
+                <span data-i18n="partnersNearYou">Partenaires près de vous</span>
             </h3>
             
-            <div class="partners-map">
-                <div class="map-placeholder">
-                    <i class="fas fa-map" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
-                    <p>Carte interactive des partenaires du club</p>
-                    <p style="font-size: 12px; margin-top: 10px;">(Géolocalisation requise)</p>
-                </div>
-            </div>
-            
-            <div class="partners-list">
-                <div class="partner-card">
-                    <div class="partner-logo">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <div class="partner-name">Boutique ASSE</div>
-                    <div class="partner-distance">
-                        <i class="fas fa-location-arrow"></i> 2.5 km
-                    </div>
-                </div>
-                
-                <div class="partner-card">
-                    <div class="partner-logo">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <div class="partner-name">Restaurant Le Stéphanois</div>
-                    <div class="partner-distance">
-                        <i class="fas fa-location-arrow"></i> 1.2 km
-                    </div>
-                </div>
-                
-                <div class="partner-card">
-                    <div class="partner-logo">
-                        <i class="fas fa-futbol"></i>
-                    </div>
-                    <div class="partner-name">Centre d'entraînement</div>
-                    <div class="partner-distance">
-                        <i class="fas fa-location-arrow"></i> 5.8 km
-                    </div>
-                </div>
-                
-                <div class="partner-card">
-                    <div class="partner-logo">
-                        <i class="fas fa-ticket-alt"></i>
-                    </div>
-                    <div class="partner-name">Billetterie Stade</div>
-                    <div class="partner-distance">
-                        <i class="fas fa-location-arrow"></i> 3.4 km
-                    </div>
-                </div>
+            <div class="partners-list" id="partnersList">
+                <!-- Partners will be loaded dynamically -->
             </div>
         </div>
     </div>
     
+    <!-- Game Rules Modal -->
+    <div class="modal" id="gameRulesModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGameRules()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2 class="modal-title" data-i18n="howToPlay">Comment jouer ?</h2>
+            
+            <div class="rule-item">
+                <div class="rule-number">1</div>
+                <div class="rule-title" data-i18n="step1Title">Choisissez votre mise</div>
+                <div class="rule-desc" data-i18n="step1Desc">Sélectionnez un montant : 1€ (1 ticket), 10€ (15 tickets bonus +50%), ou 100€ (200 tickets bonus x2)</div>
+            </div>
+            
+            <div class="rule-item">
+                <div class="rule-number">2</div>
+                <div class="rule-title" data-i18n="step2Title">Payez avec votre Wallet</div>
+                <div class="rule-desc" data-i18n="step2Desc">Utilisez vos stablecoins USDC/USDT pour un paiement sécurisé et instantané</div>
+            </div>
+            
+            <div class="rule-item">
+                <div class="rule-number">3</div>
+                <div class="rule-title" data-i18n="step3Title">Recevez vos tickets</div>
+                <div class="rule-desc" data-i18n="step3Desc">Vos numéros de tirage sont générés et enregistrés sur la blockchain</div>
+            </div>
+            
+            <div class="rule-item">
+                <div class="rule-number">4</div>
+                <div class="rule-title" data-i18n="step4Title">Attendez le tirage</div>
+                <div class="rule-desc" data-i18n="step4Desc">Le tirage a lieu chaque dimanche à 21h. Suivez le compte à rebours ci-dessus</div>
+            </div>
+            
+            <div class="rule-item">
+                <div class="rule-number">5</div>
+                <div class="rule-title" data-i18n="step5Title">Gagnez et soutenez</div>
+                <div class="rule-desc" data-i18n="step5Desc">Si vous gagnez, recevez vos gains en crypto. 1% des gains sont reversés à des œuvres caritatives de votre club</div>
+            </div>
+            
+            <button class="loto-cta" onclick="closeGameRules()">
+                <i class="fas fa-check"></i> <span data-i18n="understood">Compris !</span>
+            </button>
+        </div>
+    </div>
+    
     <script>
+        // Translations
+        const translations = {
+            fr: {
+                home: 'Accueil', charity: '1% des gains → Œuvres caritatives',
+                nextDraw: 'Prochain tirage', participants: 'participants',
+                timeRemaining: 'Temps restant avant le tirage',
+                days: 'jours', hours: 'heures', minutes: 'minutes', seconds: 'secondes',
+                playNow: 'JOUER MAINTENANT', partnersNearYou: 'Partenaires près de vous',
+                howToPlay: 'Comment jouer ?',
+                step1Title: 'Choisissez votre mise',
+                step1Desc: 'Sélectionnez un montant : 1€ (1 ticket), 10€ (15 tickets bonus +50%), ou 100€ (200 tickets bonus x2)',
+                step2Title: 'Payez avec votre Wallet',
+                step2Desc: 'Utilisez vos stablecoins USDC/USDT pour un paiement sécurisé et instantané',
+                step3Title: 'Recevez vos tickets',
+                step3Desc: 'Vos numéros de tirage sont générés et enregistrés sur la blockchain',
+                step4Title: 'Attendez le tirage',
+                step4Desc: 'Le tirage a lieu chaque dimanche à 21h. Suivez le compte à rebours ci-dessus',
+                step5Title: 'Gagnez et soutenez',
+                step5Desc: 'Si vous gagnez, recevez vos gains en crypto. 1% des gains sont reversés à des œuvres caritatives de votre club',
+                understood: 'Compris !'
+            },
+            en: {
+                home: 'Home', charity: '1% of winnings → Charity',
+                nextDraw: 'Next draw', participants: 'participants',
+                timeRemaining: 'Time remaining until draw',
+                days: 'days', hours: 'hours', minutes: 'minutes', seconds: 'seconds',
+                playNow: 'PLAY NOW', partnersNearYou: 'Partners near you',
+                howToPlay: 'How to play?',
+                step1Title: 'Choose your stake',
+                step1Desc: 'Select an amount: €1 (1 ticket), €10 (15 tickets +50% bonus), or €100 (200 tickets x2 bonus)',
+                step2Title: 'Pay with your Wallet',
+                step2Desc: 'Use your USDC/USDT stablecoins for secure and instant payment',
+                step3Title: 'Receive your tickets',
+                step3Desc: 'Your draw numbers are generated and recorded on the blockchain',
+                step4Title: 'Wait for the draw',
+                step4Desc: 'The draw takes place every Sunday at 9pm. Follow the countdown above',
+                step5Title: 'Win and support',
+                step5Desc: 'If you win, receive your winnings in crypto. 1% of winnings go to your club charities',
+                understood: 'Got it!'
+            },
+            es: {
+                home: 'Inicio', charity: '1% de ganancias → Caridad',
+                nextDraw: 'Próximo sorteo', participants: 'participantes',
+                timeRemaining: 'Tiempo restante hasta el sorteo',
+                days: 'días', hours: 'horas', minutes: 'minutos', seconds: 'segundos',
+                playNow: 'JUGAR AHORA', partnersNearYou: 'Socios cerca de ti',
+                howToPlay: '¿Cómo jugar?',
+                step1Title: 'Elige tu apuesta',
+                step1Desc: 'Selecciona un monto: €1 (1 boleto), €10 (15 boletos +50%), o €100 (200 boletos x2)',
+                step2Title: 'Paga con tu Wallet',
+                step2Desc: 'Usa tus stablecoins USDC/USDT para un pago seguro e instantáneo',
+                step3Title: 'Recibe tus boletos',
+                step3Desc: 'Tus números se generan y registran en blockchain',
+                step4Title: 'Espera el sorteo',
+                step4Desc: 'El sorteo es cada domingo a las 21h. Sigue la cuenta atrás',
+                step5Title: 'Gana y apoya',
+                step5Desc: 'Si ganas, recibe tus premios en crypto. 1% va a obras de caridad de tu club',
+                understood: '¡Entendido!'
+            },
+            pt: {
+                home: 'Início', charity: '1% dos ganhos → Caridade',
+                nextDraw: 'Próximo sorteio', participants: 'participantes',
+                timeRemaining: 'Tempo restante até o sorteio',
+                days: 'dias', hours: 'horas', minutes: 'minutos', seconds: 'segundos',
+                playNow: 'JOGAR AGORA', partnersNearYou: 'Parceiros perto de você',
+                howToPlay: 'Como jogar?',
+                step1Title: 'Escolha sua aposta',
+                step1Desc: 'Selecione um valor: €1 (1 bilhete), €10 (15 bilhetes +50%), ou €100 (200 bilhetes x2)',
+                step2Title: 'Pague com sua Wallet',
+                step2Desc: 'Use suas stablecoins USDC/USDT para pagamento seguro e instantâneo',
+                step3Title: 'Receba seus bilhetes',
+                step3Desc: 'Seus números são gerados e registrados na blockchain',
+                step4Title: 'Aguarde o sorteio',
+                step4Desc: 'O sorteio acontece todo domingo às 21h. Acompanhe a contagem regressiva',
+                step5Title: 'Ganhe e apoie',
+                step5Desc: 'Se ganhar, receba seus prêmios em crypto. 1% vai para caridade do seu clube',
+                understood: 'Entendi!'
+            },
+            ar: {
+                home: 'الرئيسية', charity: '1% من الأرباح ← الأعمال الخيرية',
+                nextDraw: 'السحب القادم', participants: 'المشاركون',
+                timeRemaining: 'الوقت المتبقي حتى السحب',
+                days: 'أيام', hours: 'ساعات', minutes: 'دقائق', seconds: 'ثواني',
+                playNow: 'العب الآن', partnersNearYou: 'شركاء بالقرب منك',
+                howToPlay: 'كيف تلعب؟',
+                step1Title: 'اختر مبلغ رهانك',
+                step1Desc: 'اختر مبلغاً: €1 (تذكرة واحدة)، €10 (15 تذكرة +50%)، أو €100 (200 تذكرة x2)',
+                step2Title: 'ادفع بمحفظتك',
+                step2Desc: 'استخدم عملاتك المستقرة USDC/USDT للدفع الآمن والفوري',
+                step3Title: 'احصل على تذاكرك',
+                step3Desc: 'يتم إنشاء أرقامك وتسجيلها على البلوكشين',
+                step4Title: 'انتظر السحب',
+                step4Desc: 'يتم السحب كل يوم أحد الساعة 9 مساءً. تابع العد التنازلي',
+                step5Title: 'اربح وادعم',
+                step5Desc: 'إذا فزت، استلم أرباحك بالعملات المشفرة. 1% يذهب للأعمال الخيرية',
+                understood: 'فهمت!'
+            },
+            zh: {
+                home: '首页', charity: '1% 奖金 → 慈善事业',
+                nextDraw: '下次抽奖', participants: '参与者',
+                timeRemaining: '抽奖倒计时',
+                days: '天', hours: '小时', minutes: '分钟', seconds: '秒',
+                playNow: '立即游戏', partnersNearYou: '附近合作伙伴',
+                howToPlay: '如何玩？',
+                step1Title: '选择您的赌注',
+                step1Desc: '选择金额：€1（1张票）、€10（15张票+50%）或€100（200张票x2）',
+                step2Title: '用钱包支付',
+                step2Desc: '使用您的USDC/USDT稳定币进行安全即时支付',
+                step3Title: '获取您的彩票',
+                step3Desc: '您的号码将生成并记录在区块链上',
+                step4Title: '等待抽奖',
+                step4Desc: '抽奖每周日晚9点进行。关注倒计时',
+                step5Title: '赢奖并支持',
+                step5Desc: '如果您赢了，将收到加密货币奖金。1%捐给您的俱乐部慈善机构',
+                understood: '明白了！'
+            }
+        };
+        
+        let currentLanguage = 'fr';
+        
+        // Club data by name
+        const clubData = {
+            'Paris SG': { icon: 'fa-star', league: 'Ligue 1', color: '#dc2626' },
+            'Olympique Marseille': { icon: 'fa-water', league: 'Ligue 1', color: '#3b82f6' },
+            'AS Saint-Etienne': { icon: 'fa-shield', league: 'Ligue 2 BKT', color: '#10b981' },
+            'Olympique Lyonnais': { icon: 'fa-crown', league: 'Ligue 1', color: '#dc2626' },
+            'Default': { icon: 'fa-shield', league: 'Loading...', color: '#10b981' }
+        };
+        
+        // Partner data by club
+        const partnersData = {
+            'Paris SG': [
+                { name: 'Boutique PSG Official', icon: 'fa-store', distance: '1.2 km' },
+                { name: 'Restaurant Le Parisien', icon: 'fa-utensils', distance: '0.8 km' },
+                { name: 'Parc des Princes', icon: 'fa-futbol', distance: '2.5 km' },
+                { name: 'Billetterie PSG', icon: 'fa-ticket-alt', distance: '2.5 km' }
+            ],
+            'Olympique Marseille': [
+                { name: 'Boutique OM', icon: 'fa-store', distance: '1.8 km' },
+                { name: 'Restaurant Le Vélodrome', icon: 'fa-utensils', distance: '1.5 km' },
+                { name: 'Orange Vélodrome', icon: 'fa-futbol', distance: '3.2 km' },
+                { name: 'Billetterie OM', icon: 'fa-ticket-alt', distance: '3.2 km' }
+            ],
+            'AS Saint-Etienne': [
+                { name: 'Boutique ASSE', icon: 'fa-store', distance: '2.5 km' },
+                { name: 'Restaurant Le Stéphanois', icon: 'fa-utensils', distance: '1.2 km' },
+                { name: 'Centre entraînement', icon: 'fa-futbol', distance: '5.8 km' },
+                { name: 'Billetterie Stade', icon: 'fa-ticket-alt', distance: '3.4 km' }
+            ],
+            'Default': [
+                { name: 'Boutique Officielle', icon: 'fa-store', distance: '2.0 km' },
+                { name: 'Restaurant Partenaire', icon: 'fa-utensils', distance: '1.5 km' },
+                { name: 'Centre entraînement', icon: 'fa-futbol', distance: '4.0 km' },
+                { name: 'Billetterie', icon: 'fa-ticket-alt', distance: '3.0 km' }
+            ]
+        };
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubName = urlParams.get('club') || 'AS Saint-Etienne';
+        const league = urlParams.get('league') || 'ligue2';
+        
+        // Initialize page
+        function initializePage() {
+            const club = clubData[clubName] || clubData['Default'];
+            
+            // Update club info
+            document.getElementById('clubName').textContent = clubName;
+            document.getElementById('clubLeague').textContent = club.league + ' - Écosystème Fan';
+            document.getElementById('clubIcon').className = 'fas ' + club.icon;
+            document.getElementById('pageTitle').textContent = clubName + ' - PaieCashFan';
+            document.getElementById('lotoTitle').textContent = 'LOTO ' + clubName;
+            
+            // Update partners
+            const partners = partnersData[clubName] || partnersData['Default'];
+            const partnersList = document.getElementById('partnersList');
+            partnersList.innerHTML = partners.map(p => `
+                <div class="partner-card">
+                    <div class="partner-logo">
+                        <i class="fas ${p.icon}"></i>
+                    </div>
+                    <div class="partner-name">${p.name}</div>
+                    <div class="partner-distance">
+                        <i class="fas fa-location-arrow"></i> ${p.distance}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Start timer
+            startCountdown();
+        }
+        
+        // Timer function
+        function startCountdown() {
+            const now = new Date();
+            const nextSunday = new Date(now);
+            nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7));
+            nextSunday.setHours(21, 0, 0, 0);
+            
+            if (nextSunday < now) {
+                nextSunday.setDate(nextSunday.getDate() + 7);
+            }
+            
+            function updateTimer() {
+                const now = new Date();
+                const diff = nextSunday - now;
+                
+                if (diff <= 0) {
+                    nextSunday.setDate(nextSunday.getDate() + 7);
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('timerDays').textContent = String(days).padStart(2, '0');
+                document.getElementById('timerHours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('timerMinutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('timerSeconds').textContent = String(seconds).padStart(2, '0');
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+        
+        // Language functions
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            document.getElementById('htmlRoot').setAttribute('lang', lang);
+            
+            // Update all translated elements
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update active language option
+            document.querySelectorAll('.language-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            toggleLanguageDropdown();
+        }
+        
+        // Price selection
         function selectPrice(price) {
             document.querySelectorAll('.price-card').forEach(card => {
                 card.classList.remove('selected');
@@ -940,22 +1073,39 @@
             event.target.closest('.price-card').classList.add('selected');
         }
         
-        function playLoto() {
-            alert('Redirection vers le paiement crypto sécurisé...');
+        // Game rules modal
+        function showGameRules() {
+            document.getElementById('gameRulesModal').classList.add('show');
         }
         
-        function scrollToLoto() {
-            document.getElementById('lotoSection').scrollIntoView({ behavior: 'smooth' });
+        function closeGameRules() {
+            document.getElementById('gameRulesModal').classList.remove('show');
         }
         
-        // Get club from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const clubName = urlParams.get('club') || 'AS Saint-Étienne';
-        const league = urlParams.get('league') || 'ligue2';
+        // Scroll to section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
         
-        // Update page title
-        document.title = `${clubName} - Écosystème Fan`;
-        document.querySelector('.club-info h1').textContent = clubName;
+        // Gamification alerts
+        function showGamification(type) {
+            const messages = {
+                points: 'Vous avez 2,400 points PCC ! Continuez à jouer pour en gagner plus.',
+                likes: '856 fans aiment votre profil ! Partagez pour augmenter.',
+                share: 'Invitez 12 amis pour gagner +600 PCC bonus !'
+            };
+            alert(messages[type] || 'Fonctionnalité gamification à venir !');
+        }
+        
+        // Close dropdowns on outside click
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.language-selector')) {
+                document.getElementById('languageDropdown').classList.remove('show');
+            }
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializePage);
     </script>
 </body>
 </html>
