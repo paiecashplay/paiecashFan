@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="fr" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Live Streams - PaieCashFan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #10b981;
+            --secondary: #6366f1;
+            --live-red: #ef4444;
+            --shopping-purple: #a855f7;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2332 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .btn-live {
+            background: linear-gradient(135deg, var(--live-red), #dc2626);
+            animation: pulse-btn 2s infinite;
+        }
+        
+        @keyframes pulse-btn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .language-selector {
+            position: relative;
+        }
+        
+        .language-btn {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--live-red), var(--shopping-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        /* Category Tabs */
+        .category-tabs {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+        
+        .category-tab:hover, .category-tab.active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+        }
+        
+        .category-tab.all.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+        }
+        
+        .category-tab.matches.active {
+            background: linear-gradient(135deg, var(--live-red), #dc2626);
+            border-color: var(--live-red);
+        }
+        
+        .category-tab.creators.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+        }
+        
+        .category-tab.shopping.active {
+            background: linear-gradient(135deg, var(--shopping-purple), #9333ea);
+            border-color: var(--shopping-purple);
+        }
+        
+        .live-badge {
+            background: var(--live-red);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Streams Grid */
+        .streams-container {
+            max-width: 1400px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .viewers-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .streams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .stream-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+        
+        .stream-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .stream-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .stream-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .stream-thumbnail-icon {
+            font-size: 64px;
+            opacity: 0.3;
+        }
+        
+        .stream-status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--live-red);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        .stream-status.upcoming {
+            background: var(--secondary);
+            animation: none;
+        }
+        
+        .stream-viewers {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stream-price {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(168, 85, 247, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .stream-info {
+            padding: 20px;
+        }
+        
+        .stream-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .stream-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .stream-creator {
+            flex: 1;
+        }
+        
+        .stream-creator-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        
+        .stream-club {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .stream-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .stream-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .stream-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stream-category {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .stream-category.match {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--live-red);
+        }
+        
+        .stream-category.creator {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        .stream-category.shopping {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--shopping-purple);
+        }
+        
+        /* Featured Stream (Large) */
+        .featured-stream {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            max-height: 450px;
+        }
+        
+        .featured-stream .stream-thumbnail {
+            height: 100%;
+        }
+        
+        .featured-stream .stream-info {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .featured-stream .stream-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .featured-stream .stream-creator-name {
+            font-size: 18px;
+        }
+        
+        .featured-cta {
+            margin-top: 25px;
+        }
+        
+        .btn-watch {
+            background: linear-gradient(135deg, var(--live-red), #dc2626);
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-watch:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .empty-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        /* Create Stream CTA */
+        .create-stream-section {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        .create-stream-card {
+            background: linear-gradient(135deg, var(--shopping-purple), #9333ea);
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .create-stream-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .create-stream-card h2 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .create-stream-card p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-create {
+            background: white;
+            color: var(--shopping-purple);
+            padding: 18px 50px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 32px; }
+            .streams-grid { grid-template-columns: 1fr; }
+            .featured-stream {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+            .featured-stream .stream-info { padding: 25px; }
+            .featured-stream .stream-title { font-size: 24px; }
+            .category-tabs { flex-direction: column; }
+            .create-stream-card { padding: 30px; }
+            .create-stream-card h2 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo" onclick="window.location.href='/'">
+                <div class="logo-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>PaieCashFan Live</h1>
+                    <p>Matchs, Créateurs & Shopping</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-live" onclick="goToCreateStream()">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <span data-i18n="goLive">GO LIVE</span>
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='/wallet.html'">
+                    <i class="fas fa-wallet"></i>
+                    Wallet
+                </button>
+                <button class="language-btn" onclick="toggleLanguage()">
+                    <span id="currentLang">FR</span>
+                    <i class="fas fa-globe"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero -->
+    <section class="hero">
+        <h2 data-i18n="heroTitle">Live Streams Exclusifs</h2>
+        <p data-i18n="heroDesc">Regardez vos matchs préférés, suivez les créateurs et achetez en direct avec crypto</p>
+    </section>
+    
+    <!-- Category Tabs -->
+    <div class="category-tabs">
+        <button class="category-tab all active" onclick="filterCategory('all', event)">
+            <i class="fas fa-fire"></i>
+            <span data-i18n="allStreams">Tous les Streams</span>
+            <span class="live-badge">LIVE</span>
+        </button>
+        <button class="category-tab matches" onclick="filterCategory('matches', event)">
+            <i class="fas fa-futbol"></i>
+            <span data-i18n="matches">Matchs</span>
+            <span id="matchCount">(3)</span>
+        </button>
+        <button class="category-tab creators" onclick="filterCategory('creators', event)">
+            <i class="fas fa-user-friends"></i>
+            <span data-i18n="creators">Créateurs</span>
+            <span id="creatorCount">(5)</span>
+        </button>
+        <button class="category-tab shopping" onclick="filterCategory('shopping', event)">
+            <i class="fas fa-shopping-bag"></i>
+            <span data-i18n="liveShopping">Live Shopping</span>
+            <span id="shoppingCount">(2)</span>
+        </button>
+    </div>
+    
+    <!-- Streams Container -->
+    <div class="streams-container">
+        <div class="section-header">
+            <h3 class="section-title" id="sectionTitle">
+                <i class="fas fa-fire"></i>
+                <span data-i18n="liveNow">En Direct Maintenant</span>
+            </h3>
+            <div class="viewers-count">
+                <i class="fas fa-users"></i>
+                <span id="totalViewers">24,567</span> <span data-i18n="viewers">spectateurs</span>
+            </div>
+        </div>
+        
+        <div class="streams-grid" id="streamsGrid">
+            <!-- Streams will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Create Stream CTA -->
+    <div class="create-stream-section">
+        <div class="create-stream-card">
+            <h2 data-i18n="becomeCreator">Devenez Créateur de Contenu</h2>
+            <p data-i18n="becomeCreatorDesc">Lancez vos propres streams, monétisez votre passion et connectez avec vos fans</p>
+            <button class="btn-create" onclick="goToCreateStream()">
+                <i class="fas fa-video"></i>
+                <span data-i18n="startStreaming">Commencer à Streamer</span>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Translations
+        const translations = {
+            fr: {
+                goLive: 'GO LIVE',
+                heroTitle: 'Live Streams Exclusifs',
+                heroDesc: 'Regardez vos matchs préférés, suivez les créateurs et achetez en direct avec crypto',
+                allStreams: 'Tous les Streams',
+                matches: 'Matchs',
+                creators: 'Créateurs',
+                liveShopping: 'Live Shopping',
+                liveNow: 'En Direct Maintenant',
+                viewers: 'spectateurs',
+                live: 'LIVE',
+                upcoming: 'Bientôt',
+                free: 'Gratuit',
+                watchNow: 'Regarder Maintenant',
+                becomeCreator: 'Devenez Créateur de Contenu',
+                becomeCreatorDesc: 'Lancez vos propres streams, monétisez votre passion et connectez avec vos fans',
+                startStreaming: 'Commencer à Streamer',
+                noStreams: 'Aucun stream disponible',
+                noStreamsDesc: 'Revenez plus tard pour découvrir de nouveaux contenus'
+            },
+            en: {
+                goLive: 'GO LIVE',
+                heroTitle: 'Exclusive Live Streams',
+                heroDesc: 'Watch your favorite matches, follow creators and shop live with crypto',
+                allStreams: 'All Streams',
+                matches: 'Matches',
+                creators: 'Creators',
+                liveShopping: 'Live Shopping',
+                liveNow: 'Live Now',
+                viewers: 'viewers',
+                live: 'LIVE',
+                upcoming: 'Upcoming',
+                free: 'Free',
+                watchNow: 'Watch Now',
+                becomeCreator: 'Become a Content Creator',
+                becomeCreatorDesc: 'Launch your own streams, monetize your passion and connect with your fans',
+                startStreaming: 'Start Streaming',
+                noStreams: 'No streams available',
+                noStreamsDesc: 'Come back later to discover new content'
+            },
+            es: {
+                goLive: 'EN VIVO',
+                heroTitle: 'Transmisiones en Vivo Exclusivas',
+                heroDesc: 'Mira tus partidos favoritos, sigue a creadores y compra en vivo con crypto',
+                allStreams: 'Todos los Streams',
+                matches: 'Partidos',
+                creators: 'Creadores',
+                liveShopping: 'Compras en Vivo',
+                liveNow: 'En Vivo Ahora',
+                viewers: 'espectadores',
+                live: 'EN VIVO',
+                upcoming: 'Próximamente',
+                free: 'Gratis',
+                watchNow: 'Ver Ahora',
+                becomeCreator: 'Conviértete en Creador de Contenido',
+                becomeCreatorDesc: 'Lanza tus propios streams, monetiza tu pasión y conecta con tus fans',
+                startStreaming: 'Comenzar a Transmitir',
+                noStreams: 'No hay streams disponibles',
+                noStreamsDesc: 'Vuelve más tarde para descubrir nuevo contenido'
+            }
+        };
+        
+        let currentLanguage = 'fr';
+        let currentCategory = 'all';
+        
+        // Mock streams data (will be replaced with Whaazs API)
+        const mockStreams = [
+            {
+                id: 1,
+                title: 'PSG vs Olympique Marseille - Le Classico',
+                creator: 'Paris SG Official',
+                club: 'Paris SG',
+                category: 'matches',
+                isLive: true,
+                viewers: 12847,
+                price: 0,
+                thumbnail: null,
+                icon: 'fa-futbol',
+                time: 'Maintenant'
+            },
+            {
+                id: 2,
+                title: 'Tirage LOTO en Direct - Super Cagnotte 50K€',
+                creator: 'PaieCashFan Official',
+                club: 'Tous les clubs',
+                category: 'matches',
+                isLive: true,
+                viewers: 5621,
+                price: 0,
+                thumbnail: null,
+                icon: 'fa-dice',
+                time: 'Maintenant'
+            },
+            {
+                id: 3,
+                title: 'Live Shopping - Maillots Signés Collection Exclusive',
+                creator: 'FootStore by PCC',
+                club: 'Boutique Officielle',
+                category: 'shopping',
+                isLive: true,
+                viewers: 3204,
+                price: 0,
+                thumbnail: null,
+                icon: 'fa-shopping-bag',
+                time: 'Maintenant'
+            },
+            {
+                id: 4,
+                title: 'Analyse Tactique - Les Secrets du PSG',
+                creator: 'Coach Michel',
+                club: 'Paris SG',
+                category: 'creators',
+                isLive: true,
+                viewers: 1892,
+                price: 5,
+                thumbnail: null,
+                icon: 'fa-chalkboard-teacher',
+                time: 'Maintenant'
+            },
+            {
+                id: 5,
+                title: 'Entraînement à domicile avec un Pro',
+                creator: 'Karim Pro Fitness',
+                club: 'Olympique Marseille',
+                category: 'creators',
+                isLive: true,
+                viewers: 987,
+                price: 3,
+                thumbnail: null,
+                icon: 'fa-dumbbell',
+                time: 'Maintenant'
+            },
+            {
+                id: 6,
+                title: 'Live Q&A avec les Joueurs de Lyon',
+                creator: 'Olympique Lyonnais',
+                club: 'Olympique Lyonnais',
+                category: 'creators',
+                isLive: false,
+                viewers: 0,
+                price: 0,
+                thumbnail: null,
+                icon: 'fa-comments',
+                time: 'Demain 19h'
+            },
+            {
+                id: 7,
+                title: 'NFT Drop - Maillots Digitaux Limités',
+                creator: 'NFT Store PCC',
+                club: 'Tous les clubs',
+                category: 'shopping',
+                isLive: false,
+                viewers: 0,
+                price: 10,
+                thumbnail: null,
+                icon: 'fa-certificate',
+                time: 'Demain 20h'
+            },
+            {
+                id: 8,
+                title: 'Histoires de Légendes - Zinedine Zidane',
+                creator: 'Football Legends',
+                club: 'Tous les clubs',
+                category: 'creators',
+                isLive: false,
+                viewers: 0,
+                price: 8,
+                thumbnail: null,
+                icon: 'fa-trophy',
+                time: 'Samedi 18h'
+            }
+        ];
+        
+        // Initialize page
+        function initializePage() {
+            renderStreams();
+            updateCounts();
+        }
+        
+        // Render streams
+        function renderStreams() {
+            const grid = document.getElementById('streamsGrid');
+            const filtered = currentCategory === 'all' 
+                ? mockStreams 
+                : mockStreams.filter(s => s.category === currentCategory);
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-video-slash"></i></div>
+                        <h3 class="empty-title" data-i18n="noStreams">Aucun stream disponible</h3>
+                        <p class="empty-desc" data-i18n="noStreamsDesc">Revenez plus tard pour découvrir de nouveaux contenus</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // First stream as featured if live
+            const featured = filtered.find(s => s.isLive);
+            const regular = filtered.filter(s => s !== featured);
+            
+            grid.innerHTML = '';
+            
+            // Add featured stream
+            if (featured && currentCategory === 'all') {
+                grid.innerHTML += createFeaturedStreamCard(featured);
+            } else if (featured) {
+                grid.innerHTML += createStreamCard(featured);
+            }
+            
+            // Add regular streams
+            regular.forEach(stream => {
+                grid.innerHTML += createStreamCard(stream);
+            });
+        }
+        
+        // Create featured stream card
+        function createFeaturedStreamCard(stream) {
+            return `
+                <div class="stream-card featured-stream" onclick="openStream(${stream.id})">
+                    <div class="stream-thumbnail">
+                        <i class="fas ${stream.icon} stream-thumbnail-icon"></i>
+                        ${stream.isLive ? `
+                            <div class="stream-status">
+                                <i class="fas fa-circle"></i>
+                                <span data-i18n="live">LIVE</span>
+                            </div>
+                            <div class="stream-viewers">
+                                <i class="fas fa-eye"></i>
+                                ${formatNumber(stream.viewers)}
+                            </div>
+                        ` : `
+                            <div class="stream-status upcoming">
+                                <i class="fas fa-clock"></i>
+                                <span data-i18n="upcoming">Bientôt</span>
+                            </div>
+                        `}
+                        ${stream.price > 0 ? `
+                            <div class="stream-price">${stream.price}€</div>
+                        ` : ''}
+                    </div>
+                    <div class="stream-info">
+                        <div class="stream-header">
+                            <div class="stream-avatar">
+                                <i class="fas ${stream.icon}"></i>
+                            </div>
+                            <div class="stream-creator">
+                                <div class="stream-creator-name">${stream.creator}</div>
+                                <div class="stream-club">${stream.club}</div>
+                            </div>
+                        </div>
+                        <h3 class="stream-title">${stream.title}</h3>
+                        <div class="stream-meta">
+                            <span class="stream-time">
+                                <i class="fas fa-clock"></i>
+                                ${stream.time}
+                            </span>
+                            <span class="stream-category ${stream.category}">${getCategoryLabel(stream.category)}</span>
+                        </div>
+                        <div class="featured-cta">
+                            <button class="btn-watch">
+                                <i class="fas fa-play"></i>
+                                <span data-i18n="watchNow">Regarder Maintenant</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create stream card
+        function createStreamCard(stream) {
+            return `
+                <div class="stream-card" onclick="openStream(${stream.id})">
+                    <div class="stream-thumbnail">
+                        <i class="fas ${stream.icon} stream-thumbnail-icon"></i>
+                        ${stream.isLive ? `
+                            <div class="stream-status">
+                                <i class="fas fa-circle"></i>
+                                <span data-i18n="live">LIVE</span>
+                            </div>
+                            <div class="stream-viewers">
+                                <i class="fas fa-eye"></i>
+                                ${formatNumber(stream.viewers)}
+                            </div>
+                        ` : `
+                            <div class="stream-status upcoming">
+                                <i class="fas fa-clock"></i>
+                                <span data-i18n="upcoming">Bientôt</span>
+                            </div>
+                        `}
+                        ${stream.price > 0 ? `
+                            <div class="stream-price">${stream.price}€</div>
+                        ` : `
+                            <div class="stream-price" style="background: rgba(16, 185, 129, 0.9);">
+                                <span data-i18n="free">Gratuit</span>
+                            </div>
+                        `}
+                    </div>
+                    <div class="stream-info">
+                        <div class="stream-header">
+                            <div class="stream-avatar">
+                                <i class="fas ${stream.icon}"></i>
+                            </div>
+                            <div class="stream-creator">
+                                <div class="stream-creator-name">${stream.creator}</div>
+                                <div class="stream-club">${stream.club}</div>
+                            </div>
+                        </div>
+                        <h3 class="stream-title">${stream.title}</h3>
+                        <div class="stream-meta">
+                            <span class="stream-time">
+                                <i class="fas fa-clock"></i>
+                                ${stream.time}
+                            </span>
+                            <span class="stream-category ${stream.category}">${getCategoryLabel(stream.category)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update counts
+        function updateCounts() {
+            const matches = mockStreams.filter(s => s.category === 'matches').length;
+            const creators = mockStreams.filter(s => s.category === 'creators').length;
+            const shopping = mockStreams.filter(s => s.category === 'shopping').length;
+            const totalViewers = mockStreams.reduce((sum, s) => sum + s.viewers, 0);
+            
+            document.getElementById('matchCount').textContent = `(${matches})`;
+            document.getElementById('creatorCount').textContent = `(${creators})`;
+            document.getElementById('shoppingCount').textContent = `(${shopping})`;
+            document.getElementById('totalViewers').textContent = formatNumber(totalViewers);
+        }
+        
+        // Filter category
+        function filterCategory(category, event) {
+            currentCategory = category;
+            renderStreams();
+            
+            // Update active tab
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.category-tab').classList.add('active');
+            
+            // Update section title
+            const titles = {
+                all: 'En Direct Maintenant',
+                matches: 'Matchs en Direct',
+                creators: 'Créateurs de Contenu',
+                shopping: 'Live Shopping'
+            };
+            document.getElementById('sectionTitle').innerHTML = `
+                <i class="fas ${getCategoryIcon(category)}"></i>
+                <span>${titles[category]}</span>
+            `;
+        }
+        
+        // Helper functions
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        function getCategoryLabel(category) {
+            const labels = {
+                matches: 'Match',
+                creators: 'Créateur',
+                shopping: 'Shopping'
+            };
+            return labels[category] || category;
+        }
+        
+        function getCategoryIcon(category) {
+            const icons = {
+                all: 'fa-fire',
+                matches: 'fa-futbol',
+                creators: 'fa-user-friends',
+                shopping: 'fa-shopping-bag'
+            };
+            return icons[category] || 'fa-fire';
+        }
+        
+        // Navigation functions
+        function openStream(streamId) {
+            const stream = mockStreams.find(s => s.id === streamId);
+            if (stream) {
+                // In production, this will open the Whaazs stream player
+                alert(`Ouverture du stream: ${stream.title}\n\nCette fonctionnalité sera connectée à l'API Whaazs pour le player vidéo.`);
+            }
+        }
+        
+        function goToCreateStream() {
+            alert('Redirection vers la page de création de stream Whaazs...\n\nVous pourrez :\n- Créer un stream live\n- Configurer le prix\n- Choisir votre club\n- Lancer la diffusion');
+        }
+        
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'fr' ? 'en' : 'fr';
+            document.getElementById('currentLang').textContent = currentLanguage.toUpperCase();
+            applyTranslations();
+        }
+        
+        function applyTranslations() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    el.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

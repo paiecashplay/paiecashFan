@@ -5,11 +5,15 @@ import type {
   Product, Event, ESIMPlan, AIRecommendation, AIInsights, AIPredictions,
   Interaction, Sponsor
 } from './api/types'
+import whaazs from './routes/whaazs'
 
 const app = new Hono()
 
 // Enable CORS
 app.use('/api/*', cors())
+
+// Mount Whaazs routes
+app.route('/api/whaazs', whaazs)
 
 // ==========================================
 // FEDERATIONS API (NEW - NO EMOJIS)
