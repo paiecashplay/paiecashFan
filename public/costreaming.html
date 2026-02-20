@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Streaming - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Auth Modal (Login/Register) -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-8">
+            <h2 id="authTitle" class="text-2xl font-bold mb-6 text-gray-800">Connexion</h2>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="loginEmail" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+                    <input type="password" id="loginPassword" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    Se connecter
+                </button>
+                <p class="text-center text-sm text-gray-600">
+                    Pas encore de compte ? 
+                    <a href="#" onclick="switchToRegister()" class="text-purple-600 hover:underline">S'inscrire</a>
+                </p>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nom d'utilisateur</label>
+                    <input type="text" id="registerUsername" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="registerEmail" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe (min. 6 caractères)</label>
+                    <input type="password" id="registerPassword" required minlength="6"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    Créer un compte
+                </button>
+                <p class="text-center text-sm text-gray-600">
+                    Déjà un compte ? 
+                    <a href="#" onclick="switchToLogin()" class="text-purple-600 hover:underline">Se connecter</a>
+                </p>
+            </form>
+            
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">
+                        <i class="fas fa-video mr-2"></i>Co-Streaming
+                    </h1>
+                    <p class="text-purple-100 mt-1">Streamez ensemble avec vos amis</p>
+                </div>
+                <div id="userInfo" class="flex items-center gap-4 hidden">
+                    <span id="userName" class="text-white font-medium"></span>
+                    <button onclick="startNewStream()" class="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition">
+                        <i class="fas fa-plus mr-2"></i>Nouveau Stream
+                    </button>
+                    <button onclick="logout()" class="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                <div id="loginButton">
+                    <button onclick="openAuthModal()" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-semibold hover:bg-purple-50 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Streams Actifs</p>
+                        <p id="activeStreamsCount" class="text-3xl font-bold text-purple-600">0</p>
+                    </div>
+                    <div class="bg-purple-100 p-4 rounded-full">
+                        <i class="fas fa-broadcast-tower text-purple-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Participants Total</p>
+                        <p id="totalParticipants" class="text-3xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-full">
+                        <i class="fas fa-users text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Utilisateurs En Ligne</p>
+                        <p class="text-3xl font-bold text-blue-600">24</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-full">
+                        <i class="fas fa-circle text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <button onclick="filterByCategory('all')" 
+                    class="px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition whitespace-nowrap">
+                Tous
+            </button>
+            <button onclick="filterByCategory('matches')" 
+                    class="px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-futbol mr-2"></i>Matches
+            </button>
+            <button onclick="filterByCategory('shopping')" 
+                    class="px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-shopping-bag mr-2"></i>Shopping
+            </button>
+            <button onclick="filterByCategory('creator')" 
+                    class="px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-microphone mr-2"></i>Créateurs
+            </button>
+            <button onclick="filterByCategory('general')" 
+                    class="px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fas fa-comment mr-2"></i>Général
+            </button>
+        </div>
+        
+        <!-- Streams Grid -->
+        <div id="streamsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Chargement initial -->
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
+                <p class="text-gray-500">Chargement des streams...</p>
+            </div>
+        </div>
+        
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Configuration
+        const API_URL = window.location.origin + '/api'
+        let currentToken = localStorage.getItem('token')
+        let currentUser = null
+        let currentCategory = 'all'
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (currentToken) {
+                await loadUserProfile()
+            }
+            await loadStreams()
+            
+            // Auto-refresh every 10 seconds
+            setInterval(loadStreams, 10000)
+        })
+        
+        // Auth functions
+        async function loadUserProfile() {
+            try {
+                const response = await axios.get(`${API_URL}/auth/me`, {
+                    headers: { Authorization: `Bearer ${currentToken}` }
+                })
+                currentUser = response.data.user
+                document.getElementById('userName').textContent = currentUser.displayName
+                document.getElementById('userInfo').classList.remove('hidden')
+                document.getElementById('loginButton').classList.add('hidden')
+            } catch (error) {
+                console.error('Erreur de chargement du profil:', error)
+                localStorage.removeItem('token')
+                currentToken = null
+            }
+        }
+        
+        function openAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden')
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden')
+        }
+        
+        function switchToRegister() {
+            document.getElementById('authTitle').textContent = 'Créer un compte'
+            document.getElementById('loginForm').classList.add('hidden')
+            document.getElementById('registerForm').classList.remove('hidden')
+        }
+        
+        function switchToLogin() {
+            document.getElementById('authTitle').textContent = 'Connexion'
+            document.getElementById('registerForm').classList.add('hidden')
+            document.getElementById('loginForm').classList.remove('hidden')
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('loginEmail').value
+            const password = document.getElementById('loginPassword').value
+            
+            try {
+                const response = await axios.post(`${API_URL}/auth/login`, { email, password })
+                currentToken = response.data.token
+                localStorage.setItem('token', currentToken)
+                await loadUserProfile()
+                closeAuthModal()
+                loadStreams()
+            } catch (error) {
+                alert(error.response?.data?.error || 'Erreur de connexion')
+            }
+        })
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('registerEmail').value
+            const password = document.getElementById('registerPassword').value
+            const username = document.getElementById('registerUsername').value
+            
+            try {
+                const response = await axios.post(`${API_URL}/auth/register`, { 
+                    email, password, username, displayName: username 
+                })
+                currentToken = response.data.token
+                localStorage.setItem('token', currentToken)
+                await loadUserProfile()
+                closeAuthModal()
+                loadStreams()
+            } catch (error) {
+                alert(error.response?.data?.error || 'Erreur d\'inscription')
+            }
+        })
+        
+        function logout() {
+            localStorage.removeItem('token')
+            currentToken = null
+            currentUser = null
+            document.getElementById('userInfo').classList.add('hidden')
+            document.getElementById('loginButton').classList.remove('hidden')
+            loadStreams()
+        }
+        
+        // Streams functions
+        async function loadStreams() {
+            try {
+                const response = await axios.get(`${API_URL}/costreaming/active?category=${currentCategory}`)
+                const streams = response.data.streams || []
+                
+                document.getElementById('activeStreamsCount').textContent = streams.length
+                const totalParts = streams.reduce((sum, s) => sum + (s.participant_count || 0), 0)
+                document.getElementById('totalParticipants').textContent = totalParts
+                
+                if (streams.length === 0) {
+                    document.getElementById('streamsGrid').innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-video-slash text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">Aucun stream actif</h3>
+                            <p class="text-gray-500 mb-6">Soyez le premier à lancer un stream !</p>
+                            <button onclick="startNewStream()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                                <i class="fas fa-plus mr-2"></i>Créer un Stream
+                            </button>
+                        </div>
+                    `
+                    return
+                }
+                
+                document.getElementById('streamsGrid').innerHTML = streams.map(stream => `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover cursor-pointer" 
+                         onclick="joinStream('${stream.id}')">
+                        <div class="relative">
+                            <div class="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <i class="fas fa-video text-white text-6xl opacity-50"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                                <i class="fas fa-circle animate-pulse"></i>LIVE
+                            </span>
+                            <span class="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-users mr-1"></i>${stream.participant_count || 1}/${stream.max_participants}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg mb-2 line-clamp-1">${stream.title}</h3>
+                            <p class="text-sm text-gray-500 mb-3 line-clamp-2">${stream.description || 'Pas de description'}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-purple-600 text-sm"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700">${stream.host_display_name || stream.host_username}</span>
+                                </div>
+                                <span class="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+                                    ${getCategoryLabel(stream.category)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')
+            } catch (error) {
+                console.error('Erreur de chargement des streams:', error)
+                document.getElementById('streamsGrid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-600">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>Erreur de chargement des streams</p>
+                    </div>
+                `
+            }
+        }
+        
+        function getCategoryLabel(category) {
+            const labels = {
+                'matches': 'Match',
+                'shopping': 'Shopping',
+                'creator': 'Créateur',
+                'general': 'Général'
+            }
+            return labels[category] || 'Général'
+        }
+        
+        function filterByCategory(category) {
+            currentCategory = category
+            document.querySelectorAll('[onclick^="filterByCategory"]').forEach(btn => {
+                btn.className = 'px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition whitespace-nowrap'
+            })
+            event.target.className = 'px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition whitespace-nowrap'
+            loadStreams()
+        }
+        
+        function startNewStream() {
+            if (!currentToken) {
+                openAuthModal()
+                return
+            }
+            window.location.href = '/costream-room.html?action=create'
+        }
+        
+        function joinStream(streamId) {
+            if (!currentToken) {
+                openAuthModal()
+                return
+            }
+            window.location.href = `/costream-room.html?streamId=${streamId}`
+        }
+    </script>
+    
+</body>
+</html>

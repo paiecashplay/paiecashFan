@@ -7,6 +7,8 @@ import type {
 } from './api/types'
 import whaazs from './routes/whaazs'
 import stream from './routes/stream'
+import auth from './routes/auth'
+import costreaming from './routes/costreaming'
 
 const app = new Hono()
 
@@ -18,6 +20,12 @@ app.route('/api/whaazs', whaazs)
 
 // Mount Cloudflare Stream routes
 app.route('/api/stream', stream)
+
+// Mount Authentication routes
+app.route('/api/auth', auth)
+
+// Mount Co-Streaming routes
+app.route('/api/costreaming', costreaming)
 
 // ==========================================
 // FEDERATIONS API (NEW - NO EMOJIS)

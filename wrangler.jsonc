@@ -15,7 +15,15 @@
   //   CLOUDFLARE_API_TOKEN=your_api_token_here
   "vars": {
     "STREAM_ENABLED": "true"
-  }
+  },
+  // D1 Database for co-streaming
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "paiecashfan-costreaming",
+      "database_id": "create-with-wrangler-d1-create"
+    }
+  ]
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",
@@ -26,13 +34,6 @@
   //   {
   //     "binding": "MY_BUCKET",
   //     "bucket_name": "my-bucket"
-  //   }
-  // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
   //   }
   // ],
   // "ai": {

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salle Co-Streaming - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        .video-grid { 
+            display: grid; 
+            gap: 8px; 
+            height: calc(100vh - 140px);
+            padding: 8px;
+        }
+        .video-grid-1 { grid-template-columns: 1fr; }
+        .video-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .video-grid-3 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+        .video-grid-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+        .video-grid-many { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .video-container {
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .controls-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 50;
+        }
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .control-btn:hover { transform: scale(1.1); }
+        .btn-mic-on { background: #10b981; }
+        .btn-mic-off { background: #ef4444; }
+        .btn-cam-on { background: #3b82f6; }
+        .btn-cam-off { background: #ef4444; }
+        .btn-share { background: #8b5cf6; }
+        .btn-leave { background: #dc2626; }
+        .participant-label {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .speaking-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid #10b981;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .speaking-indicator.active { opacity: 1; }
+    </style>
+</head>
+<body class="bg-gray-900">
+    
+    <!-- Create Stream Modal -->
+    <div id="createStreamModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Créer un nouveau stream</h2>
+            <form id="createStreamForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                    <input type="text" id="streamTitle" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <p class="text-xs text-gray-500 mt-1">Ex: Session Gaming FIFA 25</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="streamDescription" rows="3"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                    <select id="streamCategory" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="general">Général</option>
+                        <option value="matches">Match</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="creator">Créateur</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Maximum de participants</label>
+                    <select id="streamMaxParticipants" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="2">2 personnes</option>
+                        <option value="4">4 personnes</option>
+                        <option value="6">6 personnes</option>
+                        <option value="10" selected>10 personnes</option>
+                        <option value="20">20 personnes</option>
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="streamPublic" checked class="mr-2">
+                    <label for="streamPublic" class="text-sm text-gray-700">Stream public (visible par tous)</label>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    <i class="fas fa-rocket mr-2"></i>Lancer le Stream
+                </button>
+            </form>
+            <button onclick="window.location.href='/costreaming.html'" class="mt-4 w-full text-gray-600 hover:text-gray-800">
+                <i class="fas fa-arrow-left mr-2"></i>Retour
+            </button>
+        </div>
+    </div>
+    
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">Rejoindre depuis un téléphone</h2>
+            <div id="qrcode" class="flex justify-center mb-4"></div>
+            <p class="text-sm text-gray-600 mb-4">Scannez ce QR code avec votre téléphone pour rejoindre le stream</p>
+            <p class="text-xs text-gray-500 bg-gray-100 p-3 rounded-lg break-all" id="streamUrl"></p>
+            <button onclick="closeQRModal()" class="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                Fermer
+            </button>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <div class="bg-gray-800 text-white py-3 px-6 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <h1 id="streamTitle" class="text-lg font-bold">Co-Streaming</h1>
+            <span class="bg-red-600 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                <i class="fas fa-circle animate-pulse text-xs"></i>LIVE
+            </span>
+            <span id="participantCount" class="text-sm text-gray-300">
+                <i class="fas fa-users mr-1"></i>1 participant
+            </span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="showQRCode()" class="text-white hover:bg-gray-700 px-3 py-1 rounded transition" title="QR Code">
+                <i class="fas fa-qrcode text-lg"></i>
+            </button>
+            <button onclick="copyStreamLink()" class="text-white hover:bg-gray-700 px-3 py-1 rounded transition" title="Copier le lien">
+                <i class="fas fa-link text-lg"></i>
+            </button>
+            <button onclick="leaveStream()" class="bg-red-600 hover:bg-red-700 px-4 py-1 rounded transition">
+                <i class="fas fa-sign-out-alt mr-2"></i>Quitter
+            </button>
+        </div>
+    </div>
+    
+    <!-- Video Grid -->
+    <div id="videoGrid" class="video-grid video-grid-1">
+        <!-- Les vidéos seront ajoutées dynamiquement -->
+    </div>
+    
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <button id="micBtn" onclick="toggleMic()" class="control-btn btn-mic-on" title="Micro">
+            <i class="fas fa-microphone text-white text-xl"></i>
+        </button>
+        <button id="cameraBtn" onclick="toggleCamera()" class="control-btn btn-cam-on" title="Caméra">
+            <i class="fas fa-video text-white text-xl"></i>
+        </button>
+        <button onclick="toggleScreenShare()" class="control-btn btn-share" title="Partager l'écran">
+            <i class="fas fa-desktop text-white text-xl"></i>
+        </button>
+        <button onclick="leaveStream()" class="control-btn btn-leave" title="Quitter">
+            <i class="fas fa-phone-slash text-white text-xl"></i>
+        </button>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Configuration
+        const API_URL = window.location.origin + '/api'
+        const token = localStorage.getItem('token')
+        let streamData = null
+        let localStream = null
+        let peerConnections = {}
+        let dataChannels = {}
+        let isMicEnabled = true
+        let isCameraEnabled = true
+        let isHost = false
+        
+        // Récupérer les paramètres URL
+        const urlParams = new URLSearchParams(window.location.search)
+        const streamId = urlParams.get('streamId')
+        const action = urlParams.get('action')
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!token) {
+                alert('Vous devez vous connecter d\'abord')
+                window.location.href = '/costreaming.html'
+                return
+            }
+            
+            if (action === 'create') {
+                document.getElementById('createStreamModal').classList.remove('hidden')
+            } else if (streamId) {
+                await joinExistingStream(streamId)
+            } else {
+                alert('Stream ID manquant')
+                window.location.href = '/costreaming.html'
+            }
+        })
+        
+        // Créer un nouveau stream
+        document.getElementById('createStreamForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            
+            const title = document.getElementById('streamTitle').value
+            const description = document.getElementById('streamDescription').value
+            const category = document.getElementById('streamCategory').value
+            const maxParticipants = parseInt(document.getElementById('streamMaxParticipants').value)
+            const isPublic = document.getElementById('streamPublic').checked
+            
+            try {
+                const response = await axios.post(`${API_URL}/costreaming/start`, {
+                    title,
+                    description,
+                    category,
+                    maxParticipants,
+                    isPublic
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                
+                streamData = response.data.stream
+                isHost = true
+                document.getElementById('createStreamModal').classList.add('hidden')
+                document.querySelector('header h1').textContent = streamData.title
+                
+                await initializeMedia()
+                await setupWebRTC(streamData.sessionToken, streamData.iceServers)
+                
+            } catch (error) {
+                console.error('Erreur création stream:', error)
+                alert(error.response?.data?.error || 'Erreur lors de la création du stream')
+            }
+        })
+        
+        // Rejoindre un stream existant
+        async function joinExistingStream(streamId) {
+            try {
+                // Récupérer les détails du stream
+                const streamInfo = await axios.get(`${API_URL}/costreaming/${streamId}`)
+                document.querySelector('header h1').textContent = streamInfo.data.stream.title
+                
+                // Rejoindre le stream
+                const response = await axios.post(`${API_URL}/costreaming/${streamId}/join`, {}, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                
+                streamData = response.data.stream
+                streamData.id = streamId
+                
+                await initializeMedia()
+                await setupWebRTC(response.data.sessionToken, response.data.iceServers)
+                
+            } catch (error) {
+                console.error('Erreur connexion stream:', error)
+                alert(error.response?.data?.error || 'Erreur lors de la connexion au stream')
+                window.location.href = '/costreaming.html'
+            }
+        }
+        
+        // Initialiser le média local (caméra + micro)
+        async function initializeMedia() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                })
+                
+                // Ajouter la vidéo locale
+                addVideoElement('local', localStream, 'Vous', true)
+                
+            } catch (error) {
+                console.error('Erreur accès média:', error)
+                alert('Impossible d\'accéder à la caméra/micro. Vérifiez les permissions.')
+            }
+        }
+        
+        // Setup WebRTC (simplifié pour l'exemple)
+        async function setupWebRTC(sessionToken, iceServers) {
+            console.log('WebRTC setup avec token:', sessionToken)
+            console.log('ICE servers:', iceServers)
+            
+            // NOTE: L'implémentation complète WebRTC nécessite:
+            // 1. Connexion au signaling server de Cloudflare Calls
+            // 2. Échange de SDP offers/answers
+            // 3. Gestion des ICE candidates
+            // 4. Ajout/suppression dynamique des pistes audio/vidéo
+            
+            // Pour l'instant, simulons l'ajout de participants
+            setTimeout(() => {
+                updateParticipantCount(2)
+            }, 2000)
+        }
+        
+        // Ajouter un élément vidéo
+        function addVideoElement(peerId, stream, displayName, isLocal = false) {
+            const container = document.createElement('div')
+            container.className = 'video-container'
+            container.id = `video-${peerId}`
+            
+            const video = document.createElement('video')
+            video.srcObject = stream
+            video.autoplay = true
+            video.playsInline = true
+            if (isLocal) video.muted = true
+            
+            const label = document.createElement('div')
+            label.className = 'participant-label'
+            label.textContent = displayName
+            
+            const speakingIndicator = document.createElement('div')
+            speakingIndicator.className = 'speaking-indicator'
+            
+            container.appendChild(video)
+            container.appendChild(label)
+            container.appendChild(speakingIndicator)
+            
+            document.getElementById('videoGrid').appendChild(container)
+            updateGridLayout()
+        }
+        
+        // Mettre à jour la grille vidéo
+        function updateGridLayout() {
+            const grid = document.getElementById('videoGrid')
+            const count = grid.children.length
+            
+            grid.className = 'video-grid'
+            if (count === 1) grid.classList.add('video-grid-1')
+            else if (count === 2) grid.classList.add('video-grid-2')
+            else if (count === 3 || count === 4) grid.classList.add('video-grid-4')
+            else grid.classList.add('video-grid-many')
+        }
+        
+        // Contrôles
+        function toggleMic() {
+            isMicEnabled = !isMicEnabled
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = isMicEnabled
+                })
+            }
+            
+            const btn = document.getElementById('micBtn')
+            if (isMicEnabled) {
+                btn.className = 'control-btn btn-mic-on'
+                btn.querySelector('i').className = 'fas fa-microphone text-white text-xl'
+            } else {
+                btn.className = 'control-btn btn-mic-off'
+                btn.querySelector('i').className = 'fas fa-microphone-slash text-white text-xl'
+            }
+        }
+        
+        function toggleCamera() {
+            isCameraEnabled = !isCameraEnabled
+            if (localStream) {
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = isCameraEnabled
+                })
+            }
+            
+            const btn = document.getElementById('cameraBtn')
+            if (isCameraEnabled) {
+                btn.className = 'control-btn btn-cam-on'
+                btn.querySelector('i').className = 'fas fa-video text-white text-xl'
+            } else {
+                btn.className = 'control-btn btn-cam-off'
+                btn.querySelector('i').className = 'fas fa-video-slash text-white text-xl'
+            }
+        }
+        
+        async function toggleScreenShare() {
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: 'always' },
+                    audio: false
+                })
+                
+                // Remplacer la piste vidéo locale par l'écran
+                const videoTrack = screenStream.getVideoTracks()[0]
+                const sender = Object.values(peerConnections)[0]?.getSenders().find(s => 
+                    s.track && s.track.kind === 'video'
+                )
+                
+                if (sender) {
+                    await sender.replaceTrack(videoTrack)
+                }
+                
+                videoTrack.onended = async () => {
+                    // Revenir à la caméra quand le partage se termine
+                    const cameraTrack = localStream.getVideoTracks()[0]
+                    if (sender && cameraTrack) {
+                        await sender.replaceTrack(cameraTrack)
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Erreur partage d\'écran:', error)
+            }
+        }
+        
+        async function leaveStream() {
+            if (!streamData) return
+            
+            try {
+                // Arrêter les médias locaux
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop())
+                }
+                
+                // Fermer les connexions WebRTC
+                Object.values(peerConnections).forEach(pc => pc.close())
+                
+                // Notifier le serveur
+                await axios.post(`${API_URL}/costreaming/${streamData.id}/leave`, {}, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                
+                // Si host, terminer le stream
+                if (isHost) {
+                    await axios.post(`${API_URL}/costreaming/${streamData.id}/end`, {}, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                }
+                
+                window.location.href = '/costreaming.html'
+                
+            } catch (error) {
+                console.error('Erreur lors de la sortie:', error)
+                window.location.href = '/costreaming.html'
+            }
+        }
+        
+        function updateParticipantCount(count) {
+            const el = document.getElementById('participantCount')
+            el.innerHTML = `<i class="fas fa-users mr-1"></i>${count} participant${count > 1 ? 's' : ''}`
+        }
+        
+        // QR Code
+        function showQRCode() {
+            const url = window.location.href
+            document.getElementById('streamUrl').textContent = url
+            document.getElementById('qrcode').innerHTML = ''
+            new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 256,
+                height: 256
+            })
+            document.getElementById('qrModal').classList.remove('hidden')
+        }
+        
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.add('hidden')
+        }
+        
+        function copyStreamLink() {
+            const url = window.location.href
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Lien copié dans le presse-papier !')
+            }).catch(err => {
+                console.error('Erreur copie:', err)
+            })
+        }
+        
+        // Gestion de la fermeture
+        window.addEventListener('beforeunload', (e) => {
+            if (streamData) {
+                leaveStream()
+            }
+        })
+    </script>
+    
+</body>
+</html>
