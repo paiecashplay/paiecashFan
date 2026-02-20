@@ -1064,7 +1064,10 @@
         function openStream(streamId) {
             const stream = mockStreams.find(s => s.id === streamId);
             if (stream) {
-                const streamType = stream.id.includes('video') ? 'vod' : 'live';
+                const streamType = stream.isLive ? 'live' : 'vod';
+                
+                // Mapper l'ID numérique vers l'ID mock de l'API
+                const apiStreamId = `mock_live_${String(streamId).padStart(3, '0')}`;
                 
                 // Route vers le bon player selon la catégorie
                 let playerPage = 'stream-player.html'; // Default player
@@ -1077,7 +1080,7 @@
                     playerPage = 'stream-player-creator.html';
                 }
                 
-                window.location.href = `/${playerPage}?id=${streamId}&type=${streamType}`;
+                window.location.href = `/${playerPage}?id=${apiStreamId}&type=${streamType}&title=${encodeURIComponent(stream.title)}`;
             }
         }
         
