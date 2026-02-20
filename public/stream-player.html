@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecteur Stream - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        .live-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .viewer-count {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chat-message {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <header class="glass-card mx-4 mt-4 mb-6">
+        <div class="flex items-center justify-between">
+            <a href="/live-streams.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                <i class="fas fa-arrow-left text-xl"></i>
+                <span class="font-semibold">Retour aux streams</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="viewer-count px-4 py-2 rounded-full flex items-center gap-2">
+                    <i class="fas fa-eye text-blue-400"></i>
+                    <span id="viewerCount" class="font-bold">0</span>
+                </div>
+                <button id="shareButton" class="action-button px-4 py-2 rounded-full flex items-center gap-2">
+                    <i class="fas fa-share-alt"></i>
+                    <span class="hidden md:inline">Partager</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container mx-auto px-4 pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Video Player -->
+            <div class="lg:col-span-2">
+                <!-- Video Player -->
+                <div class="video-container mb-4" id="videoContainer">
+                    <!-- Cloudflare Stream iframe will be inserted here -->
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-gray-400">Chargement du stream...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stream Info -->
+                <div class="glass-card">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span id="statusBadge" class="live-badge px-3 py-1 rounded-full text-xs font-bold uppercase">
+                                    <i class="fas fa-circle mr-1"></i>
+                                    En direct
+                                </span>
+                                <span id="categoryBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600">
+                                    Match
+                                </span>
+                            </div>
+                            <h1 id="streamTitle" class="text-2xl font-bold mb-2">Titre du stream</h1>
+                            <p id="streamDescription" class="text-gray-400">Description du stream...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Creator Info -->
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-700">
+                        <img id="creatorAvatar" src="https://i.pravatar.cc/150?img=70" alt="Creator" class="w-12 h-12 rounded-full">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span id="creatorName" class="font-semibold">Creator</span>
+                                <i id="verifiedBadge" class="fas fa-check-circle text-blue-400"></i>
+                            </div>
+                            <p id="clubName" class="text-sm text-gray-400">Club Name</p>
+                        </div>
+                        <button class="action-button px-6 py-2 rounded-full font-semibold">
+                            <i class="fas fa-bell mr-2"></i>
+                            S'abonner
+                        </button>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="grid grid-cols-4 gap-3 mt-4">
+                        <button class="action-button px-4 py-3 rounded-lg flex flex-col items-center gap-1">
+                            <i class="fas fa-thumbs-up text-xl"></i>
+                            <span id="likeCount" class="text-xs">0</span>
+                        </button>
+                        <button class="action-button px-4 py-3 rounded-lg flex flex-col items-center gap-1">
+                            <i class="fas fa-heart text-xl"></i>
+                            <span class="text-xs">Aimer</span>
+                        </button>
+                        <button class="action-button px-4 py-3 rounded-lg flex flex-col items-center gap-1">
+                            <i class="fas fa-gift text-xl"></i>
+                            <span class="text-xs">Don</span>
+                        </button>
+                        <button class="action-button px-4 py-3 rounded-lg flex flex-col items-center gap-1">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span class="text-xs">Acheter</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Paywall (if needed) -->
+                <div id="paywallSection" class="glass-card mt-4 hidden">
+                    <div class="text-center py-8">
+                        <i class="fas fa-lock text-5xl text-yellow-400 mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-2">Contenu Premium</h3>
+                        <p class="text-gray-400 mb-6">Ce stream est réservé aux abonnés premium</p>
+                        <div class="flex items-center justify-center gap-4 mb-6">
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-blue-400" id="priceEUR">2.99 EUR</p>
+                                <p class="text-sm text-gray-400">ou</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-green-400" id="priceCrypto">3 USDC</p>
+                                <p class="text-sm text-gray-400">Stablecoin</p>
+                            </div>
+                        </div>
+                        <button id="unlockButton" class="action-button px-8 py-4 rounded-full font-bold text-lg">
+                            <i class="fas fa-unlock mr-2"></i>
+                            Débloquer avec Crypto
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat & Live Updates -->
+            <div class="lg:col-span-1">
+                <div class="glass-card h-[600px] flex flex-col">
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+                        <h3 class="font-bold text-lg">
+                            <i class="fas fa-comments mr-2 text-blue-400"></i>
+                            Chat en direct
+                        </h3>
+                        <span class="text-sm text-gray-400" id="chatCount">0 messages</span>
+                    </div>
+                    
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-2">
+                        <!-- Chat messages will be inserted here -->
+                    </div>
+                    
+                    <!-- Chat Input -->
+                    <div class="mt-auto">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="chatInput" 
+                                placeholder="Envoyer un message..."
+                                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400"
+                            >
+                            <button id="sendChatButton" class="action-button px-4 py-3 rounded-lg">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Get stream ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const streamId = urlParams.get('id');
+        const streamType = urlParams.get('type') || 'live';
+        
+        let streamData = null;
+        let chatMessages = [];
+        let viewerCount = 0;
+        
+        // Load stream data
+        async function loadStream() {
+            try {
+                if (!streamId) {
+                    throw new Error('No stream ID provided');
+                }
+                
+                // Fetch stream data from API
+                const endpoint = streamType === 'live' 
+                    ? `/api/stream/live/${streamId}`
+                    : `/api/stream/videos/${streamId}`;
+                
+                const response = await axios.get(endpoint);
+                
+                if (!response.data.success) {
+                    throw new Error('Failed to load stream');
+                }
+                
+                streamData = response.data[streamType === 'live' ? 'liveInput' : 'video'];
+                
+                // Update UI with stream data
+                updateStreamUI();
+                
+                // Load Cloudflare Stream iframe
+                loadVideoPlayer();
+                
+            } catch (error) {
+                console.error('Error loading stream:', error);
+                showError('Impossible de charger le stream. Veuillez réessayer.');
+            }
+        }
+        
+        function updateStreamUI() {
+            if (!streamData) return;
+            
+            // Update title and description
+            document.getElementById('streamTitle').textContent = streamData.meta?.title || 'Stream';
+            document.getElementById('streamDescription').textContent = streamData.meta?.description || '';
+            
+            // Update category badge
+            const category = streamData.meta?.category || 'matches';
+            const categoryNames = {
+                'matches': 'Match',
+                'shopping': 'Shopping',
+                'loto': 'LOTO',
+                'highlights': 'Highlights',
+                'news': 'News'
+            };
+            document.getElementById('categoryBadge').textContent = categoryNames[category] || category;
+            
+            // Update club name
+            document.getElementById('clubName').textContent = streamData.meta?.club || 'PaieCashFan';
+            
+            // Update status
+            const status = streamData.status?.state || streamData.status || 'ready';
+            const statusBadge = document.getElementById('statusBadge');
+            if (status === 'live') {
+                statusBadge.innerHTML = '<i class="fas fa-circle mr-1"></i> En direct';
+                statusBadge.className = 'live-badge px-3 py-1 rounded-full text-xs font-bold uppercase';
+            } else if (status === 'ready') {
+                statusBadge.innerHTML = '<i class="fas fa-video mr-1"></i> VOD';
+                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase bg-purple-600';
+            }
+            
+            // Simulate viewer count
+            viewerCount = streamData.meta?.viewers || Math.floor(Math.random() * 10000) + 100;
+            document.getElementById('viewerCount').textContent = viewerCount.toLocaleString();
+            
+            // Simulate likes
+            document.getElementById('likeCount').textContent = Math.floor(viewerCount * 0.15).toLocaleString();
+        }
+        
+        function loadVideoPlayer() {
+            if (!streamData) return;
+            
+            const videoContainer = document.getElementById('videoContainer');
+            
+            // Get stream URL
+            let streamUrl;
+            if (streamType === 'live') {
+                // For live streams, use WebRTC or HLS URL
+                streamUrl = streamData.webRTC?.url || streamData.iframe || null;
+            } else {
+                // For VOD, use iframe URL
+                streamUrl = streamData.iframe || streamData.playback?.hls || null;
+            }
+            
+            if (streamUrl && streamUrl.includes('iframe')) {
+                // Use iframe embed
+                videoContainer.innerHTML = `
+                    <iframe 
+                        src="${streamUrl}"
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        allowfullscreen="true"
+                    ></iframe>
+                `;
+            } else if (streamUrl && streamUrl.includes('.m3u8')) {
+                // Use HLS player (would need hls.js in production)
+                videoContainer.innerHTML = `
+                    <video controls autoplay>
+                        <source src="${streamUrl}" type="application/x-mpegURL">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                `;
+            } else {
+                // Fallback: show mock player
+                videoContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-gray-900 to-gray-800">
+                        <i class="fas fa-play-circle text-6xl text-blue-400 mb-4"></i>
+                        <p class="text-xl font-semibold mb-2">Stream en développement</p>
+                        <p class="text-gray-400">Configurez vos identifiants Cloudflare Stream pour voir le lecteur</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function showError(message) {
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full">
+                    <i class="fas fa-exclamation-triangle text-5xl text-red-400 mb-4"></i>
+                    <p class="text-xl font-semibold mb-2">Erreur</p>
+                    <p class="text-gray-400">${message}</p>
+                    <a href="/live-streams.html" class="action-button px-6 py-3 rounded-full font-semibold mt-6">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour aux streams
+                    </a>
+                </div>
+            `;
+        }
+        
+        // Simulate live chat messages
+        function addChatMessage(username, message, avatar) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <img src="${avatar}" alt="${username}" class="w-8 h-8 rounded-full">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-semibold text-sm">${username}</span>
+                            <span class="text-xs text-gray-500">${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}</span>
+                        </div>
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Update chat count
+            document.getElementById('chatCount').textContent = `${chatMessages.children.length} messages`;
+        }
+        
+        // Handle chat input
+        document.getElementById('sendChatButton').addEventListener('click', () => {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                addChatMessage('Vous', message, 'https://i.pravatar.cc/150?img=33');
+                chatInput.value = '';
+            }
+        });
+        
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendChatButton').click();
+            }
+        });
+        
+        // Share button
+        document.getElementById('shareButton').addEventListener('click', async () => {
+            const shareData = {
+                title: document.getElementById('streamTitle').textContent,
+                text: `Regardez ce stream sur PaieCashFan !`,
+                url: window.location.href
+            };
+            
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Lien copié dans le presse-papiers !');
+                }
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        });
+        
+        // Simulate live chat
+        const mockChatMessages = [
+            { username: 'Sophie_M', message: 'Quel match incroyable !', avatar: 'https://i.pravatar.cc/150?img=1' },
+            { username: 'Jean_Dupont', message: 'Allez Paris !', avatar: 'https://i.pravatar.cc/150?img=12' },
+            { username: 'Marie_L', message: 'Cette cagnotte est énorme !', avatar: 'https://i.pravatar.cc/150?img=5' },
+            { username: 'Thomas_R', message: 'Qui va gagner ? 🎉', avatar: 'https://i.pravatar.cc/150?img=15' },
+            { username: 'Alex_K', message: 'J\'ai acheté 10 tickets !', avatar: 'https://i.pravatar.cc/150?img=20' }
+        ];
+        
+        function simulateChat() {
+            const randomMessage = mockChatMessages[Math.floor(Math.random() * mockChatMessages.length)];
+            addChatMessage(randomMessage.username, randomMessage.message, randomMessage.avatar);
+        }
+        
+        // Initialize
+        loadStream();
+        
+        // Simulate chat every 5-10 seconds
+        setInterval(simulateChat, Math.random() * 5000 + 5000);
+        
+        // Update viewer count every 30 seconds
+        setInterval(() => {
+            viewerCount += Math.floor(Math.random() * 50) - 20;
+            if (viewerCount < 0) viewerCount = 0;
+            document.getElementById('viewerCount').textContent = viewerCount.toLocaleString();
+        }, 30000);
+    </script>
+</body>
+</html>

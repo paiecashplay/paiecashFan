@@ -1064,8 +1064,9 @@
         function openStream(streamId) {
             const stream = mockStreams.find(s => s.id === streamId);
             if (stream) {
-                // In production, this will open the Whaazs stream player
-                alert(`Ouverture du stream: ${stream.title}\n\nCette fonctionnalité sera connectée à l'API Whaazs pour le player vidéo.`);
+                // Navigate to stream player page with Cloudflare Stream integration
+                const streamType = stream.id.includes('video') ? 'vod' : 'live';
+                window.location.href = `/stream-player.html?id=${streamId}&type=${streamType}`;
             }
         }
         

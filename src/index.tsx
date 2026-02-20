@@ -6,6 +6,7 @@ import type {
   Interaction, Sponsor
 } from './api/types'
 import whaazs from './routes/whaazs'
+import stream from './routes/stream'
 
 const app = new Hono()
 
@@ -14,6 +15,9 @@ app.use('/api/*', cors())
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)
+
+// Mount Cloudflare Stream routes
+app.route('/api/stream', stream)
 
 // ==========================================
 // FEDERATIONS API (NEW - NO EMOJIS)

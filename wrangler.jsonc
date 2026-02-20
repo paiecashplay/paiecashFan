@@ -5,10 +5,17 @@
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
     "nodejs_compat"
-  ]
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+  ],
+  // Cloudflare Stream configuration
+  // To use Stream API, you need:
+  // 1. Cloudflare Account ID (find in Cloudflare Dashboard)
+  // 2. Cloudflare API Token with Stream permissions
+  // Add these to .dev.vars file:
+  //   CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+  //   CLOUDFLARE_API_TOKEN=your_api_token_here
+  "vars": {
+    "STREAM_ENABLED": "true"
+  }
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",
