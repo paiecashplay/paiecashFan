@@ -1,0 +1,24 @@
+{
+  "match": {
+    "uid": "f892de4999878e88dedfd85d060814e9",
+    "rtmps_url": "rtmps://live.cloudflare.com:443/live/",
+    "stream_key": "15b3d7301e593a79109aea6634db5737kf892de4999878e88dedfd85d060814e9",
+    "webrtc_url": "https://customer-ou9x8yvnzuvv942t.cloudflarestream.com/d8a982dac20e08f007cefb2f1b7c70f5kf892de4999878e88dedfd85d060814e9/webRTC/publish",
+    "name": "PSG vs Olympique Marseille - Le Classico",
+    "player_url": "https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/f892de4999878e88dedfd85d060814e9/iframe"
+  },
+  "shopping": {
+    "uid": "8d85f9dbd83c6f4f2173a293cdc02a19",
+    "rtmps_url": "rtmps://live.cloudflare.com:443/live/",
+    "stream_key": "9d1eace690be45b4c47fcc0abd658c70k8d85f9dbd83c6f4f2173a293cdc02a19",
+    "name": "Live Shopping - Maillots Signés",
+    "player_url": "https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/8d85f9dbd83c6f4f2173a293cdc02a19/iframe"
+  },
+  "creator": {
+    "uid": "798fcdc79165565c17c67e7ff1a0a991",
+    "rtmps_url": "rtmps://live.cloudflare.com:443/live/",
+    "stream_key": "824cb4417b1ce46bc0995aedbfa4840bk798fcdc79165565c17c67e7ff1a0a991",
+    "name": "Analyse Tactique - Les Secrets du PSG",
+    "player_url": "https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/798fcdc79165565c17c67e7ff1a0a991/iframe"
+  }
+}

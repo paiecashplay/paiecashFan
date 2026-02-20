@@ -534,10 +534,10 @@ stream.get('/all', async (c) => {
   const club = c.req.query('club')
   const live = c.req.query('live') === 'true'
   
-  // For now, use mock data - in production this would combine live and VOD
+  // Real Cloudflare Stream Live Inputs (created via API)
   const allStreams = [
     {
-      id: 'mock_live_001',
+      id: 'f892de4999878e88dedfd85d060814e9',
       type: 'live',
       title: 'PSG vs Olympique Marseille - Le Classico',
       description: 'Match en direct depuis le Parc des Princes',
@@ -548,7 +548,7 @@ stream.get('/all', async (c) => {
       viewers: 12847,
       price: 0,
       startTime: new Date(Date.now() - 3600000).toISOString(),
-      streamUrl: 'https://customer-subdomain.cloudflarestream.com/mock_live_001/iframe',
+      streamUrl: 'https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/f892de4999878e88dedfd85d060814e9/iframe',
       creator: {
         name: 'Paris SG Official',
         avatar: 'https://i.pravatar.cc/150?img=70',
@@ -556,37 +556,37 @@ stream.get('/all', async (c) => {
       }
     },
     {
-      id: 'mock_live_002',
+      id: '798fcdc79165565c17c67e7ff1a0a991',
       type: 'live',
-      title: 'Tirage LOTO en Direct - Super Cagnotte 50K',
-      description: 'Tirage en direct du LOTO PaieCashFan avec cagnotte de 50 000 EUR',
+      title: 'Analyse Tactique - Les Secrets du PSG',
+      description: 'Analyse en direct des schemas tactiques et strategies',
       thumbnail: 'https://picsum.photos/800/450?random=2',
-      club: 'Tous les clubs',
-      category: 'loto',
+      club: 'FootCoach Pro',
+      category: 'creators',
       status: 'live',
       viewers: 5621,
       price: 0,
       startTime: new Date(Date.now() - 1800000).toISOString(),
-      streamUrl: 'https://customer-subdomain.cloudflarestream.com/mock_live_002/iframe',
+      streamUrl: 'https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/798fcdc79165565c17c67e7ff1a0a991/iframe',
       creator: {
-        name: 'PaieCashFan Official',
+        name: 'FootCoach Pro',
         avatar: 'https://i.pravatar.cc/150?img=50',
         verified: true
       }
     },
     {
-      id: 'mock_live_003',
+      id: '8d85f9dbd83c6f4f2173a293cdc02a19',
       type: 'live',
       title: 'Live Shopping - Maillots Signes Collection Exclusive',
       description: 'Vente en direct de maillots signes et produits exclusifs',
       thumbnail: 'https://picsum.photos/800/450?random=3',
-      club: 'Boutique Officielle',
+      club: 'FootStore by PCC',
       category: 'shopping',
       status: 'live',
       viewers: 3204,
       price: 0,
       startTime: new Date(Date.now() - 900000).toISOString(),
-      streamUrl: 'https://customer-subdomain.cloudflarestream.com/mock_live_003/iframe',
+      streamUrl: 'https://customer-4a0b3e35f24b28cd17c247aef02dc728.cloudflarestream.com/8d85f9dbd83c6f4f2173a293cdc02a19/iframe',
       creator: {
         name: 'FootStore by PCC',
         avatar: 'https://i.pravatar.cc/150?img=30',

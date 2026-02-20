@@ -1066,8 +1066,15 @@
             if (stream) {
                 const streamType = stream.isLive ? 'live' : 'vod';
                 
-                // Mapper l'ID numérique vers l'ID mock de l'API
-                const apiStreamId = `mock_live_${String(streamId).padStart(3, '0')}`;
+                // Mapper l'ID numérique vers le vrai UID Cloudflare Stream
+                const streamIdMap = {
+                    1: 'f892de4999878e88dedfd85d060814e9', // PSG vs OM (Match)
+                    2: '798fcdc79165565c17c67e7ff1a0a991', // Analyse Tactique (Creator)
+                    3: '8d85f9dbd83c6f4f2173a293cdc02a19', // Live Shopping (Shopping)
+                    // Les autres streams gardent le format mock pour l'instant
+                };
+                
+                const apiStreamId = streamIdMap[streamId] || `mock_live_${String(streamId).padStart(3, '0')}`;
                 
                 // Route vers le bon player selon la catégorie
                 let playerPage = 'stream-player.html'; // Default player
