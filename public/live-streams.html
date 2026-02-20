@@ -1064,9 +1064,20 @@
         function openStream(streamId) {
             const stream = mockStreams.find(s => s.id === streamId);
             if (stream) {
-                // Navigate to stream player page with Cloudflare Stream integration
                 const streamType = stream.id.includes('video') ? 'vod' : 'live';
-                window.location.href = `/stream-player.html?id=${streamId}&type=${streamType}`;
+                
+                // Route vers le bon player selon la catégorie
+                let playerPage = 'stream-player.html'; // Default player
+                
+                if (stream.category === 'matches') {
+                    playerPage = 'stream-player-match.html';
+                } else if (stream.category === 'shopping') {
+                    playerPage = 'stream-player-shopping.html';
+                } else if (stream.category === 'creators' || stream.category === 'news' || stream.category === 'highlights') {
+                    playerPage = 'stream-player-creator.html';
+                }
+                
+                window.location.href = `/${playerPage}?id=${streamId}&type=${streamType}`;
             }
         }
         

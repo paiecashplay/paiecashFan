@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match en Direct - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        .live-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .score-board {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .score {
+            font-size: 48px;
+            font-weight: 900;
+            color: #10b981;
+        }
+        
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .timeline-event {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #10b981;
+        }
+        
+        .timeline-event.goal {
+            border-left-color: #10b981;
+        }
+        
+        .timeline-event.card {
+            border-left-color: #fbbf24;
+        }
+        
+        .timeline-event.substitution {
+            border-left-color: #3b82f6;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .chat-message {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <header class="glass-card mx-4 mt-4 mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <a href="/live-streams.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                <i class="fas fa-arrow-left text-xl"></i>
+                <span class="font-semibold">Retour aux streams</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="px-4 py-2 rounded-full flex items-center gap-2 bg-red-600">
+                    <i class="fas fa-circle animate-pulse"></i>
+                    <span class="font-bold">EN DIRECT</span>
+                </div>
+                <div class="px-4 py-2 rounded-full flex items-center gap-2 bg-gray-800">
+                    <i class="fas fa-eye text-blue-400"></i>
+                    <span id="viewerCount" class="font-bold">12,847</span>
+                </div>
+                <button id="shareButton" class="action-button px-4 py-2 rounded-full flex items-center gap-2">
+                    <i class="fas fa-share-alt"></i>
+                    <span class="hidden md:inline">Partager</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container mx-auto px-4 pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Video Player + Stats -->
+            <div class="lg:col-span-2">
+                <!-- Video Player -->
+                <div class="video-container mb-4" id="videoContainer">
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-gray-900 to-gray-800">
+                        <div class="text-center">
+                            <i class="fas fa-futbol text-6xl text-green-400 mb-4 animate-bounce"></i>
+                            <p class="text-xl font-semibold mb-2">Match en Direct</p>
+                            <p class="text-gray-400">Configurez Cloudflare Stream pour voir le match</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Score Board -->
+                <div class="score-board">
+                    <div class="grid grid-cols-3 gap-4 items-center mb-4">
+                        <div class="text-center">
+                            <div class="team-logo mx-auto mb-2">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 id="homeTeam" class="font-bold text-lg">Paris SG</h3>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center gap-4">
+                                <span id="homeScore" class="score">2</span>
+                                <span class="text-gray-400 text-2xl">-</span>
+                                <span id="awayScore" class="score">1</span>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-400">
+                                <span id="matchTime">65'</span> | 
+                                <span id="matchPeriod">2ème Mi-temps</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="team-logo mx-auto mb-2 bg-gradient-to-br from-blue-600 to-blue-400">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 id="awayTeam" class="font-bold text-lg">Marseille</h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Match Stats -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="stat-card">
+                            <i class="fas fa-futbol text-green-400 text-2xl mb-2"></i>
+                            <p class="text-2xl font-bold" id="shotsHome">12</p>
+                            <p class="text-xs text-gray-400">Tirs</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage text-blue-400 text-2xl mb-2"></i>
+                            <p class="text-2xl font-bold" id="possessionHome">58%</p>
+                            <p class="text-xs text-gray-400">Possession</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-exchange-alt text-purple-400 text-2xl mb-2"></i>
+                            <p class="text-2xl font-bold" id="passesHome">487</p>
+                            <p class="text-xs text-gray-400">Passes</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline Events -->
+                <div class="glass-card mt-4">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fas fa-clock text-blue-400"></i>
+                        Événements du Match
+                    </h3>
+                    <div id="timeline" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- Events will be inserted here -->
+                        <div class="timeline-event goal">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-green-400">⚽ BUT!</span>
+                                <span class="text-sm">65' - Mbappé (Paris SG)</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Passe décisive de Neymar</p>
+                        </div>
+                        <div class="timeline-event card">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-yellow-400">🟨 Carton</span>
+                                <span class="text-sm">58' - Veretout (Marseille)</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Faute sur Vitinha</p>
+                        </div>
+                        <div class="timeline-event substitution">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-blue-400">🔄 Remplacement</span>
+                                <span class="text-sm">50' - Paris SG</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Kolo Muani ↔️ Gonçalo Ramos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lineups -->
+                <div class="glass-card mt-4">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fas fa-users text-blue-400"></i>
+                        Compositions
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold mb-3 text-green-400">Paris SG (4-3-3)</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">1</span>
+                                    <span>Donnarumma</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">2</span>
+                                    <span>Hakimi</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">5</span>
+                                    <span>Marquinhos (C)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">15</span>
+                                    <span>Skriniar</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">25</span>
+                                    <span>Mendes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-3 text-blue-400">Marseille (4-2-3-1)</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">16</span>
+                                    <span>López</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">99</span>
+                                    <span>Clauss</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">4</span>
+                                    <span>Gigot</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">5</span>
+                                    <span>Balerdi (C)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 text-center text-gray-400">7</span>
+                                    <span>Tavares</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat & Match Info -->
+            <div class="lg:col-span-1">
+                <div class="glass-card mb-4">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-blue-400"></i>
+                        Informations Match
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Compétition:</span>
+                            <span class="font-semibold">Ligue 1</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Stade:</span>
+                            <span class="font-semibold">Parc des Princes</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Arbitre:</span>
+                            <span class="font-semibold">François Letexier</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Météo:</span>
+                            <span class="font-semibold">☀️ 18°C</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Affluence:</span>
+                            <span class="font-semibold">47,856</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card h-[600px] flex flex-col">
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+                        <h3 class="font-bold text-lg">
+                            <i class="fas fa-comments mr-2 text-blue-400"></i>
+                            Chat en direct
+                        </h3>
+                        <span class="text-sm text-gray-400" id="chatCount">0 messages</span>
+                    </div>
+                    
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-2">
+                        <!-- Chat messages will be inserted here -->
+                    </div>
+                    
+                    <!-- Chat Input -->
+                    <div class="mt-auto">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="chatInput" 
+                                placeholder="Envoyer un message..."
+                                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400"
+                            >
+                            <button id="sendChatButton" class="action-button px-4 py-3 rounded-lg">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Get stream ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const streamId = urlParams.get('id');
+        
+        let streamData = null;
+        let matchTime = 65;
+        
+        // Load stream data
+        async function loadStream() {
+            try {
+                if (!streamId) throw new Error('No stream ID provided');
+                
+                const response = await axios.get('/api/stream/live/' + streamId);
+                if (response.data.success) {
+                    streamData = response.data.liveInput;
+                    loadVideoPlayer();
+                }
+            } catch (error) {
+                console.error('Error loading stream:', error);
+            }
+        }
+        
+        function loadVideoPlayer() {
+            if (!streamData) return;
+            
+            const videoContainer = document.getElementById('videoContainer');
+            const streamUrl = streamData.webRTC?.url || streamData.iframe;
+            
+            if (streamUrl && streamUrl.includes('iframe')) {
+                videoContainer.innerHTML = '<iframe src="' + streamUrl + '" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"></iframe>';
+            } else {
+                videoContainer.innerHTML = '<div class="flex items-center justify-center h-full bg-gradient-to-br from-gray-900 to-gray-800"><div class="text-center"><i class="fas fa-futbol text-6xl text-green-400 mb-4 animate-bounce"></i><p class="text-xl font-semibold mb-2">Match en Direct</p><p class="text-gray-400">Stream en développement</p></div></div>';
+            }
+        }
+        
+        // Update match time
+        setInterval(() => {
+            matchTime++;
+            document.getElementById('matchTime').textContent = matchTime + "'";
+        }, 60000);
+        
+        // Chat functions
+        function addChatMessage(username, message, avatar) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.innerHTML = '<div class="flex items-start gap-2"><img src="' + avatar + '" alt="' + username + '" class="w-8 h-8 rounded-full"><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="font-semibold text-sm">' + username + '</span><span class="text-xs text-gray-500">' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) + '</span></div><p class="text-sm">' + message + '</p></div></div>';
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            document.getElementById('chatCount').textContent = chatMessages.children.length + ' messages';
+        }
+        
+        document.getElementById('sendChatButton').addEventListener('click', () => {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            if (message) {
+                addChatMessage('Vous', message, 'https://i.pravatar.cc/150?img=33');
+                chatInput.value = '';
+            }
+        });
+        
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendChatButton').click();
+            }
+        });
+        
+        document.getElementById('shareButton').addEventListener('click', async () => {
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Match en Direct - PaieCashFan',
+                        text: 'Regardez ce match en direct !',
+                        url: window.location.href
+                    });
+                } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Lien copié dans le presse-papiers !');
+                }
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        });
+        
+        // Mock chat messages
+        const mockMessages = [
+            { username: 'Fan_PSG_75', message: 'Quel but de Mbappé ! 🔥', avatar: 'https://i.pravatar.cc/150?img=1' },
+            { username: 'OM_Forever', message: 'On va revenir, allez l\'OM !', avatar: 'https://i.pravatar.cc/150?img=12' },
+            { username: 'FootballFan', message: 'Le Classico au top !', avatar: 'https://i.pravatar.cc/150?img=5' }
+        ];
+        
+        function simulateChat() {
+            const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
+            addChatMessage(randomMessage.username, randomMessage.message, randomMessage.avatar);
+        }
+        
+        // Initialize
+        loadStream();
+        setInterval(simulateChat, 8000);
+    </script>
+</body>
+</html>
