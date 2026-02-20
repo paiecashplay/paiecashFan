@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stream P2P - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .video-box { 
+            background: #1a1a1a; 
+            border-radius: 12px; 
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white p-6">
+    
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">🎥 Test Stream Peer-to-Peer</h1>
+            <p class="text-gray-400">WebRTC Direct - Pas de serveur intermédiaire</p>
+        </div>
+        
+        <!-- Status -->
+        <div id="status" class="bg-blue-600 text-white p-4 rounded-lg mb-6 text-center">
+            📱 Initialisation...
+        </div>
+        
+        <!-- Instructions -->
+        <div class="bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl font-bold mb-4">📋 Instructions</h2>
+            <div class="space-y-2 text-gray-300">
+                <p><strong>Étape 1 :</strong> Cliquez sur "Démarrer ma caméra"</p>
+                <p><strong>Étape 2 :</strong> Vous verrez une "Offer" générée → Copiez-la</p>
+                <p><strong>Étape 3 :</strong> Envoyez cette Offer à votre ami (SMS, WhatsApp, etc.)</p>
+                <p><strong>Étape 4 :</strong> Votre ami colle votre Offer dans sa page et clique "Connecter avec Offer"</p>
+                <p><strong>Étape 5 :</strong> Il reçoit une "Answer" → Il vous l'envoie</p>
+                <p><strong>Étape 6 :</strong> Vous collez l'Answer et cliquez "Connecter avec Answer"</p>
+                <p><strong>Résultat :</strong> Vous voyez la vidéo de votre ami et vice-versa ! 🎉</p>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            
+            <!-- Initiator (Peer 1) -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h3 class="text-lg font-bold mb-4">👤 Moi (Initiateur)</h3>
+                
+                <button onclick="startCamera()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold mb-4">
+                    📹 Démarrer ma caméra
+                </button>
+                
+                <button onclick="createOffer()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold mb-4" disabled id="createOfferBtn">
+                    🚀 Créer une Offer
+                </button>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">📤 Offer à envoyer :</label>
+                    <textarea id="offerOutput" rows="4" class="w-full bg-gray-700 text-white p-3 rounded-lg font-mono text-xs" readonly placeholder="Votre offer apparaîtra ici..."></textarea>
+                    <button onclick="copyOffer()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm">
+                        📋 Copier
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">📥 Answer reçue de l'ami :</label>
+                    <textarea id="answerInput" rows="4" class="w-full bg-gray-700 text-white p-3 rounded-lg font-mono text-xs" placeholder="Collez l'answer de votre ami ici..."></textarea>
+                    <button onclick="acceptAnswer()" class="mt-2 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm">
+                        ✅ Connecter avec Answer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Receiver (Peer 2) -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h3 class="text-lg font-bold mb-4">👥 Mon Ami (Récepteur)</h3>
+                
+                <button onclick="startCamera()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold mb-4">
+                    📹 Démarrer ma caméra
+                </button>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">📥 Offer reçue de l'initiateur :</label>
+                    <textarea id="offerInput" rows="4" class="w-full bg-gray-700 text-white p-3 rounded-lg font-mono text-xs" placeholder="Collez l'offer de votre ami ici..."></textarea>
+                    <button onclick="acceptOffer()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm">
+                        🤝 Accepter et créer Answer
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">📤 Answer à renvoyer :</label>
+                    <textarea id="answerOutput" rows="4" class="w-full bg-gray-700 text-white p-3 rounded-lg font-mono text-xs" readonly placeholder="Votre answer apparaîtra ici..."></textarea>
+                    <button onclick="copyAnswer()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm">
+                        📋 Copier
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Videos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h3 class="text-sm font-medium mb-2">📹 Ma vidéo (locale)</h3>
+                <div class="video-box">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium mb-2">👥 Vidéo de mon ami (distante)</h3>
+                <div class="video-box">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Debug Info -->
+        <div class="mt-6 bg-gray-800 p-4 rounded-lg">
+            <h3 class="text-sm font-bold mb-2">🐛 Debug</h3>
+            <pre id="debugLog" class="text-xs text-gray-400 overflow-auto max-h-32"></pre>
+        </div>
+        
+    </div>
+    
+    <script>
+        let localStream = null
+        let peer = null
+        
+        function log(message) {
+            const logEl = document.getElementById('debugLog')
+            const timestamp = new Date().toLocaleTimeString()
+            logEl.textContent += `[${timestamp}] ${message}\n`
+            logEl.scrollTop = logEl.scrollHeight
+            console.log(message)
+        }
+        
+        function updateStatus(message, color = 'blue') {
+            const statusEl = document.getElementById('status')
+            statusEl.textContent = message
+            statusEl.className = `bg-${color}-600 text-white p-4 rounded-lg mb-6 text-center`
+        }
+        
+        async function startCamera() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 1280, height: 720 },
+                    audio: true
+                })
+                
+                document.getElementById('localVideo').srcObject = localStream
+                document.getElementById('createOfferBtn').disabled = false
+                
+                log('✅ Caméra démarrée')
+                updateStatus('✅ Caméra prête !', 'green')
+                
+            } catch (error) {
+                log('❌ Erreur caméra: ' + error.message)
+                updateStatus('❌ Erreur accès caméra', 'red')
+            }
+        }
+        
+        function createOffer() {
+            if (!localStream) {
+                alert('Démarrez votre caméra d\'abord !')
+                return
+            }
+            
+            log('🚀 Création Peer (initiator)...')
+            
+            peer = new SimplePeer({
+                initiator: true,
+                stream: localStream,
+                trickle: false
+            })
+            
+            peer.on('signal', (data) => {
+                log('📤 Offer générée')
+                document.getElementById('offerOutput').value = JSON.stringify(data)
+                updateStatus('📤 Offer générée ! Copiez et envoyez à votre ami', 'blue')
+            })
+            
+            peer.on('stream', (remoteStream) => {
+                log('📥 Stream distant reçu !')
+                document.getElementById('remoteVideo').srcObject = remoteStream
+                updateStatus('🎉 Connecté ! Vous voyez votre ami !', 'green')
+            })
+            
+            peer.on('error', (err) => {
+                log('❌ Erreur: ' + err.message)
+                updateStatus('❌ Erreur de connexion', 'red')
+            })
+        }
+        
+        function acceptOffer() {
+            const offerText = document.getElementById('offerInput').value.trim()
+            
+            if (!offerText) {
+                alert('Collez l\'offer de votre ami d\'abord !')
+                return
+            }
+            
+            if (!localStream) {
+                alert('Démarrez votre caméra d\'abord !')
+                return
+            }
+            
+            try {
+                const offer = JSON.parse(offerText)
+                log('🤝 Acceptation Offer...')
+                
+                peer = new SimplePeer({
+                    initiator: false,
+                    stream: localStream,
+                    trickle: false
+                })
+                
+                peer.on('signal', (data) => {
+                    log('📤 Answer générée')
+                    document.getElementById('answerOutput').value = JSON.stringify(data)
+                    updateStatus('📤 Answer générée ! Copiez et renvoyez à votre ami', 'blue')
+                })
+                
+                peer.on('stream', (remoteStream) => {
+                    log('📥 Stream distant reçu !')
+                    document.getElementById('remoteVideo').srcObject = remoteStream
+                    updateStatus('🎉 Connecté ! Vous voyez votre ami !', 'green')
+                })
+                
+                peer.on('error', (err) => {
+                    log('❌ Erreur: ' + err.message)
+                    updateStatus('❌ Erreur de connexion', 'red')
+                })
+                
+                peer.signal(offer)
+                
+            } catch (error) {
+                log('❌ Erreur parsing offer: ' + error.message)
+                alert('Format d\'offer invalide !')
+            }
+        }
+        
+        function acceptAnswer() {
+            const answerText = document.getElementById('answerInput').value.trim()
+            
+            if (!answerText) {
+                alert('Collez l\'answer de votre ami d\'abord !')
+                return
+            }
+            
+            if (!peer) {
+                alert('Créez une offer d\'abord !')
+                return
+            }
+            
+            try {
+                const answer = JSON.parse(answerText)
+                log('✅ Acceptation Answer...')
+                peer.signal(answer)
+                updateStatus('⏳ Connexion en cours...', 'yellow')
+                
+            } catch (error) {
+                log('❌ Erreur parsing answer: ' + error.message)
+                alert('Format d\'answer invalide !')
+            }
+        }
+        
+        function copyOffer() {
+            const offer = document.getElementById('offerOutput').value
+            navigator.clipboard.writeText(offer).then(() => {
+                alert('✅ Offer copiée ! Envoyez-la à votre ami')
+            })
+        }
+        
+        function copyAnswer() {
+            const answer = document.getElementById('answerOutput').value
+            navigator.clipboard.writeText(answer).then(() => {
+                alert('✅ Answer copiée ! Envoyez-la à votre ami')
+            })
+        }
+        
+        log('🎥 Page chargée - Prêt à démarrer !')
+    </script>
+    
+</body>
+</html>
