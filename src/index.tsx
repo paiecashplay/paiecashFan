@@ -9,6 +9,7 @@ import whaazs from './routes/whaazs'
 import stream from './routes/stream'
 import auth from './routes/auth'
 import costreaming from './routes/costreaming'
+import vendorStreams from './routes/vendorStreams'
 
 const app = new Hono()
 
@@ -26,6 +27,10 @@ app.route('/api/auth', auth)
 
 // Mount Co-Streaming routes
 app.route('/api/costreaming', costreaming)
+
+// Mount Vendor Streams routes (Live Shopping Multi-Tenant)
+app.route('/api/vendor/stream', vendorStreams)
+app.route('/api/vendor/streams', vendorStreams)
 
 // ==========================================
 // FEDERATIONS API (NEW - NO EMOJIS)
