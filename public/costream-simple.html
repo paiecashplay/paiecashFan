@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Streaming Simple - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .video-container {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .username-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-video"></i> Co-Streaming Simple
+            </h1>
+            <p class="text-white/80">Streamez ensemble en quelques clics !</p>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="glass rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                <i class="fas fa-sign-in-alt"></i> Connexion
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Login Form -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Se connecter</h3>
+                    <div class="space-y-4">
+                        <input type="email" id="loginEmail" placeholder="Email" 
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20">
+                        <input type="password" id="loginPassword" placeholder="Mot de passe" 
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20">
+                        <button onclick="login()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Créer un compte</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="regUsername" placeholder="Nom d'utilisateur" 
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20">
+                        <input type="email" id="regEmail" placeholder="Email" 
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20">
+                        <input type="password" id="regPassword" placeholder="Mot de passe" 
+                               class="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20">
+                        <button onclick="register()" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 rounded-lg">
+                            <i class="fas fa-user-plus"></i> S'inscrire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loginError" class="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-white hidden"></div>
+        </div>
+
+        <!-- Room Section (hidden by default) -->
+        <div id="roomSection" class="hidden">
+            <!-- Room Controls -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <span class="text-white/60">Connecté en tant que:</span>
+                        <span id="currentUsername" class="text-white font-bold ml-2"></span>
+                    </div>
+                    <button onclick="logout()" class="text-white/80 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Create Room -->
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <h3 class="text-white font-bold mb-3">
+                            <i class="fas fa-plus-circle"></i> Créer une room
+                        </h3>
+                        <input type="text" id="roomName" placeholder="Nom de la room (ex: PSG-Live)" 
+                               class="w-full px-4 py-2 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 mb-3">
+                        <button onclick="createRoom()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg">
+                            <i class="fas fa-video"></i> Créer et démarrer
+                        </button>
+                    </div>
+
+                    <!-- Join Room -->
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <h3 class="text-white font-bold mb-3">
+                            <i class="fas fa-door-open"></i> Rejoindre une room
+                        </h3>
+                        <input type="text" id="joinRoomCode" placeholder="Code de la room" 
+                               class="w-full px-4 py-2 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 mb-3">
+                        <button onclick="joinRoom()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg">
+                            <i class="fas fa-sign-in-alt"></i> Rejoindre
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Room -->
+            <div id="activeRoom" class="hidden">
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <span class="text-white/60">Room:</span>
+                            <span id="activeRoomName" class="text-white font-bold ml-2"></span>
+                            <button onclick="copyRoomCode()" class="ml-4 text-white/80 hover:text-white">
+                                <i class="fas fa-copy"></i> Copier le code
+                            </button>
+                        </div>
+                        <button onclick="leaveRoom()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-sign-out-alt"></i> Quitter
+                        </button>
+                    </div>
+
+                    <!-- Video Controls -->
+                    <div class="flex gap-3 mb-6">
+                        <button id="toggleVideo" onclick="toggleVideo()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-video"></i> Caméra
+                        </button>
+                        <button id="toggleAudio" onclick="toggleAudio()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-microphone"></i> Micro
+                        </button>
+                        <button onclick="shareScreen()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-desktop"></i> Partager écran
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Videos Grid -->
+                <div id="videosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Videos will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="glass rounded-lg p-4 text-white text-center hidden mt-6"></div>
+    </div>
+
+    <script>
+        // Global state
+        let token = localStorage.getItem('token');
+        let currentUser = null;
+        let currentRoomId = null;
+        let localStream = null;
+        let peerConnections = {};
+        let ws = null;
+
+        // Check if already logged in
+        if (token) {
+            checkAuth();
+        }
+
+        // Auth functions
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!username || !email || !password) {
+                showError('Veuillez remplir tous les champs');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        displayName: username
+                    })
+                });
+
+                const data = await res.json();
+                
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    currentUser = data.user;
+                    showRoomSection();
+                    showStatus('Compte créé avec succès !', 'success');
+                } else {
+                    showError(data.error || 'Erreur lors de l\'inscription');
+                }
+            } catch (err) {
+                showError('Erreur réseau: ' + err.message);
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('Veuillez remplir tous les champs');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    currentUser = data.user;
+                    showRoomSection();
+                    showStatus('Connecté avec succès !', 'success');
+                } else {
+                    showError(data.error || 'Email ou mot de passe incorrect');
+                }
+            } catch (err) {
+                showError('Erreur réseau: ' + err.message);
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    showRoomSection();
+                } else {
+                    localStorage.removeItem('token');
+                    token = null;
+                }
+            } catch (err) {
+                localStorage.removeItem('token');
+                token = null;
+            }
+        }
+
+        function logout() {
+            if (currentRoomId) {
+                leaveRoom();
+            }
+            localStorage.removeItem('token');
+            token = null;
+            currentUser = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('roomSection').classList.add('hidden');
+            showStatus('Déconnecté', 'info');
+        }
+
+        // Room functions
+        async function createRoom() {
+            const roomName = document.getElementById('roomName').value || 'Room-' + Date.now();
+            
+            try {
+                const res = await fetch('/api/costreaming/start', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: roomName,
+                        description: 'Co-streaming room',
+                        category: 'fan_commentary',
+                        maxParticipants: 10
+                    })
+                });
+
+                const data = await res.json();
+                
+                if (data.success) {
+                    currentRoomId = data.stream.id;
+                    await startLocalStream();
+                    connectWebSocket();
+                    showActiveRoom(roomName);
+                    showStatus('Room créée ! Partagez le code: ' + currentRoomId, 'success');
+                } else {
+                    showError(data.error || 'Erreur lors de la création de la room');
+                }
+            } catch (err) {
+                showError('Erreur: ' + err.message);
+            }
+        }
+
+        async function joinRoom() {
+            const roomCode = document.getElementById('joinRoomCode').value;
+            
+            if (!roomCode) {
+                showError('Veuillez entrer un code de room');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/costreaming/${roomCode}/join`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+                
+                if (data.success) {
+                    currentRoomId = roomCode;
+                    await startLocalStream();
+                    connectWebSocket();
+                    showActiveRoom(data.stream.title);
+                    showStatus('Vous avez rejoint la room !', 'success');
+                } else {
+                    showError(data.error || 'Room non trouvée');
+                }
+            } catch (err) {
+                showError('Erreur: ' + err.message);
+            }
+        }
+
+        async function leaveRoom() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            
+            if (ws) {
+                ws.close();
+            }
+
+            Object.values(peerConnections).forEach(pc => pc.close());
+            peerConnections = {};
+
+            try {
+                await fetch(`/api/costreaming/${currentRoomId}/leave`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (err) {
+                console.error('Error leaving room:', err);
+            }
+
+            currentRoomId = null;
+            document.getElementById('activeRoom').classList.add('hidden');
+            document.getElementById('videosGrid').innerHTML = '';
+            showStatus('Vous avez quitté la room', 'info');
+        }
+
+        // Media functions
+        async function startLocalStream() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 1280, height: 720 },
+                    audio: true
+                });
+
+                addVideoElement('local', localStream, currentUser.username + ' (Vous)');
+                showStatus('Caméra et micro activés', 'success');
+            } catch (err) {
+                showError('Erreur d\'accès à la caméra: ' + err.message);
+            }
+        }
+
+        function toggleVideo() {
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                videoTrack.enabled = !videoTrack.enabled;
+                const btn = document.getElementById('toggleVideo');
+                btn.innerHTML = videoTrack.enabled 
+                    ? '<i class="fas fa-video"></i> Caméra'
+                    : '<i class="fas fa-video-slash"></i> Caméra off';
+                btn.className = videoTrack.enabled 
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg'
+                    : 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg';
+            }
+        }
+
+        function toggleAudio() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                audioTrack.enabled = !audioTrack.enabled;
+                const btn = document.getElementById('toggleAudio');
+                btn.innerHTML = audioTrack.enabled 
+                    ? '<i class="fas fa-microphone"></i> Micro'
+                    : '<i class="fas fa-microphone-slash"></i> Micro off';
+                btn.className = audioTrack.enabled 
+                    ? 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg'
+                    : 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg';
+            }
+        }
+
+        async function shareScreen() {
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: 'always' },
+                    audio: false
+                });
+
+                // Replace video track
+                const videoTrack = screenStream.getVideoTracks()[0];
+                const sender = Object.values(peerConnections)[0]?.getSenders().find(s => s.track?.kind === 'video');
+                if (sender) {
+                    sender.replaceTrack(videoTrack);
+                }
+
+                // Update local video
+                const localVideo = document.querySelector('video[data-peer-id="local"]');
+                if (localVideo) {
+                    localVideo.srcObject = screenStream;
+                }
+
+                videoTrack.onended = () => {
+                    startLocalStream();
+                };
+
+                showStatus('Partage d\'écran activé', 'success');
+            } catch (err) {
+                showError('Erreur de partage d\'écran: ' + err.message);
+            }
+        }
+
+        // WebSocket signaling
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/signaling`);
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    roomId: currentRoomId,
+                    userId: currentUser.id,
+                    username: currentUser.username
+                }));
+            };
+
+            ws.onmessage = async (event) => {
+                const message = JSON.parse(event.data);
+                
+                switch (message.type) {
+                    case 'user-joined':
+                        await createPeerConnection(message.userId, message.username, true);
+                        break;
+                    case 'user-left':
+                        removePeerConnection(message.userId);
+                        break;
+                    case 'offer':
+                        await handleOffer(message);
+                        break;
+                    case 'answer':
+                        await handleAnswer(message);
+                        break;
+                    case 'ice-candidate':
+                        await handleIceCandidate(message);
+                        break;
+                }
+            };
+
+            ws.onerror = (err) => {
+                console.error('WebSocket error:', err);
+                showError('Erreur de connexion WebSocket');
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+            };
+        }
+
+        // WebRTC functions
+        async function createPeerConnection(userId, username, createOffer) {
+            const pc = new RTCPeerConnection({
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            });
+
+            peerConnections[userId] = pc;
+
+            // Add local stream
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    pc.addTrack(track, localStream);
+                });
+            }
+
+            // Handle remote stream
+            pc.ontrack = (event) => {
+                addVideoElement(userId, event.streams[0], username);
+            };
+
+            // Handle ICE candidates
+            pc.onicecandidate = (event) => {
+                if (event.candidate && ws) {
+                    ws.send(JSON.stringify({
+                        type: 'ice-candidate',
+                        roomId: currentRoomId,
+                        targetUserId: userId,
+                        candidate: event.candidate
+                    }));
+                }
+            };
+
+            if (createOffer) {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                ws.send(JSON.stringify({
+                    type: 'offer',
+                    roomId: currentRoomId,
+                    targetUserId: userId,
+                    offer: offer
+                }));
+            }
+
+            return pc;
+        }
+
+        async function handleOffer(message) {
+            const pc = await createPeerConnection(message.fromUserId, message.fromUsername, false);
+            await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
+            
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            
+            ws.send(JSON.stringify({
+                type: 'answer',
+                roomId: currentRoomId,
+                targetUserId: message.fromUserId,
+                answer: answer
+            }));
+        }
+
+        async function handleAnswer(message) {
+            const pc = peerConnections[message.fromUserId];
+            if (pc) {
+                await pc.setRemoteDescription(new RTCSessionDescription(message.answer));
+            }
+        }
+
+        async function handleIceCandidate(message) {
+            const pc = peerConnections[message.fromUserId];
+            if (pc) {
+                await pc.addIceCandidate(new RTCIceCandidate(message.candidate));
+            }
+        }
+
+        function removePeerConnection(userId) {
+            if (peerConnections[userId]) {
+                peerConnections[userId].close();
+                delete peerConnections[userId];
+            }
+            
+            const videoElement = document.querySelector(`[data-peer-id="${userId}"]`);
+            if (videoElement) {
+                videoElement.parentElement.remove();
+            }
+        }
+
+        // UI functions
+        function addVideoElement(peerId, stream, username) {
+            const existing = document.querySelector(`[data-peer-id="${peerId}"]`);
+            if (existing) {
+                existing.srcObject = stream;
+                return;
+            }
+
+            const container = document.createElement('div');
+            container.className = 'video-container';
+            container.innerHTML = `
+                <video data-peer-id="${peerId}" autoplay playsinline ${peerId === 'local' ? 'muted' : ''}></video>
+                <div class="username-label">
+                    <i class="fas fa-user"></i> ${username}
+                </div>
+            `;
+
+            const video = container.querySelector('video');
+            video.srcObject = stream;
+
+            document.getElementById('videosGrid').appendChild(container);
+        }
+
+        function showRoomSection() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('roomSection').classList.remove('hidden');
+            document.getElementById('currentUsername').textContent = currentUser.username;
+        }
+
+        function showActiveRoom(roomName) {
+            document.getElementById('activeRoom').classList.remove('hidden');
+            document.getElementById('activeRoomName').textContent = roomName;
+        }
+
+        function copyRoomCode() {
+            navigator.clipboard.writeText(currentRoomId);
+            showStatus('Code copié dans le presse-papier !', 'success');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `glass rounded-lg p-4 text-white text-center mt-6 ${
+                type === 'success' ? 'bg-green-500/20 border-green-500' :
+                type === 'error' ? 'bg-red-500/20 border-red-500' :
+                'bg-blue-500/20 border-blue-500'
+            } border`;
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => statusDiv.classList.add('hidden'), 5000);
+        }
+    </script>
+</body>
+</html>

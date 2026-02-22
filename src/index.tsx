@@ -10,11 +10,15 @@ import stream from './routes/stream'
 import auth from './routes/auth'
 import costreaming from './routes/costreaming'
 import vendorStreams from './routes/vendorStreams'
+import signaling from './routes/signaling'
 
 const app = new Hono()
 
 // Enable CORS
 app.use('/api/*', cors())
+
+// Mount WebSocket Signaling routes (BEFORE other routes)
+app.route('/ws', signaling)
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)
