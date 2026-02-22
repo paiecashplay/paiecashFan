@@ -1,609 +1,483 @@
-# PaieCashFan v8.2 - Super App Sport Mondiale
+# PaieCashFan - Plateforme de Co-Streaming & Live Shopping
 
-**Version:** 8.2.0  
-**Date:** 13 Fevrier 2026  
-**Status:** PHASE 3 COMPLETE - CAF Page Deployee (100%)
+## 📋 Vue d'ensemble
 
----
+PaieCashFan est une plateforme moderne de live streaming pour les fans de football, permettant :
 
-## DESCRIPTION
+1. **Co-Streaming WebRTC P2P** - Streaming collaboratif entre fans (illimité, gratuit)
+2. **Live Shopping Multi-Tenant** - Streaming professionnel pour vendeurs (illimité spectateurs, Cloudflare Stream)
 
-PaieCashFan est une Super App sportive qui connecte les fans du monde entier avec leurs clubs favoris. Elle integre merchandising, wallet crypto, reseau social, billets NFT, eSIM, et IA personnalisation.
+## 🌐 URLs
 
-### Caracteristiques Principales
-- **6 Federations** mondiales (CAF, UEFA, CONMEBOL, CONCACAF, AFC, OFC)
-- **54 Federations** africaines (CAF complet avec filtres regionaux)
-- **10+ Clubs** avec donnees completes (sponsors, stories, couleurs)
-- **29 API Endpoints** REST fonctionnels
-- **Chargement Dynamique** depuis clubs-data.json
-- **Section LOTO** integree pour gagner PCC et NFT
-- **Page CAF Dediee** avec 54 federations et 5 filtres regionaux
-- **SANS EMOJIS** dans noms de fichiers - Compatible Vercel, Cloudflare, Netlify
-- **Interface Moderne** - Design Instagram/TikTok style
+- **Production**: https://paiecashfan.pages.dev
+- **Test P2P**: https://paiecashfan.pages.dev/test-p2p.html
+- **API Base**: https://paiecashfan.pages.dev/api
 
----
+## 🏗️ Architecture
 
-## URLS DE TEST
+### 🎯 Solution 1: Live Shopping Multi-Tenant (Cloudflare Stream)
 
-### Sandbox Development
-**Base URL:** https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai
+**Pour**: 1000+ vendeurs simultanés, millions de spectateurs
 
-### Interface Utilisateur
-- **Index Principal** : /index.html
-- **Page CAF Complete** : /caf.html (54 federations africaines)
-- **Federation Generique** : /federation.html?fed=UEFA
-- **Club Maroc** : /club.html?club=mar&name=Maroc&fed=CAF
-- **Club Algerie** : /club.html?club=alg&name=Algerie&fed=CAF
-- **Club Senegal** : /club.html?club=sen&name=Senegal&fed=CAF
-- **Club Nigeria** : /club.html?club=nga&name=Nigeria&fed=CAF
+**Technologies**:
+- Backend: Hono + Cloudflare Workers
+- Database: Cloudflare D1 (SQLite distribué)
+- Streaming: Cloudflare Stream (RTMPS)
+- Frontend: Vanilla JS + TailwindCSS
 
-### API Endpoints
-- **Health Check** : /api/health
-- **Federations** : /api/federations
-- **Stats** : /api/stats
-- **Stories** : /api/stories?club=Maroc
-- **Feed** : /api/feed?club=Maroc
-- **Wallet Balance** : /api/wallet/balance
-- **eSIM Plans** : /api/esim/plans
-- **Shop Products** : /api/shop/products?club=Maroc
+**Avantages**:
+- ♾️ Viewers illimités (CDN global)
+- 🚀 Latence 10-30s (HLS)
+- 💰 $1.80 par vendeur pour 3h
+- 📱 Mobile-friendly (OBS, Larix)
+- 🎥 Enregistrement VOD automatique
+- 📊 Analytics temps réel
 
-### JSON Data
-- **Clubs Data** : /data/clubs-data.json
+### 🎮 Solution 2: Co-Streaming P2P (WebRTC)
 
----
+**Pour**: 2-10 co-streamers, streaming collaboratif
 
-## FONCTIONNALITES
+**Technologies**:
+- WebRTC P2P mesh network
+- MediaStream API
+- Manual SDP exchange (no signaling server)
 
-### Phase 1: Backend API (100%)
-**29 Endpoints REST**
+**Avantages**:
+- ✅ Totalement gratuit
+- ⚡ Latence <100ms
+- 🎯 Simple à utiliser
+- 🔒 Décentralisé
 
-#### Auth (2)
-- POST /api/auth/register - Inscription utilisateur
-- POST /api/auth/login - Connexion avec JWT
+## 📊 Base de données D1
 
-#### Wallet (4)
-- GET /api/wallet/balance - Balance PCC/EUR
-- GET /api/wallet/transactions - Historique transactions
-- POST /api/wallet/send - Envoi PCC
-- POST /api/wallet/deposit - Depot fonds
+### Tables
 
-#### Stories & Feed (3)
-- GET /api/stories?club={name} - Stories du club
-- GET /api/feed?club={name} - Feed social
-- POST /api/interactions/track - Tracking interactions
+#### 1. `users`
+```sql
+- id (UUID, PRIMARY KEY)
+- email (TEXT, UNIQUE)
+- username (TEXT, UNIQUE)
+- password_hash (TEXT)
+- display_name (TEXT)
+- avatar_url (TEXT)
+- created_at (DATETIME)
+```
 
-#### eSIM (3)
-- GET /api/esim/plans - Liste plans eSIM
-- POST /api/esim/activate - Activation eSIM
-- GET /api/esim/active - eSIM actives
+#### 2. `active_streams`
+```sql
+- id (UUID, PRIMARY KEY)
+- user_id (UUID, FOREIGN KEY)
+- title (TEXT)
+- description (TEXT)
+- category (TEXT)
+- status (TEXT)
+- viewers_count (INTEGER)
+- max_participants (INTEGER)
+- current_participants (INTEGER)
+- started_at (DATETIME)
+- cloudflare_stream_id (TEXT)
+```
 
-#### Shop (4)
-- GET /api/shop/products?club={name} - Produits merchandising
-- POST /api/shop/cart/add - Ajout panier
-- GET /api/shop/cart - Contenu panier
-- POST /api/shop/checkout - Paiement avec cashback
+#### 3. `stream_participants`
+```sql
+- id (UUID, PRIMARY KEY)
+- stream_id (UUID, FOREIGN KEY)
+- user_id (UUID, FOREIGN KEY)
+- joined_at (DATETIME)
+- left_at (DATETIME)
+- role (TEXT)
+```
 
-#### Tickets (4)
-- GET /api/tickets/events?club={name} - Evenements
-- POST /api/tickets/purchase - Achat billet NFT
-- GET /api/tickets/my-tickets - Mes billets
-- GET /api/tickets/:id/qr - QR code billet
+#### 4. `vendor_streams`
+```sql
+- id (UUID, PRIMARY KEY)
+- user_id (UUID, FOREIGN KEY)
+- title (TEXT)
+- description (TEXT)
+- club_name (TEXT)
+- category (TEXT)
+- cloudflare_live_input_id (TEXT)
+- cloudflare_stream_id (TEXT)
+- rtmps_url (TEXT)
+- rtmps_stream_key (TEXT)
+- playback_url (TEXT)
+- status (TEXT)
+- viewers_count (INTEGER)
+- peak_viewers (INTEGER)
+- started_at (DATETIME)
+- ended_at (DATETIME)
+- duration_seconds (INTEGER)
+- is_featured (BOOLEAN)
+- is_recorded (BOOLEAN)
+- vod_url (TEXT)
+```
 
-#### Social (3)
-- GET /api/social/conversations - Liste conversations
-- POST /api/social/messages - Envoyer message
-- GET /api/social/feed - Feed social
+## 🔌 API Endpoints
 
-#### IA (3)
-- GET /api/ai/recommendations - Recommandations personnalisees
-- GET /api/ai/insights - Insights utilisateur
-- GET /api/ai/predictions - Predictions achats
+### Authentication
 
-#### System (2)
-- GET /api/health - Sante systeme
-- GET /api/stats - Statistiques globales
-
-#### Federations (2)
-- GET /api/federations - Liste federations
-- GET /api/federations/:id/clubs - Clubs par federation
-
-### Phase 2: Interface Frontend (100%)
-
-#### Index Principal (index.html)
-- Affichage 6 federations depuis clubs-data.json
-- Logo et couleurs pour chaque federation
-- Compteur clubs par federation
-- Badge "Merchandising Actif" (CAF)
-- Badge "Bientot Disponible" (autres)
-- Recherche temps reel
-- Stats globales
-
-#### Page Federation (federation.html)
-- Liste tous les clubs de la federation
-- Nom, logo (flag), ligue
-- Badge merchandising
-- Bouton retour vers index
-- Chargement dynamique JSON
-
-#### Super App Club (club.html)
-**Interface Complete avec:**
-
-1. **Header**
-   - Logo club (charge depuis currentClub.logo)
-   - Nom club (charge depuis currentClub.name)
-   - Balance PCC affichee
-   - Bouton notifications
-
-2. **Stories**
-   - Stories club (type: 'club', isLive: true)
-   - Stories fans (type: 'fan')
-   - Donnees depuis currentClub.stories
-   - Avatar et nom pour chaque story
-
-3. **Section LOTO (NOUVELLE)**
-   - Position: Sous logo gamification circulaire
-   - Click pour jouer
-   - Gagne PCC et NFT exclusifs
-
-4. **Balance Cards**
-   - Carte Bancaire (1,250.50 EUR)
-   - Wallet Crypto (250.00 EUR)
-   - Actions: Recharger, Retirer, Historique, Envoyer, Recevoir, Swap
-
-5. **Feed**
-   - Posts club avec images
-   - Likes, commentaires, partages
-   - Rewards PCC pour interactions
-   - Bouton J'aime fonctionnel
-
-6. **Modal Merchandising**
-   - Ouverture pour clubs CAF uniquement
-   - Liste produits avec prix EUR et FCFA
-   - Bouton Acheter avec paiement PaieCash
-   - Cashback 5% en PCC
-
-7. **Navigation Bottom**
-   - Accueil (actif)
-   - Shop (ouvre modal)
-   - Billets (redirection /tickets.html)
-   - Recompenses (alerte balance PCC)
-
-### Phase 3: Chargement Dynamique (100%)
-
-#### Fichier clubs-data.json (11.6 KB)
-**Structure:**
+#### POST `/api/auth/register`
 ```json
 {
-  "federations": {
-    "CAF": {
-      "id": "CAF",
-      "name": "Confederation Africaine de Football",
-      "region": "Africa",
-      "logo": "icone",
-      "merchandising": true,
-      "clubs": {
-        "Maroc": {
-          "name": "Maroc",
-          "flag": "icone",
-          "logo": "icone",
-          "colors": {"primary": "#c1272d", "secondary": "#006233"},
-          "sponsors": [...],
-          "stories": [...]
-        }
-      }
-    },
-    "UEFA": {...},
-    "CONMEBOL": {...},
-    "CONCACAF": {...},
-    "AFC": {...},
-    "OFC": {...}
-  },
-  "products": {
-    "CAF": {
-      "maillots": [...],
-      "accessoires": [...]
-    }
+  "email": "user@example.com",
+  "password": "Password123!",
+  "username": "johndoe",
+  "displayName": "John Doe"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "token": "eyJhbGc...",
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "username": "johndoe",
+    "displayName": "John Doe"
   }
 }
 ```
 
-#### Federations Supportees
-- **CAF** : 5 clubs (Maroc, Algerie, Senegal, Nigeria, Cote d'Ivoire)
-- **UEFA** : 5 pays (France, Espagne, Angleterre, Allemagne, Italie)
-- **CONMEBOL** : 2 pays (Bresil, Argentine)
-- **CONCACAF** : 2 pays (USA, Mexique)
-- **AFC** : 2 pays (Japon, Coree du Sud)
-- **OFC** : 2 pays (Australie, Nouvelle-Zelande)
-
----
-
-## INSTALLATION
-
-### Prerequis
-- Node.js 20+
-- NPM 10+
-- Git
-- PM2 (installe globalement)
-
-### Installation
-```bash
-# Cloner le projet
-git clone <repo-url>
-cd webapp
-
-# Installer dependances
-npm install
-
-# Build projet
-npm run build
-
-# Demarrer avec PM2
-pm2 start ecosystem.config.cjs
-
-# Verifier logs
-pm2 logs paiecashfan --nostream
-
-# Tester
-curl http://localhost:3000/api/health
+#### POST `/api/auth/login`
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
 ```
 
----
+#### GET `/api/auth/me`
+Headers: `Authorization: Bearer <token>`
 
-## STRUCTURE
+### Co-Streaming (WebRTC P2P)
+
+#### POST `/api/costreaming/start`
+```json
+{
+  "title": "Match PSG vs OM - Commentaire live",
+  "description": "Commentaires entre fans PSG",
+  "category": "match_commentary",
+  "maxParticipants": 4
+}
+```
+
+#### GET `/api/costreaming/active`
+Liste tous les streams actifs
+
+#### POST `/api/costreaming/:streamId/join`
+Rejoindre un stream
+
+#### POST `/api/costreaming/:streamId/leave`
+Quitter un stream
+
+### Vendor Streams (Cloudflare Stream)
+
+#### POST `/api/vendor/stream/start`
+```json
+{
+  "title": "🔴 LIVE: Maillots PSG 2026",
+  "description": "Nouveaux maillots en avant-première !",
+  "clubName": "PSG",
+  "category": "merchandising"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "title": "🔴 LIVE: Maillots PSG 2026",
+  "clubName": "PSG",
+  "status": "live",
+  "rtmpsConfig": {
+    "url": "rtmps://live.cloudflare.com:443/live/",
+    "streamKey": "MTQ0MTcjM..."
+  },
+  "playbackUrl": "https://customer-xxx.cloudflarestream.com/xxx/manifest/video.m3u8",
+  "viewersCount": 0
+}
+```
+
+#### GET `/api/vendor/streams/live`
+Query params: `?clubName=PSG&category=merchandising&featured=true`
+
+#### GET `/api/vendor/stream/:id`
+Détails d'un stream
+
+#### POST `/api/vendor/stream/:id/end`
+Terminer un stream
+
+#### GET `/api/vendor/stream/mine`
+Mes streams (actifs et passés)
+
+## 📱 Usage
+
+### Vendeur - Démarrer un Live Shopping
+
+1. **S'inscrire / Se connecter**
+```bash
+curl -X POST https://paiecashfan.pages.dev/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "vendeur@boutique.com",
+    "password": "Secure123!",
+    "username": "boutique_psg",
+    "displayName": "Boutique PSG Officielle"
+  }'
+```
+
+2. **Créer un stream**
+```bash
+curl -X POST https://paiecashfan.pages.dev/api/vendor/stream/start \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "🔴 LIVE: Nouveaux Maillots PSG",
+    "description": "Découvrez les maillots 2026",
+    "clubName": "PSG",
+    "category": "merchandising"
+  }'
+```
+
+3. **Streamer avec OBS / Larix Broadcaster**
+- RTMPS URL: `rtmps://live.cloudflare.com:443/live/`
+- Stream Key: (fourni dans la réponse API)
+
+4. **Partager l'URL de visionnage**
+- Les fans peuvent regarder sur : `playbackUrl` (fourni dans la réponse)
+
+### Fan - Regarder un Live Shopping
+
+1. **Lister les streams actifs**
+```bash
+curl "https://paiecashfan.pages.dev/api/vendor/streams/live?clubName=PSG"
+```
+
+2. **Regarder un stream**
+- Utiliser le `playbackUrl` dans un lecteur HLS (Video.js, hls.js)
+
+### Co-Streaming P2P - Test Simple
+
+1. Ouvrir https://paiecashfan.pages.dev/test-p2p.html dans **2 onglets**
+
+2. **Onglet 1** (Peer A):
+   - Cliquer "Start Camera"
+   - Cliquer "Create Offer"
+   - Copier l'offer
+
+3. **Onglet 2** (Peer B):
+   - Cliquer "Start Camera"
+   - Coller l'offer dans "Receive SDP"
+   - Cliquer "Set Offer"
+   - Copier l'answer
+
+4. **Onglet 1**:
+   - Coller l'answer dans "Receive SDP"
+   - Cliquer "Set Answer"
+
+5. ✅ **Les 2 vidéos apparaissent** (Local + Remote dans chaque onglet)
+
+## 💰 Coûts (Estimation Black Friday: 1000 vendeurs × 3h)
+
+| Service | Usage | Prix unitaire | Total |
+|---------|-------|---------------|-------|
+| **Cloudflare Stream Recording** | 180,000 min | $5/1000 min | **$900** |
+| **Cloudflare Stream Storage** | 180,000 min/mois | $5/1000 min/mois | **$900** |
+| **Cloudflare Pages** | Illimité | GRATUIT | $0 |
+| **Cloudflare Workers** | <100k req/jour | GRATUIT | $0 |
+| **Cloudflare D1** | <5M lignes lues/jour | GRATUIT | $0 |
+| **TOTAL** | | | **$1,800** |
+
+**Coût par vendeur**: $1.80 pour 3h de streaming
+**Viewers**: Illimités et gratuits (CDN)
+
+## 🚀 Déploiement
+
+### Prérequis
+
+- Compte Cloudflare avec API Token (permissions: D1, Pages, Stream)
+- Node.js 18+
+- Git
+
+### Installation locale
+
+```bash
+# Cloner le repo
+git clone https://github.com/VOTRE_USERNAME/paiecashfan.git
+cd paiecashfan
+
+# Installer les dépendances
+npm install
+
+# Configurer les variables d'environnement
+cp .dev.vars.example .dev.vars
+# Éditer .dev.vars avec vos credentials Cloudflare
+
+# Appliquer les migrations D1 (local)
+npx wrangler d1 migrations apply paiecashfan-costreaming --local
+
+# Démarrer en développement
+npm run build
+pm2 start ecosystem.config.cjs
+
+# Tester
+curl http://localhost:3000
+```
+
+### Déploiement Production
+
+```bash
+# 1. Créer la base D1 production
+npx wrangler d1 create paiecashfan-costreaming
+
+# 2. Copier le database_id dans wrangler.toml
+
+# 3. Appliquer les migrations
+npx wrangler d1 migrations apply paiecashfan-costreaming --remote
+
+# 4. Créer le projet Pages
+npx wrangler pages project create paiecashfan --production-branch main
+
+# 5. Déployer
+npm run build
+npx wrangler pages deploy dist --project-name paiecashfan
+
+# 6. Configurer les secrets
+echo "YOUR_JWT_SECRET" | npx wrangler pages secret put JWT_SECRET --project-name paiecashfan
+echo "YOUR_ACCOUNT_ID" | npx wrangler pages secret put CLOUDFLARE_ACCOUNT_ID --project-name paiecashfan
+echo "YOUR_API_TOKEN" | npx wrangler pages secret put CLOUDFLARE_API_TOKEN --project-name paiecashfan
+```
+
+## 📦 Structure du projet
 
 ```
 webapp/
 ├── src/
-│   ├── index.tsx                    # Backend Hono (29 endpoints)
-│   └── api/
-│       ├── types.ts
-│       └── regie-publicitaire.ts
+│   ├── index.tsx                 # Main Hono app entry
+│   └── routes/
+│       ├── auth.ts               # JWT auth endpoints
+│       ├── costreaming.ts        # WebRTC P2P endpoints
+│       └── vendorStreams.ts      # Cloudflare Stream endpoints
 ├── public/
-│   ├── index.html                   # Index federations
-│   ├── federation.html              # Liste clubs
-│   ├── club.html                    # Super App club
-│   └── data/
-│       └── clubs-data.json          # Donnees centralisees (11.6 KB)
-├── dist/                            # Build output
-│   ├── _worker.js                   # Worker compile (36.2 KB)
-│   ├── _routes.json                 # Routes config
-│   ├── index.html
-│   ├── federation.html
-│   ├── club.html
-│   └── data/
-│       └── clubs-data.json
-├── ecosystem.config.cjs             # PM2 config
-├── wrangler.jsonc                   # Cloudflare config
-├── vite.config.ts                   # Vite config
+│   ├── costreaming.html          # Co-streaming list UI
+│   ├── costream-room.html        # Multi-video room UI
+│   └── test-p2p.html             # P2P WebRTC test page
+├── migrations/
+│   ├── 0001_create_users_table.sql
+│   ├── 0002_create_streams_table.sql
+│   ├── 0003_create_participants_table.sql
+│   └── 0004_create_vendor_streams_table.sql
+├── wrangler.jsonc                # Wrangler config (dev)
+├── wrangler.toml                 # Wrangler config (prod)
+├── ecosystem.config.cjs          # PM2 config
 ├── package.json
-├── README.md                        # Ce fichier
-├── PHASE_3_COMPLETE.md              # Rapport Phase 3
-└── STATUS.md                        # Status global
+└── README.md
 ```
 
----
+## 🔧 Configuration
 
-## COMMANDES NPM
+### Variables d'environnement (.dev.vars)
 
-```bash
-# Development
-npm run dev                # Start Vite dev server
-npm run dev:sandbox        # Start wrangler pages dev
-npm run build              # Build for production
+```env
+# Cloudflare Account
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+CLOUDFLARE_API_TOKEN=your_api_token
 
-# Preview & Deploy
-npm run preview            # Preview production build
-npm run deploy             # Build + deploy Cloudflare Pages
-npm run deploy:prod        # Deploy with project name
+# JWT Secret
+JWT_SECRET=your_super_secure_secret_key
 
-# Utilities
-npm run clean-port         # Kill process on port 3000
-npm run test               # Health check curl
-
-# Git
-npm run git:init           # Initialize git repo
-npm run git:commit         # Commit with message
-npm run git:status         # Git status
-npm run git:log            # Git log
+# Optional: Cloudflare Email
+CLOUDFLARE_EMAIL=your@email.com
 ```
 
----
+### Secrets Cloudflare Pages (Production)
 
-## PM2 COMMANDS
+- `JWT_SECRET` - Secret pour signer les tokens JWT
+- `CLOUDFLARE_ACCOUNT_ID` - ID du compte Cloudflare
+- `CLOUDFLARE_API_TOKEN` - Token API avec permissions Stream
+
+## 🧪 Tests
+
+### Test local
 
 ```bash
-# Start
+# Démarrer le serveur
+npm run build
 pm2 start ecosystem.config.cjs
 
-# Restart
-pm2 restart paiecashfan
+# Test d'inscription
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"Test123!","username":"test","displayName":"Test User"}'
 
-# Logs
-pm2 logs paiecashfan --nostream
-
-# Stop
-pm2 stop paiecashfan
-
-# Delete
-pm2 delete paiecashfan
-
-# List
-pm2 list
+# Test de création de stream
+curl -X POST http://localhost:3000/api/vendor/stream/start \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Stream","clubName":"PSG","category":"merchandising"}'
 ```
+
+### Test production
+
+```bash
+# Remplacer localhost:3000 par paiecashfan.pages.dev
+curl -X POST https://paiecashfan.pages.dev/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"prod@test.com","password":"Prod123!","username":"prodtest","displayName":"Prod Test"}'
+```
+
+## 📝 Fonctionnalités actuelles
+
+✅ **Complété**:
+- Backend API (Auth JWT, Co-streaming, Vendor Streams)
+- Base de données D1 (4 tables, 6 index)
+- Page test P2P WebRTC
+- Déploiement Cloudflare Pages
+- Configuration secrets production
+- Documentation complète
+
+⏳ **En cours**:
+- Interface vendeur (formulaire start stream, dashboard)
+- Marketplace fans (grid streams, filtres, lecteur vidéo)
+- Tests production (JWT auth fix)
+
+🔮 **Prochaines étapes**:
+1. Fixer JWT auth en production (redéploiement)
+2. Interface vendeur mobile-first
+3. Marketplace avec filtres avancés
+4. Chat temps réel (WebSocket)
+5. Système d'amis/invitations
+6. Enregistrement VOD automatique
+7. Analytics avancés (Cloudflare Analytics)
+
+## 🛠️ Technologies
+
+- **Backend**: Hono 4.x (Cloudflare Workers)
+- **Database**: Cloudflare D1 (SQLite distribué)
+- **Streaming**: Cloudflare Stream (RTMPS/HLS)
+- **WebRTC**: Native WebRTC API
+- **Auth**: JWT (jsonwebtoken + bcryptjs)
+- **Frontend**: Vanilla JS + TailwindCSS + Font Awesome
+- **Deployment**: Cloudflare Pages
+- **Process Manager**: PM2 (dev)
+
+## 📚 Documentation technique
+
+- [Architecture complète](./SCALE_ARCHITECTURE_THOUSANDS_STREAMERS.md)
+- [Solution WebRTC P2P](./CO_STREAMING_UNLIMITED_SOLUTION.md)
+- [Guide déploiement](./DEPLOYMENT_GUIDE_PRODUCTION.md)
+
+## 👥 Contributeurs
+
+- PaieCashFan Team
+
+## 📄 Licence
+
+Propriétaire - © 2026 PaieCashFan
 
 ---
 
-## STACK TECHNIQUE
-
-### Frontend
-- **HTML5** + CSS3 + JavaScript ES6+
-- **Font Awesome** 6.4.0 - Icons
-- **Google Fonts** (Inter) - Typography
-- **Axios** 1.6.0 - HTTP client
-- **Responsive Design** - Mobile-first
-
-### Backend
-- **Hono** 4.11.9 - Web framework
-- **TypeScript** 5+ - Language
-- **Cloudflare Workers** - Runtime
-- **29 REST Endpoints** - Full API
-
-### Build & Deploy
-- **Vite** 6.4.1 - Build tool
-- **Wrangler** 4.65.0 - Cloudflare CLI
-- **PM2** 6.0.14 - Process manager
-- **Git** - Version control
-
----
-
-## EXEMPLES API
-
-### Health Check
-```bash
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/health
-
-# Response
-{
-  "status": "ok",
-  "version": "8.0.0",
-  "timestamp": "2026-02-13T14:30:00.000Z",
-  "services": {
-    "auth": "ok",
-    "wallet": "ok",
-    "esim": "ok",
-    "shop": "ok",
-    "tickets": "ok",
-    "social": "ok",
-    "ai": "ok"
-  }
-}
-```
-
-### Federations
-```bash
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/federations
-
-# Response
-{
-  "success": true,
-  "federations": [
-    {
-      "id": "caf",
-      "name": "CAF",
-      "fullName": "Confederation Africaine de Football",
-      "region": "Africa",
-      "clubsCount": 54,
-      "merchandisingEnabled": true
-    },
-    ...
-  ]
-}
-```
-
-### Wallet Balance
-```bash
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/wallet/balance
-
-# Response
-{
-  "success": true,
-  "balance": {
-    "pcc": 1247.50,
-    "eur": 124.75,
-    "stablecoins": {
-      "OMC": 50,
-      "PSC": 75,
-      "LOSC": 25,
-      "ASC": 30
-    }
-  }
-}
-```
-
----
-
-## DEPLOIEMENT
-
-### Development Local
-```bash
-# Build
-npm run build
-
-# Start PM2
-pm2 start ecosystem.config.cjs
-
-# Test
-curl http://localhost:3000/api/health
-```
-
-### Cloudflare Pages Production
-
-#### 1. Setup API Key
-```bash
-# Via interface Deploy tab ou:
-export CLOUDFLARE_API_TOKEN="your-token"
-```
-
-#### 2. Verify Auth
-```bash
-npx wrangler whoami
-```
-
-#### 3. Build
-```bash
-npm run build
-```
-
-#### 4. Create Project (first time)
-```bash
-npx wrangler pages project create paiecashfan \
-  --production-branch main \
-  --compatibility-date 2026-02-13
-```
-
-#### 5. Deploy
-```bash
-npx wrangler pages deploy dist --project-name paiecashfan
-
-# URLs recues:
-# Production: https://paiecashfan.pages.dev
-# Branch: https://main.paiecashfan.pages.dev
-```
-
-#### 6. Set Secrets (if needed)
-```bash
-npx wrangler pages secret put API_KEY --project-name paiecashfan
-```
-
----
-
-## TESTS
-
-### Test Pages HTML
-```bash
-# Index
-curl -L https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/index.html
-
-# Federation
-curl -L "https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/federation.html?fed=CAF"
-
-# Club
-curl -L "https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/club.html?club=Maroc&fed=CAF"
-```
-
-### Test JSON Data
-```bash
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/data/clubs-data.json
-```
-
-### Test API Backend
-```bash
-# Health
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/health
-
-# Federations
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/federations
-
-# Stats
-curl https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/api/stats
-```
-
----
-
-## STATISTIQUES v8.1
-
-- **3 pages HTML** (index, federation, club)
-- **1 fichier JSON** centralise (11.6 KB)
-- **29 endpoints API** backend
-- **6 federations** configurees
-- **10+ clubs** avec donnees completes
-- **Section LOTO** integree
-- **0 emojis** dans noms de fichiers
-- **0 regressions**
-
----
-
-## PROCHAINES ETAPES
-
-### Phase 4: Internationalisation (Pending)
-- Systeme I18N (11 langues)
-- Fichier multi-langues.js (SANS emojis)
-- Traductions index, federation, club
-- Detection langue navigateur
-
-### Phase 5: Services Progressifs (Pending)
-- Wallet complet
-- eSIM activation flow
-- Tickets NFT minting
-- Chat temps reel
-
-### Phase 6: Persistance (Pending)
-- PostgreSQL pour donnees
-- Redis pour cache
-- Migrations SQL
-
-### Phase 7: Production (Pending)
-- Build optimise
-- Deploy Cloudflare Pages
-- Domaine custom
-- Tests E2E
-
----
-
-## DOCUMENTATION
-
-- **README.md** : Ce fichier (guide principal)
-- **PHASE_3_COMPLETE.md** : Rapport detaille Phase 3
-- **STATUS.md** : Status global projet
-- **DEPLOY_INFO.md** : Infos deploiement
-- **VERCEL_COMPATIBILITY.md** : Compatibilite Vercel
-
----
-
-## SUPPORT
-
-- **Email** : support@paiecashfan.com
-- **Documentation** : README.md, PHASE_3_COMPLETE.md, STATUS.md
-
----
-
-## CHANGELOG
-
-### v8.1.0 (13 Feb 2026)
-- Infrastructure complete
-- Chargement dynamique clubs-data.json
-- Section LOTO integree
-- 3 pages HTML (index, federation, club)
-- 29 endpoints API backend
-- 6 federations + 10+ clubs
-- SANS emojis dans noms fichiers
-- Zero regressions
-
-### v8.0.0 (13 Feb 2026)
-- Interface principale + federations
-- Page club complete
-- Backend 29 endpoints
-- SANS emojis - Compatible Vercel
-
----
-
-## COMMITS GIT RECENTS
-
-```bash
-4c7091e docs: Phase 3 Complete - Infrastructure Club Complete avec LOTO (v8.1)
-0074efd feat: club.html avec chargement JSON dynamique + LOTO section (SANS emojis)
-af3995d feat: federation.html avec chargement JSON direct (SANS emojis)
-ac62054 feat: Index avec chargement JSON direct des federations (SANS emojis)
-5ef03eb docs: Update STATUS.md - Phase 2 complete
-4dc9952 Interface Club complete + Federation + LOTO (SANS emojis)
-3f89d5b docs: Ajout STATUS.md v8.0
-627428a feat: v8.0 - Index principal avec federations (SANS emojis)
-```
-
----
-
-**PaieCashFan v8.1 - Connectons les fans du monde entier !**
-
-**Status:** PHASE 3 COMPLETE (100%)  
-**Derniere Mise a Jour:** 13 Fevrier 2026  
-**Equipe:** PaieCashFan Development Team
+**Contact**: etot@paiecash.com
+**Dashboard**: https://dash.cloudflare.com/d9c3bb827a16a3b47905cbd6f78bf004
