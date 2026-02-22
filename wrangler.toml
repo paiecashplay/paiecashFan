@@ -1,0 +1,9 @@
+name = "paiecashfan"
+compatibility_date = "2026-02-13"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "paiecashfan-costreaming"
+database_id = "6cad0e14-e9ed-475b-a0b2-b16feea21ed0"
