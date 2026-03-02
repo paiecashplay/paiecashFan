@@ -546,8 +546,8 @@
                     <input type="text" id="searchInput" placeholder="Rechercher...">
                 </div>
                 <div id="languageSelector"></div>
-                <button class="btn btn-primary" onclick="window.location.href='/live-streams.html'">
-                    <i class="fas fa-video"></i> Live
+                <button class="btn btn-primary" onclick="joinLiveStream()">
+                    <i class="fas fa-video"></i> Live Stream
                 </button>
                 <button class="btn btn-primary" onclick="goToWallet()">
                     <i class="fas fa-wallet"></i> Wallet
@@ -899,6 +899,21 @@
         
         function goToWallet() {
             window.location.href = '/wallet.html';
+        }
+        
+        // Join Live Stream with Tencent TRTC (NO CODE NEEDED)
+        function joinLiveStream() {
+            // Get club name from URL or use default
+            const urlParams = new URLSearchParams(window.location.search);
+            const club = urlParams.get('club') || 'PaieCashFan';
+            const logo = urlParams.get('logo') || '⚽';
+            
+            // Generate random user ID
+            const userId = `${club.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substring(2, 8)}`;
+            
+            // Redirect to TRTC live page
+            const url = `/trtc-live.html?club=${encodeURIComponent(club)}&logo=${encodeURIComponent(logo)}&user=${userId}`;
+            window.location.href = url;
         }
         
         // Search functionality
