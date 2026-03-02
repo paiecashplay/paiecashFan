@@ -11,6 +11,7 @@ import auth from './routes/auth'
 import costreaming from './routes/costreaming'
 import vendorStreams from './routes/vendorStreams'
 import signaling from './routes/signaling'
+import trtc from './routes/trtc'
 
 const app = new Hono()
 
@@ -19,6 +20,9 @@ app.use('/api/*', cors())
 
 // Mount WebSocket Signaling routes (BEFORE other routes)
 app.route('/ws', signaling)
+
+// Mount Tencent TRTC routes (NEW)
+app.route('/api/trtc', trtc)
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)

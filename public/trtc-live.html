@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream - PaieCashFan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .club-badge {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #6366f1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .club-info h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .club-info p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .live-badge {
+            background: #ef4444;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Video Grid */
+        .video-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .audio-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Controls */
+        .controls {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .btn-mic {
+            background: #374151;
+            color: white;
+        }
+        
+        .btn-mic.muted {
+            background: #ef4444;
+        }
+        
+        .btn-video {
+            background: #374151;
+            color: white;
+        }
+        
+        .btn-video.disabled {
+            background: #ef4444;
+        }
+        
+        .btn-leave {
+            background: #ef4444;
+            color: white;
+        }
+        
+        /* Loading */
+        .loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="club-badge" id="clubLogo">⚽</div>
+                <div class="club-info">
+                    <h1 id="clubName">Club Live</h1>
+                    <p>Co-streaming en direct</p>
+                </div>
+                <div class="live-badge">
+                    <div class="live-dot"></div>
+                    LIVE
+                </div>
+            </div>
+            <button class="btn-close" onclick="leaveLive()">
+                <i class="fas fa-times"></i> Quitter
+            </button>
+        </div>
+        
+        <!-- Video Grid -->
+        <div class="video-grid" id="videoGrid">
+            <!-- Videos will be added dynamically -->
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn btn-mic" id="btnMic" onclick="toggleMic()">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="control-btn btn-video" id="btnVideo" onclick="toggleVideo()">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="control-btn btn-leave" onclick="leaveLive()">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Connexion au live...</div>
+        </div>
+    </div>
+
+    <!-- Tencent TRTC SDK -->
+    <script src="https://web.sdk.qcloud.com/trtc/webrtc/v5/dist/trtc.js"></script>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const club = urlParams.get('club') || 'Club';
+        const logo = urlParams.get('logo') || '⚽';
+        const userId = urlParams.get('user');
+        
+        // Set club info
+        document.getElementById('clubName').textContent = `${club} Live`;
+        document.getElementById('clubLogo').textContent = logo;
+        
+        let trtcClient = null;
+        let localStream = null;
+        let micEnabled = true;
+        let videoEnabled = true;
+        
+        // Initialize TRTC
+        async function initTRTC() {
+            try {
+                // Get credentials from backend
+                const res = await fetch(`${API_BASE}/trtc/join-room`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ club, userId })
+                });
+                
+                const data = await res.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Erreur serveur');
+                }
+                
+                const { sdkAppId, userId: finalUserId, userSig, roomId } = data;
+                
+                // Create TRTC client
+                trtcClient = TRTC.create();
+                
+                // Listen to remote streams
+                trtcClient.on(TRTC.EVENT.REMOTE_VIDEO_AVAILABLE, ({ userId, streamType }) => {
+                    trtcClient.startRemoteVideo({ userId, streamType, view: `video-${userId}` });
+                });
+                
+                trtcClient.on(TRTC.EVENT.REMOTE_AUDIO_AVAILABLE, ({ userId }) => {
+                    console.log(`Remote audio available: ${userId}`);
+                });
+                
+                trtcClient.on(TRTC.EVENT.REMOTE_USER_ENTER, ({ userId }) => {
+                    console.log(`User entered: ${userId}`);
+                    addRemoteUser(userId);
+                });
+                
+                trtcClient.on(TRTC.EVENT.REMOTE_USER_EXIT, ({ userId }) => {
+                    console.log(`User exited: ${userId}`);
+                    removeRemoteUser(userId);
+                });
+                
+                // Enter room
+                await trtcClient.enterRoom({
+                    roomId: parseInt(roomId.replace(/\D/g, '') || Date.now().toString().slice(-8)),
+                    sdkAppId,
+                    userId: finalUserId,
+                    userSig
+                });
+                
+                console.log('Entered room:', roomId);
+                
+                // Start local stream
+                await startLocalStream(finalUserId);
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error initializing TRTC:', error);
+                alert('Erreur de connexion: ' + error.message);
+                window.history.back();
+            }
+        }
+        
+        // Start local stream
+        async function startLocalStream(userId) {
+            try {
+                await trtcClient.startLocalVideo({ view: `video-${userId}`, option: { profile: '720p' } });
+                await trtcClient.startLocalAudio({ option: { microphoneId: 'default' } });
+                
+                // Add local video to grid
+                addLocalUser(userId);
+                
+            } catch (error) {
+                console.error('Error starting local stream:', error);
+                alert('Erreur d\'accès caméra/micro: ' + error.message);
+            }
+        }
+        
+        // Add local user video
+        function addLocalUser(userId) {
+            const videoGrid = document.getElementById('videoGrid');
+            
+            const container = document.createElement('div');
+            container.className = 'video-container';
+            container.id = `container-${userId}`;
+            
+            container.innerHTML = `
+                <div id="video-${userId}" style="width: 100%; height: 100%;"></div>
+                <div class="video-overlay">
+                    <span class="user-name">Vous</span>
+                    <div class="audio-indicator">
+                        <i class="fas fa-microphone" style="font-size: 10px;"></i>
+                    </div>
+                </div>
+            `;
+            
+            videoGrid.appendChild(container);
+        }
+        
+        // Add remote user video
+        function addRemoteUser(userId) {
+            const videoGrid = document.getElementById('videoGrid');
+            
+            // Check if already exists
+            if (document.getElementById(`container-${userId}`)) return;
+            
+            const container = document.createElement('div');
+            container.className = 'video-container';
+            container.id = `container-${userId}`;
+            
+            container.innerHTML = `
+                <div id="video-${userId}" style="width: 100%; height: 100%;"></div>
+                <div class="video-overlay">
+                    <span class="user-name">${userId}</span>
+                    <div class="audio-indicator">
+                        <i class="fas fa-microphone" style="font-size: 10px;"></i>
+                    </div>
+                </div>
+            `;
+            
+            videoGrid.appendChild(container);
+        }
+        
+        // Remove remote user video
+        function removeRemoteUser(userId) {
+            const container = document.getElementById(`container-${userId}`);
+            if (container) {
+                container.remove();
+            }
+        }
+        
+        // Toggle mic
+        async function toggleMic() {
+            micEnabled = !micEnabled;
+            const btn = document.getElementById('btnMic');
+            
+            if (micEnabled) {
+                await trtcClient.startLocalAudio();
+                btn.classList.remove('muted');
+                btn.innerHTML = '<i class="fas fa-microphone"></i>';
+            } else {
+                await trtcClient.stopLocalAudio();
+                btn.classList.add('muted');
+                btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+            }
+        }
+        
+        // Toggle video
+        async function toggleVideo() {
+            videoEnabled = !videoEnabled;
+            const btn = document.getElementById('btnVideo');
+            
+            if (videoEnabled) {
+                await trtcClient.startLocalVideo({ option: { profile: '720p' } });
+                btn.classList.remove('disabled');
+                btn.innerHTML = '<i class="fas fa-video"></i>';
+            } else {
+                await trtcClient.stopLocalVideo();
+                btn.classList.add('disabled');
+                btn.innerHTML = '<i class="fas fa-video-slash"></i>';
+            }
+        }
+        
+        // Leave live
+        async function leaveLive() {
+            if (trtcClient) {
+                await trtcClient.exitRoom();
+                trtcClient.destroy();
+            }
+            window.history.back();
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', initTRTC);
+        
+        // Cleanup on unload
+        window.addEventListener('beforeunload', leaveLive);
+    </script>
+</body>
+</html>

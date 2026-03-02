@@ -106,6 +106,22 @@
             box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
         }
         
+        .btn-live {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            animation: pulse-live 2s infinite;
+        }
+        
+        @keyframes pulse-live {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+        
+        .btn-live:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+        
         /* Container */
         .container {
             max-width: 1200px;
@@ -520,6 +536,9 @@
             </div>
             
             <div class="header-actions">
+                <button class="btn btn-live" onclick="goToLive()">
+                    <i class="fas fa-video"></i> Live Stream
+                </button>
                 <button class="btn btn-primary" onclick="goToWallet()">
                     <i class="fas fa-wallet"></i> Wallet
                 </button>
@@ -667,6 +686,16 @@
         // Wallet
         function goToWallet() {
             window.location.href = '/wallet.html';
+        }
+        
+        // Live Stream (NEW - Tencent TRTC)
+        function goToLive() {
+            // Generate user ID
+            const userId = `${clubName.toLowerCase()}_${Math.random().toString(36).substring(2, 8)}`;
+            
+            // Redirect to TRTC live page
+            const url = `/trtc-live.html?club=${encodeURIComponent(clubName)}&logo=${encodeURIComponent(clubLogo)}&user=${userId}`;
+            window.location.href = url;
         }
         
         // Generate upcoming events (next 30 days)
