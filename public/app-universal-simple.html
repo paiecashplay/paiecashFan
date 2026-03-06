@@ -1555,6 +1555,179 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* ========== MODE TOMBOLA ========== */
+        .tombola-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 20px 0 10px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tombola-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .tombola-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .tombola-stat-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .tombola-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f59e0b;
+            margin-bottom: 5px;
+        }
+        
+        .tombola-stat-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tombola-tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 5px;
+        }
+        
+        .tombola-tab-btn {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .tombola-tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        
+        .tombola-tab-btn.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #f59e0b;
+            color: white;
+        }
+        
+        .tombola-content-wrapper {
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .tombola-tab-content {
+            display: none;
+        }
+        
+        .tombola-tab-content.active {
+            display: block;
+        }
+        
+        .tombola-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            padding: 10px 5px;
+        }
+        
+        .tombola-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .tombola-select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        .tombola-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .tombola-loading i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #f59e0b;
+        }
+        
+        .tombola-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .tombola-empty i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 768px) {
+            .tombola-stats-row {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .tombola-stat-box {
+                padding: 10px;
+            }
+            
+            .tombola-stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .tombola-tabs-nav {
+                gap: 5px;
+            }
+            
+            .tombola-tab-btn {
+                padding: 10px 8px;
+                font-size: 0.75rem;
+            }
+            
+            .tombola-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         /* ========== TOMBOLA IMPORTS ========== */
         @import url('/static/tombola.css');
     </style>
@@ -2827,6 +3000,146 @@ function openNumbersMode() {
     updateNumbersDisplay();
 }
 
+// ========== MODE TOMBOLA ==========
+function openTombolaMode() {
+    document.getElementById('lotoHome').style.display = 'none';
+    document.getElementById('lotoTombola').style.display = 'block';
+    
+    // Charger les données Tombola
+    loadTombolaStats();
+    loadTombolaCampaigns();
+}
+
+function switchTombolaTab(tabName) {
+    // Désactiver tous les tabs
+    document.querySelectorAll('.tombola-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelectorAll('.tombola-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Activer le tab sélectionné
+    event.target.closest('.tombola-tab-btn').classList.add('active');
+    document.getElementById('tombola-tab-' + tabName).classList.add('active');
+    
+    // Charger les données selon le tab
+    if (tabName === 'campaigns') {
+        loadTombolaCampaigns();
+    } else if (tabName === 'catalogue') {
+        loadTombolaLots();
+    } else if (tabName === 'my-tickets') {
+        loadMyTombolaTickets();
+    }
+}
+
+async function loadTombolaStats() {
+    try {
+        const response = await fetch('/api/tombola/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('tombola-campaigns').textContent = data.stats.active_campaigns;
+            document.getElementById('tombola-lots').textContent = data.stats.total_lots;
+            document.getElementById('tombola-participations').textContent = data.stats.total_participations;
+        }
+    } catch (error) {
+        console.error('Erreur chargement stats tombola:', error);
+    }
+}
+
+async function loadTombolaCampaigns() {
+    const container = document.getElementById('tombola-campaigns-list');
+    container.innerHTML = '<div class="tombola-loading"><i class="fas fa-spinner fa-spin"></i><p>Chargement...</p></div>';
+    
+    try {
+        const response = await fetch('/api/tombola/campaigns');
+        const data = await response.json();
+        
+        if (data.success && data.campaigns.length > 0) {
+            container.innerHTML = data.campaigns.map(campaign => `
+                <div class="game-option-card" style="cursor: pointer;" onclick="viewTombolaCampaign('${campaign.id}')">
+                    <div class="game-option-icon">🎁</div>
+                    <h3 class="game-option-title" style="font-size: 1rem;">${campaign.prize_name}</h3>
+                    <p class="game-option-desc">
+                        💰 Valeur: ${campaign.prize_value}€<br>
+                        🎫 Mise: ${campaign.entry_fee}€<br>
+                        👥 ${campaign.current_participants}/${campaign.target_participants} participants<br>
+                        📅 Tirage: ${new Date(campaign.draw_datetime).toLocaleDateString('fr-FR')}
+                    </p>
+                    <button class="game-option-btn">PARTICIPER</button>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Aucun tirage actif</p></div>';
+        }
+    } catch (error) {
+        console.error('Erreur chargement campagnes:', error);
+        container.innerHTML = '<div class="tombola-empty"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p></div>';
+    }
+}
+
+async function loadTombolaLots() {
+    const container = document.getElementById('tombola-lots-list');
+    const category = document.getElementById('tombola-category-filter').value;
+    
+    container.innerHTML = '<div class="tombola-loading"><i class="fas fa-spinner fa-spin"></i><p>Chargement...</p></div>';
+    
+    try {
+        const url = category ? `/api/tombola/lots/category/${category}` : '/api/tombola/lots';
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success && data.lots.length > 0) {
+            container.innerHTML = data.lots.map(lot => `
+                <div class="game-option-card">
+                    <div class="game-option-icon">${getCategoryIcon(lot.category)}</div>
+                    <h3 class="game-option-title" style="font-size: 0.95rem;">${lot.name}</h3>
+                    <p class="game-option-desc">
+                        💰 Valeur: ${lot.perceived_value}€<br>
+                        📦 Catégorie: ${lot.category}<br>
+                        ${lot.description || ''}
+                    </p>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Aucun lot dans cette catégorie</p></div>';
+        }
+    } catch (error) {
+        console.error('Erreur chargement lots:', error);
+        container.innerHTML = '<div class="tombola-empty"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p></div>';
+    }
+}
+
+function filterTombolaLots() {
+    loadTombolaLots();
+}
+
+function loadMyTombolaTickets() {
+    const container = document.getElementById('tombola-my-tickets-list');
+    container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Vous n\'avez pas encore participé</p><button class="game-option-btn" onclick="switchTombolaTab(\'campaigns\')">Voir les tirages actifs</button></div>';
+}
+
+function viewTombolaCampaign(campaignId) {
+    alert('🎰 Participation au tirage\n\nFonctionnalité en cours de développement.\n\nVous pourrez bientôt acheter vos tickets et participer aux tirages !');
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'merchandise': '🎽',
+        'billetterie': '🎫',
+        'cash': '💰',
+        'automobile': '🏍️',
+        'experience': '✨',
+        'digital': '📱',
+        'superbonus': '🎁',
+        'boutique': '🛍️',
+        'hospitalite': '🏨',
+        'voyage': '✈️'
+    };
+    return icons[category] || '🎁';
+}
+
 // ========== COMPTE À REBOURS ==========
 function startLotoCountdown() {
     const countdownEl = document.getElementById('lotoCountdown');
@@ -4093,6 +4406,13 @@ function shareResult() {
                         <p class="game-option-desc">Choisissez 5 numéros de 1 à 49 et tentez de remporter le jackpot !</p>
                         <button class="game-option-btn">JOUER MAINTENANT!</button>
                     </div>
+                    
+                    <div class="game-option-card" onclick="openTombolaMode()">
+                        <div class="game-option-icon">🎰</div>
+                        <h3 class="game-option-title">TOMBOLA</h3>
+                        <p class="game-option-desc">Participez aux tirages quotidiens et gagnez des lots incroyables : cash, véhicules, expériences VIP !</p>
+                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                    </div>
                 </div>
 
                 <!-- Game Rules -->
@@ -4297,6 +4617,94 @@ function shareResult() {
                         <button class="result-btn" onclick="shareResult()">
                             <i class="fas fa-share"></i> Partager
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÉCRAN 4: MODE TOMBOLA -->
+            <div id="lotoTombola" class="loto-screen" style="display: none;">
+                <button class="loto-back" onclick="backToLotoHome()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="loto-close" onclick="closeLoto()">
+                    &times;
+                </button>
+
+                <h2 class="tombola-title">🎰 TOMBOLA QUOTIDIENNE</h2>
+                <p class="tombola-subtitle">Participez aux tirages et gagnez des lots incroyables !</p>
+
+                <!-- Stats Tombola -->
+                <div class="tombola-stats-row">
+                    <div class="tombola-stat-box">
+                        <div class="tombola-stat-value" id="tombola-campaigns">-</div>
+                        <div class="tombola-stat-label">Tirages actifs</div>
+                    </div>
+                    <div class="tombola-stat-box">
+                        <div class="tombola-stat-value" id="tombola-lots">-</div>
+                        <div class="tombola-stat-label">Lots disponibles</div>
+                    </div>
+                    <div class="tombola-stat-box">
+                        <div class="tombola-stat-value" id="tombola-participations">-</div>
+                        <div class="tombola-stat-label">Participations</div>
+                    </div>
+                </div>
+
+                <!-- Tabs Tombola -->
+                <div class="tombola-tabs-nav">
+                    <button class="tombola-tab-btn active" onclick="switchTombolaTab('campaigns')">
+                        <i class="fas fa-trophy"></i> Tirages
+                    </button>
+                    <button class="tombola-tab-btn" onclick="switchTombolaTab('catalogue')">
+                        <i class="fas fa-gift"></i> Catalogue
+                    </button>
+                    <button class="tombola-tab-btn" onclick="switchTombolaTab('my-tickets')">
+                        <i class="fas fa-ticket-alt"></i> Mes Tickets
+                    </button>
+                </div>
+
+                <!-- Content Tabs -->
+                <div class="tombola-content-wrapper">
+                    <!-- Tab 1: Campaigns -->
+                    <div id="tombola-tab-campaigns" class="tombola-tab-content active">
+                        <div id="tombola-campaigns-list" class="tombola-cards-grid">
+                            <div class="tombola-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Chargement des tirages...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Catalogue -->
+                    <div id="tombola-tab-catalogue" class="tombola-tab-content">
+                        <select id="tombola-category-filter" class="tombola-select" onchange="filterTombolaLots()">
+                            <option value="">Toutes catégories</option>
+                            <option value="merchandise">🎽 Merchandising</option>
+                            <option value="billetterie">🎫 Billetterie</option>
+                            <option value="cash">💰 Cash</option>
+                            <option value="automobile">🏍️ Véhicules</option>
+                            <option value="experience">✨ Expériences</option>
+                            <option value="digital">📱 Digital</option>
+                            <option value="superbonus">🎁 Super Bonus</option>
+                        </select>
+                        <div id="tombola-lots-list" class="tombola-cards-grid">
+                            <div class="tombola-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Chargement du catalogue...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: My Tickets -->
+                    <div id="tombola-tab-my-tickets" class="tombola-tab-content">
+                        <div id="tombola-my-tickets-list" class="tombola-cards-grid">
+                            <div class="tombola-empty">
+                                <i class="fas fa-inbox"></i>
+                                <p>Vous n'avez pas encore participé</p>
+                                <button class="game-option-btn" onclick="switchTombolaTab('campaigns')">
+                                    Voir les tirages actifs
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
