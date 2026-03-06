@@ -520,6 +520,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/static/tombola.css">
 </head>
 <body>
     <!-- Header -->
@@ -590,6 +591,90 @@
             <button class="loto-cta" onclick="playLoto()">
                 <i class="fas fa-ticket-alt"></i> Jouer Maintenant
             </button>
+        </section>
+        
+        <!-- TOMBOLA Section - Système de Loterie Quotidienne -->
+        <section class="tombola-section" id="tombola-section">
+            <div class="tombola-header">
+                <div class="tombola-title">
+                    <div class="tombola-icon">🎰</div>
+                    <div>
+                        <h2>Tombola Quotidienne</h2>
+                        <p class="tombola-subtitle">Gagnez des lots exceptionnels chaque jour !</p>
+                    </div>
+                </div>
+                
+                <div class="tombola-stats">
+                    <div class="tombola-stat-item">
+                        <span class="tombola-stat-value" id="tombola-active-campaigns">0</span>
+                        <span class="tombola-stat-label">Tirages Actifs</span>
+                    </div>
+                    <div class="tombola-stat-item">
+                        <span class="tombola-stat-value" id="tombola-total-lots">0</span>
+                        <span class="tombola-stat-label">Lots Disponibles</span>
+                    </div>
+                    <div class="tombola-stat-item">
+                        <span class="tombola-stat-value" id="tombola-total-clubs">0</span>
+                        <span class="tombola-stat-label">Clubs Partenaires</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tombola-tabs">
+                <button class="tombola-tab active" onclick="TombolaUI.switchTab('campaigns')">
+                    <i class="fas fa-trophy"></i> Tirages Actifs
+                </button>
+                <button class="tombola-tab" onclick="TombolaUI.switchTab('lots')">
+                    <i class="fas fa-gift"></i> Catalogue des Lots
+                </button>
+                <button class="tombola-tab" onclick="TombolaUI.switchTab('my-participations')">
+                    <i class="fas fa-ticket-alt"></i> Mes Participations
+                </button>
+            </div>
+            
+            <!-- Tirages actifs -->
+            <div class="tombola-campaigns-container" id="tombola-campaigns-container" style="display: block;">
+                <div class="tombola-campaigns-list" id="tombola-campaigns-list">
+                    <!-- Campagnes chargées dynamiquement via JavaScript -->
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
+                        <p style="margin-top: 15px;">Chargement des tirages...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Catalogue des lots -->
+            <div class="tombola-lots-container" id="tombola-lots-container" style="display: none;">
+                <div id="tombola-lots-grid">
+                    <!-- Lots chargés dynamiquement via JavaScript -->
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
+                        <p style="margin-top: 15px;">Chargement du catalogue...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mes participations -->
+            <div class="tombola-my-participations-container" id="tombola-my-participations-container" style="display: none;">
+                <div id="tombola-my-participations-list">
+                    <!-- Participations chargées dynamiquement via JavaScript -->
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <i class="fas fa-info-circle" style="font-size: 32px;"></i>
+                        <p style="margin-top: 15px;">Vous n'avez pas encore de participations</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tombola-actions">
+                <button class="btn-tombola-action" onclick="TombolaUI.showRules()">
+                    <i class="fas fa-file-contract"></i>
+                    Règlement
+                </button>
+                <button class="btn-tombola-action" onclick="TombolaUI.showWinners()">
+                    <i class="fas fa-trophy"></i>
+                    Derniers Gagnants
+                </button>
+            </div>
         </section>
         
         <!-- Events Calendar -->
@@ -821,5 +906,6 @@
             renderEvents(allEvents);
         });
     </script>
+    <script src="/static/tombola.js"></script>
 </body>
 </html>
