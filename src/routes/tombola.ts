@@ -7,6 +7,91 @@ type Bindings = {
 const tombola = new Hono<{ Bindings: Bindings }>()
 
 // ==========================================
+// UTILS - Calcul automatique prix d'entrée
+// ==========================================
+
+/**
+ * Calcule le prix d'entrée optimal basé sur la valeur du lot
+ * Formule: Prix entrée = (Valeur lot × Coefficient) ÷ Participants cibles
+ * 
+ * Coefficients par tranche:
+ * - < 100€ : 1% (petits lots)
+ * - 100-500€ : 2% (lots moyens)
+ * - 500-2000€ : 5% (gros lots)
+ * - > 2000€ : 10% (jackpots)
+ */
+function calculateEntryFee(lotValue: number, targetParticipants: number): number {
+  // Déterminer le coefficient selon la valeur du lot
+  let coefficient: number;
+  
+  if (lotValue < 100) {
+    coefficient = 0.015; // 1.5% pour petits lots (augmenté)
+  } else if (lotValue < 500) {
+    coefficient = 0.025; // 2.5% pour lots moyens (augmenté)
+  } else if (lotValue < 2000) {
+    coefficient = 0.08;  // 8% pour gros lots (augmenté)
+  } else {
+    coefficient = 0.12;  // 12% pour jackpots (augmenté)
+  }
+  
+  // Calcul: (Valeur × Coefficient) ÷ Participants
+  const calculatedFee = (lotValue * coefficient) / targetParticipants;
+  
+  // 2. Vérification de rentabilité minimale (30% de marge)
+  // Revenu minimum requis = lotValue × 1.3 (coût + 30%)
+  const minRevenueRequired = lotValue * 1.3;
+  const minFeeForProfitability = minRevenueRequired / targetParticipants;
+  
+  // Prendre le maximum entre calcul attractif et rentabilité garantie
+  const safeFee = Math.max(calculatedFee, minFeeForProfitability);
+  
+  // Arrondir à 0.50€ près (0.50, 1.00, 1.50, 2.00, etc.)
+  const roundedFee = Math.ceil(safeFee * 2) / 2;
+  
+  // Minimum 0.50€, Maximum 50€
+  return Math.max(0.50, Math.min(50.00, roundedFee));
+}
+
+/**
+ * Calcule le nombre minimum de participants pour couvrir le coût du lot
+ */
+function calculateMinParticipants(costToClub: number, entryFee: number): number {
+  if (costToClub === 0) {
+    // Lot sponsorisé: minimum symbolique
+    return Math.ceil(entryFee * 100); // Ex: 1€ → 100 participants
+  }
+  
+  // Calcul: Coût ÷ Prix entrée (avec marge 20%)
+  const minParticipants = Math.ceil((costToClub * 1.2) / entryFee);
+  
+  // Minimum 50 participants, maximum 50000
+  return Math.max(50, Math.min(50000, minParticipants));
+}
+
+/**
+ * Affiche les infos de calcul pour debug
+ */
+function getCalculationDetails(lotValue: number, costToClub: number, targetParticipants: number) {
+  const entryFee = calculateEntryFee(lotValue, targetParticipants);
+  const minParticipants = calculateMinParticipants(costToClub, entryFee);
+  const totalRevenue = entryFee * targetParticipants;
+  const profit = totalRevenue - costToClub;
+  const profitMargin = costToClub > 0 ? ((profit / costToClub) * 100).toFixed(1) : 'N/A';
+  
+  return {
+    lot_value: lotValue,
+    cost_to_club: costToClub,
+    entry_fee: entryFee,
+    target_participants: targetParticipants,
+    min_participants: minParticipants,
+    total_revenue: totalRevenue,
+    profit: profit,
+    profit_margin: `${profitMargin}%`,
+    coefficient: lotValue < 100 ? '1%' : lotValue < 500 ? '2%' : lotValue < 2000 ? '5%' : '10%'
+  };
+}
+
+// ==========================================
 // LOTS - Catalogue
 // ==========================================
 
@@ -210,8 +295,7 @@ tombola.post('/campaigns', async (c) => {
     organization_id,
     lot_id,
     name,
-    entry_fee,
-    target_participants,
+    target_participants = 100, // Valeur par défaut
     start_datetime,
     draw_datetime
   } = body
@@ -226,19 +310,50 @@ tombola.post('/campaigns', async (c) => {
       return c.json({ success: false, error: 'Lot not found' }, 404)
     }
     
-    // Calculer min_participants basé sur le coût
-    const minParticipants = Math.ceil((lot.cost_to_club as number) / entry_fee)
+    // CALCUL AUTOMATIQUE du prix d'entrée avec coefficient
+    const lotValue = lot.perceived_value as number
+    const costToClub = lot.cost_to_club as number
     
-    // Créer allocation
-    const allocationId = `alloc-${Date.now()}`
-    await DB.prepare(`
-      INSERT INTO lot_allocations (
-        id, lot_id, organization_id, allocation_date,
-        min_participants, status
-      ) VALUES (?, ?, ?, date('now'), ?, 'active')
-    `).bind(allocationId, lot_id, organization_id, minParticipants).run()
+    console.log('📊 Lot data:', { lotValue, costToClub, target_participants })
     
-    // Créer campagne
+    const entryFee = calculateEntryFee(lotValue, target_participants)
+    const minParticipants = calculateMinParticipants(costToClub, entryFee)
+    
+    console.log('💰 Calculs:', { entryFee, minParticipants })
+    
+    // Détails de calcul pour logs
+    try {
+      const calcDetails = getCalculationDetails(lotValue, costToClub, target_participants)
+      console.log('📈 Détails:', calcDetails)
+    } catch (e) {
+      console.log('⚠️  Warning: Could not generate calculation details')
+    }
+    
+    // Vérifier si allocation existe pour aujourd'hui
+    let allocation = await DB.prepare(`
+      SELECT * FROM lot_allocations 
+      WHERE lot_id = ? AND organization_id = ? AND allocation_date = date('now')
+    `).bind(lot_id, organization_id).first()
+    
+    let allocationId: string
+    
+    if (allocation) {
+      // Utiliser allocation existante
+      allocationId = allocation.id as string
+      console.log('♻️  Allocation existante réutilisée:', allocationId)
+    } else {
+      // Créer nouvelle allocation
+      allocationId = `alloc-${Date.now()}`
+      await DB.prepare(`
+        INSERT INTO lot_allocations (
+          id, lot_id, organization_id, allocation_date,
+          min_participants, status
+        ) VALUES (?, ?, ?, date('now'), ?, 'active')
+      `).bind(allocationId, lot_id, organization_id, minParticipants).run()
+      console.log('✨ Nouvelle allocation créée:', allocationId)
+    }
+    
+    // Créer campagne avec prix calculé
     const campaignId = `campaign-${Date.now()}`
     await DB.prepare(`
       INSERT INTO campaigns (
@@ -254,18 +369,22 @@ tombola.post('/campaigns', async (c) => {
       name,
       lot.category,
       lot.name,
-      lot.perceived_value,
-      entry_fee,
+      lotValue,
+      entryFee, // Prix calculé automatiquement
       target_participants,
       minParticipants,
       start_datetime,
       draw_datetime
     ).run()
     
+    // Calcul des détails pour réponse
+    const calcDetails = getCalculationDetails(lotValue, costToClub, target_participants)
+    
     return c.json({
       success: true,
       campaign_id: campaignId,
-      message: 'Campaign created successfully'
+      calculation: calcDetails,
+      message: `Campagne créée: ${lot.name} - Mise ${entryFee}€ pour lot ${lotValue}€`
     })
   } catch (error) {
     return c.json({
