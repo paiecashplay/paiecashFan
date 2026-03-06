@@ -12,6 +12,7 @@ import costreaming from './routes/costreaming'
 import vendorStreams from './routes/vendorStreams'
 import signaling from './routes/signaling'
 import trtc from './routes/trtc'
+import tombola from './routes/tombola'
 
 const app = new Hono()
 
@@ -23,6 +24,9 @@ app.route('/ws', signaling)
 
 // Mount Tencent TRTC routes (NEW)
 app.route('/api/trtc', trtc)
+
+// Mount Tombola routes (NEW - Système de loterie quotidienne)
+app.route('/api/tombola', tombola)
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)
