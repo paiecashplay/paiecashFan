@@ -3,419 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">PaieCashFan - Club</title>
+    <title>PaieCashFan - Super App v6.1 Complete</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- 🎬 STORIES CSS -->
+    <link rel="stylesheet" href="css/stories.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --primary: #1abc9c;
-            --secondary: #6b5dd3;
-            --loto-orange: #f59e0b;
-            --dark-bg: #0D0D40;
-            --card-bg: #1a1a2e;
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gold: #fbbf24;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: rgba(255, 255, 255, 0.05);
             --text: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.7);
-            --success: #10b981;
-            --danger: #ef4444;
             --border: rgba(255, 255, 255, 0.1);
         }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2332 100%);
+            background: var(--background);
             color: var(--text);
-            min-height: 100vh;
+            overflow-x: hidden;
             padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
         }
         
-        /* Header */
-        .header {
-            background: rgba(13, 13, 64, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border);
+        /* HEADER */
+        .app-header {
             position: sticky;
             top: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
             z-index: 1000;
         }
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .club-badge {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .club-logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-        
-        .club-info h1 {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-        
-        .club-info p {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
-        }
-        
-        .btn-live {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            animation: pulse-live 2s infinite;
-        }
-        
-        @keyframes pulse-live {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-        }
-        
-        .btn-live:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
-        }
-        
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-        
-        /* LOTO Section */
-        .loto-section {
-            background: linear-gradient(135deg, var(--loto-orange), #d97706);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .loto-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-        
-        .loto-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .loto-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .loto-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            animation: rotate 3s linear infinite;
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .loto-title h2 {
-            font-size: 28px;
-            font-weight: 800;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .loto-subtitle {
-            font-size: 16px;
-            opacity: 0.95;
-        }
-        
-        .loto-stats {
-            text-align: right;
-        }
-        
-        .loto-stat {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .loto-jackpot {
-            font-size: 32px;
-            font-weight: 800;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Price Options */
-        .price-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .price-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .price-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-        
-        .price-card.selected {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: white;
-        }
-        
-        .price-value {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-        
-        .price-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-        
-        .price-chances {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .loto-cta {
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--loto-orange);
-            padding: 15px 40px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            width: 100%;
-        }
-        
-        .loto-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            background: white;
-        }
-        
-        /* Events Calendar */
-        .events-section {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .section-title {
-            font-size: 24px;
-            font-weight: 800;
+        .header-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
         
-        .section-title i {
-            color: var(--primary);
-        }
-        
-        .filter-tabs {
+        .club-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
         
-        .filter-tab {
-            padding: 8px 16px;
-            border-radius: 8px;
+        .club-name {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--card);
             border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 600;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
         }
         
-        .filter-tab:hover,
-        .filter-tab.active {
-            background: var(--primary);
+        .header-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--secondary);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* LANG SELECTOR - CODE MINUSCULE */
+        .lang-display {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: lowercase !important;
+        }
+        
+        /* STORIES SECTION */
+        .stories-section {
+            padding: 15px 0 15px 15px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .stories-section::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            padding-right: 15px;
+        }
+        
+        .story-item {
+            flex-shrink: 0;
+            width: 70px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .story-ring {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--warning));
+        }
+        
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--background);
+            background-size: cover;
+            background-position: center;
+            background-color: var(--surface);
+        }
+        
+        .story-name {
+            font-size: 11px;
+            margin-top: 6px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+        
+        /* LEFT ACTION BAR - Gamification en haut */
+        .left-actions {
+            position: fixed;
+            left: 15px;
+            top: 45%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+        
+        .action-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .action-btn i {
+            font-size: 20px;
+            color: var(--text);
+        }
+        
+        .action-count {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        /* GAMIFICATION BUTTON - En haut à gauche */
+        .gamification-btn {
+            background: linear-gradient(135deg, var(--gold), var(--warning));
+            border-color: var(--gold);
+            animation: glowGold 2s infinite;
+        }
+        
+        @keyframes glowGold {
+            0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+        }
+        
+        .gamification-btn i {
+            color: #1a1a2e !important;
+        }
+        
+        .gamification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--background);
+        }
+        
+        /* LOTO BUTTON */
+        .loto-btn {
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            border-color: #FF6B35;
+            animation: glowOrange 2s infinite;
+        }
+        
+        @keyframes glowOrange {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.6); }
+        }
+        
+        .loto-btn i {
+            color: #ffffff !important;
+        }
+        
+        .loto-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: #E91E63;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--background);
             color: white;
-            border-color: var(--primary);
         }
         
-        /* Event Cards */
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        
-        .event-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
+        /* BALANCE CARDS */
+        .balance-section {
             padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1));
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
         }
         
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            border-color: var(--primary);
-        }
-        
-        .event-date {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            color: var(--primary);
+        .balance-label {
+            font-size: 12px;
             font-weight: 600;
-        }
-        
-        .event-date i {
-            font-size: 18px;
-        }
-        
-        .event-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .event-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        
-        .event-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .event-prize {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--loto-orange);
-            font-weight: 700;
-        }
-        
-        .event-participants {
+            opacity: 0.7;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 14px;
+        }
+        
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        
+        .balance-subtitle {
+            font-size: 10px;
+            opacity: 0.5;
+        }
+        
+        /* TRANSACTIONS EN TEMPS RÉEL */
+        .transactions-live {
+            padding: 0 20px 20px;
+        }
+        
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .transactions-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .transaction-item {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .transaction-time {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: 900;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--success);
+        }
+        
+        .transaction-amount.negative {
+            color: var(--secondary);
+        }
+        
+        /* CONTAINER */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* SECTIONS */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* TAB BAR */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px 0;
+            z-index: 1000;
+        }
+        
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        
+        .tab-item:active {
+            transform: scale(0.95);
+        }
+        
+        .tab-item i {
+            font-size: 22px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .tab-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .tab-label {
+            font-size: 11px;
+            font-weight: 600;
             color: var(--text-secondary);
         }
         
-        /* Share Modal */
+        .tab-item.active .tab-label {
+            color: var(--primary);
+        }
+        
+        /* PROFIL SERVICES */
+        .profil-section {
+            padding: 20px;
+        }
+        
+        .service-group {
+            margin-bottom: 30px;
+        }
+        
+        .service-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .service-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .service-item {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .service-item:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .service-desc {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* MODALS */
         .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
             z-index: 2000;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
         .modal.active {
@@ -423,489 +569,3860 @@
         }
         
         .modal-content {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2f45 100%);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 450px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
         }
         
         .modal-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: none;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
             border: none;
-            color: var(--text);
-            font-size: 24px;
+            color: white;
             cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-        
-        .modal-close:hover {
-            opacity: 1;
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .share-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .share-btn {
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .modal-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .modal-item:hover {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .modal-item-title {
             font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
         
-        .share-btn:hover {
-            transform: translateY(-2px);
+        .modal-item-desc {
+            font-size: 13px;
+            opacity: 0.7;
         }
         
-        .share-btn.facebook {
-            background: #1877f2;
+        .modal-item-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--success);
             color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
         }
         
-        .share-btn.twitter {
-            background: #1da1f2;
-            color: white;
-        }
+        /* ========== LOTO MODAL SYSTEM ========== */
+:root {
+    --loto-primary: var(--loto-primary);
+    --loto-secondary: var(--loto-secondary);
+    --loto-gradient: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    --loto-accent: var(--loto-primary);
+    --loto-glow: var(--loto-glow);
+}
+
+.loto-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.loto-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.loto-modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    border-radius: 24px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loto-screen {
+    padding: 24px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loto-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.loto-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.loto-back {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.loto-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-4px);
+}
+
+/* ========== PAGE D'ACCUEIL ========== */
+.loto-home-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.loto-home-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--loto-primary);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px var(--loto-glow);
+}
+
+.loto-home-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.loto-charity {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-bottom: 8px;
+}
+
+.loto-charity i {
+    color: #ef4444;
+}
+
+.loto-charity span {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.loto-charity-detail {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+/* Streak Section */
+.loto-streak {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.streak-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.streak-header i {
+    color: var(--loto-secondary);
+}
+
+.streak-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+}
+
+.streak-countdown {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--loto-secondary);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.streak-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.streak-day {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.streak-day.active {
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
+}
+
+.day-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.day-status {
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+}
+
+/* Game Options */
+.loto-game-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.game-option-card {
+    background: linear-gradient(135deg, var(--loto-glow), rgba(5, 150, 105, 0.1));
+    border: 2px solid var(--loto-glow);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-option-card:hover {
+    background: linear-gradient(135deg, var(--loto-glow), rgba(5, 150, 105, 0.2));
+    border-color: var(--loto-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--loto-glow);
+}
+
+.game-option-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.game-option-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.game-option-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.game-option-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
+    border: none;
+    border-radius: 12px;
+    color: #1a1a2e;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-option-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4);
+}
+
+.loto-rules {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.loto-rules:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.loto-rules i {
+    color: var(--loto-primary);
+}
+
+.loto-rules span {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+/* ========== MODE SCRATCH ========== */
+.scratch-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--loto-primary);
+    text-align: center;
+    margin-bottom: 24px;
+    margin-top: 40px;
+}
+
+.scratch-tickets {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.scratch-ticket-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.scratch-ticket-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--loto-primary);
+    transform: translateX(4px);
+}
+
+.scratch-ticket-card.popular {
+    border-color: var(--loto-secondary);
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+}
+
+.ticket-badge {
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
+    color: #1a1a2e;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ticket-icon {
+    font-size: 32px;
+}
+
+.ticket-price {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--loto-primary);
+    min-width: 80px;
+}
+
+.ticket-bonus {
+    font-size: 14px;
+    color: var(--loto-secondary);
+    font-weight: 700;
+}
+
+.ticket-info {
+    flex: 1;
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+.ticket-chances {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.scratch-buy-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px var(--loto-glow);
+}
+
+.scratch-buy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--loto-glow);
+}
+
+.scratch-balance {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 12px;
+}
+
+/* Scratch Card */
+.scratch-card-container {
+    text-align: center;
+}
+
+.scratch-timer {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--loto-secondary);
+    margin-bottom: 16px;
+}
+
+.scratch-ticket-info {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: white;
+}
+
+.scratch-canvas {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    border-radius: 16px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.scratch-instruction {
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    margin-top: 16px;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Result */
+.scratch-result {
+    text-align: center;
+}
+
+.result-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.result-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--loto-secondary);
+    margin-bottom: 16px;
+}
+
+.result-amount {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--loto-primary);
+    margin-bottom: 8px;
+}
+
+.result-currency {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 24px;
+}
+
+.result-details {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    color: white;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-row.total {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--loto-primary);
+}
+
+.result-multiplier {
+    color: var(--loto-secondary);
+    font-weight: 700;
+}
+
+.result-balance {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.result-charity {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+}
+
+.result-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.result-btn {
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.result-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.result-btn.primary {
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
+    grid-column: 1 / -1;
+}
+
+/* ========== MODE LOTO CHIFFRES ========== */
+.numbers-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--loto-primary);
+    text-align: center;
+    margin-bottom: 12px;
+    margin-top: 40px;
+}
+
+.numbers-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.numbers-gains-table {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.gain-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gain-item.highlight {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+    border-color: var(--loto-secondary);
+}
+
+.gain-item span {
+    display: block;
+    font-size: 14px;
+    color: var(--loto-primary);
+    margin-top: 4px;
+}
+
+.numbers-selection {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.numbers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.numbers-header span {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+.numbers-random-btn {
+    padding: 8px 16px;
+    background: var(--loto-glow);
+    border: 1px solid var(--loto-primary);
+    border-radius: 8px;
+    color: var(--loto-primary);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.numbers-random-btn:hover {
+    background: var(--loto-glow);
+}
+
+.numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.number-btn {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.number-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--loto-primary);
+}
+
+.number-btn.selected {
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-color: var(--loto-primary);
+    transform: scale(1.1);
+}
+
+.numbers-add-line-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--loto-glow);
+    border: 1px solid var(--loto-primary);
+    border-radius: 12px;
+    color: var(--loto-primary);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.numbers-add-line-btn:hover {
+    background: var(--loto-glow);
+}
+
+.numbers-lines {
+    margin-bottom: 24px;
+}
+
+.numbers-lines h3 {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.empty-lines {
+    text-align: center;
+    padding: 24px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+}
+
+.line-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.line-numbers {
+    display: flex;
+    gap: 8px;
+}
+
+.line-number {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.line-remove {
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.numbers-footer {
+    text-align: center;
+}
+
+.numbers-cost {
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.numbers-play-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--loto-primary), var(--loto-primary));
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px var(--loto-glow);
+    margin-bottom: 12px;
+}
+
+.numbers-play-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.numbers-play-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--loto-glow);
+}
+
+.numbers-charity {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.numbers-result {
+    text-align: center;
+}
+
+.winning-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.winning-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--loto-secondary), var(--loto-secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a2e;
+    font-weight: 900;
+    font-size: 20px;
+    animation: popIn 0.5s ease-out;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.user-lines-result {
+    margin: 24px 0;
+}
+
+.result-message {
+    margin: 24px 0;
+}
+
+.result-message h3 {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ef4444;
+    margin-bottom: 8px;
+}
+
+.result-message p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .loto-modal-content {
+        max-height: 95vh;
+    }
+    
+    .loto-home-title {
+        font-size: 28px;
+    }
+    
+    .loto-game-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .streak-calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+    
+    .streak-day {
+        padding: 8px 4px;
+    }
+    
+    .numbers-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+    
+    .number-btn {
+        font-size: 14px;
+    }
+    
+    .result-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-btn.primary {
+        grid-column: 1;
+    }
+}
+
         
-        .share-btn.whatsapp {
-            background: #25d366;
-            color: white;
-        }
-        
-        .share-btn.telegram {
-            background: #0088cc;
-            color: white;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .price-options {
+            
+            .ticket-price {
+                font-size: 24px;
+                min-width: 60px;
+            }
+            
+            .prizes-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .events-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .loto-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .loto-stats {
-                text-align: center;
-                margin-top: 15px;
-            }
         }
+        /* ========== TOMBOLA IMPORTS ========== */
+        @import url('/static/tombola.css');
     </style>
-    <link rel="stylesheet" href="/static/tombola.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="club-badge">
-                <div class="club-logo" id="clubLogo">
-                    <i class="fas fa-futbol"></i>
-                </div>
-                <div class="club-info">
-                    <h1 id="clubName">Club</h1>
-                    <p id="clubLeague">Ligue</p>
-                </div>
-            </div>
-            
-            <div class="header-actions">
-                <button class="btn btn-live" onclick="goToLive()">
-                    <i class="fas fa-video"></i> Live Stream
-                </button>
-                <button class="btn btn-primary" onclick="goToWallet()">
-                    <i class="fas fa-wallet"></i> Wallet
-                </button>
-            </div>
+
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-left">
+            <div class="club-logo" id="headerLogo">⚽</div>
+            <div class="club-name" id="headerClubName">AS Monaco</div>
         </div>
-    </header>
-    
-    <!-- Container -->
-    <div class="container">
-        <!-- LOTO Section -->
-        <section class="loto-section">
-            <div class="loto-header">
-                <div class="loto-title">
-                    <div class="loto-icon">
-                        <i class="fas fa-dice"></i>
-                    </div>
-                    <div>
-                        <h2>LOTO PaieCashFan</h2>
-                        <p class="loto-subtitle">Tentez votre chance chaque jour !</p>
-                    </div>
-                </div>
-                
-                <div class="loto-stats">
-                    <div class="loto-stat">Jackpot du jour</div>
-                    <div class="loto-jackpot">1 000 EUR</div>
-                </div>
-            </div>
+        <div class="header-right">
+            <!-- 🌍 Sélecteur I18N (généré dynamiquement) -->
+            <div id="languageSelector" style="margin-right: 10px;"></div>
             
-            <div class="price-options">
-                <div class="price-card" onclick="selectPrice(1)">
-                    <div class="price-value">1€</div>
-                    <div class="price-label">Ticket Simple</div>
-                    <div class="price-chances">1 chance sur 1000</div>
-                </div>
-                
-                <div class="price-card selected" onclick="selectPrice(5)">
-                    <div class="price-value">5€</div>
-                    <div class="price-label">Ticket Premium</div>
-                    <div class="price-chances">5 chances sur 1000</div>
-                </div>
-                
-                <div class="price-card" onclick="selectPrice(20)">
-                    <div class="price-value">20€</div>
-                    <div class="price-label">Ticket VIP</div>
-                    <div class="price-chances">20 chances sur 1000</div>
-                </div>
+            <div class="header-btn" onclick="toggleLanguageDropdown()" title="Changer la langue">
+                <span id="langDisplay" style="font-size: 24px;">🇫🇷</span>
             </div>
-            
-            <button class="loto-cta" onclick="playLoto()">
-                <i class="fas fa-ticket-alt"></i> Jouer Maintenant
-            </button>
-        </section>
-        
-        <!-- TOMBOLA Section - Système de Loterie Quotidienne -->
-        <section class="tombola-section" id="tombola-section">
-            <div class="tombola-header">
-                <div class="tombola-title">
-                    <div class="tombola-icon">🎰</div>
-                    <div>
-                        <h2>Tombola Quotidienne</h2>
-                        <p class="tombola-subtitle">Gagnez des lots exceptionnels chaque jour !</p>
-                    </div>
-                </div>
-                
-                <div class="tombola-stats">
-                    <div class="tombola-stat-item">
-                        <span class="tombola-stat-value" id="tombola-active-campaigns">0</span>
-                        <span class="tombola-stat-label">Tirages Actifs</span>
-                    </div>
-                    <div class="tombola-stat-item">
-                        <span class="tombola-stat-value" id="tombola-total-lots">0</span>
-                        <span class="tombola-stat-label">Lots Disponibles</span>
-                    </div>
-                    <div class="tombola-stat-item">
-                        <span class="tombola-stat-value" id="tombola-total-clubs">0</span>
-                        <span class="tombola-stat-label">Clubs Partenaires</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="tombola-tabs">
-                <button class="tombola-tab active" onclick="TombolaUI.switchTab('campaigns')">
-                    <i class="fas fa-trophy"></i> Tirages Actifs
-                </button>
-                <button class="tombola-tab" onclick="TombolaUI.switchTab('lots')">
-                    <i class="fas fa-gift"></i> Catalogue des Lots
-                </button>
-                <button class="tombola-tab" onclick="TombolaUI.switchTab('my-participations')">
-                    <i class="fas fa-ticket-alt"></i> Mes Participations
-                </button>
-            </div>
-            
-            <!-- Tirages actifs -->
-            <div class="tombola-campaigns-container" id="tombola-campaigns-container" style="display: block;">
-                <div class="tombola-campaigns-list" id="tombola-campaigns-list">
-                    <!-- Campagnes chargées dynamiquement via JavaScript -->
-                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
-                        <p style="margin-top: 15px;">Chargement des tirages...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Catalogue des lots -->
-            <div class="tombola-lots-container" id="tombola-lots-container" style="display: none;">
-                <div id="tombola-lots-grid">
-                    <!-- Lots chargés dynamiquement via JavaScript -->
-                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
-                        <p style="margin-top: 15px;">Chargement du catalogue...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Mes participations -->
-            <div class="tombola-my-participations-container" id="tombola-my-participations-container" style="display: none;">
-                <div id="tombola-my-participations-list">
-                    <!-- Participations chargées dynamiquement via JavaScript -->
-                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
-                        <i class="fas fa-info-circle" style="font-size: 32px;"></i>
-                        <p style="margin-top: 15px;">Vous n'avez pas encore de participations</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="tombola-actions">
-                <button class="btn-tombola-action" onclick="TombolaUI.showRules()">
-                    <i class="fas fa-file-contract"></i>
-                    Règlement
-                </button>
-                <button class="btn-tombola-action" onclick="TombolaUI.showWinners()">
-                    <i class="fas fa-trophy"></i>
-                    Derniers Gagnants
-                </button>
-            </div>
-        </section>
-        
-        <!-- Events Calendar -->
-        <section class="events-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    Événements à Venir
-                </h2>
-                
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterEvents('all')">Tous</button>
-                    <button class="filter-tab" onclick="filterEvents('week')">Cette semaine</button>
-                    <button class="filter-tab" onclick="filterEvents('month')">Ce mois</button>
-                </div>
-            </div>
-            
-            <div class="events-grid" id="eventsContainer">
-                <!-- Events will be dynamically loaded -->
-            </div>
-        </section>
-    </div>
-    
-    <!-- Share Modal -->
-    <div class="modal" id="shareModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeShareModal()">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <h3 class="modal-title">Partager sur les réseaux</h3>
-            
-            <div class="share-options">
-                <button class="share-btn facebook" onclick="shareOnFacebook()">
-                    <i class="fab fa-facebook"></i>
-                    Facebook
-                </button>
-                
-                <button class="share-btn twitter" onclick="shareOnTwitter()">
-                    <i class="fab fa-twitter"></i>
-                    Twitter
-                </button>
-                
-                <button class="share-btn whatsapp" onclick="shareOnWhatsApp()">
-                    <i class="fab fa-whatsapp"></i>
-                    WhatsApp
-                </button>
-                
-                <button class="share-btn telegram" onclick="shareOnTelegram()">
-                    <i class="fab fa-telegram"></i>
-                    Telegram
-                </button>
+            <div class="header-btn" onclick="openNotifications()">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge" id="notifCount">5</div>
             </div>
         </div>
     </div>
-    
-    <script>
-        // Parse URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const clubName = urlParams.get('club') || 'Club';
-        const clubLogo = urlParams.get('logo') || '⚽';
-        const sport = urlParams.get('sport') || 'Football';
-        const league = urlParams.get('league') || 'Ligue';
+
+    <!-- LEFT ACTION BAR - Gamification en haut -->
+    <div class="left-actions">
+        <div class="action-btn gamification-btn" onclick="openGamification()" title="Gamification">
+            <i class="fas fa-trophy"></i>
+            <div class="gamification-badge">🔥</div>
+        </div>
+        <div class="action-btn loto-btn" onclick="openLoto()" title="Loto">
+            <i class="fas fa-dice"></i>
+            <div class="loto-badge">1</div>
+        </div>
+        <div class="action-btn" onclick="handleLike()" title="J'aime">
+            <i class="fas fa-heart"></i>
+            <span class="action-count">2.4K</span>
+        </div>
+        <div class="action-btn" onclick="handleShare()" title="Partager">
+            <i class="fas fa-share"></i>
+            <span class="action-count">856</span>
+        </div>
+        <div class="action-btn" onclick="handleSearch()" title="Rechercher">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+
+    <div class="app-container">
         
-        // Set club info
-        document.getElementById('clubName').textContent = clubName;
-        document.getElementById('clubLeague').textContent = `${sport} - ${league}`;
-        document.getElementById('clubLogo').innerHTML = clubLogo;
-        document.getElementById('pageTitle').textContent = `${clubName} - PaieCashFan`;
-        
-        // Selected price
-        let selectedPrice = 5;
-        
-        // Select price
-        function selectPrice(price) {
-            selectedPrice = price;
-            
-            // Update UI
-            document.querySelectorAll('.price-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-        }
-        
-        // Play LOTO
-        let currentEventId = null;
-        
-        function playLoto(eventId = null) {
-            currentEventId = eventId;
-            const url = `/loto.html?club=${clubName}&price=${selectedPrice}${eventId ? `&event=${eventId}` : ''}`;
-            window.location.href = url;
-        }
-        
-        // Wallet
-        function goToWallet() {
-            window.location.href = '/wallet.html';
-        }
-        
-        // Live Stream (NEW - Tencent TRTC)
-        function goToLive() {
-            // Generate user ID
-            const userId = `${clubName.toLowerCase()}_${Math.random().toString(36).substring(2, 8)}`;
-            
-            // Redirect to TRTC live page
-            const url = `/trtc-live.html?club=${encodeURIComponent(clubName)}&logo=${encodeURIComponent(clubLogo)}&user=${userId}`;
-            window.location.href = url;
-        }
-        
-        // Generate upcoming events (next 30 days)
-        function generateEvents() {
-            const events = [];
-            const today = new Date();
-            
-            // Generate 10 upcoming events
-            for (let i = 1; i <= 10; i++) {
-                const eventDate = new Date(today);
-                eventDate.setDate(today.getDate() + i);
-                
-                const prizes = ['Maillot dédicacé', 'NFT Exclusif', '100 PCC', 'Billet VIP', 'Pack Famille', 'Weekend Club'];
-                const prizeValues = ['300€', '150€', '100€', '250€', '400€', '600€'];
-                
-                events.push({
-                    id: `event-${i}`,
-                    date: eventDate,
-                    title: `Tirage ${eventDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`,
-                    description: `Gagnez un ${prizes[Math.floor(Math.random() * prizes.length)]} d'une valeur de ${prizeValues[Math.floor(Math.random() * prizeValues.length)]}`,
-                    prize: prizeValues[Math.floor(Math.random() * prizeValues.length)],
-                    participants: Math.floor(Math.random() * 500) + 100
-                });
-            }
-            
-            return events;
-        }
-        
-        // Render events
-        function renderEvents(events) {
-            const container = document.getElementById('eventsContainer');
-            
-            container.innerHTML = events.map(event => `
-                <div class="event-card" onclick="playLoto('${event.id}')">
-                    <div class="event-date">
-                        <i class="fas fa-calendar-day"></i>
-                        <span>${event.date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+        <!-- STORIES SECTION -->
+        <div class="stories-section">
+            <div class="stories-container" id="storiesContainer"></div>
+        </div>
+
+        <!-- SECTION ACCUEIL -->
+        <div class="section active" id="section-accueil">
+            <!-- BALANCE CARDS -->
+            <div class="balance-section">
+                <div class="balance-card">
+                    <div class="balance-label">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Compte Bancaire</span>
                     </div>
-                    
-                    <h3 class="event-title">${event.title}</h3>
-                    
-                    <p class="event-description">${event.description}</p>
-                    
-                    <div class="event-footer">
-                        <div class="event-prize">
-                            <i class="fas fa-trophy"></i>
-                            <span>${event.prize}</span>
+                    <div class="balance-amount">1 250,50 €</div>
+                    <div class="balance-subtitle">Compte courant principal</div>
+                </div>
+                
+                <div class="balance-card">
+                    <div class="balance-label">
+                        <i class="fas fa-wallet"></i>
+                        <span>Wallet Crypto</span>
+                    </div>
+                    <div class="balance-amount">250,00 €</div>
+                    <div class="balance-subtitle">USDC • 0x1234...5678</div>
+                </div>
+            </div>
+            
+            <!-- 🎬 STORIES TEMPS RÉEL -->
+            <div id="storiesDisplay"></div>
+            
+            <!-- TRANSACTIONS EN TEMPS RÉEL -->
+            <div class="transactions-live">
+                <div class="transactions-header">
+                    <div class="transactions-title">
+                        <div class="live-indicator"></div>
+                        <span>Transactions en temps réel</span>
+                    </div>
+                    <button onclick="showSection('transactions')" style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 700; font-size: 13px;">Voir tout</button>
+                </div>
+                <div id="transactionsContainer"></div>
+            </div>
+        </div>
+
+        <!-- SECTION TRANSACTIONS -->
+        <div class="section" id="section-transactions">
+            <div class="profil-section">
+                <h3 class="service-title">💸 Historique des Transactions</h3>
+                <div id="transactionsHistoryContainer"></div>
+            </div>
+        </div>
+
+        <!-- SECTION CHAT -->
+        <div class="section" id="section-chat">
+            <div class="profil-section">
+                <h3 class="service-title">💬 Conversations</h3>
+                <div class="service-list">
+                    <div class="service-item">
+                        <div class="service-icon">👤</div>
+                        <div class="service-info">
+                            <div class="service-name">Marc Dubois</div>
+                            <div class="service-desc">Salut! Tu vas au match samedi?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION IA -->
+        <div class="section" id="section-ia">
+            <div class="profil-section">
+                <h3 class="service-title">🤖 Intelligence Artificielle</h3>
+                <div class="service-list">
+                    <div class="service-item">
+                        <div class="service-icon">🔮</div>
+                        <div class="service-info">
+                            <div class="service-name">Prédiction Match</div>
+                            <div class="service-desc">Monaco 68% de chances de victoire</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION PROFIL -->
+        <div class="section" id="section-profil">
+            <div class="profil-section">
+                
+                <!-- FINANCE & WALLET -->
+                <div class="service-group">
+                    <h3 class="service-title">💰 Finance & Wallet</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="alert('Wallet : Gérer vos cryptos USDC, EURC')">
+                            <div class="service-icon">💳</div>
+                            <div class="service-info">
+                                <div class="service-name">Wallet</div>
+                                <div class="service-desc">Gérer vos cryptos</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="alert('Épargne : Économiser et investir avec rendement 5%')">
+                            <div class="service-icon">💰</div>
+                            <div class="service-info">
+                                <div class="service-name">Épargne</div>
+                                <div class="service-desc">Économiser et investir</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="alert('Cartes Prépayées : Visa, Mastercard disponibles')">
+                            <div class="service-icon">💎</div>
+                            <div class="service-info">
+                                <div class="service-name">Cartes Prépayées</div>
+                                <div class="service-desc">Visa, Mastercard</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SERVICES PREMIUM -->
+                <div class="service-group">
+                    <h3 class="service-title">🌟 Services Premium</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="openEsimService()">
+                            <div class="service-icon">📡</div>
+                            <div class="service-info">
+                                <div class="service-name">eSIM</div>
+                                <div class="service-desc">Forfaits data internationaux</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openShopService()">
+                            <div class="service-icon">🛍️</div>
+                            <div class="service-info">
+                                <div class="service-name">Shop</div>
+                                <div class="service-desc">Merchandising officiel</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openBilletsService()">
+                            <div class="service-icon">🎟️</div>
+                            <div class="service-info">
+                                <div class="service-name">Billets NFT</div>
+                                <div class="service-desc">Tickets blockchain</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JEUX & TOMBOLA -->
+                <div class="service-group">
+                    <h3 class="service-title">🎰 Jeux & Tombola</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="openTombolaService()">
+                            <div class="service-icon">🎫</div>
+                            <div class="service-info">
+                                <div class="service-name">Tombola Quotidienne</div>
+                                <div class="service-desc">Gagnez des lots incroyables !</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMMUNAUTÉ -->
+                <div class="service-group">
+                    <h3 class="service-title">👥 Communauté</h3>
+                    <div class="service-list">
+                        <div class="service-item" onclick="openLegendesService()">
+                            <div class="service-icon">⭐</div>
+                            <div class="service-info">
+                                <div class="service-name">Légendes du Club</div>
+                                <div class="service-desc">NFT ambassadeurs</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openJoueursService()">
+                            <div class="service-icon">⚽</div>
+                            <div class="service-info">
+                                <div class="service-name">Joueurs en Activité</div>
+                                <div class="service-desc">Effectif et stats</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="openFansService()">
+                            <div class="service-icon">🏆</div>
+                            <div class="service-info">
+                                <div class="service-name">Fans Actifs</div>
+                                <div class="service-desc">Classement communauté</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🌍 AFRIQUE -->
+                <div class="service-group">
+                    <h3 class="service-title">🌍 Afrique</h3>
+                    <div class="service-list">
+                        <!-- MERCHANDISING OM AFRIQUE -->
+                        <div class="service-item" onclick="openAfriqueMerchandisingService()">
+                            <div class="service-icon">👕</div>
+                            <div class="service-info">
+                                <div class="service-name">Merchandising OM</div>
+                                <div class="service-desc">Maillots, écharpes - Paiement Mobile Money</div>
+                            </div>
                         </div>
                         
-                        <div class="event-participants">
-                            <i class="fas fa-users"></i>
-                            <span>${event.participants}</span>
+                        <!-- AMBASSADEURS AFRICAINS NFT -->
+                        <div class="service-item" onclick="openAfriqueAmbassadeursNFTService()">
+                            <div class="service-icon">💎</div>
+                            <div class="service-info">
+                                <div class="service-name">Ambassadeurs NFT</div>
+                                <div class="service-desc">Drogba, Beye, Mbia - Cartes Collectors</div>
+                            </div>
                         </div>
+                        
+                        <!-- MOBILE MONEY PAIEMENTS -->
+                        <div class="service-item" onclick="openAfriqueMobileMoneyService()">
+                            <div class="service-icon">📱</div>
+                            <div class="service-info">
+                                <div class="service-name">Mobile Money</div>
+                                <div class="service-desc">Orange, MTN, Moov, Wave</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriquePartenariatsService()">
+                            <div class="service-icon">🤝</div>
+                            <div class="service-info">
+                                <div class="service-name">Partenariats Africains</div>
+                                <div class="service-desc">Clubs et académies</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriqueSupportersService()">
+                            <div class="service-icon">🎺</div>
+                            <div class="service-info">
+                                <div class="service-name">Supporters Africains</div>
+                                <div class="service-desc">2.5M+ fans en Afrique</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-item" onclick="openAfriqueEventsService()">
+                            <div class="service-icon">🏆</div>
+                            <div class="service-info">
+                                <div class="service-name">Événements Africains</div>
+                                <div class="service-desc">Tournées et matchs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🎁 PARRAINAGE -->
+                <!-- 🎁 PARRAINAGE SIMPLIFIÉ -->
+                <div class="service-group" style="background: white; border: 2px solid #ff3366; border-radius: 16px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #ff3366; font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        🎁 Parrainage
+                    </h3>
+                    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                        Invitez vos amis : <strong style="color: #ff3366;">10€ par filleul</strong> + <strong style="color: #ff3366;">-20% billets</strong>
+                    </p>
+                    
+                    <!-- Code de parrainage -->
+                    <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center;">
+                        <div style="color: #64748b; font-size: 0.8rem; margin-bottom: 5px;">Votre code</div>
+                        <div style="color: #1e293b; font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; font-family: 'Courier New', monospace;">FANCLUB2024</div>
+                        <button onclick="navigator.clipboard.writeText('FANCLUB2024'); alert('✅ Code copié !')" style="margin-top: 10px; padding: 8px 16px; background: #ff3366; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                            📋 Copier le code
+                        </button>
+                    </div>
+                    
+                    <!-- Partage réseaux sociaux -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="color: #64748b; font-size: 0.85rem; margin-bottom: 8px; font-weight: 500;">Partager sur :</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="window.open('https://wa.me/?text=Rejoins-moi sur PaieCashFan avec mon code FANCLUB2024 et gagne 10€ ! https://jphbvnok.gensparkspace.com', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #25D366; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">💬</span> WhatsApp
+                            </button>
+                            <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=https://jphbvnok.gensparkspace.com&quote=Rejoins-moi avec le code FANCLUB2024', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #1877F2; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">📘</span> Facebook
+                            </button>
+                            <button onclick="window.open('https://twitter.com/intent/tweet?text=Rejoins-moi sur PaieCashFan avec mon code FANCLUB2024 et gagne 10€ !&url=https://jphbvnok.gensparkspace.com', '_blank')" style="flex: 1; min-width: 100px; padding: 10px; background: #1DA1F2; color: white; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                <span style="font-size: 1.2rem;">🐦</span> X (Twitter)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="color: #94a3b8; font-size: 0.75rem; text-align: center; margin-top: 10px;">
+                        💡 Partagez votre code et gagnez 10€ par ami inscrit
+                    </div>
+                </div>
+
+                <!-- PARAMÈTRES -->
+                <div class="service-group">
+                    <h3 class="service-title">⚙️ Paramètres</h3>
+                    <div class="service-list">
+                        <div class="service-item">
+                            <div class="service-icon">🔐</div>
+                            <div class="service-info">
+                                <div class="service-name">Sécurité</div>
+                                <div class="service-desc">2FA, mot de passe</div>
+                            </div>
+                        </div>
+                        <div class="service-item" onclick="toggleLanguageDropdown()">
+                            <div class="service-icon">🌍</div>
+                            <div class="service-info">
+                                <div class="service-name">Langue</div>
+                                <div class="service-desc" id="currentLanguageDisplay">Français</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+        <div class="tab-item" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i>
+            <div class="tab-label">Accueil</div>
+        </div>
+        <div class="tab-item active" onclick="navigateToEquipes()">
+            <i class="fas fa-users"></i>
+            <div class="tab-label">Équipes</div>
+        </div>
+        <div class="tab-item" onclick="showSection('chat')">
+            <i class="fas fa-comments"></i>
+            <div class="tab-label">Chat</div>
+        </div>
+        <div class="tab-item" onclick="showSection('ia')">
+            <i class="fas fa-robot"></i>
+            <div class="tab-label">IA</div>
+        </div>
+        <div class="tab-item" onclick="showSection('profil')">
+            <i class="fas fa-user"></i>
+            <div class="tab-label">Profil</div>
+        </div>
+    </div>
+
+    <!-- MODAL GAMIFICATION -->
+    <div class="modal" id="gamificationModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('gamificationModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🏆 Gamification</div>
+                <p style="font-size: 14px; opacity: 0.7;">Gagnez en jouant et partageant</p>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">👤 Fan : Gagnez des PaieCash Coins</div>
+                    <div class="modal-item-desc">
+                        • Partagez une story : +5 PCC<br>
+                        • Likez un produit : +2 PCC<br>
+                        • Achetez un billet : +20 PCC<br>
+                        • Invitez un ami : +50 PCC
+                    </div>
+                    <span class="modal-item-badge">🎁 Récompenses actives</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">🏢 Sponsor : Visibilité & Engagement</div>
+                    <div class="modal-item-desc">
+                        • Vues story sponsor : Statistiques temps réel<br>
+                        • Interactions : Likes, partages, clics<br>
+                        • Conversions : Achats via sponsor<br>
+                        • ROI : Retour sur investissement mesuré
+                    </div>
+                    <span class="modal-item-badge">📊 Analytics en temps réel</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">🎯 Vos Stats</div>
+                    <div class="modal-item-desc">
+                        • PCC gagnés aujourd'hui : <strong>35 PCC</strong><br>
+                        • Partages ce mois : <strong>12 partages</strong><br>
+                        • Niveau : <strong>⭐ Gold Fan</strong><br>
+                        • Classement : <strong>#15 / 1,200 fans</strong>
+                    </div>
+                    <span class="modal-item-badge">🔥 Vous êtes actif!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOTIFICATIONS -->
+    <div class="modal" id="notificationsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('notificationsModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🔔 Notifications</div>
+            </div>
+            <div class="modal-list" id="notificationsList"></div>
+        </div>
+    </div>
+
+    <!-- MODAL ESIM -->
+    <div class="modal" id="esimModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('esimModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">📡 eSIM Forfaits</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Europe eSIM</div>
+                    <div class="modal-item-desc">5GB • 30 jours • 30 pays</div>
+                    <span class="modal-item-badge">9,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Mondial eSIM</div>
+                    <div class="modal-item-desc">10GB • 30 jours • 150 pays</div>
+                    <span class="modal-item-badge">24,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Premium eSIM</div>
+                    <div class="modal-item-desc">20GB • 60 jours • Mondial</div>
+                    <span class="modal-item-badge">39,99 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SHOP -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('shopModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🛍️ Shop Officiel</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Maillot Domicile 2024/25</div>
+                    <div class="modal-item-desc">Tailles: S, M, L, XL, XXL</div>
+                    <span class="modal-item-badge">89,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Casquette Officielle</div>
+                    <div class="modal-item-desc">Logo brodé • Ajustable</div>
+                    <span class="modal-item-badge">24,99 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Écharpe Supporters</div>
+                    <div class="modal-item-desc">100% Acrylique • 150cm</div>
+                    <span class="modal-item-badge">19,99 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BILLETS -->
+    <div class="modal" id="billetsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('billetsModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🎟️ Billets NFT</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Monaco vs PSG</div>
+                    <div class="modal-item-desc">15 Jan 2025 • Stade Louis II</div>
+                    <span class="modal-item-badge">45 €</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Monaco vs OM</div>
+                    <div class="modal-item-desc">22 Jan 2025 • Stade Louis II</div>
+                    <span class="modal-item-badge">40 €</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LÉGENDES -->
+    <div class="modal" id="legendesModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('legendesModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">⭐ Légendes du Club</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Thierry Henry</div>
+                    <div class="modal-item-desc">500 NFT éditions • Henry for Kids Association</div>
+                    <span class="modal-item-badge">Disponible</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Kylian Mbappé</div>
+                    <div class="modal-item-desc">1000 NFT éditions • Inspired by KM Association</div>
+                    <span class="modal-item-badge">Disponible</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL JOUEURS -->
+    <div class="modal" id="joueursModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('joueursModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">⚽ Joueurs en Activité</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">Wissam Ben Yedder</div>
+                    <div class="modal-item-desc">Attaquant • 15 buts • 8 passes</div>
+                    <span class="modal-item-badge">Note: 92/100</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">Youssouf Fofana</div>
+                    <div class="modal-item-desc">Milieu • 3 buts • 12 passes</div>
+                    <span class="modal-item-badge">Note: 88/100</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FANS -->
+    <div class="modal" id="fansModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('fansModal')">×</button>
+            <div class="modal-header">
+                <div class="modal-title">🏆 Fans Actifs</div>
+            </div>
+            <div class="modal-list">
+                <div class="modal-item">
+                    <div class="modal-item-title">#1 Marc Dubois</div>
+                    <div class="modal-item-desc">15,450 points • ⭐ Gold Fan</div>
+                    <span class="modal-item-badge">👑 Top Fan</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">#2 Sophie Martin</div>
+                    <div class="modal-item-desc">12,380 points • ⭐ Gold Fan</div>
+                    <span class="modal-item-badge">🔥 En feu</span>
+                </div>
+                <div class="modal-item">
+                    <div class="modal-item-title">#15 Vous</div>
+                    <div class="modal-item-desc">6,240 points • ⚡ Silver Fan</div>
+                    <span class="modal-item-badge">Votre rang</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌍 Données fédérations CAF -->
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    
+    <!-- 🌍 Système I18N Multi-Langues - RÉACTIVÉ ✅ -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+
+    <!-- 🎲 LOTO FUNCTIONS -->
+    <script>
+        // ========== LOTO SYSTEM - VARIABLES GLOBALES ==========
+let selectedLotoTicket = 100;
+let userBalance = 500; // PCC
+let selectedScratchPrice = 25;
+let selectedScratchCount = 3;
+let selectedNumbers = [];
+let userLines = [];
+let scratchCanvas, scratchCtx;
+
+// ========== THÈMES DE CLUBS ==========
+const clubThemes = {
+    'MARSEILLE': {
+        primary: '#0D9CDB',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0D9CDB, #0A7AB8)',
+        accent: '#00B4D8',
+        glow: 'rgba(13, 156, 219, 0.4)'
+    },
+    'PARIS': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'PSG': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'MONACO': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#FFD700',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'LYON': {
+        primary: '#DA020E',
+        secondary: '#003A70',
+        gradient: 'linear-gradient(135deg, #DA020E, #003A70)',
+        accent: '#DA020E',
+        glow: 'rgba(218, 2, 14, 0.4)'
+    },
+    'LILLE': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'RENNES': {
+        primary: '#E30613',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #E30613, #8B0000)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'NICE': {
+        primary: '#E30613',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #E30613, #8B0000)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'LENS': {
+        primary: '#FFC300',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #FFC300, #E30613)',
+        accent: '#FFC300',
+        glow: 'rgba(255, 195, 0, 0.4)'
+    },
+    'NANTES': {
+        primary: '#FFC300',
+        secondary: '#006633',
+        gradient: 'linear-gradient(135deg, #FFC300, #006633)',
+        accent: '#FFC300',
+        glow: 'rgba(255, 195, 0, 0.4)'
+    },
+    'SAINT-ÉTIENNE': {
+        primary: '#009639',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #009639, #007A2E)',
+        accent: '#009639',
+        glow: 'rgba(0, 150, 57, 0.4)'
+    },
+    'BORDEAUX': {
+        primary: '#003A70',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #003A70, #002550)',
+        accent: '#003A70',
+        glow: 'rgba(0, 58, 112, 0.4)'
+    },
+    'MONTPELLIER': {
+        primary: '#0066CC',
+        secondary: '#FF6600',
+        gradient: 'linear-gradient(135deg, #0066CC, #FF6600)',
+        accent: '#FF6600',
+        glow: 'rgba(0, 102, 204, 0.4)'
+    },
+    'STRASBOURG': {
+        primary: '#0066CC',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066CC, #004C99)',
+        accent: '#0066CC',
+        glow: 'rgba(0, 102, 204, 0.4)'
+    },
+    'REIMS': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'TOULOUSE': {
+        primary: '#5F259F',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #5F259F, #461C75)',
+        accent: '#5F259F',
+        glow: 'rgba(95, 37, 159, 0.4)'
+    },
+    'PARIS SG': {
+        primary: '#004170',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #004170, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'BREST': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    // Clubs africains
+    'TANZANIE': {
+        primary: '#1EB53A',
+        secondary: '#FCD116',
+        gradient: 'linear-gradient(135deg, #1EB53A, #FCD116)',
+        accent: '#1EB53A',
+        glow: 'rgba(30, 181, 58, 0.4)'
+    },
+    'MAURITANIE': {
+        primary: '#006233',
+        secondary: '#FFC72C',
+        gradient: 'linear-gradient(135deg, #006233, #FFC72C)',
+        accent: '#FFC72C',
+        glow: 'rgba(0, 98, 51, 0.4)'
+    },
+    'KENYA': {
+        primary: '#006600',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #006600, #E30613)',
+        accent: '#E30613',
+        glow: 'rgba(0, 102, 0, 0.4)'
+    },
+    'OUGANDA': {
+        primary: '#FCDC04',
+        secondary: '#E30613',
+        gradient: 'linear-gradient(135deg, #FCDC04, #E30613)',
+        accent: '#FCDC04',
+        glow: 'rgba(252, 220, 4, 0.4)'
+    },
+    // Clubs marocains
+    'WYDAD': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'WYDAD CASABLANCA': {
+        primary: '#E30613',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #E30613, #B00510)',
+        accent: '#E30613',
+        glow: 'rgba(227, 6, 19, 0.4)'
+    },
+    'RAJA': {
+        primary: '#006633',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #006633, #004D26)',
+        accent: '#006633',
+        glow: 'rgba(0, 102, 51, 0.4)'
+    },
+    'RAJA CASABLANCA': {
+        primary: '#006633',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #006633, #004D26)',
+        accent: '#006633',
+        glow: 'rgba(0, 102, 51, 0.4)'
+    },
+    // === CLUBS MAROCAINS ===
+    'AS FAR RABAT': {
+        primary: '#006233',
+        secondary: '#C1272D',
+        gradient: 'linear-gradient(135deg, #006233, #C1272D)',
+        accent: '#C1272D',
+        glow: 'rgba(193, 39, 45, 0.4)'
+    },
+    'AS FAR': {
+        primary: '#006233',
+        secondary: '#C1272D',
+        gradient: 'linear-gradient(135deg, #006233, #C1272D)',
+        accent: '#C1272D',
+        glow: 'rgba(193, 39, 45, 0.4)'
+    },
+    'RENAISSANCE DE BERKANE': {
+        primary: '#FF8C00',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FF8C00, #CC7000)',
+        accent: '#FF8C00',
+        glow: 'rgba(255, 140, 0, 0.4)'
+    },
+    'RS BERKANE': {
+        primary: '#FF8C00',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FF8C00, #CC7000)',
+        accent: '#FF8C00',
+        glow: 'rgba(255, 140, 0, 0.4)'
+    },
+    'FUS RABAT': {
+        primary: '#FFC627',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #FFC627, #0066B2)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'MAGHREB DE FÈS': {
+        primary: '#006233',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #006233, #004D26)',
+        accent: '#006233',
+        glow: 'rgba(0, 98, 51, 0.4)'
+    },
+    // === LIGUE 1 FRANÇAISE ===
+    'FC METZ': {
+        primary: '#8B0304',
+        secondary: '#FFC627',
+        gradient: 'linear-gradient(135deg, #8B0304, #FFC627)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'METZ': {
+        primary: '#8B0304',
+        secondary: '#FFC627',
+        gradient: 'linear-gradient(135deg, #8B0304, #FFC627)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'ANGERS': {
+        primary: '#000000',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #000000, #333333)',
+        accent: '#FFFFFF',
+        glow: 'rgba(255, 255, 255, 0.4)'
+    },
+    'AUXERRE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'LE HAVRE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'LORIENT': {
+        primary: '#FF8C00',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FF8C00, #CC7000)',
+        accent: '#FF8C00',
+        glow: 'rgba(255, 140, 0, 0.4)'
+    },
+    'PARIS FC': {
+        primary: '#002F6C',
+        secondary: '#004BA8',
+        gradient: 'linear-gradient(135deg, #002F6C, #004BA8)',
+        accent: '#004BA8',
+        glow: 'rgba(0, 75, 168, 0.4)'
+    },
+    // === LIGUE 2 FRANÇAISE ===
+    'AMIENS': {
+        primary: '#FFFFFF',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FFFFFF, #CCCCCC)',
+        accent: '#000000',
+        glow: 'rgba(0, 0, 0, 0.4)'
+    },
+    'ANNECY': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'BOULOGNE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'CLERMONT': {
+        primary: '#C8102E',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #C8102E, #0066B2)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'DUNKERQUE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'GRENOBLE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'GUINGAMP': {
+        primary: '#C8102E',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #C8102E, #8B0000)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'LAVAL': {
+        primary: '#FF8C00',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #FF8C00, #CC7000)',
+        accent: '#FF8C00',
+        glow: 'rgba(255, 140, 0, 0.4)'
+    },
+    'LE MANS': {
+        primary: '#FFC627',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FFC627, #CCA01F)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'NANCY': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'PAU': {
+        primary: '#FFC627',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #FFC627, #0066B2)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'RED STAR': {
+        primary: '#00A651',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #00A651, #008040)',
+        accent: '#00A651',
+        glow: 'rgba(0, 166, 81, 0.4)'
+    },
+    'RODEZ': {
+        primary: '#C8102E',
+        secondary: '#FFC627',
+        gradient: 'linear-gradient(135deg, #C8102E, #FFC627)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'SC BASTIA': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'TROYES': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    // === NATIONAL ===
+    'FC SOCHAUX': {
+        primary: '#0066B2',
+        secondary: '#FFC627',
+        gradient: 'linear-gradient(135deg, #0066B2, #FFC627)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'SOCHAUX': {
+        primary: '#0066B2',
+        secondary: '#FFC627',
+        gradient: 'linear-gradient(135deg, #0066B2, #FFC627)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'US ORLÉANS': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'ORLÉANS': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'US QUEVILLY-ROUEN': {
+        primary: '#FFC627',
+        secondary: '#C8102E',
+        gradient: 'linear-gradient(135deg, #FFC627, #C8102E)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'QUEVILLY-ROUEN': {
+        primary: '#FFC627',
+        secondary: '#C8102E',
+        gradient: 'linear-gradient(135deg, #FFC627, #C8102E)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'NÎMES OLYMPIQUE': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'NÎMES': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'FC VILLEFRANCHE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'VILLEFRANCHE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'AC AJACCIO': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'AJACCIO': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'DIJON FCO': {
+        primary: '#C8102E',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #C8102E, #0066B2)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'DIJON': {
+        primary: '#C8102E',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #C8102E, #0066B2)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'VERSAILLES': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'BOURG-EN-BRESSE': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'CHÂTEAUROUX': {
+        primary: '#C8102E',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #C8102E, #0066B2)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'LE PUY FOOT': {
+        primary: '#FFC627',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FFC627, #CCA01F)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'LE PUY': {
+        primary: '#FFC627',
+        secondary: '#000000',
+        gradient: 'linear-gradient(135deg, #FFC627, #CCA01F)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'ÉPINAL': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    'CONCARNEAU': {
+        primary: '#FFC627',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #FFC627, #0066B2)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'AUBAGNE': {
+        primary: '#FFC627',
+        secondary: '#0066B2',
+        gradient: 'linear-gradient(135deg, #FFC627, #0066B2)',
+        accent: '#FFC627',
+        glow: 'rgba(255, 198, 39, 0.4)'
+    },
+    'SÈTE': {
+        primary: '#C8102E',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #C8102E, #A00D25)',
+        accent: '#C8102E',
+        glow: 'rgba(200, 16, 46, 0.4)'
+    },
+    'AVRANCHES': {
+        primary: '#0066B2',
+        secondary: '#FFFFFF',
+        gradient: 'linear-gradient(135deg, #0066B2, #004C85)',
+        accent: '#0066B2',
+        glow: 'rgba(0, 102, 178, 0.4)'
+    },
+    // Thème par défaut
+    'DEFAULT': {
+        primary: '#10b981',
+        secondary: '#fbbf24',
+        gradient: 'linear-gradient(135deg, #10b981, #059669)',
+        accent: '#10b981',
+        glow: 'rgba(16, 185, 129, 0.4)'
+    }
+};
+
+// Appliquer le thème du club
+function applyClubTheme(clubName) {
+    // Normaliser le nom du club
+    let normalizedName = clubName.toUpperCase().trim();
+    
+    // Essayer de trouver le thème avec différentes variantes
+    let theme = clubThemes[normalizedName];
+    
+    // Si non trouvé, essayer sans espaces ni caractères spéciaux
+    if (!theme) {
+        const simplifiedName = normalizedName.replace(/[\s-]/g, '');
+        theme = clubThemes[simplifiedName];
+    }
+    
+    // Si non trouvé, essayer de trouver une correspondance partielle
+    if (!theme) {
+        for (const key in clubThemes) {
+            if (normalizedName.includes(key) || key.includes(normalizedName)) {
+                theme = clubThemes[key];
+                break;
+            }
+        }
+    }
+    
+    // Si toujours non trouvé, utiliser le thème par défaut
+    if (!theme) {
+        theme = clubThemes['DEFAULT'];
+    }
+    
+    const root = document.documentElement;
+    
+    // Appliquer les variables CSS
+    root.style.setProperty('--loto-primary', theme.primary);
+    root.style.setProperty('--loto-secondary', theme.secondary);
+    root.style.setProperty('--loto-gradient', theme.gradient);
+    root.style.setProperty('--loto-accent', theme.accent);
+    root.style.setProperty('--loto-glow', theme.glow);
+}
+
+// ========== NAVIGATION ==========
+
+// Ouvrir la modal LOTO (page d'accueil)
+function openLoto() {
+    const modal = document.getElementById('lotoModal');
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
+    
+    // Appliquer le thème du club
+    applyClubTheme(clubName);
+    
+    // Afficher la modal et la page d'accueil
+    modal.style.display = 'flex';
+    document.getElementById('lotoHome').style.display = 'block';
+    document.getElementById('lotoScratch').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'none';
+    
+    document.body.style.overflow = 'hidden';
+    
+    // Démarrer le compte à rebours
+    startLotoCountdown();
+}
+
+// Fermer la modal LOTO
+function closeLoto() {
+    const modal = document.getElementById('lotoModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Arrêter les confettis
+    stopConfetti();
+    
+    // Réinitialiser
+    backToLotoHome();
+}
+
+// Retour à la page d'accueil
+function backToLotoHome() {
+    document.getElementById('lotoHome').style.display = 'block';
+    document.getElementById('lotoScratch').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'none';
+    
+    // Réinitialiser les états
+    resetScratchMode();
+    resetNumbersMode();
+}
+
+// Ouvrir le mode SCRATCH
+function openScratchMode() {
+    document.getElementById('lotoHome').style.display = 'none';
+    document.getElementById('lotoScratch').style.display = 'block';
+    document.getElementById('scratchTicketSelection').style.display = 'block';
+    document.getElementById('scratchCardContainer').style.display = 'none';
+    document.getElementById('scratchResult').style.display = 'none';
+    
+    // Mettre à jour le solde
+    document.getElementById('userBalance').textContent = userBalance;
+}
+
+// Ouvrir le mode LOTTO NUMBERS
+function openNumbersMode() {
+    document.getElementById('lotoHome').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'block';
+    
+    // Générer la grille de numéros
+    generateNumbersGrid();
+    updateNumbersDisplay();
+}
+
+// ========== COMPTE À REBOURS ==========
+function startLotoCountdown() {
+    const countdownEl = document.getElementById('lotoCountdown');
+    if (!countdownEl) return;
+    
+    // Calculer le temps jusqu'au prochain dimanche 21h
+    const now = new Date();
+    const nextDraw = new Date();
+    nextDraw.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7));
+    nextDraw.setHours(21, 0, 0, 0);
+    
+    function updateCountdown() {
+        const now = new Date();
+        const diff = nextDraw - now;
+        
+        if (diff <= 0) {
+            countdownEl.textContent = '00:00:00';
+            return;
+        }
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        countdownEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+// ========== MODE SCRATCH ==========
+
+function selectScratchTicket(price, count) {
+    selectedScratchPrice = price;
+    selectedScratchCount = count;
+    
+    // Mettre à jour l'affichage
+    document.getElementById('scratchPrice').textContent = price;
+    
+    // Retirer la classe selected
+    document.querySelectorAll('.scratch-ticket-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Ajouter au ticket cliqué
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+    }
+}
+
+function buyScratchTicket() {
+    if (userBalance < selectedScratchPrice) {
+        alert('❌ Solde insuffisant !');
+        return;
+    }
+    
+    // Déduire le montant
+    userBalance -= selectedScratchPrice;
+    
+    // Afficher la carte à gratter
+    document.getElementById('scratchTicketSelection').style.display = 'none';
+    document.getElementById('scratchCardContainer').style.display = 'block';
+    
+    // Mettre à jour les infos
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('scratchClubName').textContent = clubName;
+    document.getElementById('scratchTicketCount').textContent = selectedScratchCount;
+    document.getElementById('scratchCost').textContent = selectedScratchPrice;
+    
+    // Initialiser le canvas
+    initScratchCanvas();
+    
+    // Démarrer le timer
+    startScratchTimer();
+}
+
+function initScratchCanvas() {
+    scratchCanvas = document.getElementById('scratchCanvas');
+    if (!scratchCanvas) return;
+    
+    scratchCtx = scratchCanvas.getContext('2d');
+    
+    // Définir la taille
+    const rect = scratchCanvas.getBoundingClientRect();
+    scratchCanvas.width = rect.width * 2;
+    scratchCanvas.height = rect.height * 2;
+    scratchCtx.scale(2, 2);
+    
+    // Dessiner le fond (récompense)
+    scratchCtx.fillStyle = 'linear-gradient(135deg, #10b981, #059669)';
+    scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+    
+    // Dessiner la couche à gratter
+    const gradient = scratchCtx.createLinearGradient(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    gradient.addColorStop(0, '#fbbf24');
+    gradient.addColorStop(1, '#10b981');
+    scratchCtx.fillStyle = gradient;
+    scratchCtx.fillRect(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    
+    // Ajouter le texte
+    scratchCtx.fillStyle = 'white';
+    scratchCtx.font = 'bold 24px Arial';
+    scratchCtx.textAlign = 'center';
+    scratchCtx.textBaseline = 'middle';
+    scratchCtx.fillText('TAP TO SCRATCH', scratchCanvas.width / 4, scratchCanvas.height / 4);
+    
+    // Événements de grattage
+    let isScratching = false;
+    
+    scratchCanvas.addEventListener('mousedown', () => isScratching = true);
+    scratchCanvas.addEventListener('mouseup', () => isScratching = false);
+    scratchCanvas.addEventListener('mousemove', scratch);
+    scratchCanvas.addEventListener('touchstart', () => isScratching = true);
+    scratchCanvas.addEventListener('touchend', () => isScratching = false);
+    scratchCanvas.addEventListener('touchmove', scratch);
+}
+
+function scratch(e) {
+    if (!scratchCtx) return;
+    
+    const rect = scratchCanvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    
+    scratchCtx.globalCompositeOperation = 'destination-out';
+    scratchCtx.beginPath();
+    scratchCtx.arc(x, y, 20, 0, Math.PI * 2);
+    scratchCtx.fill();
+}
+
+function startScratchTimer() {
+    let seconds = 6;
+    const timerEl = document.getElementById('scratchTimer');
+    
+    const interval = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds + 's';
+        
+        if (seconds <= 0) {
+            clearInterval(interval);
+            showScratchResult();
+        }
+    }, 1000);
+}
+
+function showScratchResult() {
+    // Cacher le canvas
+    document.getElementById('scratchCardContainer').style.display = 'none';
+    
+    // Calculer le gain (aléatoire)
+    const multipliers = [0, 0, 0, 1, 1, 2, 2, 3, 5];
+    const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+    const winAmount = selectedScratchPrice * multiplier;
+    
+    // Mettre à jour le solde
+    userBalance += winAmount;
+    
+    // Afficher le résultat
+    document.getElementById('scratchResult').style.display = 'block';
+    document.getElementById('scratchWinAmount').textContent = winAmount;
+    document.getElementById('resultCost').textContent = selectedScratchPrice + ' PCC';
+    document.getElementById('resultMultiplier').textContent = 'x' + multiplier;
+    document.getElementById('resultTotal').textContent = '+' + winAmount + ' PCC';
+    document.getElementById('resultNewBalance').textContent = userBalance + ' PCC';
+    
+    // Lancer les confettis si gain
+    if (winAmount > 0) {
+        startConfetti();
+    }
+}
+
+function playScratchAgain() {
+    resetScratchMode();
+    openScratchMode();
+}
+
+function resetScratchMode() {
+    selectedScratchPrice = 25;
+    selectedScratchCount = 3;
+}
+
+// ========== ANIMATION DE CONFETTIS ==========
+
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+class Confetti {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 10 + 5;
+        this.speedY = Math.random() * 3 + 2;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 10;
+        
+        // Couleurs dynamiques basées sur le thème du club
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-primary').trim();
+        const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-secondary').trim();
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-accent').trim();
+        
+        const colors = [
+            primaryColor,
+            secondaryColor,
+            accentColor,
+            '#FFD700', // Or
+            '#FF6B6B', // Rouge
+            '#4ECDC4', // Cyan
+            '#95E1D3', // Vert menthe
+            '#F38181'  // Rose
+        ];
+        
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.opacity = 1;
+    }
+    
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+        this.speedY += 0.1; // Gravité
+        
+        // Fade out progressif
+        if (this.y > window.innerHeight - 100) {
+            this.opacity -= 0.02;
+        }
+    }
+    
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        
+        // Dessiner un rectangle (confetti)
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 2);
+        
+        ctx.restore();
+    }
+}
+
+function createConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Créer 150 confettis
+    confettiParticles = [];
+    for (let i = 0; i < 150; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * -0.5; // Commencer au-dessus de l'écran
+        confettiParticles.push(new Confetti(x, y));
+    }
+}
+
+function animateConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Mettre à jour et dessiner chaque confetti
+    confettiParticles = confettiParticles.filter(confetti => {
+        confetti.update();
+        confetti.draw(ctx);
+        return confetti.opacity > 0; // Garder seulement les confettis visibles
+    });
+    
+    // Continuer l'animation si des confettis sont encore visibles
+    if (confettiParticles.length > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+    } else {
+        stopConfetti();
+    }
+}
+
+function startConfetti() {
+    // Arrêter l'animation précédente si elle existe
+    stopConfetti();
+    
+    // Créer et lancer les confettis
+    createConfetti();
+    animateConfetti();
+}
+
+function stopConfetti() {
+    if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+    }
+    
+    const canvas = document.getElementById('confettiCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    confettiParticles = [];
+}
+
+// Redimensionner le canvas quand la fenêtre change de taille
+window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confettiCanvas');
+    if (canvas && confettiParticles.length > 0) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+});
+
+// ========== MODE LOTTO NUMBERS ==========
+
+function generateNumbersGrid() {
+    const grid = document.getElementById('numbersGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    for (let i = 1; i <= 49; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'number-btn';
+        btn.textContent = i;
+        btn.onclick = () => toggleNumber(i);
+        grid.appendChild(btn);
+    }
+}
+
+function toggleNumber(num) {
+    const index = selectedNumbers.indexOf(num);
+    
+    if (index > -1) {
+        // Désélectionner
+        selectedNumbers.splice(index, 1);
+    } else {
+        // Sélectionner (max 5)
+        if (selectedNumbers.length >= 5) {
+            alert('❌ Vous ne pouvez sélectionner que 5 numéros !');
+            return;
+        }
+        selectedNumbers.push(num);
+    }
+    
+    updateNumbersDisplay();
+}
+
+function randomNumbers() {
+    selectedNumbers = [];
+    
+    while (selectedNumbers.length < 5) {
+        const num = Math.floor(Math.random() * 49) + 1;
+        if (!selectedNumbers.includes(num)) {
+            selectedNumbers.push(num);
+        }
+    }
+    
+    selectedNumbers.sort((a, b) => a - b);
+    updateNumbersDisplay();
+}
+
+function updateNumbersDisplay() {
+    // Mettre à jour le compteur
+    document.getElementById('selectedCount').textContent = selectedNumbers.length;
+    
+    // Mettre à jour les boutons
+    document.querySelectorAll('.number-btn').forEach(btn => {
+        const num = parseInt(btn.textContent);
+        if (selectedNumbers.includes(num)) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+    
+    // Mettre à jour le bouton d'ajout
+    const addBtn = document.querySelector('.numbers-add-line-btn');
+    if (addBtn) {
+        addBtn.innerHTML = `<i class="fas fa-plus"></i> Ajouter la ligne (${selectedNumbers.length}/5)`;
+        addBtn.disabled = selectedNumbers.length !== 5;
+    }
+}
+
+function addNumberLine() {
+    if (selectedNumbers.length !== 5) {
+        alert('❌ Vous devez sélectionner exactement 5 numéros !');
+        return;
+    }
+    
+    // Ajouter la ligne
+    userLines.push([...selectedNumbers]);
+    selectedNumbers = [];
+    
+    updateNumbersDisplay();
+    updateLinesDisplay();
+    updateNumbersCost();
+}
+
+function updateLinesDisplay() {
+    const container = document.getElementById('numbersLines');
+    if (!container) return;
+    
+    if (userLines.length === 0) {
+        container.innerHTML = '<h3>Vos lignes</h3><div class="empty-lines">Aucune ligne ajoutée</div>';
+        return;
+    }
+    
+    let html = '<h3>Vos lignes</h3>';
+    userLines.forEach((line, index) => {
+        html += `
+            <div class="line-item">
+                <div class="line-numbers">
+                    ${line.map(num => `<div class="line-number">${num}</div>`).join('')}
+                </div>
+                <i class="fas fa-times line-remove" onclick="removeLine(${index})"></i>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function removeLine(index) {
+    userLines.splice(index, 1);
+    updateLinesDisplay();
+    updateNumbersCost();
+}
+
+function updateNumbersCost() {
+    const cost = userLines.length * 10; // 10 PCC par ligne
+    document.getElementById('numbersTotalCost').textContent = cost;
+    
+    const playBtn = document.querySelector('.numbers-play-btn');
+    if (playBtn) {
+        playBtn.disabled = userLines.length === 0;
+    }
+}
+
+function playNumbersLoto() {
+    if (userLines.length === 0) {
+        alert('❌ Ajoutez au moins une ligne !');
+        return;
+    }
+    
+    const cost = userLines.length * 10;
+    if (userBalance < cost) {
+        alert('❌ Solde insuffisant !');
+        return;
+    }
+    
+    // Déduire le coût
+    userBalance -= cost;
+    
+    // Cacher la sélection
+    document.querySelector('.numbers-selection').style.display = 'none';
+    document.querySelector('.numbers-lines').style.display = 'none';
+    document.querySelector('.numbers-footer').style.display = 'none';
+    
+    // Afficher le résultat
+    document.getElementById('numbersResult').style.display = 'block';
+    
+    // Générer les numéros gagnants
+    const winningNumbers = [];
+    while (winningNumbers.length < 5) {
+        const num = Math.floor(Math.random() * 49) + 1;
+        if (!winningNumbers.includes(num)) {
+            winningNumbers.push(num);
+        }
+    }
+    winningNumbers.sort((a, b) => a - b);
+    
+    // Afficher les numéros gagnants
+    const winningContainer = document.getElementById('winningNumbers');
+    winningContainer.innerHTML = winningNumbers.map(num => 
+        `<div class="winning-number">${num}</div>`
+    ).join('');
+    
+    // Vérifier les lignes
+    let totalWin = 0;
+    let bestMatch = 0;
+    
+    userLines.forEach(line => {
+        const matches = line.filter(num => winningNumbers.includes(num)).length;
+        if (matches > bestMatch) bestMatch = matches;
+        
+        // Calculer les gains
+        const multipliers = {1: 2, 2: 5, 3: 25, 4: 500, 5: 50000};
+        if (multipliers[matches]) {
+            totalWin += cost * multipliers[matches] / userLines.length;
+        }
+    });
+    
+    // Mettre à jour le solde
+    userBalance += totalWin;
+    
+    // Afficher le message
+    const messageEl = document.getElementById('numbersResultMessage');
+    if (bestMatch >= 3) {
+        messageEl.innerHTML = `
+            <h3>FÉLICITATIONS, VOUS GAGNEZ !</h3>
+            <p>Vous avez trouvé ${bestMatch} numéros !</p>
+            <div class="result-amount">+${Math.floor(totalWin)}</div>
+            <div class="result-currency">PaieCash Coins</div>
+        `;
+        // Lancer les confettis
+        startConfetti();
+    } else {
+        messageEl.innerHTML = `
+            <h3>PAS CETTE FOIS...</h3>
+            <p>Tentez votre chance au prochain tirage !</p>
+        `;
+    }
+    
+    document.getElementById('numbersNewBalance').textContent = userBalance;
+}
+
+function playNumbersAgain() {
+    resetNumbersMode();
+    openNumbersMode();
+}
+
+function resetNumbersMode() {
+    selectedNumbers = [];
+    userLines = [];
+    
+    // Réafficher les sections
+    const selection = document.querySelector('.numbers-selection');
+    const lines = document.querySelector('.numbers-lines');
+    const footer = document.querySelector('.numbers-footer');
+    
+    if (selection) selection.style.display = 'block';
+    if (lines) lines.style.display = 'block';
+    if (footer) footer.style.display = 'block';
+}
+
+// ========== AUTRES FONCTIONS ==========
+
+function toggleRules() {
+    alert('📖 RÈGLES DU JEU\n\n🎲 SCRATCH: Grattez pour révéler vos gains instantanés\n\n# LOTO CHIFFRES: Choisissez 5 numéros et tentez de gagner le jackpot\n\n🤍 1% des gains sont reversés aux œuvres caritatives du club');
+}
+
+function viewSuperJackpot() {
+    alert('🌟 SUPER JACKPOT\n\n🏠 Une maison (250K€)\n✈️ 11 voyages VIP\n👕 Maillots signés\n🎟️ Places VIP saison complète');
+}
+
+function shareResult() {
+    alert('🔗 Partage en cours...\n\nFonctionnalité à venir !');
+}
+
+    </script>
+
+    <script>
+        // État global
+        let currentLanguage = localStorage.getItem('paiecashfan_lang') || 'fr';
+        
+        // Stories data - DÉFILEMENT HORIZONTAL (pas de rotation)
+        const stories = [
+            {
+                id: 1,
+                name: 'AS Monaco',
+                avatar: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/AS_Monaco_FC_logo.svg/200px-AS_Monaco_FC_logo.svg.png',
+                type: 'club',
+                story: '⚽ Nouvelle saison 2025/2026 !'
+            },
+            {
+                id: 2,
+                name: 'Marc Dubois',
+                avatar: 'https://i.pravatar.cc/150?img=12',
+                type: 'fan',
+                story: '🔥 Au stade ce soir !'
+            },
+            {
+                id: 3,
+                name: 'Sophie Martin',
+                avatar: 'https://i.pravatar.cc/150?img=5',
+                type: 'fan',
+                story: '🎉 Supporter depuis 10 ans !'
+            },
+            {
+                id: 4,
+                name: 'Thomas Leroy',
+                avatar: 'https://i.pravatar.cc/150?img=33',
+                type: 'fan',
+                story: '👕 Nouveau maillot reçu !'
+            },
+            {
+                id: 5,
+                name: 'Julie Moreau',
+                avatar: 'https://i.pravatar.cc/150?img=9',
+                type: 'fan',
+                story: '📸 Photos du match !'
+            },
+            {
+                id: 6,
+                name: 'Ahmed Diallo',
+                avatar: 'https://i.pravatar.cc/150?img=51',
+                type: 'fan',
+                story: '🇸🇳 Supporter depuis Dakar !'
+            },
+            {
+                id: 7,
+                name: 'Emma Laurent',
+                avatar: 'https://i.pravatar.cc/150?img=47',
+                type: 'fan',
+                story: '💙 Fan depuis toujours !'
+            },
+            {
+                id: 8,
+                name: 'Lucas Bernard',
+                avatar: 'https://i.pravatar.cc/150?img=68',
+                type: 'fan',
+                story: '🏆 Champions !'
+            }
+        ];
+        
+        // Transactions data (temps réel simulé)
+        const transactions = [
+            { id: 1, type: 'received', name: 'Marc Dubois', amount: 20, time: 'Il y a 2 min', icon: '💸' },
+            { id: 2, type: 'sent', name: 'Billet Monaco vs PSG', amount: -45, time: 'Il y a 15 min', icon: '🎟️' },
+            { id: 3, type: 'received', name: 'Cashback Shop', amount: 5, time: 'Il y a 1h', icon: '🎁' },
+            { id: 4, type: 'sent', name: 'Maillot domicile', amount: -89.99, time: 'Il y a 2h', icon: '👕' },
+            { id: 5, type: 'received', name: 'Sophie Martin', amount: 10, time: 'Il y a 3h', icon: '💸' }
+        ];
+        
+        // Notifications data
+        const notifications = [
+            { id: 1, title: 'Nouveau message', desc: 'Marc Dubois vous a envoyé un message', time: '5 min', icon: '💬' },
+            { id: 2, title: 'Transaction reçue', desc: '+20 € de Marc Dubois', time: '2 min', icon: '💸' },
+            { id: 3, title: 'Match demain', desc: 'Monaco vs PSG à 21h', time: '1h', icon: '⚽' },
+            { id: 4, title: 'Nouveau produit', desc: 'Maillot 2024/25 disponible', time: '2h', icon: '👕' },
+            { id: 5, title: 'Cashback', desc: '+5 € de cashback Shop', time: '1h', icon: '🎁' }
+        ];
+        
+        // Langues supportées (codes en MINUSCULES)
+        const langs = {
+            'fr': 'Français',
+            'en': 'English',
+            'es': 'Español',
+            'de': 'Deutsch',
+            'it': 'Italiano',
+            'pt': 'Português',
+            'tr': 'Türkçe',
+            'ru': 'Русский',
+            'zh': '中文',
+            'ar': 'العربية',
+            'ja': '日本語'
+        };
+        
+        // Charger les stories (DÉFILEMENT HORIZONTAL)
+        function loadStories() {
+            const container = document.getElementById('storiesDisplay');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div style="overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 15px 0;">
+                    <div style="display: flex; gap: 12px; padding: 0 15px;">
+                        ${stories.map(story => `
+                            <div class="story-item" onclick="alert('📖 Story de ${story.name}\\n\\n${story.story}')" style="flex-shrink: 0; width: 70px; cursor: pointer; text-align: center;">
+                                <div class="story-ring" style="width: 70px; height: 70px; border-radius: 50%; padding: 3px; background: linear-gradient(45deg, #ff3366, #7c3aed, #fbbf24);">
+                                    <div class="story-avatar" style="width: 100%; height: 100%; border-radius: 50%; border: 3px solid white; background-image: url('${story.avatar}'); background-size: cover; background-position: center;"></div>
+                                </div>
+                                <div class="story-name" style="font-size: 11px; margin-top: 6px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b;">${story.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Charger les transactions temps réel
+        function loadTransactions() {
+            const container = document.getElementById('transactionsContainer');
+            const recentTransactions = transactions.slice(0, 3);
+            container.innerHTML = recentTransactions.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-icon">${t.icon}</div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${t.name}</div>
+                        <div class="transaction-time">${t.time}</div>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'received' ? 'positive' : 'negative'}">
+                        ${t.amount > 0 ? '+' : ''}${t.amount} €
                     </div>
                 </div>
             `).join('');
         }
         
-        // Filter events
-        let allEvents = [];
+        // Charger l'historique complet
+        function loadTransactionsHistory() {
+            const container = document.getElementById('transactionsHistoryContainer');
+            container.innerHTML = transactions.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-icon">${t.icon}</div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${t.name}</div>
+                        <div class="transaction-time">${t.time}</div>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'received' ? 'positive' : 'negative'}">
+                        ${t.amount > 0 ? '+' : ''}${t.amount} €
+                    </div>
+                </div>
+            `).join('');
+        }
         
-        function filterEvents(filter) {
-            // Update tabs
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Charger les notifications
+        function loadNotifications() {
+            const container = document.getElementById('notificationsList');
+            container.innerHTML = notifications.map(n => `
+                <div class="modal-item">
+                    <div style="font-size: 24px; margin-bottom: 8px;">${n.icon}</div>
+                    <div class="modal-item-title">${n.title}</div>
+                    <div class="modal-item-desc">${n.desc}</div>
+                    <span class="modal-item-badge">${n.time}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(`section-${section}`).classList.add('active');
             event.currentTarget.classList.add('active');
             
-            const today = new Date();
-            let filtered = [];
+            if (section === 'accueil') {
+                loadTransactions();
+            } else if (section === 'transactions') {
+                loadTransactionsHistory();
+            }
+        }
+        
+        // Toggle langue (AFFICHE SEULEMENT LE DRAPEAU + I18N)
+        function toggleLanguageDropdown() {
+            const langKeys = Object.keys(langs);
+            const currentIdx = langKeys.indexOf(currentLanguage);
+            const nextIdx = (currentIdx + 1) % langKeys.length;
+            currentLanguage = langKeys[nextIdx];
             
-            if (filter === 'all') {
-                filtered = allEvents;
-            } else if (filter === 'week') {
-                const nextWeek = new Date(today);
-                nextWeek.setDate(today.getDate() + 7);
-                filtered = allEvents.filter(e => e.date <= nextWeek);
-            } else if (filter === 'month') {
-                const nextMonth = new Date(today);
-                nextMonth.setMonth(today.getMonth() + 1);
-                filtered = allEvents.filter(e => e.date <= nextMonth);
+            localStorage.setItem('paiecashfan_lang', currentLanguage);
+            
+            // Afficher SEULEMENT le drapeau (pas le code)
+            const langFlags = {
+                fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹',
+                pt: '🇵🇹', tr: '🇹🇷', ru: '🇷🇺', zh: '🇨🇳', ar: '🇸🇦', ja: '🇯🇵'
+            };
+            document.getElementById('langDisplay').textContent = langFlags[currentLanguage];
+            document.getElementById('currentLanguageDisplay').textContent = langs[currentLanguage] + ' (' + currentLanguage + ')';
+        }
+        
+        // Ouvrir modals
+        function openGamification() {
+            document.getElementById('gamificationModal').classList.add('active');
+        }
+        
+        function openNotifications() {
+            loadNotifications();
+            document.getElementById('notificationsModal').classList.add('active');
+            document.getElementById('notifCount').textContent = '0';
+        }
+        
+        function openEsimService() {
+            document.getElementById('esimModal').classList.add('active');
+        }
+        
+        function openShopService() {
+            document.getElementById('shopModal').classList.add('active');
+        }
+        
+        function openBilletsService() {
+            document.getElementById('billetsModal').classList.add('active');
+        }
+        
+        function openLegendesService() {
+            document.getElementById('legendesModal').classList.add('active');
+        }
+        
+        function openJoueursService() {
+            document.getElementById('joueursModal').classList.add('active');
+        }
+        
+        function openFansService() {
+            document.getElementById('fansModal').classList.add('active');
+        }
+        
+        // ========== SERVICES AFRIQUE ==========
+        
+        // MERCHANDISING OM AFRIQUE avec PaieCash (Wallet + Carte Bancaire + Mobile Money)
+        function openAfriqueMerchandisingService() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">👕 Merchandising OM</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:8px;">🌍 Livraison en Afrique</div>
+                        <div style="color:#64748b;font-size:0.9rem;">Livraison gratuite dans 25+ pays africains</div>
+                    </div>
+                    
+                    <!-- PRODUITS -->
+                    <div style="display:grid;gap:12px;margin-bottom:20px;">
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">👕</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Maillot Domicile 2024/25</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Taille: S, M, L, XL, XXL</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">85€</div>
+                            </div>
+                        </div>
+                        
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">🧣</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Écharpe Officielle OM</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Droit Au But - Edition 2025</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">25€</div>
+                            </div>
+                        </div>
+                        
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:12px;display:flex;gap:12px;">
+                            <div style="font-size:40px;">🧢</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e293b;">Casquette OM Bleu Blanc</div>
+                                <div style="color:#64748b;font-size:0.85rem;margin:4px 0;">Réglable - 100% Coton</div>
+                                <div style="color:#ff3366;font-weight:700;font-size:1.1rem;">30€</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MÉTHODES DE PAIEMENT -->
+                    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-weight:700;color:#166534;margin-bottom:12px;font-size:1.05rem;">💳 Paiement PaieCash</div>
+                        <div style="display:grid;gap:8px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="wallet" checked style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">💰 Wallet Crypto (USDC/EURC)</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="card" style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">💎 Carte Bancaire (Visa/Mastercard)</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:8px;background:white;">
+                                <input type="radio" name="payment" value="mobile" style="width:18px;height:18px;">
+                                <span style="color:#1e293b;font-weight:600;">📱 Mobile Money (Orange/MTN/Moov/Wave)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="alert('✅ Commande confirmée !\\n\\nVotre commande sera livrée sous 7-14 jours.\\n\\nMerci d\\'avoir choisi PaieCash pour votre paiement !')" style="width:100%;padding:16px;background:#ff3366;color:white;border:none;border-radius:12px;font-weight:700;font-size:1.05rem;cursor:pointer;">
+                        🛒 Commander maintenant
+                    </button>
+                    
+                    <div style="color:#64748b;font-size:0.8rem;text-align:center;margin-top:12px;">
+                        ✅ Paiement sécurisé • 🚚 Livraison suivie • 🔄 Retour 30 jours
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // AMBASSADEURS AFRICAINS NFT (Drogba, Beye, Mbia)
+        function openAfriqueAmbassadeursNFTService() {
+            const ambassadeurs = [
+                { nom: 'Didier Drogba', pays: '🇨🇮 Côte d\'Ivoire', periode: '2003-2004', followers: '13M', prix: '299', rarity: 'LEGENDARY' },
+                { nom: 'Habib Beye', pays: '🇸🇳 Sénégal', periode: '2007-2009', followers: '280K', prix: '89', rarity: 'RARE' },
+                { nom: 'Stéphane Mbia', pays: '🇨🇲 Cameroun', periode: '2009-2012', followers: '450K', prix: '129', rarity: 'EPIC' }
+            ];
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">💎 Ambassadeurs NFT</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;padding:16px;margin-bottom:20px;color:white;">
+                        <div style="font-weight:700;margin-bottom:8px;font-size:1.05rem;">🌟 Cartes Collectors NFT</div>
+                        <div style="font-size:0.9rem;opacity:0.95;">Possédez une carte NFT unique de vos légendes africaines préférées !</div>
+                    </div>
+                    
+                    <!-- AMBASSADEURS -->
+                    ${ambassadeurs.map(amb => `
+                        <div style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;background:${amb.rarity === 'LEGENDARY' ? 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' : amb.rarity === 'EPIC' ? 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'};color:${amb.rarity === 'LEGENDARY' ? '#1e293b' : 'white'};">
+                            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+                                <div>
+                                    <div style="font-weight:800;font-size:1.15rem;margin-bottom:4px;">⭐ ${amb.nom}</div>
+                                    <div style="font-size:0.85rem;opacity:0.9;">${amb.pays}</div>
+                                    <div style="font-size:0.8rem;opacity:0.8;margin-top:2px;">${amb.periode}</div>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.2);padding:4px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">
+                                    ${amb.rarity}
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-size:0.8rem;opacity:0.9;margin-bottom:2px;">👥 ${amb.followers} followers</div>
+                                </div>
+                                <button onclick="alert('🎉 NFT ${amb.nom} ajouté au panier !\\n\\nPrix: ${amb.prix}€\\n\\nPayez avec PaieCash Wallet, Carte ou Mobile Money')" style="padding:10px 20px;background:rgba(255,255,255,0.95);color:#1e293b;border:none;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                                    ${amb.prix}€
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <!-- AVANTAGES NFT -->
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-top:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:12px;">✨ Avantages NFT Exclusifs</div>
+                        <div style="display:grid;gap:8px;color:#64748b;font-size:0.85rem;">
+                            <div>🎁 Accès prioritaire aux événements avec l'ambassadeur</div>
+                            <div>📸 Meet & Greet exclusif lors des tournées africaines</div>
+                            <div>🎥 Vidéos personnalisées de votre légende</div>
+                            <div>🏆 Participez aux tirages au sort mensuels</div>
+                            <div>💰 Revendez votre NFT sur le marketplace</div>
+                        </div>
+                    </div>
+                    
+                    <div style="color:#64748b;font-size:0.8rem;text-align:center;margin-top:16px;">
+                        🔐 NFT sur blockchain • ✅ Authentification garantie • 💎 Propriété vérifiable
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function openAfriquePartenariatsService() {
+            alert('🌍 PARTENARIATS AFRICAINS\n\n' +
+                  '• 15 clubs partenaires en Afrique\n' +
+                  '• Académies au Sénégal, Côte d\'Ivoire, Cameroun\n' +
+                  '• Échanges de joueurs et formations\n' +
+                  '• Tournées pré-saison en Afrique\n\n' +
+                  '📍 Prochaine tournée : Été 2025');
+        }
+        
+        function openAfriqueSupportersService() {
+            alert('🎺 SUPPORTERS AFRICAINS\n\n' +
+                  '• 2.5M+ supporters en Afrique\n' +
+                  '• Clubs de supporters : Sénégal, Maroc, Algérie, Cameroun\n' +
+                  '• Événements de visionnage en direct\n' +
+                  '• Rencontres avec légendes du club\n\n' +
+                  '🏆 Communauté la plus active : Sénégal');
+        }
+        
+        function openAfriqueMobileMoneyService() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:20px;max-width:450px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">📱 Mobile Money</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                    </div>
+                    
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;">
+                        <div style="font-weight:700;color:#1e293b;margin-bottom:8px;">💳 Paiement Mobile Money disponible</div>
+                        <div style="color:#64748b;font-size:0.9rem;">Payez vos billets, merchandising et NFT avec votre Mobile Money</div>
+                    </div>
+                    
+                    <!-- OPÉRATEURS -->
+                    <div style="display:grid;gap:12px;margin-bottom:20px;">
+                        <div style="border:2px solid #FF7900;border-radius:12px;padding:16px;background:#FFF5F0;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟠</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#FF7900;font-size:1.1rem;">Orange Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Disponible dans 18 pays</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #FFCB05;border-radius:12px;padding:16px;background:#FFFBF0;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟡</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#E4A300;font-size:1.1rem;">MTN Mobile Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Leader en Afrique</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #0055A4;border-radius:12px;padding:16px;background:#F0F5FF;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🔵</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#0055A4;font-size:1.1rem;">Moov Money</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Afrique de l'Ouest</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                        
+                        <div style="border:2px solid #21C275;border-radius:12px;padding:16px;background:#F0FDF7;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                <div style="font-size:32px;">🟢</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:700;color:#21C275;font-size:1.1rem;">Wave</div>
+                                    <div style="color:#64748b;font-size:0.85rem;">Sénégal, Côte d'Ivoire</div>
+                                </div>
+                            </div>
+                            <div style="color:#64748b;font-size:0.8rem;">✅ Paiement instantané • 🔒 100% sécurisé</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;">
+                        <div style="font-weight:700;color:#166534;margin-bottom:8px;">💰 Avantages PaieCash</div>
+                        <div style="display:grid;gap:6px;color:#64748b;font-size:0.85rem;">
+                            <div>✅ Zéro frais de transaction</div>
+                            <div>✅ Conversion automatique en USDC</div>
+                            <div>✅ Paiement en temps réel</div>
+                            <div>✅ Support 24/7 en français</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function openAfriqueEventsService() {
+            alert('🏆 ÉVÉNEMENTS AFRICAINS\n\n' +
+                  'PROCHAINS ÉVÉNEMENTS:\n\n' +
+                  '⚽ Tournée Afrique de l\'Ouest - Juillet 2025\n' +
+                  '   • Dakar, Abidjan, Accra\n\n' +
+                  '🎉 Fan Fest Casablanca - Août 2025\n' +
+                  '   • Rencontre joueurs et légendes\n\n' +
+                  '🏟️ Match Exhibition Cameroun - Septembre 2025\n\n' +
+                  '🎫 Billets en prévente bientôt !');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Actions gauche
+        function handleLike() {
+            alert('❤️ J\'aime ajouté! +2 PCC gagnés');
+        }
+        
+        function handleShare() {
+            alert('📤 Partagé! +5 PCC gagnés');
+        }
+        
+        function handleSearch() {
+            const query = prompt('🔍 Rechercher:');
+            if (query) {
+                alert(`Recherche: "${query}"`);
+            }
+        }
+        
+        // Navigation vers les équipes spécifiques du club
+        function navigateToEquipes() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || 'Maroc';
+            
+            // Mapping des noms de clubs vers leurs identifiants
+            const clubMapping = {
+                'Paris SG': 'psg',
+                'Paris Saint-Germain': 'psg',
+                'PSG': 'psg',
+                'Olympique de Marseille': 'marseille',
+                'Marseille': 'marseille',
+                'OM': 'marseille',
+                'Olympique Lyonnais': 'lyon',
+                'Lyon': 'lyon',
+                'OL': 'lyon',
+                'AS Monaco': 'monaco',
+                'Monaco': 'monaco',
+                'OGC Nice': 'nice',
+                'Nice': 'nice',
+                'RC Lens': 'lens',
+                'Lens': 'lens',
+                'LOSC Lille': 'lille',
+                'Lille': 'lille',
+                'Stade Rennais': 'rennes',
+                'Rennes': 'rennes',
+                'FC Nantes': 'nantes',
+                'Nantes': 'nantes',
+                'RC Strasbourg': 'strasbourg',
+                'Strasbourg': 'strasbourg',
+                'Stade Brestois': 'brest',
+                'Brest': 'brest',
+                'Montpellier HSC': 'montpellier',
+                'Montpellier': 'montpellier',
+                'Stade de Reims': 'reims',
+                'Reims': 'reims',
+                'Maroc': 'maroc',
+                'MA': 'maroc',
+                'Tanzanie': 'tanzanie',
+                'Tanzania': 'tanzanie',
+                'Young Africans SC': 'tanzanie',
+                'Simba SC': 'tanzanie',
+                'Azam FC': 'tanzanie',
+                'Mauritanie': 'mauritanie',
+                'Mauritania': 'mauritanie',
+                'FC Nouadhibou': 'mauritanie',
+                'AS Douanes': 'mauritanie',
+                'Kenya': 'kenya',
+                'Gor Mahia': 'kenya',
+                'AFC Leopards': 'kenya',
+                'Ouganda': 'ouganda',
+                'Uganda': 'ouganda',
+                'KCCA FC': 'ouganda',
+                'Vipers SC': 'ouganda'
+            };
+            
+            // Obtenir l'ID du club
+            let clubId = clubMapping[clubName] || clubName.toLowerCase().replace(/\s+/g, '-');
+            
+            // Clubs spéciaux avec leur propre page
+            if (clubId === 'maroc') {
+                window.location.href = 'equipes-maroc.html';
+            } else if (clubId === 'tanzanie') {
+                window.location.href = 'equipes-tanzanie.html';
+            } else if (clubId === 'mauritanie') {
+                window.location.href = 'equipes-mauritanie.html';
+            } else if (clubId === 'kenya') {
+                window.location.href = 'equipes-kenya.html';
+            } else if (clubId === 'ouganda') {
+                window.location.href = 'equipes-ouganda.html';
+            } else {
+                // Tous les autres clubs utilisent equipes.html avec paramètre
+                window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}`;
+            }
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialiser I18N en premier
+            if (typeof initialiserMultiLangues === 'function') {
+                initialiserMultiLangues();
             }
             
-            renderEvents(filtered);
-        }
-        
-        // Share modal
-        function closeShareModal() {
-            document.getElementById('shareModal').classList.remove('active');
-        }
-        
-        function openShareModal() {
-            document.getElementById('shareModal').classList.add('active');
-        }
-        
-        function shareOnFacebook() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Rejoignez-moi sur PaieCashFan ${clubName} pour tenter de gagner au LOTO !`);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
-        }
-        
-        function shareOnTwitter() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Rejoignez-moi sur PaieCashFan ${clubName} pour tenter de gagner au LOTO !`);
-            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-        }
-        
-        function shareOnWhatsApp() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Rejoignez-moi sur PaieCashFan ${clubName} pour tenter de gagner au LOTO ! ${window.location.href}`);
-            window.open(`https://wa.me/?text=${text}`, '_blank');
-        }
-        
-        function shareOnTelegram() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(`Rejoignez-moi sur PaieCashFan ${clubName} pour tenter de gagner au LOTO !`);
-            window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            allEvents = generateEvents();
-            renderEvents(allEvents);
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || 'AS Monaco';
+            const clubLogo = urlParams.get('logo') || '⚽';
+            const league = urlParams.get('league') || '';
+            const sport = urlParams.get('sport') || '';
+            
+            document.getElementById('headerClubName').textContent = clubName;
+            
+            // Détecter si c'est une image ou un emoji
+            const headerLogoElement = document.getElementById('headerLogo');
+            const isImageLogo = clubLogo && (
+                clubLogo.includes('assets/') || 
+                clubLogo.includes('.png') || 
+                clubLogo.includes('.svg') || 
+                clubLogo.includes('.jpg')
+            );
+            
+            if (isImageLogo) {
+                // Afficher l'image
+                headerLogoElement.innerHTML = `<img src="${clubLogo}" alt="${clubName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                // Afficher l'emoji ou texte
+                headerLogoElement.textContent = clubLogo;
+            }
+            
+            // 🌍 Pour les fédérations : Garde le MÊME design que les clubs
+            // Seule différence : les sponsors changent (géré automatiquement)
+            
+            // Charger langue actuelle (AFFICHE SEULEMENT LE DRAPEAU)
+            const langFlags = {
+                fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹',
+                pt: '🇵🇹', tr: '🇹🇷', ru: '🇷🇺', zh: '🇨🇳', ar: '🇸🇦', ja: '🇯🇵'
+            };
+            document.getElementById('langDisplay').textContent = langFlags[currentLanguage];
+            document.getElementById('currentLanguageDisplay').textContent = langs[currentLanguage] + ' (' + currentLanguage + ')';
+            
+            loadStories();
+            loadTransactions();
+            
+            // Simuler nouvelles transactions en temps réel toutes les 30s
+            setInterval(() => {
+                console.log('📊 Mise à jour transactions temps réel...');
+                loadTransactions();
+            }, 30000);
         });
     </script>
+
+    <!-- 🎲 MODAL LOTO -->
+    <!-- LOTO MODAL SYSTEM -->
+    <div id="lotoModal" class="loto-modal" style="display: none;">
+        <canvas id="confettiCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
+        <div class="loto-modal-overlay" onclick="closeLoto()"></div>
+        <div class="loto-modal-content">
+            
+            <!-- ÉCRAN 1: PAGE D'ACCUEIL -->
+            <div id="lotoHome" class="loto-screen">
+                <button class="loto-close" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="loto-home-header">
+                    <h1 class="loto-home-title" id="lotoHomeClubName">SAINT-ÉTIENNE</h1>
+                    <p class="loto-home-desc">Achetez vos tickets de loterie et tentez de gagner des récompenses exclusives : billets, merchandising, expériences VIP !</p>
+                    <div class="loto-charity">
+                        <i class="fas fa-heart"></i>
+                        <span>1% des gains vers les actions sociales du club</span>
+                    </div>
+                    <p class="loto-charity-detail">Voyages enfants, écoles, femmes football, équipements sportifs</p>
+                </div>
+
+                <!-- Start your streak -->
+                <div class="loto-streak">
+                    <div class="streak-header">
+                        <i class="fas fa-fire"></i>
+                        <span>Lancez votre série !</span>
+                    </div>
+                    <p class="streak-subtitle">Jouez aujourd'hui pour continuer votre série !</p>
+                    <div class="streak-countdown" id="lotoCountdown">01:05:27</div>
+                    
+                    <div class="streak-calendar">
+                        <div class="streak-day">
+                            <div class="day-label">Lun</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Mar</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Mer</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Jeu</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Ven</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day">
+                            <div class="day-label">Sam</div>
+                            <div class="day-status">-</div>
+                        </div>
+                        <div class="streak-day active">
+                            <div class="day-label">Dim</div>
+                            <div class="day-status">▶</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 Options de jeu -->
+                <div class="loto-game-options">
+                    <div class="game-option-card" onclick="openScratchMode()">
+                        <div class="game-option-icon">✨</div>
+                        <h3 class="game-option-title">SCRATCH</h3>
+                        <p class="game-option-desc">Achetez un ticket et grattez pour révéler vos récompenses : billets, merchandising, expériences VIP !</p>
+                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                    </div>
+                    
+                    <div class="game-option-card" onclick="openNumbersMode()">
+                        <div class="game-option-icon">#</div>
+                        <h3 class="game-option-title">LOTO CHIFFRES</h3>
+                        <p class="game-option-desc">Choisissez 5 numéros de 1 à 49 et tentez de remporter le jackpot !</p>
+                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                    </div>
+                </div>
+
+                <!-- Game Rules -->
+                <div class="loto-rules" onclick="toggleRules()">
+                    <i class="fas fa-book"></i>
+                    <span>Règles du jeu</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- ÉCRAN 2: MODE SCRATCH -->
+            <div id="lotoScratch" class="loto-screen" style="display: none;">
+                <button class="loto-back" onclick="backToLotoHome()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="loto-close" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 class="scratch-title">MODE SCRATCH</h2>
+                
+                <!-- Ticket Selection -->
+                <div class="scratch-tickets" id="scratchTicketSelection">
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(10, 1)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">10 PCC</div>
+                        <div class="ticket-info">1 ticket</div>
+                        <div class="ticket-chances">chances: 1/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card popular" onclick="selectScratchTicket(25, 3)">
+                        <div class="ticket-badge">⭐ POPULAIRE</div>
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">25 PCC</div>
+                        <div class="ticket-bonus">⚡ +50%</div>
+                        <div class="ticket-info">3 tickets</div>
+                        <div class="ticket-chances">chances: 3/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(50, 6)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">50 PCC</div>
+                        <div class="ticket-bonus">⚡ x2</div>
+                        <div class="ticket-info">6 tickets</div>
+                        <div class="ticket-chances">chances: 6/1000</div>
+                    </div>
+                    <div class="scratch-ticket-card" onclick="selectScratchTicket(100, 15)">
+                        <div class="ticket-icon">🎫</div>
+                        <div class="ticket-price">100 PCC</div>
+                        <div class="ticket-bonus">⚡ x3</div>
+                        <div class="ticket-info">15 tickets</div>
+                        <div class="ticket-chances">chances: 15/1000</div>
+                    </div>
+                    <button class="scratch-buy-btn" onclick="buyScratchTicket()">
+                        <i class="fas fa-ticket-alt"></i> ACHETER & GRATTER - <span id="scratchPrice">25</span> PCC
+                    </button>
+                    <p class="scratch-balance">Votre solde: <span id="userBalance">500</span> PCC</p>
+                </div>
+
+                <!-- Scratch Card -->
+                <div class="scratch-card-container" id="scratchCardContainer" style="display: none;">
+                    <div class="scratch-timer" id="scratchTimer">6s</div>
+                    <div class="scratch-ticket-info">
+                        <i class="fas fa-ticket-alt"></i> VOTRE TICKET
+                        <div><span id="scratchClubName">Saint-Étienne</span> — <span id="scratchTicketCount">3</span> tickets</div>
+                        <div>Coût du ticket: <span id="scratchCost">25</span> PCC</div>
+                    </div>
+                    
+                    <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
+                    <div class="scratch-instruction">TAP TO SCRATCH</div>
+                </div>
+
+                <!-- Result -->
+                <div class="scratch-result" id="scratchResult" style="display: none;">
+                    <div class="result-icon">🏆</div>
+                    <h2 class="result-title">FÉLICITATIONS, VOUS GAGNEZ !</h2>
+                    <div class="result-amount">+<span id="scratchWinAmount">50</span></div>
+                    <div class="result-currency">PaieCash Coins</div>
+                    
+                    <div class="result-details">
+                        <div class="result-row">
+                            <span>🎫 Coût du ticket</span>
+                            <span id="resultCost">25 PCC</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Multiplicateur</span>
+                            <span class="result-multiplier" id="resultMultiplier">x2</span>
+                        </div>
+                        <div class="result-row total">
+                            <span>Total gagné</span>
+                            <span class="result-total" id="resultTotal">+50 PCC</span>
+                        </div>
+                    </div>
+
+                    <div class="result-balance">
+                        <i class="fas fa-chart-line"></i> Nouveau solde: <span id="resultNewBalance">525</span> PCC
+                    </div>
+                    <div class="result-charity">
+                        <i class="fas fa-heart"></i> 0 PCC donnés à des œuvres caritatives — Total donné aux actions sociales: 0 PCC
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="result-btn primary" onclick="playScratchAgain()">
+                            <i class="fas fa-redo"></i> REJOUER
+                        </button>
+                        <button class="result-btn" onclick="backToLotoHome()">
+                            <i class="fas fa-home"></i> Accueil
+                        </button>
+                        <button class="result-btn" onclick="viewSuperJackpot()">
+                            <i class="fas fa-star"></i> SUPER JACKPOT
+                        </button>
+                        <button class="result-btn" onclick="shareResult()">
+                            <i class="fas fa-share"></i> Partager
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÉCRAN 3: MODE LOTO CHIFFRES -->
+            <div id="lotoNumbers" class="loto-screen" style="display: none;">
+                <button class="loto-back" onclick="backToLotoHome()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="loto-close" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 class="numbers-title"># LOTO CHIFFRES</h2>
+                <p class="numbers-subtitle">Choisissez 5 numéros de 1 à 49 et tentez de remporter le jackpot !</p>
+
+                <!-- Gains Table -->
+                <div class="numbers-gains-table">
+                    <div class="gain-item">1/5 <span>x2</span></div>
+                    <div class="gain-item">2/5 <span>x5</span></div>
+                    <div class="gain-item">3/5 <span>x25</span></div>
+                    <div class="gain-item highlight">4/5 <span>x500</span></div>
+                    <div class="gain-item highlight">5/5 <span>x50K</span></div>
+                </div>
+
+                <!-- Number Grid -->
+                <div class="numbers-selection">
+                    <div class="numbers-header">
+                        <span>Choisissez vos numéros (<span id="selectedCount">0</span>/5)</span>
+                        <button class="numbers-random-btn" onclick="randomNumbers()">
+                            <i class="fas fa-random"></i> Aléatoire
+                        </button>
+                    </div>
+                    
+                    <div class="numbers-grid" id="numbersGrid">
+                        <!-- Généré par JavaScript -->
+                    </div>
+
+                    <button class="numbers-add-line-btn" onclick="addNumberLine()">
+                        <i class="fas fa-plus"></i> Ajouter la ligne (0/5)
+                    </button>
+                </div>
+
+                <!-- User Lines -->
+                <div class="numbers-lines" id="numbersLines">
+                    <h3>Vos lignes</h3>
+                    <div class="empty-lines">Aucune ligne ajoutée</div>
+                </div>
+
+                <!-- Play Button -->
+                <div class="numbers-footer">
+                    <div class="numbers-cost">Coût total: <span id="numbersTotalCost">0</span> PCC</div>
+                    <button class="numbers-play-btn" onclick="playNumbersLoto()" disabled>
+                        <i class="fas fa-play"></i> LANCER LE TIRAGE
+                    </button>
+                    <p class="numbers-charity">
+                        <i class="fas fa-heart"></i> 1% de chaque mise est reversé aux œuvres caritatives du club
+                    </p>
+                </div>
+
+                <!-- Result -->
+                <div class="numbers-result" id="numbersResult" style="display: none;">
+                    <h2 class="result-title">TIRAGE EN COURS</h2>
+                    <p class="result-subtitle">Les numéros gagnants sont révélés...</p>
+                    
+                    <div class="winning-numbers" id="winningNumbers">
+                        <!-- Généré par JavaScript -->
+                    </div>
+
+                    <div class="user-lines-result" id="userLinesResult">
+                        <!-- Généré par JavaScript -->
+                    </div>
+
+                    <div class="result-message" id="numbersResultMessage">
+                        <h3>PAS CETTE FOIS...</h3>
+                        <p>Tentez votre chance au prochain tirage !</p>
+                    </div>
+
+                    <div class="result-balance">
+                        Nouveau solde: <span id="numbersNewBalance">490</span> PCC
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="result-btn primary" onclick="playNumbersAgain()">
+                            <i class="fas fa-redo"></i> REJOUER
+                        </button>
+                        <button class="result-btn" onclick="backToLotoHome()">
+                            <i class="fas fa-home"></i> Accueil
+                        </button>
+                        <button class="result-btn" onclick="shareResult()">
+                            <i class="fas fa-share"></i> Partager
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🎬 STORIES SYSTÈME -->
+    <script src="js/storiesManager.js"></script>
+    <script>
+        // Initialiser les stories au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof storiesManager !== 'undefined') {
+                console.log('🎬 Initialisation stories...');
+                storiesManager.loadAllStories();
+                storiesManager.startAutoPlay();
+                console.log('✅ Stories initialisées avec auto-scroll');
+            } else {
+                console.warn('⚠️ storiesManager non chargé');
+            }
+        });
+    </script>
+
+    <!-- 🎰 MODAL TOMBOLA -->
+    <div id="tombola-modal" class="loto-modal">
+        <div class="loto-modal-content" style="max-width: 900px;">
+            <button class="loto-modal-close" onclick="document.getElementById('tombola-modal').classList.remove('active')">&times;</button>
+            
+            <!-- Section Tombola complète -->
+            <section class="tombola-section" id="tombola-section" style="margin: 0; box-shadow: none;">
+                <div class="tombola-header">
+                    <div class="tombola-title">
+                        <div class="tombola-icon">🎰</div>
+                        <h2>Tombola Quotidienne</h2>
+                    </div>
+                    <p class="tombola-subtitle">Gagnez des lots incroyables chaque jour !</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="tombola-stats" id="tombola-stats">
+                    <div class="tombola-stat-card">
+                        <div class="tombola-stat-value" id="active-campaigns-count">-</div>
+                        <div class="tombola-stat-label">Tirages actifs</div>
+                    </div>
+                    <div class="tombola-stat-card">
+                        <div class="tombola-stat-value" id="total-lots-count">-</div>
+                        <div class="tombola-stat-label">Lots disponibles</div>
+                    </div>
+                    <div class="tombola-stat-card">
+                        <div class="tombola-stat-value" id="total-participations-count">-</div>
+                        <div class="tombola-stat-label">Participations</div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tombola-tabs">
+                    <button class="tombola-tab active" data-tab="campaigns">
+                        <i class="fas fa-trophy"></i> Tirages Actifs
+                    </button>
+                    <button class="tombola-tab" data-tab="lots">
+                        <i class="fas fa-gift"></i> Catalogue
+                    </button>
+                    <button class="tombola-tab" data-tab="participations">
+                        <i class="fas fa-ticket-alt"></i> Mes Participations
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="tombola-content">
+                    <!-- Tab 1: Campaigns -->
+                    <div class="tombola-tab-content active" id="tab-campaigns">
+                        <div id="campaigns-list" class="tombola-grid">
+                            <div class="tombola-loading">Chargement des tirages...</div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Lots -->
+                    <div class="tombola-tab-content" id="tab-lots">
+                        <div class="tombola-filters">
+                            <select id="category-filter" class="tombola-select">
+                                <option value="">Toutes catégories</option>
+                                <option value="merchandise">Merchandising</option>
+                                <option value="billetterie">Billetterie</option>
+                                <option value="experiences">Expériences</option>
+                                <option value="formation">Formation</option>
+                                <option value="esim">eSIM</option>
+                                <option value="vehicules">Véhicules</option>
+                                <option value="electronique">Électronique</option>
+                                <option value="cash">Cash</option>
+                                <option value="super_bonus">Super Bonus</option>
+                                <option value="immobilier">Immobilier</option>
+                            </select>
+                        </div>
+                        <div id="lots-list" class="tombola-grid">
+                            <div class="tombola-loading">Chargement du catalogue...</div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: My Participations -->
+                    <div class="tombola-tab-content" id="tab-participations">
+                        <div id="participations-list" class="tombola-grid">
+                            <div class="tombola-empty">
+                                <i class="fas fa-inbox"></i>
+                                <p>Vous n'avez pas encore participé</p>
+                                <button class="tombola-btn" onclick="document.querySelector('[data-tab=campaigns]').click()">
+                                    Voir les tirages actifs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 🎰 TOMBOLA SYSTEM -->
     <script src="/static/tombola.js"></script>
+    <script>
+        // Fonction pour ouvrir le service Tombola
+        function openTombolaService() {
+            document.getElementById('tombola-modal').classList.add('active');
+            // Initialiser si pas encore fait
+            if (typeof TombolaUI !== 'undefined' && document.getElementById('tombola-section')) {
+                TombolaUI.init();
+            }
+        }
+    </script>
 </body>
 </html>
