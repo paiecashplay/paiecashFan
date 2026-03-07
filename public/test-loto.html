@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Bouton Loto</title>
+    <style>
+        .test-btn {
+            padding: 20px;
+            font-size: 18px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Bouton Loto</h1>
+    <button class="test-btn" onclick="alert('Bouton cliqué!')">Test Simple</button>
+    <button class="test-btn" onclick="openLoto()">Test openLoto()</button>
+    
+    <div id="headerClubName">Marseille</div>
+    <div id="lotoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8);">
+        <div style="background:white; margin:50px auto; padding:20px; max-width:500px;">
+            <h2>Modal Loto</h2>
+            <div id="lotoHomeClubName"></div>
+            <div id="lotoHome">Accueil</div>
+            <div id="lotoScratch">Scratch</div>
+            <div id="lotoNumbers">Numbers</div>
+            <div id="lotoTombola">Tombola</div>
+            <button onclick="closeLoto()">Fermer</button>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Script chargé');
+        
+        function applyClubTheme(clubName) {
+            console.log('Theme appliqué:', clubName);
+        }
+        
+        function startLotoCountdown() {
+            console.log('Countdown démarré');
+        }
+        
+        function openLoto() {
+            console.log('openLoto() appelé');
+            const modal = document.getElementById('lotoModal');
+            const clubName = document.getElementById('headerClubName').textContent;
+            document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
+            
+            applyClubTheme(clubName);
+            
+            modal.style.display = 'flex';
+            document.getElementById('lotoHome').style.display = 'block';
+            document.getElementById('lotoScratch').style.display = 'none';
+            document.getElementById('lotoNumbers').style.display = 'none';
+            document.getElementById('lotoTombola').style.display = 'none';
+            
+            document.body.style.overflow = 'hidden';
+            
+            startLotoCountdown();
+            console.log('Modal affichée');
+        }
+        
+        function closeLoto() {
+            console.log('closeLoto() appelé');
+            const modal = document.getElementById('lotoModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>

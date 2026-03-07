@@ -2288,6 +2288,44 @@
             }
         }
     </style>
+    
+    <!-- SCRIPT URGENT : Charger openLoto() immédiatement pour éviter "not defined" -->
+    <script>
+        // Fonction globale accessible immédiatement
+        window.openLoto = function() {
+            console.log('🎰 openLoto() GLOBAL appelé');
+            try {
+                const modal = document.getElementById('lotoModal');
+                if (!modal) {
+                    console.error('❌ lotoModal introuvable - DOM pas encore chargé?');
+                    // Réessayer après chargement DOM
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            window.openLoto();
+                        });
+                    }
+                    return;
+                }
+                
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+                // Masquer toutes les sections sauf Home
+                const sections = ['lotoHome', 'lotoScratch', 'lotoNumbers', 'lotoTombola'];
+                sections.forEach((id, idx) => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = (idx === 0) ? 'block' : 'none';
+                });
+                
+                console.log('✅ Modal Loto ouverte');
+            } catch (error) {
+                console.error('❌ Erreur openLoto():', error);
+                alert('Erreur: ' + error.message);
+            }
+        };
+        
+        console.log('✅ openLoto() chargé en global');
+    </script>
 </head>
 <body>
 
@@ -3478,24 +3516,56 @@ function applyClubTheme(clubName) {
 
 // Ouvrir la modal LOTO (page d'accueil)
 function openLoto() {
-    const modal = document.getElementById('lotoModal');
-    const clubName = document.getElementById('headerClubName').textContent;
-    document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
-    
-    // Appliquer le thème du club
-    applyClubTheme(clubName);
-    
-    // Afficher la modal et la page d'accueil
-    modal.style.display = 'flex';
-    document.getElementById('lotoHome').style.display = 'block';
-    document.getElementById('lotoScratch').style.display = 'none';
-    document.getElementById('lotoNumbers').style.display = 'none';
-    document.getElementById('lotoTombola').style.display = 'none';
-    
-    document.body.style.overflow = 'hidden';
-    
-    // Démarrer le compte à rebours
-    startLotoCountdown();
+    try {
+        console.log('🎰 openLoto() appelé');
+        
+        const modal = document.getElementById('lotoModal');
+        if (!modal) {
+            console.error('❌ lotoModal introuvable');
+            return;
+        }
+        console.log('✅ lotoModal trouvé');
+        
+        const headerClubName = document.getElementById('headerClubName');
+        if (!headerClubName) {
+            console.error('❌ headerClubName introuvable');
+            return;
+        }
+        const clubName = headerClubName.textContent;
+        console.log('✅ clubName:', clubName);
+        
+        const lotoHomeClubName = document.getElementById('lotoHomeClubName');
+        if (!lotoHomeClubName) {
+            console.error('❌ lotoHomeClubName introuvable');
+            return;
+        }
+        lotoHomeClubName.textContent = clubName.toUpperCase();
+        console.log('✅ lotoHomeClubName mis à jour');
+        
+        // Appliquer le thème du club
+        console.log('🎨 Application thème...');
+        applyClubTheme(clubName);
+        console.log('✅ Thème appliqué');
+        
+        // Afficher la modal et la page d'accueil
+        modal.style.display = 'flex';
+        document.getElementById('lotoHome').style.display = 'block';
+        document.getElementById('lotoScratch').style.display = 'none';
+        document.getElementById('lotoNumbers').style.display = 'none';
+        document.getElementById('lotoTombola').style.display = 'none';
+        console.log('✅ Modal affichée');
+        
+        document.body.style.overflow = 'hidden';
+        
+        // Démarrer le compte à rebours
+        console.log('⏰ Démarrage countdown...');
+        startLotoCountdown();
+        console.log('✅ openLoto() terminé avec succès');
+        
+    } catch (error) {
+        console.error('❌ ERREUR dans openLoto():', error);
+        alert('Erreur lors de l\'ouverture du Loto: ' + error.message);
+    }
 }
 
 // Fermer la modal LOTO
