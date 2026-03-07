@@ -1943,6 +1943,350 @@
                 font-size: 12px;
             }
         }
+
+        /* ====================================
+           💳 MODAL PAIEMENT TOMBOLA
+        ==================================== */
+        
+        .payment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .payment-modal-content {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payment-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f1f5f9;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #64748b;
+            transition: all 0.2s;
+            z-index: 1;
+        }
+
+        .payment-close-btn:hover {
+            background: #e2e8f0;
+            transform: rotate(90deg);
+        }
+
+        .payment-header {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px 20px 0 0;
+            color: white;
+        }
+
+        .payment-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .payment-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .payment-campaign-info {
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .campaign-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .campaign-info-label {
+            color: #64748b;
+        }
+
+        .campaign-info-value {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .payment-entries {
+            padding: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .payment-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+
+        .entries-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .entry-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .entry-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .entry-btn:active {
+            transform: scale(0.95);
+        }
+
+        #numEntries {
+            width: 80px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .entries-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 10px 0 0 0;
+        }
+
+        .payment-total {
+            padding: 20px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .total-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .payment-balance {
+            padding: 15px 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            margin: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        .payment-methods {
+            padding: 20px;
+        }
+
+        .methods-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+            margin: 0 0 15px 0;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .method-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .method-btn:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+            transform: translateX(5px);
+        }
+
+        .method-btn.selected {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+
+        .method-btn i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .method-btn span {
+            flex: 1;
+            font-weight: 600;
+            color: #1e293b;
+            text-align: left;
+        }
+
+        .method-badge {
+            padding: 4px 10px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .payment-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 14px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-confirm {
+            flex: 2;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .payment-modal-content {
+                margin: 0;
+                border-radius: 20px 20px 0 0;
+                max-height: 95vh;
+            }
+
+            .payment-total {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .payment-actions {
+                flex-direction: column;
+            }
+
+            .btn-cancel,
+            .btn-confirm {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -3294,7 +3638,7 @@ async function loadTombolaCampaigns() {
                             <i class="fas fa-calendar"></i> 
                             Tirage: ${formatDate(c.draw_datetime)}
                         </div>
-                        <button class="btn-participate" onclick="participateCampaign('${c.id}', ${c.entry_fee})">
+                        <button class="btn-participate" onclick="participateCampaign('${c.id}', ${c.entry_fee}, '${c.name}', '${c.prize_name}', ${c.prize_value})">
                             Participer
                         </button>
                     </div>
@@ -3370,48 +3714,166 @@ async function loadMyTickets() {
 }
 
 // ========== PARTICIPATION ==========
-async function participateCampaign(campaignId, entryFee) {
-    // TODO: Vérifier le solde utilisateur
+let currentCampaign = null;
+let selectedPaymentMethod = 'wallet';
+
+async function participateCampaign(campaignId, entryFee, campaignName, prizeName, prizeValue) {
+    // Stocker les infos de la campagne
+    currentCampaign = {
+        id: campaignId,
+        entryFee: entryFee,
+        name: campaignName,
+        prizeName: prizeName,
+        prizeValue: prizeValue
+    };
+    
+    // Récupérer le solde
     const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
     
-    if (userBalance < entryFee) {
-        showToast('❌ Solde insuffisant', 'error');
+    // Afficher la modal
+    document.getElementById('paymentModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Remplir les infos de la campagne
+    document.getElementById('paymentCampaignInfo').innerHTML = `
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Tirage:</span>
+            <span class="campaign-info-value">${campaignName}</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Lot:</span>
+            <span class="campaign-info-value">${prizeName}</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Valeur:</span>
+            <span class="campaign-info-value">${prizeValue}€</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Prix unitaire:</span>
+            <span class="campaign-info-value">${entryFee}€</span>
+        </div>
+    `;
+    
+    // Afficher le solde
+    document.getElementById('userBalanceDisplay').textContent = `${userBalance.toFixed(2)} PCC`;
+    
+    // Réinitialiser
+    document.getElementById('numEntries').value = 1;
+    updateTotalAmount();
+    selectPaymentMethod('wallet');
+}
+
+function closePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    currentCampaign = null;
+}
+
+function changeEntries(delta) {
+    const input = document.getElementById('numEntries');
+    let value = parseInt(input.value) + delta;
+    
+    // Limiter entre 1 et 5
+    value = Math.max(1, Math.min(5, value));
+    input.value = value;
+    
+    updateTotalAmount();
+}
+
+function updateTotalAmount() {
+    if (!currentCampaign) return;
+    
+    const numEntries = parseInt(document.getElementById('numEntries').value);
+    const total = (currentCampaign.entryFee * numEntries).toFixed(2);
+    document.getElementById('totalAmount').textContent = `${total}€`;
+}
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    
+    // Retirer la classe selected de tous les boutons
+    document.querySelectorAll('.method-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Ajouter la classe au bouton sélectionné
+    const buttons = document.querySelectorAll('.method-btn');
+    if (method === 'wallet') buttons[0].classList.add('selected');
+    else if (method === 'card') buttons[1].classList.add('selected');
+    else if (method === 'mobile') buttons[2].classList.add('selected');
+}
+
+async function confirmPayment() {
+    if (!currentCampaign) return;
+    
+    const numEntries = parseInt(document.getElementById('numEntries').value);
+    const totalAmount = currentCampaign.entryFee * numEntries;
+    const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
+    
+    // Vérifier le solde
+    if (selectedPaymentMethod === 'wallet' && userBalance < totalAmount) {
+        alert('❌ Solde insuffisant dans votre PaieCash Wallet');
         return;
     }
     
-    const confirmMsg = `Participer au tirage pour ${entryFee}€ ?`;
-    if (!confirm(confirmMsg)) return;
+    // Désactiver le bouton pendant le traitement
+    const btn = document.getElementById('btnConfirmPayment');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
     
     try {
         const response = await fetch('/api/tombola/participate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                campaign_id: campaignId,
-                user_id: 'user-demo-001', // TODO: Remplacer par vrai user_id
-                num_entries: 1
+                campaign_id: currentCampaign.id,
+                user_id: 'user-demo-001',
+                num_entries: numEntries,
+                payment_method: selectedPaymentMethod,
+                amount: totalAmount
             })
         });
         
         const data = await response.json();
         
         if (data.success) {
-            // Mise à jour solde
-            const newBalance = userBalance - entryFee;
-            localStorage.setItem('userBalance', newBalance);
+            // Mise à jour du solde si paiement par wallet
+            if (selectedPaymentMethod === 'wallet') {
+                const newBalance = userBalance - totalAmount;
+                localStorage.setItem('userBalance', newBalance.toFixed(2));
+            }
             
-            showToast(`✅ Participation enregistrée ! Ticket N°${data.ticket_numbers.join(', ')}`, 'success');
+            // Fermer la modal
+            closePaymentModal();
             
-            // Recharger les stats
+            // Afficher le succès
+            showSuccessModal(data, numEntries);
+            
+            // Recharger les stats et campagnes
             loadTombolaStats();
+            loadTombolaCampaigns();
         } else {
-            showToast('❌ ' + (data.error || 'Erreur de participation'), 'error');
+            alert('❌ ' + (data.error || 'Erreur de participation'));
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
         }
     } catch (error) {
         console.error('❌ Erreur participation:', error);
-        showToast('❌ Erreur réseau', 'error');
+        alert('❌ Erreur réseau. Veuillez réessayer.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
     }
 }
+
+function showSuccessModal(data, numEntries) {
+    const ticketNumbers = data.ticket_numbers || [];
+    const ticketText = ticketNumbers.length > 1 
+        ? `Tickets N° ${ticketNumbers.join(', ')}`
+        : `Ticket N° ${ticketNumbers[0]}`;
+    
+    alert(`🎉 Participation enregistrée avec succès !\n\n${ticketText}\n\nBonne chance pour le tirage !`);
+}
+
 
 // ========== UTILITAIRES ==========
 function getCategoryIcon(category) {
@@ -5057,6 +5519,75 @@ function shareResult() {
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- 💳 MODAL PAIEMENT TOMBOLA -->
+    <div id="paymentModal" class="payment-modal" style="display: none;">
+        <div class="payment-modal-overlay" onclick="closePaymentModal()"></div>
+        <div class="payment-modal-content">
+            <button class="payment-close-btn" onclick="closePaymentModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="payment-header">
+                <div class="payment-icon">💳</div>
+                <h2 class="payment-title">Finaliser ma participation</h2>
+            </div>
+            
+            <div class="payment-campaign-info" id="paymentCampaignInfo">
+                <!-- Dynamiquement rempli -->
+            </div>
+            
+            <div class="payment-entries">
+                <label class="payment-label">Nombre d'entrées :</label>
+                <div class="entries-selector">
+                    <button class="entry-btn" onclick="changeEntries(-1)">-</button>
+                    <input type="number" id="numEntries" value="1" min="1" max="5" readonly>
+                    <button class="entry-btn" onclick="changeEntries(1)">+</button>
+                </div>
+                <p class="entries-hint">Maximum 5 entrées par tirage</p>
+            </div>
+            
+            <div class="payment-total">
+                <div class="total-label">Total à payer :</div>
+                <div class="total-amount" id="totalAmount">1.50€</div>
+            </div>
+            
+            <div class="payment-balance">
+                <i class="fas fa-wallet"></i>
+                <span>Solde disponible : <strong id="userBalanceDisplay">500 PCC</strong></span>
+            </div>
+            
+            <div class="payment-methods">
+                <h3 class="methods-title">Choisir un mode de paiement :</h3>
+                <div class="methods-grid">
+                    <button class="method-btn" onclick="selectPaymentMethod('wallet')">
+                        <i class="fas fa-wallet"></i>
+                        <span>PaieCash Wallet</span>
+                        <div class="method-badge">Instantané</div>
+                    </button>
+                    <button class="method-btn" onclick="selectPaymentMethod('card')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Carte Bancaire</span>
+                        <div class="method-badge">Sécurisé</div>
+                    </button>
+                    <button class="method-btn" onclick="selectPaymentMethod('mobile')">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Mobile Money</span>
+                        <div class="method-badge">Orange/Wave</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="payment-actions">
+                <button class="btn-cancel" onclick="closePaymentModal()">
+                    Annuler
+                </button>
+                <button class="btn-confirm" id="btnConfirmPayment" onclick="confirmPayment()">
+                    <i class="fas fa-lock"></i> Confirmer le paiement
+                </button>
+            </div>
         </div>
     </div>
 
