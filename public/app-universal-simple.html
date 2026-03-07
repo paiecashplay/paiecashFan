@@ -3490,6 +3490,7 @@ function openLoto() {
     document.getElementById('lotoHome').style.display = 'block';
     document.getElementById('lotoScratch').style.display = 'none';
     document.getElementById('lotoNumbers').style.display = 'none';
+    document.getElementById('lotoTombola').style.display = 'none';
     
     document.body.style.overflow = 'hidden';
     
@@ -3631,14 +3632,31 @@ async function loadTombolaCampaigns() {
                             <div class="detail-label">Participants</div>
                             <div class="detail-value">${c.current_participants || 0} <span style="font-size: 11px; color: #94a3b8;">(min: ${c.min_participants})</span></div>
                         </div>
-                        <div class="campaign-detail-item">
-                            <div class="detail-label">Statut</div>
-                            <div class="detail-value" style="font-size: 11px;">
-                                ${(c.current_participants || 0) >= c.min_participants 
-                                    ? '<span style="color: #10b981;">✓ Validé</span>' 
-                                    : '<span style="color: #f59e0b;">⏳ ' + Math.max(0, c.min_participants - (c.current_participants || 0)) + ' restants</span>'}
-                            </div>
-                        </div>
+                    </div>
+                    
+                    <!-- Validation financière : Somme ≥ 2× valeur lot -->
+                    <div style="padding: 0 15px 10px 15px;">
+                        ${(() => {
+                            const currentAmount = (c.current_participants || 0) * c.entry_fee;
+                            const requiredAmount = c.prize_value * 2;
+                            const percentage = Math.min(100, (currentAmount / requiredAmount) * 100);
+                            const isValid = currentAmount >= requiredAmount;
+                            
+                            return `
+                                <div style="margin-bottom: 5px; display: flex; justify-content: space-between; font-size: 11px;">
+                                    <span style="color: #64748b;">💰 Cagnotte : ${currentAmount.toFixed(2)}€</span>
+                                    <span style="color: #64748b;">Objectif : ${requiredAmount}€</span>
+                                </div>
+                                <div style="background: #e2e8f0; border-radius: 10px; height: 8px; overflow: hidden;">
+                                    <div style="background: ${isValid ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #f59e0b, #d97706)'}; height: 100%; width: ${percentage}%; transition: all 0.3s ease;"></div>
+                                </div>
+                                <div style="margin-top: 5px; text-align: center; font-size: 11px;">
+                                    ${isValid 
+                                        ? '<span style="color: #10b981; font-weight: bold;">✓ Tirage validé</span>' 
+                                        : `<span style="color: #f59e0b;">⏳ Encore ${(requiredAmount - currentAmount).toFixed(2)}€ nécessaires</span>`}
+                                </div>
+                            `;
+                        })()}
                     </div>
                     
                     <div class="campaign-footer">
@@ -5616,7 +5634,8 @@ function shareResult() {
                     </p>
                     <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155;">
                         <li>Le tirage nécessite un <strong>nombre minimum de participants</strong> pour être validé.</li>
-                        <li>Si le minimum n'est pas atteint avant la date du tirage : <strong>ANNULATION automatique</strong></li>
+                        <li><strong>💰 Règle financière :</strong> La somme totale des participations doit atteindre <strong>au minimum 2× la valeur du lot</strong> pour valider le tirage.</li>
+                        <li>Si les conditions ne sont pas remplies avant la date du tirage : <strong>ANNULATION automatique</strong></li>
                         <li>En cas d'annulation : <strong>Remboursement intégral</strong> sur votre PaieCash Wallet</li>
                         <li>Vous pourrez <strong>rejouer</strong> lors du prochain tirage</li>
                     </ul>
