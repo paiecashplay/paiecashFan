@@ -1555,181 +1555,394 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ====================================
+           🎰 STYLES TOMBOLA QUOTIDIENNE
+        ==================================== */
         
-        /* ========== MODE TOMBOLA ========== */
-        .tombola-title {
-            font-size: 1.8rem;
-            font-weight: 800;
+        .tombola-header {
             text-align: center;
-            margin: 20px 0 10px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .tombola-subtitle {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
+            padding: 25px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
             margin-bottom: 20px;
-            font-size: 0.9rem;
+            color: white;
         }
-        
-        .tombola-stats-row {
+
+        .tombola-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .tombola-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tombola-subtitle {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 5px 0 0 0;
+        }
+
+        /* STATISTIQUES */
+        .tombola-stats-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 0 5px;
         }
-        
-        .tombola-stat-box {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 15px;
+
+        .tombola-stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 16px;
+            padding: 18px 12px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
         }
-        
-        .tombola-stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #f59e0b;
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 5px;
         }
-        
-        .tombola-stat-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.95;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
-        .tombola-tabs-nav {
+
+        /* TABS NAVIGATION */
+        .tombola-tabs {
             display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            padding: 0 5px;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            overflow-x: auto;
         }
-        
-        .tombola-tab-btn {
+
+        .tombola-tab {
             flex: 1;
-            padding: 12px 15px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.85rem;
+            min-width: 110px;
+            padding: 12px 10px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 13px;
             font-weight: 600;
+            color: #64748b;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
-        
-        .tombola-tab-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(245, 158, 11, 0.3);
+
+        .tombola-tab i {
+            margin-right: 5px;
         }
-        
-        .tombola-tab-btn.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-color: #f59e0b;
+
+        .tombola-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
-        .tombola-content-wrapper {
-            position: relative;
-            min-height: 300px;
+
+        .tombola-tab:not(.active):hover {
+            background: #e2e8f0;
+            border-color: #cbd5e0;
         }
-        
+
+        /* CONTENU */
+        .tombola-content {
+            padding: 0 10px 20px;
+        }
+
         .tombola-tab-content {
             display: none;
         }
-        
+
         .tombola-tab-content.active {
             display: block;
+            animation: fadeIn 0.4s ease;
         }
-        
-        .tombola-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            padding: 10px 5px;
+
+        /* FILTRES */
+        .tombola-filters {
+            margin-bottom: 20px;
         }
-        
-        .tombola-select {
+
+        .tombola-filters select {
             width: 100%;
             padding: 12px 15px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
             cursor: pointer;
         }
-        
-        .tombola-select option {
-            background: #1a1a2e;
+
+        /* GRILLES */
+        .campaigns-grid,
+        .lots-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        /* CARTE DE CAMPAGNE */
+        .campaign-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 2px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .campaign-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .campaign-prize-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 12px;
+        }
+
+        .campaign-info {
+            flex: 1;
+        }
+
+        .campaign-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 4px 0;
+        }
+
+        .campaign-prize {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .campaign-prize-value {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .campaign-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .campaign-detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .detail-value.highlight {
+            color: #f5576c;
+        }
+
+        .campaign-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .campaign-date {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-participate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        .tombola-loading {
+
+        .btn-participate:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* CARTE LOT */
+        .lot-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 2px solid #f1f5f9;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .lot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.2);
+            border-color: #f5576c;
+        }
+
+        .lot-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .lot-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 8px 0;
+        }
+
+        .lot-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #667eea;
+            margin: 8px 0;
+        }
+
+        .lot-category-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: rgba(255,255,255,0.5);
+            color: #94a3b8;
         }
-        
-        .tombola-loading i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #f59e0b;
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
-        
-        .tombola-empty {
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* LOADING */
+        .loading-placeholder {
             text-align: center;
             padding: 60px 20px;
-            color: rgba(255,255,255,0.5);
+            color: #94a3b8;
+            font-size: 16px;
         }
-        
-        .tombola-empty i {
-            font-size: 3rem;
+
+        .loading-placeholder i {
+            font-size: 32px;
             margin-bottom: 15px;
-            opacity: 0.3;
         }
-        
-        @media (max-width: 768px) {
-            .tombola-stats-row {
-                grid-template-columns: repeat(3, 1fr);
+
+        /* RESPONSIVE */
+        @media (min-width: 640px) {
+            .campaigns-grid,
+            .lots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tombola-stats-container {
                 gap: 8px;
             }
-            
-            .tombola-stat-box {
-                padding: 10px;
+
+            .tombola-stat-card {
+                padding: 14px 8px;
             }
-            
-            .tombola-stat-value {
-                font-size: 1.4rem;
+
+            .stat-number {
+                font-size: 22px;
             }
-            
-            .tombola-tabs-nav {
-                gap: 5px;
+
+            .stat-label {
+                font-size: 10px;
             }
-            
-            .tombola-tab-btn {
+
+            .tombola-tab {
+                min-width: 100px;
                 padding: 10px 8px;
-                font-size: 0.75rem;
-            }
-            
-            .tombola-cards-grid {
-                grid-template-columns: 1fr;
+                font-size: 12px;
             }
         }
-        
-        /* ========== TOMBOLA IMPORTS ========== */
-        @import url('/static/tombola.css');
     </style>
 </head>
 <body>
@@ -1918,20 +2131,6 @@
                             <div class="service-info">
                                 <div class="service-name">Billets NFT</div>
                                 <div class="service-desc">Tickets blockchain</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- JEUX & TOMBOLA -->
-                <div class="service-group">
-                    <h3 class="service-title">🎰 Jeux & Tombola</h3>
-                    <div class="service-list">
-                        <div class="service-item" onclick="openTombolaService()">
-                            <div class="service-icon">🎫</div>
-                            <div class="service-info">
-                                <div class="service-name">Tombola Quotidienne</div>
-                                <div class="service-desc">Gagnez des lots incroyables !</div>
                             </div>
                         </div>
                     </div>
@@ -3002,142 +3201,275 @@ function openNumbersMode() {
 
 // ========== MODE TOMBOLA ==========
 function openTombolaMode() {
+    console.log('🎰 Ouverture mode Tombola');
     document.getElementById('lotoHome').style.display = 'none';
     document.getElementById('lotoTombola').style.display = 'block';
     
-    // Charger les données Tombola
+    // Charger les données
     loadTombolaStats();
     loadTombolaCampaigns();
 }
 
+function closeTombolaMode() {
+    document.getElementById('lotoTombola').style.display = 'none';
+    document.getElementById('lotoHome').style.display = 'block';
+}
+
 function switchTombolaTab(tabName) {
-    // Désactiver tous les tabs
-    document.querySelectorAll('.tombola-tab-btn').forEach(btn => {
-        btn.classList.remove('active');
+    console.log('🔄 Switch tab:', tabName);
+    
+    // Masquer tous les onglets
+    document.querySelectorAll('.tombola-tab').forEach(tab => {
+        tab.classList.remove('active');
     });
     document.querySelectorAll('.tombola-tab-content').forEach(content => {
         content.classList.remove('active');
     });
     
-    // Activer le tab sélectionné
-    event.target.closest('.tombola-tab-btn').classList.add('active');
-    document.getElementById('tombola-tab-' + tabName).classList.add('active');
+    // Activer l'onglet cliqué
+    document.querySelector(`.tombola-tab[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
     
-    // Charger les données selon le tab
+    // Charger les données selon l'onglet
     if (tabName === 'campaigns') {
         loadTombolaCampaigns();
-    } else if (tabName === 'catalogue') {
+    } else if (tabName === 'catalog') {
         loadTombolaLots();
-    } else if (tabName === 'my-tickets') {
-        loadMyTombolaTickets();
+    } else if (tabName === 'mytickets') {
+        loadMyTickets();
     }
 }
 
+// ========== CHARGEMENT DONNÉES TOMBOLA ==========
 async function loadTombolaStats() {
     try {
         const response = await fetch('/api/tombola/stats');
         const data = await response.json();
         
         if (data.success) {
-            document.getElementById('tombola-campaigns').textContent = data.stats.active_campaigns;
-            document.getElementById('tombola-lots').textContent = data.stats.total_lots;
-            document.getElementById('tombola-participations').textContent = data.stats.total_participations;
+            document.getElementById('statCampaigns').textContent = data.active_campaigns || 0;
+            document.getElementById('statLots').textContent = data.total_lots || 0;
+            document.getElementById('statParticipations').textContent = data.total_participations || 0;
         }
     } catch (error) {
-        console.error('Erreur chargement stats tombola:', error);
+        console.error('❌ Erreur chargement stats:', error);
     }
 }
 
 async function loadTombolaCampaigns() {
-    const container = document.getElementById('tombola-campaigns-list');
-    container.innerHTML = '<div class="tombola-loading"><i class="fas fa-spinner fa-spin"></i><p>Chargement...</p></div>';
+    const container = document.getElementById('campaignsList');
+    container.innerHTML = '<div class="loading-placeholder"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
     
     try {
         const response = await fetch('/api/tombola/campaigns');
         const data = await response.json();
         
-        if (data.success && data.campaigns.length > 0) {
-            container.innerHTML = data.campaigns.map(campaign => `
-                <div class="game-option-card" style="cursor: pointer;" onclick="viewTombolaCampaign('${campaign.id}')">
-                    <div class="game-option-icon">🎁</div>
-                    <h3 class="game-option-title" style="font-size: 1rem;">${campaign.prize_name}</h3>
-                    <p class="game-option-desc">
-                        💰 Valeur: ${campaign.prize_value}€<br>
-                        🎫 Mise: ${campaign.entry_fee}€<br>
-                        👥 ${campaign.current_participants}/${campaign.target_participants} participants<br>
-                        📅 Tirage: ${new Date(campaign.draw_datetime).toLocaleDateString('fr-FR')}
-                    </p>
-                    <button class="game-option-btn">PARTICIPER</button>
+        if (data.success && data.campaigns && data.campaigns.length > 0) {
+            container.innerHTML = data.campaigns.map(c => `
+                <div class="campaign-card">
+                    <div class="campaign-header">
+                        <div class="campaign-prize-icon">${getCategoryIcon(c.prize_type)}</div>
+                        <div class="campaign-info">
+                            <h3 class="campaign-name">${c.name}</h3>
+                            <p class="campaign-prize">
+                                ${c.prize_name} 
+                                <span class="campaign-prize-value">${c.prize_value}€</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-details">
+                        <div class="campaign-detail-item">
+                            <div class="detail-label">Mise</div>
+                            <div class="detail-value highlight">${c.entry_fee}€</div>
+                        </div>
+                        <div class="campaign-detail-item">
+                            <div class="detail-label">Participants</div>
+                            <div class="detail-value">${c.current_participants || 0}/${c.target_participants}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-footer">
+                        <div class="campaign-date">
+                            <i class="fas fa-calendar"></i> 
+                            Tirage: ${formatDate(c.draw_datetime)}
+                        </div>
+                        <button class="btn-participate" onclick="participateCampaign('${c.id}', ${c.entry_fee})">
+                            Participer
+                        </button>
+                    </div>
                 </div>
             `).join('');
         } else {
-            container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Aucun tirage actif</p></div>';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>Aucun tirage actif pour le moment</p>
+                </div>
+            `;
         }
     } catch (error) {
-        console.error('Erreur chargement campagnes:', error);
-        container.innerHTML = '<div class="tombola-empty"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p></div>';
+        console.error('❌ Erreur chargement campagnes:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erreur de chargement</p>
+            </div>
+        `;
     }
 }
 
 async function loadTombolaLots() {
-    const container = document.getElementById('tombola-lots-list');
-    const category = document.getElementById('tombola-category-filter').value;
-    
-    container.innerHTML = '<div class="tombola-loading"><i class="fas fa-spinner fa-spin"></i><p>Chargement...</p></div>';
+    const container = document.getElementById('lotsList');
+    container.innerHTML = '<div class="loading-placeholder"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
     
     try {
-        const url = category ? `/api/tombola/lots/category/${category}` : '/api/tombola/lots';
-        const response = await fetch(url);
+        const response = await fetch('/api/tombola/lots');
         const data = await response.json();
         
-        if (data.success && data.lots.length > 0) {
+        if (data.success && data.lots && data.lots.length > 0) {
             container.innerHTML = data.lots.map(lot => `
-                <div class="game-option-card">
-                    <div class="game-option-icon">${getCategoryIcon(lot.category)}</div>
-                    <h3 class="game-option-title" style="font-size: 0.95rem;">${lot.name}</h3>
-                    <p class="game-option-desc">
-                        💰 Valeur: ${lot.perceived_value}€<br>
-                        📦 Catégorie: ${lot.category}<br>
-                        ${lot.description || ''}
-                    </p>
+                <div class="lot-card">
+                    <div class="lot-icon">${getCategoryIcon(lot.category)}</div>
+                    <h3 class="lot-name">${lot.name}</h3>
+                    <div class="lot-value">${lot.perceived_value}€</div>
+                    <div class="lot-category-badge">${getCategoryName(lot.category)}</div>
                 </div>
             `).join('');
         } else {
-            container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Aucun lot dans cette catégorie</p></div>';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <p>Aucun lot disponible</p>
+                </div>
+            `;
         }
     } catch (error) {
-        console.error('Erreur chargement lots:', error);
-        container.innerHTML = '<div class="tombola-empty"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p></div>';
+        console.error('❌ Erreur chargement lots:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erreur de chargement</p>
+            </div>
+        `;
     }
 }
 
-function filterTombolaLots() {
-    loadTombolaLots();
+async function loadMyTickets() {
+    const container = document.getElementById('myTicketsList');
+    // TODO: Implémenter l'authentification utilisateur
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-ticket-alt"></i>
+            <p>Vous n'avez pas encore de tickets</p>
+            <button class="btn-primary" onclick="switchTombolaTab('campaigns')">
+                Participer maintenant
+            </button>
+        </div>
+    `;
 }
 
-function loadMyTombolaTickets() {
-    const container = document.getElementById('tombola-my-tickets-list');
-    container.innerHTML = '<div class="tombola-empty"><i class="fas fa-inbox"></i><p>Vous n\'avez pas encore participé</p><button class="game-option-btn" onclick="switchTombolaTab(\'campaigns\')">Voir les tirages actifs</button></div>';
+// ========== PARTICIPATION ==========
+async function participateCampaign(campaignId, entryFee) {
+    // TODO: Vérifier le solde utilisateur
+    const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
+    
+    if (userBalance < entryFee) {
+        showToast('❌ Solde insuffisant', 'error');
+        return;
+    }
+    
+    const confirmMsg = `Participer au tirage pour ${entryFee}€ ?`;
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const response = await fetch('/api/tombola/participate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                campaign_id: campaignId,
+                user_id: 'user-demo-001', // TODO: Remplacer par vrai user_id
+                num_entries: 1
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Mise à jour solde
+            const newBalance = userBalance - entryFee;
+            localStorage.setItem('userBalance', newBalance);
+            
+            showToast(`✅ Participation enregistrée ! Ticket N°${data.ticket_numbers.join(', ')}`, 'success');
+            
+            // Recharger les stats
+            loadTombolaStats();
+        } else {
+            showToast('❌ ' + (data.error || 'Erreur de participation'), 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erreur participation:', error);
+        showToast('❌ Erreur réseau', 'error');
+    }
 }
 
-function viewTombolaCampaign(campaignId) {
-    alert('🎰 Participation au tirage\n\nFonctionnalité en cours de développement.\n\nVous pourrez bientôt acheter vos tickets et participer aux tirages !');
-}
-
+// ========== UTILITAIRES ==========
 function getCategoryIcon(category) {
     const icons = {
-        'merchandise': '🎽',
-        'billetterie': '🎫',
         'cash': '💰',
-        'automobile': '🏍️',
+        'merchandise': '👕',
+        'billetterie': '🎫',
         'experience': '✨',
+        'superbonus': '🌟',
+        'voyage': '✈️',
+        'automobile': '🚗',
         'digital': '📱',
-        'superbonus': '🎁',
-        'boutique': '🛍️',
-        'hospitalite': '🏨',
-        'voyage': '✈️'
+        'hospitalite': '🏟️',
+        'boutique': '🛍️'
     };
     return icons[category] || '🎁';
+}
+
+function getCategoryName(category) {
+    const names = {
+        'cash': 'Cash',
+        'merchandise': 'Merchandising',
+        'billetterie': 'Billets',
+        'experience': 'Expérience',
+        'superbonus': 'Super Bonus',
+        'voyage': 'Voyage',
+        'automobile': 'Automobile',
+        'digital': 'Digital',
+        'hospitalite': 'Hospitalité',
+        'boutique': 'Boutique'
+    };
+    return names[category] || category;
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}/${month}`;
+}
+
+function showToast(message, type = 'info') {
+    // Toast simple (à améliorer avec une vraie bibliothèque)
+    alert(message);
+}
+
+function filterCampaigns() {
+    const category = document.getElementById('categoryFilter').value;
+    console.log('🔍 Filtrer campagnes:', category);
+    // TODO: Implémenter le filtrage
+    loadTombolaCampaigns();
+}
+
+function filterLots() {
+    const category = document.getElementById('lotCategoryFilter').value;
+    console.log('🔍 Filtrer lots:', category);
+    // TODO: Implémenter le filtrage
+    loadTombolaLots();
 }
 
 // ========== COMPTE À REBOURS ==========
@@ -4407,11 +4739,11 @@ function shareResult() {
                         <button class="game-option-btn">JOUER MAINTENANT!</button>
                     </div>
                     
-                    <div class="game-option-card" onclick="openTombolaMode()">
+                    <div class="game-option-card" onclick="alert('🎰 TOMBOLA\\n\\nCette fonctionnalité sera disponible prochainement !\\n\\nRestez connecté pour participer aux tirages quotidiens.')">
                         <div class="game-option-icon">🎰</div>
                         <h3 class="game-option-title">TOMBOLA</h3>
                         <p class="game-option-desc">Participez aux tirages quotidiens et gagnez des lots incroyables : cash, véhicules, expériences VIP !</p>
-                        <button class="game-option-btn">JOUER MAINTENANT!</button>
+                        <button class="game-option-btn">BIENTÔT DISPONIBLE</button>
                     </div>
                 </div>
 
@@ -4623,89 +4955,105 @@ function shareResult() {
 
             <!-- ÉCRAN 4: MODE TOMBOLA -->
             <div id="lotoTombola" class="loto-screen" style="display: none;">
-                <button class="loto-back" onclick="backToLotoHome()">
-                    <i class="fas fa-arrow-left"></i>
+                <button class="loto-back-btn" onclick="closeTombolaMode()">
+                    <i class="fas fa-chevron-left"></i> Retour
                 </button>
-                <button class="loto-close" onclick="closeLoto()">
-                    &times;
+                <button class="loto-close-btn" onclick="closeLoto()">
+                    <i class="fas fa-times"></i>
                 </button>
 
-                <h2 class="tombola-title">🎰 TOMBOLA QUOTIDIENNE</h2>
-                <p class="tombola-subtitle">Participez aux tirages et gagnez des lots incroyables !</p>
+                <div class="tombola-header">
+                    <div class="tombola-icon">🎰</div>
+                    <h2 class="tombola-title">TOMBOLA QUOTIDIENNE</h2>
+                    <p class="tombola-subtitle">Gagnez des lots incroyables chaque jour !</p>
+                </div>
 
-                <!-- Stats Tombola -->
-                <div class="tombola-stats-row">
-                    <div class="tombola-stat-box">
-                        <div class="tombola-stat-value" id="tombola-campaigns">-</div>
-                        <div class="tombola-stat-label">Tirages actifs</div>
+                <!-- STATISTIQUES -->
+                <div class="tombola-stats-container" id="tombolaStats">
+                    <div class="tombola-stat-card">
+                        <div class="stat-number" id="statCampaigns">--</div>
+                        <div class="stat-label">Tirages actifs</div>
                     </div>
-                    <div class="tombola-stat-box">
-                        <div class="tombola-stat-value" id="tombola-lots">-</div>
-                        <div class="tombola-stat-label">Lots disponibles</div>
+                    <div class="tombola-stat-card">
+                        <div class="stat-number" id="statLots">--</div>
+                        <div class="stat-label">Lots disponibles</div>
                     </div>
-                    <div class="tombola-stat-box">
-                        <div class="tombola-stat-value" id="tombola-participations">-</div>
-                        <div class="tombola-stat-label">Participations</div>
+                    <div class="tombola-stat-card">
+                        <div class="stat-number" id="statParticipations">--</div>
+                        <div class="stat-label">Participations</div>
                     </div>
                 </div>
 
-                <!-- Tabs Tombola -->
-                <div class="tombola-tabs-nav">
-                    <button class="tombola-tab-btn active" onclick="switchTombolaTab('campaigns')">
-                        <i class="fas fa-trophy"></i> Tirages
+                <!-- NAVIGATION PAR ONGLETS -->
+                <div class="tombola-tabs">
+                    <button class="tombola-tab active" data-tab="campaigns" onclick="switchTombolaTab('campaigns')">
+                        <i class="fas fa-trophy"></i> Tirages actifs
                     </button>
-                    <button class="tombola-tab-btn" onclick="switchTombolaTab('catalogue')">
-                        <i class="fas fa-gift"></i> Catalogue
+                    <button class="tombola-tab" data-tab="catalog" onclick="switchTombolaTab('catalog')">
+                        <i class="fas fa-gifts"></i> Catalogue
                     </button>
-                    <button class="tombola-tab-btn" onclick="switchTombolaTab('my-tickets')">
-                        <i class="fas fa-ticket-alt"></i> Mes Tickets
+                    <button class="tombola-tab" data-tab="mytickets" onclick="switchTombolaTab('mytickets')">
+                        <i class="fas fa-ticket-alt"></i> Mes tickets
                     </button>
                 </div>
 
-                <!-- Content Tabs -->
-                <div class="tombola-content-wrapper">
-                    <!-- Tab 1: Campaigns -->
-                    <div id="tombola-tab-campaigns" class="tombola-tab-content active">
-                        <div id="tombola-campaigns-list" class="tombola-cards-grid">
-                            <div class="tombola-loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Chargement des tirages...</p>
+                <!-- CONTENU DES ONGLETS -->
+                <div class="tombola-content">
+                    
+                    <!-- ONGLET 1: TIRAGES ACTIFS -->
+                    <div id="tabCampaigns" class="tombola-tab-content active">
+                        <div class="tombola-filters">
+                            <select id="categoryFilter" onchange="filterCampaigns()">
+                                <option value="all">Toutes les catégories</option>
+                                <option value="cash">💰 Cash</option>
+                                <option value="merchandise">👕 Merchandising</option>
+                                <option value="billetterie">🎫 Billets</option>
+                                <option value="experience">✨ Expériences</option>
+                                <option value="superbonus">🌟 Super Bonus</option>
+                            </select>
+                        </div>
+                        
+                        <div id="campaignsList" class="campaigns-grid">
+                            <!-- Chargement dynamique via API -->
+                            <div class="loading-placeholder">
+                                <i class="fas fa-spinner fa-spin"></i> Chargement des tirages...
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tab 2: Catalogue -->
-                    <div id="tombola-tab-catalogue" class="tombola-tab-content">
-                        <select id="tombola-category-filter" class="tombola-select" onchange="filterTombolaLots()">
-                            <option value="">Toutes catégories</option>
-                            <option value="merchandise">🎽 Merchandising</option>
-                            <option value="billetterie">🎫 Billetterie</option>
-                            <option value="cash">💰 Cash</option>
-                            <option value="automobile">🏍️ Véhicules</option>
-                            <option value="experience">✨ Expériences</option>
-                            <option value="digital">📱 Digital</option>
-                            <option value="superbonus">🎁 Super Bonus</option>
-                        </select>
-                        <div id="tombola-lots-list" class="tombola-cards-grid">
-                            <div class="tombola-loading">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Chargement du catalogue...</p>
+                    <!-- ONGLET 2: CATALOGUE -->
+                    <div id="tabCatalog" class="tombola-tab-content">
+                        <div class="tombola-filters">
+                            <select id="lotCategoryFilter" onchange="filterLots()">
+                                <option value="all">Toutes les catégories</option>
+                                <option value="cash">💰 Cash</option>
+                                <option value="merchandise">👕 Merchandising</option>
+                                <option value="billetterie">🎫 Billets</option>
+                                <option value="experience">✨ Expériences</option>
+                                <option value="superbonus">🌟 Super Bonus</option>
+                            </select>
+                        </div>
+                        
+                        <div id="lotsList" class="lots-grid">
+                            <div class="loading-placeholder">
+                                <i class="fas fa-spinner fa-spin"></i> Chargement du catalogue...
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tab 3: My Tickets -->
-                    <div id="tombola-tab-my-tickets" class="tombola-tab-content">
-                        <div id="tombola-my-tickets-list" class="tombola-cards-grid">
-                            <div class="tombola-empty">
-                                <i class="fas fa-inbox"></i>
-                                <p>Vous n'avez pas encore participé</p>
-                                <button class="game-option-btn" onclick="switchTombolaTab('campaigns')">
-                                    Voir les tirages actifs
+                    <!-- ONGLET 3: MES TICKETS -->
+                    <div id="tabMytickets" class="tombola-tab-content">
+                        <div id="myTicketsList" class="tickets-list">
+                            <div class="empty-state">
+                                <i class="fas fa-ticket-alt"></i>
+                                <p>Vous n'avez pas encore de tickets</p>
+                                <button class="btn-primary" onclick="switchTombolaTab('campaigns')">
+                                    Participer maintenant
                                 </button>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -4728,109 +5076,5 @@ function shareResult() {
         });
     </script>
 
-    <!-- 🎰 MODAL TOMBOLA -->
-    <div id="tombola-modal" class="loto-modal">
-        <div class="loto-modal-content" style="max-width: 900px;">
-            <button class="loto-modal-close" onclick="document.getElementById('tombola-modal').classList.remove('active')">&times;</button>
-            
-            <!-- Section Tombola complète -->
-            <section class="tombola-section" id="tombola-section" style="margin: 0; box-shadow: none;">
-                <div class="tombola-header">
-                    <div class="tombola-title">
-                        <div class="tombola-icon">🎰</div>
-                        <h2>Tombola Quotidienne</h2>
-                    </div>
-                    <p class="tombola-subtitle">Gagnez des lots incroyables chaque jour !</p>
-                </div>
-
-                <!-- Stats -->
-                <div class="tombola-stats" id="tombola-stats">
-                    <div class="tombola-stat-card">
-                        <div class="tombola-stat-value" id="active-campaigns-count">-</div>
-                        <div class="tombola-stat-label">Tirages actifs</div>
-                    </div>
-                    <div class="tombola-stat-card">
-                        <div class="tombola-stat-value" id="total-lots-count">-</div>
-                        <div class="tombola-stat-label">Lots disponibles</div>
-                    </div>
-                    <div class="tombola-stat-card">
-                        <div class="tombola-stat-value" id="total-participations-count">-</div>
-                        <div class="tombola-stat-label">Participations</div>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
-                <div class="tombola-tabs">
-                    <button class="tombola-tab active" data-tab="campaigns">
-                        <i class="fas fa-trophy"></i> Tirages Actifs
-                    </button>
-                    <button class="tombola-tab" data-tab="lots">
-                        <i class="fas fa-gift"></i> Catalogue
-                    </button>
-                    <button class="tombola-tab" data-tab="participations">
-                        <i class="fas fa-ticket-alt"></i> Mes Participations
-                    </button>
-                </div>
-
-                <!-- Content -->
-                <div class="tombola-content">
-                    <!-- Tab 1: Campaigns -->
-                    <div class="tombola-tab-content active" id="tab-campaigns">
-                        <div id="campaigns-list" class="tombola-grid">
-                            <div class="tombola-loading">Chargement des tirages...</div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 2: Lots -->
-                    <div class="tombola-tab-content" id="tab-lots">
-                        <div class="tombola-filters">
-                            <select id="category-filter" class="tombola-select">
-                                <option value="">Toutes catégories</option>
-                                <option value="merchandise">Merchandising</option>
-                                <option value="billetterie">Billetterie</option>
-                                <option value="experiences">Expériences</option>
-                                <option value="formation">Formation</option>
-                                <option value="esim">eSIM</option>
-                                <option value="vehicules">Véhicules</option>
-                                <option value="electronique">Électronique</option>
-                                <option value="cash">Cash</option>
-                                <option value="super_bonus">Super Bonus</option>
-                                <option value="immobilier">Immobilier</option>
-                            </select>
-                        </div>
-                        <div id="lots-list" class="tombola-grid">
-                            <div class="tombola-loading">Chargement du catalogue...</div>
-                        </div>
-                    </div>
-
-                    <!-- Tab 3: My Participations -->
-                    <div class="tombola-tab-content" id="tab-participations">
-                        <div id="participations-list" class="tombola-grid">
-                            <div class="tombola-empty">
-                                <i class="fas fa-inbox"></i>
-                                <p>Vous n'avez pas encore participé</p>
-                                <button class="tombola-btn" onclick="document.querySelector('[data-tab=campaigns]').click()">
-                                    Voir les tirages actifs
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- 🎰 TOMBOLA SYSTEM -->
-    <script src="/static/tombola.js"></script>
-    <script>
-        // Fonction pour ouvrir le service Tombola
-        function openTombolaService() {
-            document.getElementById('tombola-modal').classList.add('active');
-            // Initialiser si pas encore fait
-            if (typeof TombolaUI !== 'undefined' && document.getElementById('tombola-section')) {
-                TombolaUI.init();
-            }
-        }
-    </script>
 </body>
 </html>
