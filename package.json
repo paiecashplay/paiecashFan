@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "hono": "^4.11.9"
+    "hono": "^4.11.9",
+    "http-proxy-middleware": "^3.0.5",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250705.0",

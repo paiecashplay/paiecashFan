@@ -1,9 +1,8 @@
 module.exports = {
   apps: [
     {
-      name: 'paiecashfan',
-      script: 'npx',
-      args: 'wrangler pages dev dist --local --ip 0.0.0.0 --port 3000',
+      name: 'web-server',
+      script: 'preview-server.cjs',
       env: {
         NODE_ENV: 'development',
         PORT: 3000
