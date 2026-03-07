@@ -2324,7 +2324,60 @@
             }
         };
         
-        console.log('✅ openLoto() chargé en global');
+        // ✨ SCRATCH MODE
+        window.openScratchMode = function() {
+            console.log('✨ openScratchMode() GLOBAL appelé');
+            try {
+                document.getElementById('lotoHome').style.display = 'none';
+                document.getElementById('lotoScratch').style.display = 'block';
+                document.getElementById('lotoNumbers').style.display = 'none';
+                document.getElementById('lotoTombola').style.display = 'none';
+                console.log('✅ Mode Scratch activé');
+            } catch (error) {
+                console.error('❌ Erreur openScratchMode():', error);
+                alert('Erreur Scratch: ' + error.message);
+            }
+        };
+        
+        // 🔢 LOTO NUMBERS MODE
+        window.openNumbersMode = function() {
+            console.log('🔢 openNumbersMode() GLOBAL appelé');
+            try {
+                document.getElementById('lotoHome').style.display = 'none';
+                document.getElementById('lotoScratch').style.display = 'none';
+                document.getElementById('lotoNumbers').style.display = 'block';
+                document.getElementById('lotoTombola').style.display = 'none';
+                console.log('✅ Mode Loto Chiffres activé');
+            } catch (error) {
+                console.error('❌ Erreur openNumbersMode():', error);
+                alert('Erreur Loto Chiffres: ' + error.message);
+            }
+        };
+        
+        // 🎰 TOMBOLA MODE
+        window.openTombolaMode = function() {
+            console.log('🎰 openTombolaMode() GLOBAL appelé');
+            try {
+                document.getElementById('lotoHome').style.display = 'none';
+                document.getElementById('lotoScratch').style.display = 'none';
+                document.getElementById('lotoNumbers').style.display = 'none';
+                document.getElementById('lotoTombola').style.display = 'block';
+                console.log('✅ Mode Tombola activé');
+                
+                // Charger les données Tombola si fonction disponible
+                if (typeof loadTombolaStats === 'function') {
+                    loadTombolaStats();
+                }
+                if (typeof loadTombolaCampaigns === 'function') {
+                    loadTombolaCampaigns();
+                }
+            } catch (error) {
+                console.error('❌ Erreur openTombolaMode():', error);
+                alert('Erreur Tombola: ' + error.message);
+            }
+        };
+        
+        console.log('✅ Toutes les fonctions de jeux chargées en global');
     </script>
 </head>
 <body>
