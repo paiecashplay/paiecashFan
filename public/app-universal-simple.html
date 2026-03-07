@@ -3629,7 +3629,15 @@ async function loadTombolaCampaigns() {
                         </div>
                         <div class="campaign-detail-item">
                             <div class="detail-label">Participants</div>
-                            <div class="detail-value">${c.current_participants || 0}/${c.target_participants}</div>
+                            <div class="detail-value">${c.current_participants || 0} <span style="font-size: 11px; color: #94a3b8;">(min: ${c.min_participants})</span></div>
+                        </div>
+                        <div class="campaign-detail-item">
+                            <div class="detail-label">Statut</div>
+                            <div class="detail-value" style="font-size: 11px;">
+                                ${(c.current_participants || 0) >= c.min_participants 
+                                    ? '<span style="color: #10b981;">✓ Validé</span>' 
+                                    : '<span style="color: #f59e0b;">⏳ ' + Math.max(0, c.min_participants - (c.current_participants || 0)) + ' restants</span>'}
+                            </div>
                         </div>
                     </div>
                     
@@ -3727,33 +3735,9 @@ async function participateCampaign(campaignId, entryFee, campaignName, prizeName
         prizeValue: prizeValue
     };
     
-    // Récupérer le solde
-    const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
-    
-    // Afficher la modal
-    document.getElementById('paymentModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Remplir les infos de la campagne
-    document.getElementById('paymentCampaignInfo').innerHTML = `
-        <div class="campaign-info-item">
-            <span class="campaign-info-label">Tirage:</span>
-            <span class="campaign-info-value">${campaignName}</span>
-        </div>
-        <div class="campaign-info-item">
-            <span class="campaign-info-label">Lot:</span>
-            <span class="campaign-info-value">${prizeName}</span>
-        </div>
-        <div class="campaign-info-item">
-            <span class="campaign-info-label">Valeur:</span>
-            <span class="campaign-info-value">${prizeValue}€</span>
-        </div>
-        <div class="campaign-info-item">
-            <span class="campaign-info-label">Prix unitaire:</span>
-            <span class="campaign-info-value">${entryFee}€</span>
-        </div>
-    `;
-    
+    // Afficher d'abord le modal de règlement
+    showRulesModal();
+}
     // Afficher le solde
     document.getElementById('userBalanceDisplay').textContent = `${userBalance.toFixed(2)} PCC`;
     
@@ -3767,6 +3751,86 @@ function closePaymentModal() {
     document.getElementById('paymentModal').style.display = 'none';
     document.body.style.overflow = 'auto';
     currentCampaign = null;
+}
+
+// ========== GESTION RÈGLEMENT ==========
+function showRulesModal() {
+    document.getElementById('rulesModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Réinitialiser la checkbox
+    document.getElementById('acceptRules').checked = false;
+    document.getElementById('btnAcceptRules').disabled = true;
+    document.getElementById('btnAcceptRules').style.opacity = '0.5';
+    
+    // Activer le bouton quand la checkbox est cochée
+    document.getElementById('acceptRules').addEventListener('change', function(e) {
+        const btn = document.getElementById('btnAcceptRules');
+        if (e.target.checked) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+    });
+}
+
+function closeRulesModal() {
+    document.getElementById('rulesModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function acceptRulesAndProceed() {
+    if (!document.getElementById('acceptRules').checked) {
+        alert('⚠️ Veuillez accepter le règlement pour continuer');
+        return;
+    }
+    
+    // Fermer le modal de règlement
+    closeRulesModal();
+    
+    // Ouvrir le modal de paiement
+    showPaymentModal();
+}
+
+function showPaymentModal() {
+    if (!currentCampaign) return;
+    
+    // Récupérer le solde
+    const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
+    
+    // Afficher la modal
+    document.getElementById('paymentModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Remplir les infos de la campagne
+    document.getElementById('paymentCampaignInfo').innerHTML = `
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Tirage:</span>
+            <span class="campaign-info-value">${currentCampaign.name}</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Lot:</span>
+            <span class="campaign-info-value">${currentCampaign.prizeName}</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Valeur:</span>
+            <span class="campaign-info-value">${currentCampaign.prizeValue}€</span>
+        </div>
+        <div class="campaign-info-item">
+            <span class="campaign-info-label">Prix unitaire:</span>
+            <span class="campaign-info-value">${currentCampaign.entryFee}€</span>
+        </div>
+    `;
+    
+    // Afficher le solde
+    document.getElementById('userBalanceDisplay').textContent = `${userBalance.toFixed(2)} PCC`;
+    
+    // Réinitialiser
+    document.getElementById('numEntries').value = 1;
+    updateTotalAmount();
+    selectPaymentMethod('wallet');
 }
 
 function changeEntries(delta) {
@@ -5519,6 +5583,98 @@ function shareResult() {
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- 📜 MODAL RÈGLEMENT TOMBOLA -->
+    <div id="rulesModal" class="payment-modal" style="display: none;">
+        <div class="payment-modal-overlay" onclick="closeRulesModal()"></div>
+        <div class="payment-modal-content">
+            <button class="payment-close-btn" onclick="closeRulesModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="payment-header">
+                <div class="payment-icon">📜</div>
+                <h2 class="payment-title">Règlement de la Tombola</h2>
+            </div>
+            
+            <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                <h3 style="color: #667eea; margin-bottom: 15px; font-size: 16px;">
+                    <i class="fas fa-info-circle"></i> Conditions de participation
+                </h3>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>1. Participation :</strong> Chaque participation est définitive et ne peut être remboursée que si le tirage est annulé.
+                    </p>
+                </div>
+                
+                <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #f59e0b;">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>2. Validation du tirage :</strong>
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155;">
+                        <li>Le tirage nécessite un <strong>nombre minimum de participants</strong> pour être validé.</li>
+                        <li>Si le minimum n'est pas atteint avant la date du tirage : <strong>ANNULATION automatique</strong></li>
+                        <li>En cas d'annulation : <strong>Remboursement intégral</strong> sur votre PaieCash Wallet</li>
+                        <li>Vous pourrez <strong>rejouer</strong> lors du prochain tirage</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>3. Nombre de participations :</strong> Illimité ! Plus il y a de participants, plus le tirage est excitant.
+                    </p>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>4. Tirage au sort :</strong> Le gagnant est tiré au sort de manière aléatoire et équitable parmi tous les participants.
+                    </p>
+                </div>
+                
+                <div style="background: #dcfce7; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #10b981;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>5. Notification :</strong> Le gagnant sera notifié par email, SMS et notification push dans l'application.
+                    </p>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                        <strong>6. Récupération du lot :</strong> Le gagnant dispose de 30 jours pour réclamer son lot. Passé ce délai, le lot est perdu.
+                    </p>
+                </div>
+                
+                <h3 style="color: #667eea; margin: 20px 0 15px 0; font-size: 16px;">
+                    <i class="fas fa-shield-alt"></i> Vos garanties
+                </h3>
+                
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; border: 1px solid #10b981;">
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155;">
+                        <li>✅ Remboursement automatique si tirage annulé</li>
+                        <li>✅ Tirage équitable et transparent</li>
+                        <li>✅ Notification immédiate des résultats</li>
+                        <li>✅ Support client disponible 7j/7</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <label style="display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #334155;">
+                    <input type="checkbox" id="acceptRules" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                    <span>J'ai lu et j'accepte le règlement de la tombola</span>
+                </label>
+            </div>
+            
+            <div class="payment-actions">
+                <button class="btn-cancel" onclick="closeRulesModal()">
+                    Annuler
+                </button>
+                <button class="btn-confirm" id="btnAcceptRules" onclick="acceptRulesAndProceed()" disabled style="opacity: 0.5;">
+                    <i class="fas fa-check"></i> Accepter et continuer
+                </button>
+            </div>
         </div>
     </div>
 
