@@ -98,6 +98,74 @@
             font-weight: bold;
             display: inline-block;
         }
+        
+        /* Animation brillante pour les lots */
+        .prize-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .prize-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .prize-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+        
+        .prize-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .prize-value {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
     </style>
 </head>
 <body class="p-4">
@@ -238,17 +306,17 @@
                         <div class="mb-4">
                             <h3 class="font-bold text-lg text-purple-600 mb-2">🏆 GROS LOTS</h3>
                             ${grouped.big.map(prize => `
-                                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg mb-2">
+                                <div class="prize-card flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl mb-3 shadow-md">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-trophy text-white"></i>
+                                        <div class="prize-icon w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-trophy text-white text-lg"></i>
                                         </div>
                                         <div class="text-left">
-                                            <p class="font-bold text-gray-800">${prize.name}</p>
-                                            <p class="text-xs text-gray-500">${prize.description || ''}</p>
+                                            <p class="font-bold text-gray-800 text-lg">${prize.name}</p>
+                                            <p class="text-sm text-gray-600">${prize.description || 'Lot exclusif'}</p>
                                         </div>
                                     </div>
-                                    <span class="font-bold text-purple-600">${prize.value}€</span>
+                                    <span class="prize-value text-2xl">${prize.value}€</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -260,17 +328,17 @@
                         <div class="mb-4">
                             <h3 class="font-bold text-lg text-blue-600 mb-2">🎁 LOTS MOYENS</h3>
                             ${grouped.medium.map(prize => `
-                                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg mb-2">
+                                <div class="prize-card flex items-center justify-between p-4 bg-blue-50 rounded-xl mb-3 shadow-md">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-gift text-white"></i>
+                                        <div class="prize-icon w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-gift text-white text-lg"></i>
                                         </div>
                                         <div class="text-left">
                                             <p class="font-bold text-gray-800">${prize.name}</p>
-                                            <p class="text-xs text-gray-500">${prize.description || ''}</p>
+                                            <p class="text-sm text-gray-600">${prize.description || 'Lot disponible'}</p>
                                         </div>
                                     </div>
-                                    <span class="font-bold text-blue-600">${prize.value}€</span>
+                                    <span class="prize-value text-xl">${prize.value}€</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -282,17 +350,17 @@
                         <div>
                             <h3 class="font-bold text-lg text-green-600 mb-2">✨ LOTS QUOTIDIENS</h3>
                             ${grouped.small.map(prize => `
-                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg mb-2">
+                                <div class="prize-card flex items-center justify-between p-4 bg-green-50 rounded-xl mb-3 shadow-md">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center">
+                                        <div class="prize-icon w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
                                             <i class="fas fa-star text-white"></i>
                                         </div>
                                         <div class="text-left">
                                             <p class="font-bold text-gray-800">${prize.name}</p>
-                                            <p class="text-xs text-gray-500">${prize.description || ''}</p>
+                                            <p class="text-sm text-gray-600">${prize.description || 'Lot quotidien'}</p>
                                         </div>
                                     </div>
-                                    <span class="font-bold text-green-600">${prize.value}€</span>
+                                    <span class="prize-value text-lg">${prize.value}€</span>
                                 </div>
                             `).join('')}
                         </div>
