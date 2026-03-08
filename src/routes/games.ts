@@ -1241,12 +1241,46 @@ games.post('/loto/play', async (c) => {
     }
 
     // Si paiement par wallet, continuer le jeu immédiatement
-    // Simulation tirage aléatoire
-    const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 50) + 1)
+    // Simulation tirage aléatoire avec système de "boost" pour garantir un minimum de correspondances
+    let winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 50) + 1)
     const winningChance = Math.floor(Math.random() * 10) + 1
 
-    // Calcul des correspondances
-    const matchedNumbers = numbers.filter(n => winningNumbers.includes(n)).length
+    // Calcul initial des correspondances
+    let matchedCount = numbers.filter(n => winningNumbers.includes(n)).length
+    
+    // 🚀 Système de BOOST : garantir minimum 2-3 numéros matchés
+    if (matchedCount < 2) {
+      // Déterminer combien de numéros on doit "booster"
+      const boostTarget = Math.random() < 0.5 ? 2 : 3 // Aléatoire entre 2 et 3
+      const numbersToBoost = boostTarget - matchedCount
+      
+      // Remplacer des numéros gagnants par des numéros du joueur (non encore matchés)
+      const unmatchedUserNumbers = numbers.filter(n => !winningNumbers.includes(n))
+      
+      for (let i = 0; i < numbersToBoost && unmatchedUserNumbers.length > 0; i++) {
+        // Prendre un numéro du joueur qui n'a pas encore matché
+        const userNum = unmatchedUserNumbers.shift()
+        
+        // Trouver un index dans winningNumbers qui n'est pas déjà un match
+        let replaceIndex = winningNumbers.findIndex(wn => !numbers.includes(wn))
+        if (replaceIndex === -1) replaceIndex = 0 // Fallback
+        
+        // Remplacer
+        winningNumbers[replaceIndex] = userNum
+      }
+      
+      // Recalculer après boost
+      matchedCount = numbers.filter(n => winningNumbers.includes(n)).length
+      
+      console.log('🚀 BOOST appliqué:', {
+        avant: matchedCount - numbersToBoost,
+        après: matchedCount,
+        boost: numbersToBoost
+      })
+    }
+
+    // Calcul final des correspondances
+    const matchedNumbers = matchedCount
     const matchedChance = chance === winningChance ? 1 : 0
 
     console.log('🎲 LOTO Tirage:', {
@@ -1566,12 +1600,38 @@ games.get('/loto/result/:sessionId', async (c) => {
     const selectedNumbers = JSON.parse(numbers)
     const selectedChance = parseInt(chance)
 
-    // Simulation tirage aléatoire
-    const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 50) + 1)
+    // Simulation tirage aléatoire avec système de "boost"
+    let winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 50) + 1)
     const winningChance = Math.floor(Math.random() * 10) + 1
 
-    // Calcul des correspondances
-    const matchedNumbers = selectedNumbers.filter((n: number) => winningNumbers.includes(n)).length
+    // Calcul initial des correspondances
+    let matchedCount = selectedNumbers.filter((n: number) => winningNumbers.includes(n)).length
+    
+    // 🚀 Système de BOOST : garantir minimum 2-3 numéros matchés
+    if (matchedCount < 2) {
+      const boostTarget = Math.random() < 0.5 ? 2 : 3
+      const numbersToBoost = boostTarget - matchedCount
+      
+      const unmatchedUserNumbers = selectedNumbers.filter((n: number) => !winningNumbers.includes(n))
+      
+      for (let i = 0; i < numbersToBoost && unmatchedUserNumbers.length > 0; i++) {
+        const userNum = unmatchedUserNumbers.shift()
+        let replaceIndex = winningNumbers.findIndex((wn: number) => !selectedNumbers.includes(wn))
+        if (replaceIndex === -1) replaceIndex = 0
+        winningNumbers[replaceIndex] = userNum
+      }
+      
+      matchedCount = selectedNumbers.filter((n: number) => winningNumbers.includes(n)).length
+      
+      console.log('🚀 BOOST (Stripe) appliqué:', {
+        avant: matchedCount - numbersToBoost,
+        après: matchedCount,
+        boost: numbersToBoost
+      })
+    }
+
+    // Calcul final des correspondances
+    const matchedNumbers = matchedCount
     const matchedChance = selectedChance === winningChance ? 1 : 0
 
     // Déterminer le lot gagné
