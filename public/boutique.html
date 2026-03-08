@@ -426,21 +426,27 @@
 
         // Checkout avec Lyra
         async function checkout() {
+            console.log('🛒 Début checkout, panier:', cart)
+            
             if (cart.length === 0) {
-                showNotification('Votre panier est vide', 'error')
+                alert('⚠️ Votre panier est vide. Ajoutez des produits avant de payer.')
                 return
             }
             
             const email = document.getElementById('customerEmail').value
             const name = document.getElementById('customerName').value
             
-            if (!email) {
-                showNotification('Email requis', 'error')
+            console.log('📧 Email:', email, 'Nom:', name)
+            
+            if (!email || email.trim() === '') {
+                alert('⚠️ Veuillez saisir votre email avant de continuer.')
+                document.getElementById('customerEmail').focus()
                 return
             }
             
             try {
-                showNotification('Création de la commande...', 'info')
+                console.log('💳 Début création commande...')
+                alert('⏳ Création de votre commande en cours...')
                 
                 // 1. Créer la commande
                 const orderResponse = await fetch(`${API_BASE_URL}/api/shop/order/create`, {
@@ -461,14 +467,17 @@
                 })
                 
                 const orderData = await orderResponse.json()
+                console.log('📦 Commande créée:', orderData)
                 
                 if (!orderData.success) {
                     throw new Error(orderData.error || 'Erreur création commande')
                 }
                 
                 currentOrder = orderData.order
+                console.log('✅ Order ID:', currentOrder.id)
                 
                 // 2. Créer le paiement Lyra
+                console.log('💰 Création paiement Lyra...')
                 const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
                 const amountCents = Math.round(total * 100)
                 
@@ -491,36 +500,55 @@
                 })
                 
                 const paymentData = await paymentResponse.json()
+                console.log('💳 Réponse paiement:', paymentData)
                 
                 if (!paymentData.success) {
                     throw new Error(paymentData.error || 'Erreur création paiement')
                 }
+                
+                console.log('✅ FormToken:', paymentData.formToken ? 'Reçu' : 'Manquant')
                 
                 // 3. Afficher le formulaire Lyra
                 document.getElementById('cartModal').classList.remove('active')
                 document.getElementById('paymentModal').classList.add('active')
                 document.getElementById('paymentAmount').textContent = total.toFixed(2) + ' €'
                 
+                console.log('🔐 Initialisation formulaire Lyra avec token...')
+                
                 // Initialiser le formulaire Lyra
                 initLyraForm(paymentData.formToken)
                 
             } catch (error) {
-                console.error('Erreur checkout:', error)
-                showNotification(error.message, 'error')
+                console.error('❌ Erreur checkout:', error)
+                alert('❌ Erreur: ' + error.message)
             }
         }
 
         // Initialiser formulaire Lyra
         function initLyraForm(formToken) {
-            KR.setFormConfig({
-                formToken: formToken,
-                'kr-language': 'fr-FR'
-            })
+            console.log('🔐 initLyraForm appelé avec formToken:', formToken ? 'OK' : 'MANQUANT')
             
-            KR.attachForm('#lyraForm')
+            if (!formToken) {
+                console.error('❌ FormToken manquant !')
+                alert('Erreur: FormToken manquant')
+                return
+            }
             
-            // Event listeners
-            KR.onSubmit(async function(paymentData) {
+            try {
+                console.log('📝 Configuration Krypton...')
+                
+                KR.setFormConfig({
+                    formToken: formToken,
+                    'kr-language': 'fr-FR'
+                })
+                
+                console.log('🔗 Attachement du formulaire...')
+                KR.attachForm('#lyraForm')
+                
+                console.log('✅ Formulaire Lyra initialisé')
+                
+                // Event listeners
+                KR.onSubmit(async function(paymentData) {
                 console.log('✅ Paiement Lyra réussi:', paymentData)
                 
                 try {
@@ -556,8 +584,13 @@
             
             KR.onError(function(error) {
                 console.error('❌ Erreur paiement Lyra:', error)
-                showNotification('Erreur de paiement: ' + error.message, 'error')
+                alert('❌ Erreur de paiement: ' + (error.message || 'Erreur inconnue'))
             })
+            
+            } catch (error) {
+                console.error('❌ Erreur init Lyra:', error)
+                alert('❌ Erreur initialisation formulaire: ' + error.message)
+            }
         }
 
         // Close modals
@@ -578,6 +611,13 @@
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Boutique initialisée')
+            console.log('🔐 SDK Lyra (KR) disponible:', typeof KR !== 'undefined' ? 'OUI ✅' : 'NON ❌')
+            
+            if (typeof KR === 'undefined') {
+                console.error('❌ Le SDK Lyra (KR) n\'est pas chargé ! Vérifier les scripts.')
+            }
+            
             loadProducts()
         })
     </script>
