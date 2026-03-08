@@ -1145,10 +1145,6 @@ games.get('/loto/prizes', async (c) => {
 games.post('/loto/play', async (c) => {
   try {
     const { env } = c
-    
-    // Désactiver temporairement les foreign keys
-    await env.DB.exec('PRAGMA foreign_keys=OFF')
-    
     const body = await c.req.json()
     const {
       user_id,
@@ -1159,18 +1155,6 @@ games.post('/loto/play', async (c) => {
       payment_id,
       user_email
     } = body
-
-    // S'assurer que l'organisation existe
-    const org = await env.DB.prepare(`
-      SELECT id FROM organizations WHERE id = ?
-    `).bind(organization_id).first()
-
-    if (!org) {
-      return c.json({
-        success: false,
-        error: 'Organisation introuvable'
-      }, 404)
-    }
 
     // Validation
     if (!user_id || !numbers || !chance) {
