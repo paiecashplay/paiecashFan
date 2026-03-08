@@ -17,6 +17,7 @@ export interface Bindings {
   LYRA_API_URL?: string
   LYRA_USERNAME?: string
   LYRA_PASSWORD?: string
+  LYRA_PUBLIC_KEY?: string
   
   // Resend Email
   RESEND_API_KEY?: string

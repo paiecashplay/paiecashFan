@@ -263,6 +263,33 @@
         let allProducts = []
         let cart = []
         let currentOrder = null
+        let lyraPublicKey = null // Clé publique Lyra
+
+        // Load Lyra config
+        async function loadLyraConfig() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/lyra/config`)
+                const data = await response.json()
+                
+                if (data.success && data.publicKey) {
+                    lyraPublicKey = data.publicKey
+                    console.log('🔐 Lyra Public Key chargée:', lyraPublicKey)
+                    
+                    // Configurer le SDK Lyra avec la clé publique globale
+                    if (typeof KR !== 'undefined') {
+                        console.log('🔑 Configuration globale de la clé publique Lyra...')
+                        KR.setFormConfig({
+                            'kr-public-key': lyraPublicKey
+                        })
+                        console.log('✅ Clé publique Lyra configurée globalement')
+                    }
+                } else {
+                    console.error('❌ Impossible de charger la clé publique Lyra')
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement config Lyra:', error)
+            }
+        }
 
         // Load products
         async function loadProducts() {
@@ -527,6 +554,7 @@
         // Initialiser formulaire Lyra
         function initLyraForm(formToken) {
             console.log('🔐 initLyraForm appelé avec formToken:', formToken ? 'OK' : 'MANQUANT')
+            console.log('🔑 Clé publique Lyra:', lyraPublicKey || 'MANQUANTE')
             
             if (!formToken) {
                 console.error('❌ FormToken manquant !')
@@ -534,11 +562,19 @@
                 return
             }
             
+            if (!lyraPublicKey) {
+                console.error('❌ Clé publique Lyra manquante !')
+                alert('Erreur: Configuration Lyra incomplète. Clé publique manquante.')
+                return
+            }
+            
             try {
-                console.log('📝 Configuration Krypton...')
+                console.log('📝 Configuration Krypton avec clé publique...')
                 
+                // Configuration avec la clé publique
                 KR.setFormConfig({
                     formToken: formToken,
+                    'kr-public-key': lyraPublicKey,
                     'kr-language': 'fr-FR'
                 })
                 
@@ -610,7 +646,7 @@
         }
 
         // Init
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Boutique initialisée')
             console.log('🔐 SDK Lyra (KR) disponible:', typeof KR !== 'undefined' ? 'OUI ✅' : 'NON ❌')
             
@@ -618,6 +654,10 @@
                 console.error('❌ Le SDK Lyra (KR) n\'est pas chargé ! Vérifier les scripts.')
             }
             
+            // Charger la config Lyra (clé publique)
+            await loadLyraConfig()
+            
+            // Charger les produits
             loadProducts()
         })
     </script>

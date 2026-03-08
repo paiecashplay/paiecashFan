@@ -247,7 +247,7 @@ lyra.post('/webhook', async (c) => {
  * Retourner la configuration publique pour le frontend
  */
 lyra.get('/config', async (c) => {
-  const { LYRA_API_URL, LYRA_USERNAME } = c.env
+  const { LYRA_API_URL, LYRA_USERNAME, LYRA_PUBLIC_KEY } = c.env
 
   if (!LYRA_API_URL || !LYRA_USERNAME) {
     return c.json({
@@ -256,10 +256,13 @@ lyra.get('/config', async (c) => {
     }, 500)
   }
 
+  // En environnement de test Lyra, la clé publique = username
+  const publicKey = LYRA_PUBLIC_KEY || LYRA_USERNAME
+
   return c.json({
     success: true,
     apiUrl: LYRA_API_URL,
-    username: LYRA_USERNAME,
+    publicKey: publicKey,
     // Note: Ne JAMAIS exposer le password
   })
 })
