@@ -411,6 +411,15 @@ tombola.post('/participate', async (c) => {
     payment_method = 'credit_card'
   } = body
   
+  // Mapper les méthodes de paiement frontend → backend
+  const paymentMethodMap: Record<string, string> = {
+    'wallet': 'paypal',           // PaieCash Wallet → paypal dans DB
+    'card': 'credit_card',         // Carte bancaire → credit_card
+    'mobile': 'mobile_money'       // Mobile Money → mobile_money
+  }
+  
+  const dbPaymentMethod = paymentMethodMap[payment_method] || payment_method
+  
   try {
     // Vérifier campagne
     const campaign = await DB.prepare(`
@@ -420,6 +429,18 @@ tombola.post('/participate', async (c) => {
     if (!campaign) {
       return c.json({ success: false, error: 'Campaign not found or inactive' }, 404)
     }
+    
+    // Créer l'utilisateur s'il n'existe pas (support paiement sans compte)
+    await DB.prepare(`
+      INSERT OR IGNORE INTO users (
+        id, email, password_hash, username, display_name, created_at, is_active
+      ) VALUES (?, ?, '', ?, ?, datetime('now'), 1)
+    `).bind(
+      user_id,
+      `${user_id}@temp.com`,
+      user_id,
+      `User ${user_id}`
+    ).run()
     
     // Générer numéros de ticket
     const ticketNumbers = Array.from({ length: entries_count }, () => 
@@ -450,15 +471,28 @@ tombola.post('/participate', async (c) => {
       INSERT INTO tombola_payments (
         id, user_id, campaign_id, participation_id,
         amount, payment_method, status
-      ) VALUES (?, ?, ?, ?, ?, ?, 'pending')
+      ) VALUES (?, ?, ?, ?, ?, ?, 'completed')
     `).bind(
       paymentId,
       user_id,
       campaign_id,
       participationId,
       entryFeePaid,
-      payment_method
+      dbPaymentMethod
     ).run()
+    
+    // Mettre à jour le statut de la participation
+    await DB.prepare(`
+      UPDATE participations SET payment_status = 'completed'
+      WHERE id = ?
+    `).bind(participationId).run()
+    
+    // Mettre à jour le nombre de participants de la campagne
+    await DB.prepare(`
+      UPDATE campaigns 
+      SET current_participants = current_participants + ?
+      WHERE id = ?
+    `).bind(entries_count, campaign_id).run()
     
     return c.json({
       success: true,
