@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCRATCH - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .scratch-card {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scratch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%23666" opacity="0.5"/></svg>') 16 16, crosshair;
+        }
+        
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .prize-animation {
+            animation: prizeReveal 1s ease-out;
+        }
+        
+        @keyframes prizeReveal {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confetti-fall 3s linear infinite;
+        }
+        
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    
+    <!-- Container Principal -->
+    <div class="max-w-2xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-8 text-white">
+            <a href="/app-universal-simple.html?club=Marseille" class="inline-block mb-4">
+                <i class="fas fa-arrow-left mr-2"></i> Retour
+            </a>
+            <h1 class="text-4xl font-bold mb-2">
+                <i class="fas fa-ticket-alt mr-3"></i>SCRATCH
+            </h1>
+            <p class="text-lg opacity-90">Grattez votre ticket et tentez de gagner des lots exclusifs !</p>
+        </div>
+        
+        <!-- Section Informations -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                Comment jouer ?
+            </h2>
+            <ul class="space-y-2 text-gray-700">
+                <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix du ticket : <strong>1,00 €</strong></li>
+                <li><i class="fas fa-percentage text-purple-500 mr-2"></i> Taux de gain : <strong>10%</strong></li>
+                <li><i class="fas fa-trophy text-yellow-500 mr-2"></i> Lots disponibles : Écharpes, casquettes, maillots, survêtements, billets VIP...</li>
+            </ul>
+        </div>
+        
+        <!-- Zone de jeu -->
+        <div id="game-area" class="bg-white rounded-2xl shadow-xl p-6 text-center">
+            
+            <!-- Étape 1 : Choix du paiement -->
+            <div id="payment-choice" class="space-y-4">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Choisissez votre mode de paiement</h3>
+                
+                <button onclick="playWithCard()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-credit-card mr-2"></i>
+                    Payer par Carte Bancaire (1,00 €)
+                </button>
+                
+                <button onclick="playWithWallet()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-wallet mr-2"></i>
+                    Payer avec Wallet (1,00 €)
+                </button>
+                
+                <button onclick="playWithMobile()" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-orange-700 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-mobile-alt mr-2"></i>
+                    Payer par Mobile Money (Bientôt)
+                </button>
+            </div>
+            
+            <!-- Étape 2 : Chargement -->
+            <div id="loading-state" class="hidden space-y-4">
+                <div class="loader mx-auto"></div>
+                <p class="text-gray-600 text-lg">Traitement du paiement...</p>
+            </div>
+            
+            <!-- Étape 3 : Carte à gratter -->
+            <div id="scratch-state" class="hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Grattez votre ticket !</h3>
+                <p class="text-gray-600 mb-6">Utilisez votre souris ou votre doigt pour gratter</p>
+                
+                <div class="scratch-card mx-auto">
+                    <canvas id="scratch-canvas" class="scratch-overlay"></canvas>
+                    <div id="result-content" class="result-container hidden">
+                        <!-- Résultat sera injecté ici -->
+                    </div>
+                </div>
+                
+                <button id="reveal-btn" onclick="revealAll()" class="mt-6 bg-purple-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-purple-700 transition">
+                    <i class="fas fa-eye mr-2"></i>
+                    Révéler immédiatement
+                </button>
+            </div>
+            
+            <!-- Étape 4 : Résultat final -->
+            <div id="result-state" class="hidden space-y-6">
+                <!-- Injecté dynamiquement -->
+            </div>
+            
+        </div>
+        
+        <!-- Section Lots disponibles -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mt-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-gift text-red-500 mr-2"></i>
+                Lots à gagner
+            </h2>
+            <div id="prizes-list" class="space-y-3">
+                <div class="loader mx-auto"></div>
+                <p class="text-center text-gray-500">Chargement des lots...</p>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE_URL = window.location.origin;
+        const USER_ID = localStorage.getItem('user_id') || `user-${Date.now()}`;
+        const ORGANIZATION_ID = 'om-001'; // Olympique de Marseille par défaut
+        
+        let gameResult = null;
+        let isScratching = false;
+        let canvas, ctx;
+        
+        // Charger les lots disponibles
+        async function loadPrizes() {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/games/scratch/prizes/${ORGANIZATION_ID}`);
+                const prizes = response.data.prizes || [];
+                
+                const prizesList = document.getElementById('prizes-list');
+                if (prizes.length === 0) {
+                    prizesList.innerHTML = '<p class="text-center text-gray-500">Aucun lot disponible</p>';
+                    return;
+                }
+                
+                prizesList.innerHTML = prizes.map(prize => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-gift text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800">${prize.name}</p>
+                                <p class="text-sm text-gray-500">${prize.description || ''}</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-green-600">${prize.value}€</span>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Erreur chargement lots:', error);
+            }
+        }
+        
+        // Jouer avec Carte Bancaire
+        async function playWithCard() {
+            showLoading();
+            
+            try {
+                const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
+                    user_id: USER_ID,
+                    organization_id: ORGANIZATION_ID,
+                    payment_method: 'card',
+                    amount: 1.0
+                });
+                
+                if (response.data.success && response.data.payment_required) {
+                    // Redirection vers Stripe Checkout
+                    window.location.href = response.data.checkout_url;
+                } else {
+                    alert('Erreur lors de la création du paiement');
+                    showPaymentChoice();
+                }
+                
+            } catch (error) {
+                console.error('Erreur paiement carte:', error);
+                alert('Erreur : ' + (error.response?.data?.message || error.message));
+                showPaymentChoice();
+            }
+        }
+        
+        // Jouer avec Wallet
+        async function playWithWallet() {
+            showLoading();
+            
+            try {
+                const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
+                    user_id: USER_ID,
+                    organization_id: ORGANIZATION_ID,
+                    payment_method: 'wallet',
+                    amount: 1.0
+                });
+                
+                if (response.data.success) {
+                    gameResult = response.data;
+                    initScratchCard();
+                } else {
+                    alert('Erreur : ' + response.data.error);
+                    showPaymentChoice();
+                }
+                
+            } catch (error) {
+                console.error('Erreur paiement wallet:', error);
+                alert('Erreur : ' + (error.response?.data?.message || error.message));
+                showPaymentChoice();
+            }
+        }
+        
+        // Jouer avec Mobile Money
+        function playWithMobile() {
+            alert('Paiement Mobile Money (Orange Money, Wave) bientôt disponible via Lyra !');
+        }
+        
+        // Initialiser la carte à gratter
+        function initScratchCard() {
+            showScratch();
+            
+            canvas = document.getElementById('scratch-canvas');
+            ctx = canvas.getContext('2d');
+            
+            const card = document.querySelector('.scratch-card');
+            canvas.width = card.offsetWidth;
+            canvas.height = card.offsetHeight;
+            
+            // Remplir avec une texture de grattage
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#silver');
+            gradient.addColorStop(0.5, '#gray');
+            gradient.addColorStop(1, '#darkgray');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Texte "Grattez ici"
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GRATTEZ ICI', canvas.width / 2, canvas.height / 2);
+            
+            // Afficher le résultat en arrière-plan
+            displayResult();
+            
+            // Événements de grattage
+            let isDrawing = false;
+            
+            canvas.addEventListener('mousedown', () => { isDrawing = true; });
+            canvas.addEventListener('mouseup', () => { isDrawing = false; checkScratchProgress(); });
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDrawing) {
+                    scratch(e.offsetX, e.offsetY);
+                }
+            });
+            
+            // Touch events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+            });
+            canvas.addEventListener('touchend', () => {
+                isDrawing = false;
+                checkScratchProgress();
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (isDrawing) {
+                    const rect = canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+                }
+            });
+        }
+        
+        // Fonction de grattage
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Vérifier progression du grattage
+        function checkScratchProgress() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparent = 0;
+            
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] < 128) transparent++;
+            }
+            
+            const percentage = (transparent / (pixels.length / 4)) * 100;
+            
+            if (percentage > 50) {
+                revealAll();
+            }
+        }
+        
+        // Révéler tout
+        function revealAll() {
+            canvas.style.display = 'none';
+            document.getElementById('reveal-btn').style.display = 'none';
+            document.getElementById('result-content').classList.remove('hidden');
+            
+            if (gameResult.is_winner) {
+                createConfetti();
+            }
+            
+            setTimeout(() => {
+                showFinalResult();
+            }, 3000);
+        }
+        
+        // Afficher le résultat sous la carte
+        function displayResult() {
+            const resultContent = document.getElementById('result-content');
+            
+            if (gameResult.is_winner && gameResult.prize) {
+                resultContent.innerHTML = `
+                    <div class="prize-animation">
+                        <i class="fas fa-trophy text-yellow-400 text-6xl mb-4"></i>
+                        <h3 class="text-3xl font-bold text-green-600 mb-2">FÉLICITATIONS !</h3>
+                        <p class="text-xl font-bold text-gray-800">${gameResult.prize.name}</p>
+                        <p class="text-lg text-gray-600">Valeur : ${gameResult.prize.value}€</p>
+                    </div>
+                `;
+            } else {
+                resultContent.innerHTML = `
+                    <div class="prize-animation">
+                        <i class="fas fa-times-circle text-gray-400 text-6xl mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-600 mb-2">Dommage...</h3>
+                        <p class="text-lg text-gray-500">Ce n'est pas gagnant cette fois</p>
+                        <p class="text-sm text-gray-400 mt-2">Retentez votre chance !</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Afficher résultat final
+        function showFinalResult() {
+            const resultState = document.getElementById('result-state');
+            
+            if (gameResult.is_winner && gameResult.prize) {
+                resultState.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-trophy text-yellow-400 text-6xl mb-4 animate-bounce"></i>
+                        <h2 class="text-3xl font-bold text-green-600 mb-4">VOUS AVEZ GAGNÉ !</h2>
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl mb-4">
+                            <p class="text-2xl font-bold text-gray-800 mb-2">${gameResult.prize.name}</p>
+                            <p class="text-lg text-gray-600 mb-1">${gameResult.prize.description || ''}</p>
+                            <p class="text-xl font-bold text-green-600">Valeur : ${gameResult.prize.value}€</p>
+                        </div>
+                        <p class="text-gray-600 mb-6">Votre lot sera envoyé à votre adresse email dans les 24h</p>
+                        <button onclick="location.reload()" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-purple-700 transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            Rejouer (1,00 €)
+                        </button>
+                    </div>
+                `;
+            } else {
+                resultState.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-sad-tear text-gray-400 text-6xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-700 mb-4">Ce n'est pas gagnant</h2>
+                        <p class="text-gray-600 mb-6">Retentez votre chance ! La prochaine fois sera peut-être la bonne 🍀</p>
+                        <button onclick="location.reload()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105">
+                            <i class="fas fa-redo mr-2"></i>
+                            Rejouer (1,00 €)
+                        </button>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('scratch-state').classList.add('hidden');
+            resultState.classList.remove('hidden');
+        }
+        
+        // Créer des confettis
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'][Math.floor(Math.random() * 6)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+        
+        // Gestion des états d'affichage
+        function showPaymentChoice() {
+            document.getElementById('payment-choice').classList.remove('hidden');
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('scratch-state').classList.add('hidden');
+            document.getElementById('result-state').classList.add('hidden');
+        }
+        
+        function showLoading() {
+            document.getElementById('payment-choice').classList.add('hidden');
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('scratch-state').classList.add('hidden');
+            document.getElementById('result-state').classList.add('hidden');
+        }
+        
+        function showScratch() {
+            document.getElementById('payment-choice').classList.add('hidden');
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('scratch-state').classList.remove('hidden');
+            document.getElementById('result-state').classList.add('hidden');
+        }
+        
+        // Initialisation au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPrizes();
+            
+            // Si on revient depuis Stripe
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            
+            if (sessionId) {
+                // Récupérer le résultat depuis le serveur
+                showLoading();
+                axios.get(`${API_BASE_URL}/api/games/scratch/result/${sessionId}`)
+                    .then(response => {
+                        if (response.data.success) {
+                            gameResult = response.data;
+                            initScratchCard();
+                        } else {
+                            alert('Erreur : ' + response.data.error);
+                            showPaymentChoice();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur récupération résultat:', error);
+                        alert('Erreur : ' + (error.response?.data?.message || error.message));
+                        showPaymentChoice();
+                    });
+            }
+        });
+    </script>
+    
+</body>
+</html>

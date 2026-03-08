@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat SCRATCH - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    
+    <div class="max-w-2xl mx-auto mt-12">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div class="loader mb-6"></div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Vérification du paiement...</h2>
+            <p class="text-gray-600">Veuillez patienter pendant que nous préparons votre ticket</p>
+        </div>
+        
+        <!-- Result Container -->
+        <div id="result-container" class="hidden">
+            <!-- Le contenu sera injecté ici -->
+        </div>
+        
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        const API_BASE_URL = window.location.origin;
+        
+        // Récupérer le session_id depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (!sessionId) {
+            document.getElementById('loading-state').innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Session invalide</h2>
+                    <p class="text-gray-600 mb-6">Aucune session de paiement n'a été trouvée</p>
+                    <a href="/scratch.html" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-purple-700 transition inline-block">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour au jeu
+                    </a>
+                </div>
+            `;
+        } else {
+            // Rediriger vers scratch.html avec le session_id
+            window.location.href = `/scratch.html?session_id=${sessionId}`;
+        }
+    </script>
+    
+</body>
+</html>

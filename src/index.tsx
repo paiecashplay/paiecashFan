@@ -14,6 +14,7 @@ import signaling from './routes/signaling'
 import trtc from './routes/trtc'
 import tombola from './routes/tombola'
 import payments from './routes/payments'
+import games from './routes/games'
 
 const app = new Hono()
 
@@ -31,6 +32,9 @@ app.route('/api/tombola', tombola)
 
 // Mount Payments routes (NEW - Stripe & Lyra)
 app.route('/api/payments', payments)
+
+// Mount Games routes (NEW - Scratch, Loto, Bonus...)
+app.route('/api/games', games)
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)
