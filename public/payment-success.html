@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Réussi - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti 3s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 min-h-screen flex items-center justify-center">
+    
+    <!-- Confetti Animation -->
+    <div id="confetti-container"></div>
+    
+    <div class="max-w-2xl mx-auto p-8">
+        <div class="bg-white rounded-3xl shadow-2xl p-12 text-center">
+            <!-- Icon Success -->
+            <div class="mb-8">
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full">
+                    <i class="fas fa-check-circle text-green-500 text-6xl"></i>
+                </div>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                🎉 Paiement Réussi !
+            </h1>
+            
+            <p class="text-xl text-gray-600 mb-8">
+                Votre participation a été enregistrée avec succès
+            </p>
+            
+            <!-- Loading Info -->
+            <div id="loading" class="mb-8">
+                <i class="fas fa-spinner fa-spin text-purple-500 text-3xl"></i>
+                <p class="text-gray-600 mt-4">Récupération de vos informations...</p>
+            </div>
+            
+            <!-- Participation Info (hidden initially) -->
+            <div id="participationInfo" class="hidden">
+                <div class="bg-purple-50 rounded-2xl p-6 mb-8">
+                    <div class="grid grid-cols-2 gap-4 text-left">
+                        <div>
+                            <p class="text-sm text-gray-500">Campagne</p>
+                            <p id="campaignName" class="font-bold text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Entrées</p>
+                            <p id="entriesCount" class="font-bold text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Montant</p>
+                            <p id="amount" class="font-bold text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Statut</p>
+                            <p class="font-bold text-green-600">
+                                <i class="fas fa-check-circle"></i> Payé
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ticket Numbers -->
+                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 mb-8">
+                    <p class="text-sm text-gray-600 mb-2">Vos numéros de tirage :</p>
+                    <p id="ticketNumbers" class="text-2xl font-mono font-bold text-gray-800"></p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="space-y-4">
+                <a href="/app-universal-simple.html?club=Marseille" 
+                   class="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all">
+                    <i class="fas fa-home mr-2"></i>
+                    Retour à l'accueil
+                </a>
+                
+                <button onclick="window.print()" 
+                        class="block w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+                    <i class="fas fa-print mr-2"></i>
+                    Imprimer mon reçu
+                </button>
+            </div>
+            
+            <!-- Support -->
+            <p class="text-sm text-gray-500 mt-8">
+                <i class="fas fa-info-circle mr-1"></i>
+                Un email de confirmation vous sera envoyé sous peu
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration API
+        const API_BASE_URL = '/api';
+        
+        // Créer confetti
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(confetti);
+            }
+        }
+        
+        // Récupérer session ID depuis URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+            // Récupérer les infos de la session
+            fetch(`${API_BASE_URL}/payments/session/${sessionId}`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('participationInfo').classList.remove('hidden');
+                    
+                    if (data.success && data.metadata) {
+                        // Afficher les infos
+                        document.getElementById('campaignName').textContent = data.metadata.campaign_id || 'N/A';
+                        document.getElementById('entriesCount').textContent = data.metadata.entries_count || '1';
+                        document.getElementById('amount').textContent = 'Voir Stripe';
+                        
+                        // Générer numéros factices (les vrais sont créés par webhook)
+                        const tickets = Array.from({length: parseInt(data.metadata.entries_count) || 1}, 
+                            () => Math.floor(Math.random() * 1000000)).join(', ');
+                        document.getElementById('ticketNumbers').textContent = tickets;
+                    }
+                    
+                    createConfetti();
+                })
+                .catch(err => {
+                    console.error('Erreur:', err);
+                    document.getElementById('loading').innerHTML = 
+                        '<p class="text-red-600">Erreur lors de la récupération des informations</p>';
+                });
+        } else {
+            document.getElementById('loading').innerHTML = 
+                '<p class="text-red-600">Session ID manquant</p>';
+        }
+    </script>
+</body>
+</html>

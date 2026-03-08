@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Paiement Stripe - Tombola OM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-blue-600 mb-6">🎯 Test Paiement Stripe</h1>
+        
+        <div class="mb-6 p-4 bg-blue-50 rounded">
+            <h2 class="font-bold text-lg mb-2">Campagne : Écharpe Collector OM</h2>
+            <p class="text-gray-700">Prix du lot : 25€</p>
+            <p class="text-gray-700">Frais d'entrée : 1.00€</p>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Nombre de participations
+            </label>
+            <input type="number" id="numEntries" value="1" min="1" max="10" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+        </div>
+
+        <button onclick="payerAvecStripe()" 
+                class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+            💳 Payer avec Carte Bancaire (Stripe)
+        </button>
+
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        async function payerAvecStripe() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création session Stripe...';
+
+            const numEntries = parseInt(document.getElementById('numEntries').value);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        campaign_id: 'camp-004',
+                        campaign_name: 'Écharpe Collector OM',
+                        prize_name: 'Écharpe Collector OM',
+                        entries_count: numEntries,
+                        entry_fee: 1.0,
+                        user_id: 'user-demo-frontend-001'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.checkout_url) {
+                    document.getElementById('result').innerHTML = `
+                        <div class="p-4 bg-green-50 text-green-800 rounded">
+                            ✅ Session créée ! Redirection vers Stripe dans 2 secondes...
+                            <br><br>
+                            <a href="${data.checkout_url}" class="text-blue-600 underline">
+                                Cliquer ici si pas de redirection automatique
+                            </a>
+                        </div>
+                    `;
+                    
+                    // Redirection automatique après 2 secondes
+                    setTimeout(() => {
+                        window.location.href = data.checkout_url;
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Erreur création session');
+                }
+
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="p-4 bg-red-50 text-red-800 rounded">
+                        ❌ Erreur : ${error.message}
+                    </div>
+                `;
+                btn.disabled = false;
+                btn.innerHTML = '💳 Payer avec Carte Bancaire (Stripe)';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -13,6 +13,7 @@ import vendorStreams from './routes/vendorStreams'
 import signaling from './routes/signaling'
 import trtc from './routes/trtc'
 import tombola from './routes/tombola'
+import payments from './routes/payments'
 
 const app = new Hono()
 
@@ -27,6 +28,9 @@ app.route('/api/trtc', trtc)
 
 // Mount Tombola routes (NEW - Système de loterie quotidienne)
 app.route('/api/tombola', tombola)
+
+// Mount Payments routes (NEW - Stripe & Lyra)
+app.route('/api/payments', payments)
 
 // Mount Whaazs routes
 app.route('/api/whaazs', whaazs)

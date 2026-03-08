@@ -4023,53 +4023,89 @@ async function confirmPayment() {
     const totalAmount = currentCampaign.entryFee * numEntries;
     const userBalance = parseFloat(localStorage.getItem('userBalance') || '500');
     
-    // Vérifier le solde
-    if (selectedPaymentMethod === 'wallet' && userBalance < totalAmount) {
-        alert('❌ Solde insuffisant dans votre PaieCash Wallet');
-        return;
-    }
-    
     // Désactiver le bouton pendant le traitement
     const btn = document.getElementById('btnConfirmPayment');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
     
     try {
-        const response = await fetch(`${API_BASE_URL}/tombola/participate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                campaign_id: currentCampaign.id,
-                user_id: 'user-demo-001',
-                num_entries: numEntries,
-                payment_method: selectedPaymentMethod,
-                amount: totalAmount
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Mise à jour du solde si paiement par wallet
-            if (selectedPaymentMethod === 'wallet') {
-                const newBalance = userBalance - totalAmount;
-                localStorage.setItem('userBalance', newBalance.toFixed(2));
+        // WALLET : Paiement local (simulation)
+        if (selectedPaymentMethod === 'wallet') {
+            // Vérifier le solde
+            if (userBalance < totalAmount) {
+                alert('❌ Solde insuffisant dans votre PaieCash Wallet');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
+                return;
             }
             
-            // Fermer la modal
-            closePaymentModal();
+            // Appeler l'API existante
+            const response = await fetch(`${API_BASE_URL}/tombola/participate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    campaign_id: currentCampaign.id,
+                    user_id: 'user-demo-001',
+                    entries_count: numEntries,
+                    payment_method: 'wallet',
+                    amount: totalAmount
+                })
+            });
             
-            // Afficher le succès
-            showSuccessModal(data, numEntries);
+            const data = await response.json();
             
-            // Recharger les stats et campagnes
-            loadTombolaStats();
-            loadTombolaCampaigns();
-        } else {
-            alert('❌ ' + (data.error || 'Erreur de participation'));
+            if (data.success) {
+                // Mise à jour du solde
+                const newBalance = userBalance - totalAmount;
+                localStorage.setItem('userBalance', newBalance.toFixed(2));
+                
+                closePaymentModal();
+                showSuccessModal(data, numEntries);
+                loadTombolaStats();
+                loadTombolaCampaigns();
+            } else {
+                alert('❌ ' + (data.error || 'Erreur de participation'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
+            }
+        }
+        
+        // CARTE BANCAIRE : Redirection Stripe Checkout
+        else if (selectedPaymentMethod === 'card') {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirection vers Stripe...';
+            
+            const response = await fetch(`${API_BASE_URL}/payments/create-checkout-session`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    campaign_id: currentCampaign.id,
+                    campaign_name: currentCampaign.name,
+                    prize_name: currentCampaign.prizeName,
+                    entries_count: numEntries,
+                    entry_fee: currentCampaign.entryFee,
+                    user_id: 'user-demo-001'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.checkout_url) {
+                // Rediriger vers Stripe Checkout
+                window.location.href = data.checkout_url;
+            } else {
+                alert('❌ ' + (data.error || 'Erreur création session Stripe'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
+            }
+        }
+        
+        // MOBILE MONEY : Lyra (à implémenter)
+        else if (selectedPaymentMethod === 'mobile') {
+            alert('🚧 Mobile Money (Orange Money, Wave) sera bientôt disponible via Lyra');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-lock"></i> Confirmer le paiement';
         }
+        
     } catch (error) {
         console.error('❌ Erreur participation:', error);
         alert('❌ Erreur réseau. Veuillez réessayer.');
