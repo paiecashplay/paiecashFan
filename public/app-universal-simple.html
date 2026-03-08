@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- 🎬 STORIES CSS -->
-    <link rel="stylesheet" href="css/stories.css">
+    <!-- <link rel="stylesheet" href="css/stories.css"> -->
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -2364,13 +2364,23 @@
                 document.getElementById('lotoTombola').style.display = 'block';
                 console.log('✅ Mode Tombola activé');
                 
-                // Charger les données Tombola si fonction disponible
-                if (typeof loadTombolaStats === 'function') {
-                    loadTombolaStats();
-                }
-                if (typeof loadTombolaCampaigns === 'function') {
-                    loadTombolaCampaigns();
-                }
+                // Attendre que le DOM et les fonctions soient chargés
+                setTimeout(function() {
+                    // Charger les données Tombola si fonction disponible
+                    if (typeof loadTombolaStats === 'function') {
+                        console.log('📊 Chargement stats...');
+                        loadTombolaStats();
+                    } else {
+                        console.warn('⚠️ loadTombolaStats non disponible');
+                    }
+                    
+                    if (typeof loadTombolaCampaigns === 'function') {
+                        console.log('📋 Chargement campagnes...');
+                        loadTombolaCampaigns();
+                    } else {
+                        console.warn('⚠️ loadTombolaCampaigns non disponible');
+                    }
+                }, 100);
             } catch (error) {
                 console.error('❌ Erreur openTombolaMode():', error);
                 alert('Erreur Tombola: ' + error.message);
@@ -2946,10 +2956,10 @@
     </div>
 
     <!-- 🌍 Données fédérations CAF -->
-    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
+    <!-- <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script> -->
     
     <!-- 🌍 Système I18N Multi-Langues - RÉACTIVÉ ✅ -->
-    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
+    <!-- <script src="🌍_MULTI_LANGUES_I18N.js"></script> -->
 
     <!-- 🎲 LOTO FUNCTIONS -->
     <script>
@@ -3878,14 +3888,6 @@ async function participateCampaign(campaignId, entryFee, campaignName, prizeName
     
     // Afficher d'abord le modal de règlement
     showRulesModal();
-}
-    // Afficher le solde
-    document.getElementById('userBalanceDisplay').textContent = `${userBalance.toFixed(2)} PCC`;
-    
-    // Réinitialiser
-    document.getElementById('numEntries').value = 1;
-    updateTotalAmount();
-    selectPaymentMethod('wallet');
 }
 
 function closePaymentModal() {
@@ -5890,7 +5892,8 @@ function shareResult() {
     </div>
 
     <!-- 🎬 STORIES SYSTÈME -->
-    <script src="js/storiesManager.js"></script>
+    <!-- <script src="js/storiesManager.js"></script> -->
+    <!-- 
     <script>
         // Initialiser les stories au chargement
         document.addEventListener('DOMContentLoaded', function() {
@@ -5904,6 +5907,7 @@ function shareResult() {
             }
         });
     </script>
+    -->
 
 </body>
 </html>
