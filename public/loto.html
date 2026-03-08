@@ -3,221 +3,883 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOTO Chiffres - PaieCashFan</title>
+    <title>LOTO PaieCashFan - Tirages Quotidiens</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        * { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: #1a1a2e;
+            --card: #252837;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
         
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1a2332 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 60px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 30px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px 40px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-stat-number {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+        
+        .hero-stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 40px;
+        }
+        
+        /* Game Card */
+        .game-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-header {
+            margin-bottom: 30px;
+        }
+        
+        .game-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .game-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        /* Number Grid */
+        .numbers-section {
+            margin-bottom: 40px;
+        }
+        
+        .numbers-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
         
         .number-btn {
-            @apply w-14 h-14 rounded-lg font-bold text-lg transition-all duration-200 cursor-pointer;
-            @apply bg-white text-gray-700 border-2 border-gray-200;
-            @apply hover:border-purple-400 hover:shadow-lg hover:-translate-y-1;
+            aspect-ratio: 1;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .number-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
         }
         
         .number-btn.selected {
-            @apply bg-gradient-to-br from-purple-500 to-pink-500 text-white border-purple-600 shadow-xl scale-110;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.5);
         }
         
         .number-btn:disabled {
-            @apply opacity-50 cursor-not-allowed;
+            opacity: 0.3;
+            cursor: not-allowed;
         }
         
-        .hidden { display: none !important; }
+        .selection-counter {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+        
+        /* Chance Grid */
+        .chance-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+        }
+        
+        /* Prize Info */
+        .prize-info-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .prize-info-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+        
+        .prize-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .prize-example {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .prize-example-match {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .prize-example-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Price & Play */
+        .play-section {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .price-display {
+            flex: 1;
+        }
+        
+        .price-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .price-amount {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        
+        .play-btn {
+            padding: 18px 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.6);
+        }
+        
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Payment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            margin-bottom: 30px;
+        }
+        
+        .modal-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .payment-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-btn {
+            padding: 20px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .payment-btn:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+        
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .payment-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .payment-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .modal-close {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--surface);
+        }
+        
+        /* Loading */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        /* Result Modal */
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .result-modal.active {
+            display: flex;
+        }
+        
+        .result-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .result-header h2 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .numbers-display {
+            margin-bottom: 30px;
+        }
+        
+        .numbers-display h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        
+        .numbers-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .result-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .result-number.user {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .result-number.winning {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .result-number.chance {
+            background: linear-gradient(135deg, var(--secondary), #be185d);
+        }
+        
+        .prize-won {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            border: 2px solid var(--success);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .prize-won-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .prize-won-name {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .prize-won-value {
+            font-size: 20px;
+            color: var(--success);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .prize-won-match {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .result-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .result-btn {
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .result-btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .result-btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+        }
+        
+        .result-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .numbers-grid,
+            .chance-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .play-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .result-actions {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
     <!-- Header -->
-    <div class="max-w-6xl mx-auto mb-8">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <a href="/" class="text-gray-600 hover:text-gray-900 transition">
-                    <i class="fas fa-arrow-left text-2xl"></i>
-                </a>
-                <div>
-                    <h1 class="text-3xl font-black text-gray-900">🎲 LOTO Chiffres</h1>
-                    <p class="text-gray-600">Sélectionnez vos numéros et tentez votre chance !</p>
-                </div>
+    <header class="header">
+        <div class="logo" onclick="location.href='/'">
+            <div class="logo-icon">
+                <i class="fas fa-dice"></i>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="/mes-tickets.html" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition">
-                    <i class="fas fa-history mr-2"></i>Mes Tickets
-                </a>
+            <div class="logo-text">
+                <h1>LOTO PaieCashFan</h1>
+                <p>Tirages Quotidiens</p>
             </div>
         </div>
-    </div>
-
-    <div class="max-w-6xl mx-auto">
-        <!-- Instructions -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-info-circle text-purple-500 mr-2"></i>Comment jouer ?
-            </h2>
-            <div class="grid md:grid-cols-3 gap-4">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="font-bold text-purple-600">1</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Choisissez vos numéros</h3>
-                        <p class="text-sm text-gray-600">5 numéros entre 1 et 50 + 1 numéro chance entre 1 et 10</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="font-bold text-purple-600">2</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Payez 2€</h3>
-                        <p class="text-sm text-gray-600">Avec votre Wallet ou carte bancaire</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="font-bold text-purple-600">3</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Gagnez toujours !</h3>
-                        <p class="text-sm text-gray-600">Lot garanti minimum : produits Grande Distribution</p>
-                    </div>
-                </div>
+        
+        <div class="header-actions">
+            <a href="/mes-tickets.html" class="btn btn-secondary">
+                <i class="fas fa-history"></i> Mes Tickets
+            </a>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>🎲 LOTO PaieCashFan</h1>
+        <p>Sélectionnez vos numéros et tentez votre chance - Lot garanti à chaque partie !</p>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-number">Jackpot</div>
+                <div class="hero-stat-label">500€ Carrefour</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-number">2€</div>
+                <div class="hero-stat-label">Prix/Grille</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-number">100%</div>
+                <div class="hero-stat-label">Toujours gagnant</div>
             </div>
         </div>
-
-        <!-- Game Area -->
-        <div id="game-area" class="bg-white rounded-2xl shadow-xl p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">🎯 Sélectionnez vos numéros</h2>
+    </section>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Game Card -->
+        <div class="game-card">
+            <div class="game-header">
+                <h2>🏆 Sélectionnez vos numéros</h2>
+                <p>Choisissez 5 numéros entre 1 et 50, puis 1 numéro chance entre 1 et 10</p>
+            </div>
             
             <!-- Main Numbers (1-50) -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-gray-700 mb-4">Vos 5 numéros (1-50)</h3>
-                <div class="grid grid-cols-10 gap-2" id="main-numbers">
-                    <!-- Generated by JS -->
+            <div class="numbers-section">
+                <div class="numbers-title">
+                    <i class="fas fa-hashtag"></i>
+                    Vos 5 numéros (1-50)
                 </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    <span id="selected-count">0</span>/5 numéros sélectionnés
-                </p>
-            </div>
-
-            <!-- Chance Number (1-10) -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-gray-700 mb-4">Votre numéro chance (1-10)</h3>
-                <div class="grid grid-cols-10 gap-2" id="chance-numbers">
-                    <!-- Generated by JS -->
+                <div class="numbers-grid" id="mainNumbersGrid"></div>
+                <div class="selection-counter">
+                    <span id="selectedCount">0</span>/5 numéros sélectionnés
                 </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    <span id="chance-selected">Aucun</span> numéro chance sélectionné
-                </p>
             </div>
-
-            <!-- Price & Play Button -->
-            <div class="flex items-center justify-between p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                <div>
-                    <p class="text-gray-600">Prix de la grille</p>
-                    <p class="text-3xl font-black text-purple-600">2,00 €</p>
-                </div>
-                <button 
-                    id="play-btn"
-                    onclick="showPaymentChoice()"
-                    disabled
-                    class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fas fa-play mr-2"></i>JOUER (2€)
-                </button>
-            </div>
-        </div>
-
-        <!-- Payment Choice (Hidden by default) -->
-        <div id="payment-choice" class="hidden bg-white rounded-2xl shadow-xl p-8 mt-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">💳 Choisissez votre mode de paiement</h2>
             
-            <div class="grid md:grid-cols-2 gap-4 mb-6">
-                <button onclick="playWithWallet()" class="p-6 border-2 border-purple-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition">
-                    <i class="fas fa-wallet text-4xl text-purple-500 mb-3"></i>
-                    <h3 class="font-bold text-lg mb-2">Wallet PCC</h3>
-                    <p class="text-sm text-gray-600">Paiement instantané</p>
-                </button>
-                
-                <button onclick="playWithCard()" class="p-6 border-2 border-purple-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition">
-                    <i class="fas fa-credit-card text-4xl text-purple-500 mb-3"></i>
-                    <h3 class="font-bold text-lg mb-2">Carte Bancaire</h3>
-                    <p class="text-sm text-gray-600">Paiement sécurisé Stripe</p>
+            <!-- Chance Number (1-10) -->
+            <div class="numbers-section">
+                <div class="numbers-title">
+                    <i class="fas fa-star"></i>
+                    Votre numéro chance (1-10)
+                </div>
+                <div class="chance-grid" id="chanceNumbersGrid"></div>
+                <div class="selection-counter">
+                    Numéro chance : <span id="chanceSelected">Aucun</span>
+                </div>
+            </div>
+            
+            <!-- Prize Info -->
+            <div class="prize-info-box">
+                <h3>🎁 Lots Grande Distribution</h3>
+                <div class="prize-examples">
+                    <div class="prize-example">
+                        <div class="prize-example-match">5 + Chance</div>
+                        <div class="prize-example-value">500€ Carrefour</div>
+                    </div>
+                    <div class="prize-example">
+                        <div class="prize-example-match">5 numéros</div>
+                        <div class="prize-example-value">100€ Carrefour</div>
+                    </div>
+                    <div class="prize-example">
+                        <div class="prize-example-match">4 + Chance</div>
+                        <div class="prize-example-value">50€ Auchan</div>
+                    </div>
+                    <div class="prize-example">
+                        <div class="prize-example-match">0-2 numéros</div>
+                        <div class="prize-example-value">Baguette, Café...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Play Section -->
+            <div class="play-section">
+                <div class="price-display">
+                    <div class="price-label">Prix de la grille</div>
+                    <div class="price-amount">2,00 €</div>
+                </div>
+                <button class="play-btn" id="playBtn" onclick="openPaymentModal()" disabled>
+                    <i class="fas fa-play"></i> LANCER LE TIRAGE
                 </button>
             </div>
-
-            <button onclick="cancelPayment()" class="w-full py-3 text-gray-600 hover:text-gray-900 transition">
-                <i class="fas fa-times mr-2"></i>Annuler
-            </button>
-        </div>
-
-        <!-- Loading State -->
-        <div id="loading-state" class="hidden bg-white rounded-2xl shadow-xl p-12 mt-6 text-center">
-            <div class="animate-spin text-6xl text-purple-500 mb-6">⏳</div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Tirage en cours...</h2>
-            <p class="text-gray-600">Votre grille est en cours de traitement</p>
-        </div>
-
-        <!-- Result State -->
-        <div id="result-state" class="hidden bg-white rounded-2xl shadow-xl p-8 mt-6">
-            <!-- Filled by JS -->
         </div>
     </div>
-
+    
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💳 Choisissez votre paiement</h2>
+                <p style="color: var(--text-secondary);">Sécurisé et instantané</p>
+            </div>
+            
+            <div class="payment-options">
+                <button class="payment-btn" onclick="playWithWallet()">
+                    <div class="payment-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="payment-info">
+                        <h3>Wallet PCC</h3>
+                        <p>Paiement instantané</p>
+                    </div>
+                </button>
+                
+                <button class="payment-btn" onclick="playWithCard()">
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="payment-info">
+                        <h3>Carte Bancaire</h3>
+                        <p>Paiement sécurisé Stripe</p>
+                    </div>
+                </button>
+            </div>
+            
+            <button class="modal-close" onclick="closePaymentModal()">
+                <i class="fas fa-times"></i> Annuler
+            </button>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Tirage en cours...</div>
+    </div>
+    
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-content" id="resultContent">
+            <!-- Filled by JavaScript -->
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         const API_BASE_URL = window.location.origin;
         const LOTO_PRICE = 2.00;
         
-        // Generate unique user ID
+        // User ID management
         let USER_ID = localStorage.getItem('USER_ID');
         if (!USER_ID) {
             USER_ID = `user-${Date.now()}-${Math.random().toString(36).substring(7)}`;
             localStorage.setItem('USER_ID', USER_ID);
         }
-        console.log('USER_ID:', USER_ID);
-
-        // Get user email if set
+        
         let USER_EMAIL = localStorage.getItem('USER_EMAIL') || null;
-
+        
         let selectedNumbers = [];
         let selectedChance = null;
         let gameResult = null;
-
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             generateMainNumbers();
             generateChanceNumbers();
-            updatePlayButton();
         });
-
+        
+        // Generate main numbers grid (1-50)
         function generateMainNumbers() {
-            const container = document.getElementById('main-numbers');
+            const grid = document.getElementById('mainNumbersGrid');
             for (let i = 1; i <= 50; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'number-btn';
                 btn.textContent = i;
-                btn.onclick = () => toggleMainNumber(i, btn);
-                container.appendChild(btn);
+                btn.onclick = () => toggleMainNumber(i);
+                btn.dataset.number = i;
+                grid.appendChild(btn);
             }
         }
-
+        
+        // Generate chance numbers grid (1-10)
         function generateChanceNumbers() {
-            const container = document.getElementById('chance-numbers');
+            const grid = document.getElementById('chanceNumbersGrid');
             for (let i = 1; i <= 10; i++) {
                 const btn = document.createElement('button');
                 btn.className = 'number-btn';
                 btn.textContent = i;
                 btn.onclick = () => selectChance(i);
-                container.appendChild(btn);
+                btn.dataset.chance = i;
+                grid.appendChild(btn);
             }
         }
-
-        function toggleMainNumber(num, btn) {
+        
+        // Toggle main number selection
+        function toggleMainNumber(num) {
+            const btn = document.querySelector(`#mainNumbersGrid .number-btn[data-number="${num}"]`);
             const index = selectedNumbers.indexOf(num);
+            
             if (index > -1) {
                 // Deselect
                 selectedNumbers.splice(index, 1);
@@ -228,65 +890,67 @@
                     selectedNumbers.push(num);
                     btn.classList.add('selected');
                 } else {
-                    alert('❌ Vous pouvez sélectionner maximum 5 numéros !');
+                    alert('❌ Maximum 5 numéros !');
+                    return;
                 }
             }
-            document.getElementById('selected-count').textContent = selectedNumbers.length;
+            
+            document.getElementById('selectedCount').textContent = selectedNumbers.length;
             updatePlayButton();
         }
-
+        
+        // Select chance number
         function selectChance(num) {
             // Remove previous selection
-            document.querySelectorAll('#chance-numbers .number-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#chanceNumbersGrid .number-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
             
-            // Select new
             selectedChance = num;
-            event.target.classList.add('selected');
-            document.getElementById('chance-selected').textContent = num;
+            const btn = document.querySelector(`#chanceNumbersGrid .number-btn[data-chance="${num}"]`);
+            btn.classList.add('selected');
+            
+            document.getElementById('chanceSelected').textContent = num;
             updatePlayButton();
         }
-
+        
+        // Update play button state
         function updatePlayButton() {
-            const playBtn = document.getElementById('play-btn');
+            const playBtn = document.getElementById('playBtn');
             if (selectedNumbers.length === 5 && selectedChance !== null) {
                 playBtn.disabled = false;
             } else {
                 playBtn.disabled = true;
             }
         }
-
-        function showPaymentChoice() {
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('payment-choice').classList.remove('hidden');
+        
+        // Open payment modal
+        function openPaymentModal() {
+            document.getElementById('paymentModal').classList.add('active');
         }
-
-        function cancelPayment() {
-            document.getElementById('payment-choice').classList.add('hidden');
-            document.getElementById('game-area').classList.remove('hidden');
+        
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
         }
-
+        
+        // Play with Wallet
         async function playWithWallet() {
-            console.log('🎮 Jouer avec Wallet');
+            closePaymentModal();
             await playLoto('wallet');
         }
-
+        
+        // Play with Card (Stripe)
         async function playWithCard() {
-            alert('💳 Paiement par carte : À implémenter avec Stripe');
+            alert('💳 Paiement Stripe à implémenter');
             // TODO: Implement Stripe payment
         }
-
+        
+        // Play LOTO
         async function playLoto(paymentMethod) {
             try {
-                // Hide payment choice, show loading
-                document.getElementById('payment-choice').classList.add('hidden');
-                document.getElementById('loading-state').classList.remove('hidden');
-
-                console.log('🎲 LOTO Play:', {
-                    numbers: selectedNumbers,
-                    chance: selectedChance,
-                    payment_method: paymentMethod
-                });
-
+                document.getElementById('loadingOverlay').classList.add('active');
+                
                 const response = await axios.post(`${API_BASE_URL}/api/games/loto/play`, {
                     user_id: USER_ID,
                     organization_id: 'om-001',
@@ -295,97 +959,79 @@
                     payment_method: paymentMethod,
                     user_email: USER_EMAIL
                 });
-
+                
                 if (response.data.success) {
                     gameResult = response.data;
                     console.log('✅ Résultat:', gameResult);
                     
                     // Wait 2s for suspense
                     setTimeout(() => {
+                        document.getElementById('loadingOverlay').classList.remove('active');
                         showResult();
                     }, 2000);
                 } else {
-                    throw new Error(response.data.error || 'Erreur lors du jeu');
+                    throw new Error(response.data.error || 'Erreur');
                 }
             } catch (error) {
                 console.error('❌ Erreur:', error);
-                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('loadingOverlay').classList.remove('active');
                 alert('❌ Erreur : ' + (error.response?.data?.error || error.message));
-                document.getElementById('game-area').classList.remove('hidden');
             }
         }
-
+        
+        // Show result
         function showResult() {
-            document.getElementById('loading-state').classList.add('hidden');
+            const { user_numbers, user_chance, winning_numbers, winning_chance, matched_numbers, matched_chance, prize, email_sent } = gameResult;
             
-            const resultDiv = document.getElementById('result-state');
-            resultDiv.classList.remove('hidden');
-
-            const { user_numbers, user_chance, winning_numbers, winning_chance, matched_numbers, matched_chance, prize, email_sent, transaction_id, invoice_number } = gameResult;
-
-            resultDiv.innerHTML = `
-                <h2 class="text-3xl font-black text-center mb-8">
-                    🎉 Résultat du Tirage
-                </h2>
-
-                <!-- Your Numbers -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-bold text-gray-700 mb-3">Vos numéros</h3>
-                    <div class="flex gap-2 items-center justify-center flex-wrap">
-                        ${user_numbers.map(n => `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold flex items-center justify-center text-lg shadow-lg">${n}</div>`).join('')}
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold flex items-center justify-center text-lg shadow-lg">⭐${user_chance}</div>
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `
+                <div class="result-header">
+                    <h2>🎉 Résultat du Tirage</h2>
+                </div>
+                
+                <div class="numbers-display">
+                    <h3>Vos numéros</h3>
+                    <div class="numbers-row">
+                        ${user_numbers.map(n => `<div class="result-number user">${n}</div>`).join('')}
+                        <div class="result-number chance">⭐${user_chance}</div>
                     </div>
                 </div>
-
-                <!-- Winning Numbers -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold text-gray-700 mb-3">Numéros gagnants</h3>
-                    <div class="flex gap-2 items-center justify-center flex-wrap">
-                        ${winning_numbers.map(n => `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold flex items-center justify-center text-lg shadow-lg">${n}</div>`).join('')}
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold flex items-center justify-center text-lg shadow-lg">⭐${winning_chance}</div>
+                
+                <div class="numbers-display">
+                    <h3>Numéros gagnants</h3>
+                    <div class="numbers-row">
+                        ${winning_numbers.map(n => `<div class="result-number winning">${n}</div>`).join('')}
+                        <div class="result-number chance">⭐${winning_chance}</div>
                     </div>
                 </div>
-
-                <!-- Prize -->
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 mb-6">
-                    <div class="text-center">
-                        <div class="text-6xl mb-4">🎁</div>
-                        <h2 class="text-2xl font-black text-gray-800 mb-2">${prize.name}</h2>
-                        <p class="text-lg text-gray-600 mb-4">Valeur : ${prize.value.toFixed(2)} €</p>
-                        <p class="text-sm text-gray-500">
-                            ${matched_numbers} numéro(s) trouvé(s)${matched_chance ? ' + Chance ✨' : ''}
-                        </p>
+                
+                <div class="prize-won">
+                    <div class="prize-won-icon">🎁</div>
+                    <div class="prize-won-name">${prize.name}</div>
+                    <div class="prize-won-value">Valeur : ${prize.value.toFixed(2)} €</div>
+                    <div class="prize-won-match">
+                        ${matched_numbers} numéro(s) trouvé(s)${matched_chance ? ' + Chance ✨' : ''}
                     </div>
                 </div>
-
-                <!-- Receipt Info -->
+                
                 ${email_sent && USER_EMAIL ? `
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
-                    <i class="fas fa-envelope-circle-check text-blue-500 text-2xl mb-2"></i>
-                    <p class="text-sm text-gray-700">
-                        ✅ Reçu généré ! Consultez <a href="/mes-tickets.html" class="text-blue-600 underline">Mes Tickets</a>
-                    </p>
-                    <p class="text-xs text-gray-500">N° ${invoice_number}</p>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    Reçu envoyé à ${USER_EMAIL}
                 </div>
-                ` : `
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-center">
-                    <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i>
-                    <p class="text-sm text-gray-700">
-                        ⚠️ Email non configuré. <a href="/mes-tickets.html" class="text-blue-600 underline">Enregistrez votre email</a> pour recevoir vos reçus.
-                    </p>
-                </div>
-                `}
-
-                <!-- Actions -->
-                <div class="flex gap-4">
-                    <a href="/mes-tickets.html" class="flex-1 py-3 bg-purple-500 text-white font-bold rounded-lg text-center hover:bg-purple-600 transition">
-                        <i class="fas fa-history mr-2"></i>Mes Tickets
-                    </a>
-                    <button onclick="location.reload()" class="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-xl transition">
-                        <i class="fas fa-redo mr-2"></i>Rejouer
+                ` : ''}
+                
+                <div class="result-actions">
+                    <button class="result-btn result-btn-secondary" onclick="location.href='/mes-tickets.html'">
+                        <i class="fas fa-history"></i> Mes Tickets
+                    </button>
+                    <button class="result-btn result-btn-primary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Rejouer
                     </button>
                 </div>
             `;
+            
+            document.getElementById('resultModal').classList.add('active');
         }
     </script>
 </body>
