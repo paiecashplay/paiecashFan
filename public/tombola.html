@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tombola Quotidienne - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        
+        .campaign-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .campaign-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(236, 72, 153, 0.3);
+        }
+        
+        .badge-hot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .empty-state {
+            animation: fadeIn 1s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-black bg-opacity-40 backdrop-blur-lg border-b border-white border-opacity-10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="window.location.href='/home.html'" class="p-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition">
+                        <i class="fas fa-arrow-left text-white"></i>
+                    </button>
+                    <div class="w-12 h-12 bg-gradient-to-br from-pink-600 to-pink-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-gift text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Tombola Quotidienne</h1>
+                        <p class="text-xs text-gray-400">Gagnez des lots incroyables</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.location.href='/mes-tickets.html'" class="p-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition">
+                        <i class="fas fa-ticket text-white"></i>
+                    </button>
+                    <button onclick="alert('Wallet: 125.50 €')" class="p-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition">
+                        <i class="fas fa-wallet text-white"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="py-6 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gradient-to-br from-pink-600 to-pink-700 rounded-2xl p-4 text-center">
+                    <div id="active-campaigns-count" class="text-3xl font-black text-white mb-1">...</div>
+                    <div class="text-xs text-pink-100">Tirages actifs</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-4 text-center">
+                    <div id="total-lots-count" class="text-3xl font-black text-white mb-1">...</div>
+                    <div class="text-xs text-purple-100">Lots disponibles</div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-center">
+                    <div id="my-participations-count" class="text-3xl font-black text-white mb-1">...</div>
+                    <div class="text-xs text-blue-100">Participations</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabs -->
+    <section class="px-4 mb-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex gap-2 bg-white bg-opacity-10 rounded-2xl p-2 backdrop-blur-lg">
+                <button onclick="switchTab('campaigns')" id="tab-campaigns" class="flex-1 py-3 rounded-xl font-bold transition text-white bg-pink-600">
+                    <i class="fas fa-fire mr-2"></i>Tirages actifs
+                </button>
+                <button onclick="switchTab('lots')" id="tab-lots" class="flex-1 py-3 rounded-xl font-bold transition text-gray-400">
+                    <i class="fas fa-gift mr-2"></i>Catalogue
+                </button>
+                <button onclick="switchTab('my-tickets')" id="tab-my-tickets" class="flex-1 py-3 rounded-xl font-bold transition text-gray-400">
+                    <i class="fas fa-ticket mr-2"></i>Mes tickets
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <section class="px-4 pb-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Campaigns Tab -->
+            <div id="content-campaigns" class="space-y-4">
+                <!-- Empty State -->
+                <div id="campaigns-empty" class="empty-state bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-12 text-center hidden">
+                    <div class="w-24 h-24 bg-pink-600 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-calendar-times text-5xl text-pink-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Aucun tirage actif pour le moment</h3>
+                    <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                        Les tirages de tombola sont organisés régulièrement. 
+                        Revenez bientôt pour participer et tenter de gagner des lots exceptionnels !
+                    </p>
+                    <div class="flex gap-4 justify-center">
+                        <button onclick="switchTab('lots')" class="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl transition">
+                            <i class="fas fa-gift mr-2"></i>Voir le catalogue
+                        </button>
+                        <button onclick="loadCampaigns()" class="px-6 py-3 bg-white bg-opacity-10 hover:bg-opacity-20 text-white font-bold rounded-xl transition">
+                            <i class="fas fa-sync mr-2"></i>Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Campaigns List -->
+                <div id="campaigns-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Lots Tab -->
+            <div id="content-lots" class="hidden">
+                <!-- Categories Filter -->
+                <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                    <button onclick="filterLots('all')" class="px-4 py-2 bg-pink-600 text-white rounded-lg font-medium whitespace-nowrap">
+                        Tous
+                    </button>
+                    <button onclick="filterLots('cash')" class="px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 text-white rounded-lg font-medium whitespace-nowrap">
+                        💰 Cash
+                    </button>
+                    <button onclick="filterLots('experience')" class="px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 text-white rounded-lg font-medium whitespace-nowrap">
+                        🎉 Expériences
+                    </button>
+                    <button onclick="filterLots('voyage')" class="px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 text-white rounded-lg font-medium whitespace-nowrap">
+                        ✈️ Voyages
+                    </button>
+                    <button onclick="filterLots('automobile')" class="px-4 py-2 bg-white bg-opacity-10 hover:bg-opacity-20 text-white rounded-lg font-medium whitespace-nowrap">
+                        🚗 Automobile
+                    </button>
+                </div>
+
+                <!-- Lots List -->
+                <div id="lots-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Empty lots -->
+                <div id="lots-empty" class="empty-state bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-12 text-center hidden">
+                    <div class="w-24 h-24 bg-purple-600 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-box-open text-5xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Aucun lot disponible</h3>
+                    <p class="text-gray-400">Le catalogue sera bientôt alimenté avec de superbes lots !</p>
+                </div>
+            </div>
+
+            <!-- My Tickets Tab -->
+            <div id="content-my-tickets" class="hidden">
+                <div id="my-tickets-list" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Empty tickets -->
+                <div id="my-tickets-empty" class="empty-state bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-12 text-center hidden">
+                    <div class="w-24 h-24 bg-blue-600 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-ticket text-5xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Aucune participation pour le moment</h3>
+                    <p class="text-gray-400 mb-6">Vous n'avez pas encore participé à une tombola.</p>
+                    <button onclick="switchTab('campaigns')" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">
+                        <i class="fas fa-play mr-2"></i>Participer maintenant
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // Global state
+        let campaigns = [];
+        let lots = [];
+        let myParticipations = [];
+        let currentTab = 'campaigns';
+        let currentLotFilter = 'all';
+
+        // Initialize
+        async function init() {
+            await Promise.all([
+                loadCampaigns(),
+                loadLots(),
+                loadMyParticipations()
+            ]);
+            updateStats();
+        }
+
+        // Load campaigns
+        async function loadCampaigns() {
+            try {
+                const response = await fetch('/api/tombola/campaigns');
+                const data = await response.json();
+                campaigns = data.campaigns || [];
+                renderCampaigns();
+            } catch (error) {
+                console.error('Error loading campaigns:', error);
+                campaigns = [];
+                renderCampaigns();
+            }
+        }
+
+        // Load lots
+        async function loadLots() {
+            try {
+                const response = await fetch('/api/tombola/lots');
+                const data = await response.json();
+                lots = data.lots || [];
+                renderLots();
+            } catch (error) {
+                console.error('Error loading lots:', error);
+                lots = [];
+                renderLots();
+            }
+        }
+
+        // Load my participations
+        async function loadMyParticipations() {
+            try {
+                // Mock user ID - en production, récupérer depuis le token JWT
+                const userId = 'user-test-001';
+                const response = await fetch(`/api/tombola/my-participations?user_id=${userId}`);
+                const data = await response.json();
+                myParticipations = data.participations || [];
+                renderMyParticipations();
+            } catch (error) {
+                console.error('Error loading participations:', error);
+                myParticipations = [];
+                renderMyParticipations();
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('active-campaigns-count').textContent = campaigns.length;
+            document.getElementById('total-lots-count').textContent = lots.length;
+            document.getElementById('my-participations-count').textContent = myParticipations.length;
+        }
+
+        // Render campaigns
+        function renderCampaigns() {
+            const list = document.getElementById('campaigns-list');
+            const empty = document.getElementById('campaigns-empty');
+            
+            if (campaigns.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = campaigns.map(campaign => `
+                    <div class="campaign-card bg-gradient-to-br from-pink-900 to-pink-700 rounded-2xl p-6 relative overflow-hidden">
+                        <span class="absolute top-4 right-4 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full badge-hot">
+                            🔥 LIVE
+                        </span>
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-white mb-2">${campaign.title}</h4>
+                            <p class="text-pink-200 text-sm mb-3">${campaign.description || ''}</p>
+                            <div class="flex items-center gap-2 text-sm text-pink-200 mb-2">
+                                <i class="fas fa-calendar"></i>
+                                <span>Fin: ${new Date(campaign.end_date).toLocaleDateString('fr-FR')}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-pink-200">
+                                <i class="fas fa-users"></i>
+                                <span>${campaign.current_participations || 0} / ${campaign.max_participations} participants</span>
+                            </div>
+                        </div>
+                        <div class="bg-white bg-opacity-10 rounded-xl p-3 mb-4">
+                            <div class="text-2xl font-black text-white">${campaign.entry_fee}€</div>
+                            <div class="text-xs text-pink-200">Prix d'entrée</div>
+                        </div>
+                        <button onclick="participateToCampaign('${campaign.id}')" class="w-full bg-white hover:bg-gray-100 text-pink-900 font-bold py-3 rounded-xl transition">
+                            <i class="fas fa-ticket mr-2"></i>PARTICIPER
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render lots
+        function renderLots() {
+            const list = document.getElementById('lots-list');
+            const empty = document.getElementById('lots-empty');
+            
+            const filteredLots = currentLotFilter === 'all' 
+                ? lots 
+                : lots.filter(lot => lot.category === currentLotFilter);
+            
+            if (filteredLots.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = filteredLots.map(lot => `
+                    <div class="bg-gradient-to-br from-purple-900 to-purple-700 rounded-2xl p-6">
+                        <div class="mb-4">
+                            ${lot.image_url ? `<img src="${lot.image_url}" alt="${lot.name}" class="w-full h-40 object-cover rounded-lg mb-4">` : ''}
+                            <span class="text-xs px-3 py-1 bg-purple-500 text-white rounded-full">${getCategoryLabel(lot.category)}</span>
+                            <h4 class="text-xl font-bold text-white mb-2 mt-3">${lot.name}</h4>
+                            <p class="text-purple-200 text-sm mb-3">${lot.description || ''}</p>
+                        </div>
+                        <div class="bg-white bg-opacity-10 rounded-xl p-3">
+                            <div class="text-2xl font-black text-white">${lot.perceived_value}€</div>
+                            <div class="text-xs text-purple-200">Valeur perçue</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render my participations
+        function renderMyParticipations() {
+            const list = document.getElementById('my-tickets-list');
+            const empty = document.getElementById('my-tickets-empty');
+            
+            if (myParticipations.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = myParticipations.map(participation => `
+                    <div class="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h4 class="text-lg font-bold text-white mb-1">${participation.campaign_title}</h4>
+                                <p class="text-blue-200 text-sm">Ticket #${participation.ticket_code}</p>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">
+                                ${participation.status === 'winner' ? '🏆 GAGNANT' : '⏳ En attente'}
+                            </span>
+                        </div>
+                        <div class="text-sm text-blue-200 space-y-1">
+                            <div><i class="fas fa-calendar mr-2"></i>${new Date(participation.participation_date).toLocaleDateString('fr-FR')}</div>
+                            <div><i class="fas fa-euro-sign mr-2"></i>${participation.amount_paid}€</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            ['campaigns', 'lots', 'my-tickets'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`content-${t}`);
+                
+                if (t === tab) {
+                    btn.classList.add('bg-pink-600', 'text-white');
+                    btn.classList.remove('text-gray-400');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('bg-pink-600', 'text-white');
+                    btn.classList.add('text-gray-400');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // Filter lots
+        function filterLots(category) {
+            currentLotFilter = category;
+            renderLots();
+        }
+
+        // Participate to campaign
+        function participateToCampaign(campaignId) {
+            alert(`Participation à la campagne ${campaignId}\n\nFonctionnalité disponible prochainement !\n\n✅ Paiement Wallet\n✅ Paiement Stripe\n✅ Confirmation par email`);
+        }
+
+        // Get category label
+        function getCategoryLabel(category) {
+            const labels = {
+                'cash': '💰 Cash',
+                'experience': '🎉 Expérience',
+                'voyage': '✈️ Voyage',
+                'automobile': '🚗 Automobile',
+                'superbonus': '⭐ Super Bonus'
+            };
+            return labels[category] || category;
+        }
+
+        // Initialize on load
+        init();
+    </script>
+
+</body>
+</html>

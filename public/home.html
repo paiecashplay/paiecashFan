@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaieCashFan - Accueil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+        }
+        
+        .gradient-purple { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); }
+        .gradient-pink { background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); }
+        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        .gradient-red { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-new { background: #10b981; color: white; }
+        .badge-hot { background: #ef4444; color: white; animation: pulse 2s infinite; }
+        .badge-beta { background: #f59e0b; color: white; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .hero-stat {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .hero-stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-black bg-opacity-40 backdrop-blur-lg border-b border-white border-opacity-10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+                        <i class="fas fa-coins text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">PaieCashFan</h1>
+                        <p class="text-xs text-gray-400">Votre plateforme de divertissement</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.location.href='/mes-tickets.html'" class="p-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition">
+                        <i class="fas fa-ticket text-white"></i>
+                    </button>
+                    <button onclick="alert('Wallet: 125.50 €')" class="p-2 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition">
+                        <i class="fas fa-wallet text-white"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-8 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-3">
+                    Bienvenue sur <span class="gradient-purple" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;">PaieCashFan</span>
+                </h2>
+                <p class="text-lg text-gray-400">Jeux, boutiques, divertissement - tout en un seul endroit</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-3 gap-4 mb-12">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">10 000€</div>
+                    <div class="hero-stat-label">Jackpot LOTO</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">6</div>
+                    <div class="hero-stat-label">Produits OM</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">100%</div>
+                    <div class="hero-stat-label">Gagnants garantis</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Features -->
+    <section class="px-4 pb-8">
+        <div class="max-w-7xl mx-auto">
+            <h3 class="text-2xl font-bold text-white mb-6">
+                <i class="fas fa-star text-yellow-400 mr-2"></i>
+                Fonctionnalités principales
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- LOTO Card -->
+                <div onclick="window.location.href='/loto.html'" class="card-hover bg-gradient-to-br from-purple-900 to-purple-700 rounded-2xl p-6 relative overflow-hidden">
+                    <span class="badge badge-hot absolute top-4 right-4">🔥 HOT</span>
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-dice text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">LOTO "Chiffres"</h4>
+                        <p class="text-purple-200 text-sm mb-4">Tentez votre chance pour gagner jusqu'à 10 000€ !</p>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-3xl font-black text-white">10 000€</div>
+                            <div class="text-purple-200 text-xs">Jackpot Carrefour</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">2€</div>
+                            <div class="text-purple-200 text-xs">par grille</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <span class="text-xs bg-white bg-opacity-20 px-3 py-1 rounded-full text-white">✅ Wallet</span>
+                        <span class="text-xs bg-white bg-opacity-20 px-3 py-1 rounded-full text-white">💳 Stripe</span>
+                    </div>
+                    <button class="w-full bg-white hover:bg-gray-100 text-purple-900 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-play mr-2"></i>JOUER MAINTENANT
+                    </button>
+                </div>
+
+                <!-- Boutique Card -->
+                <div onclick="window.location.href='/boutique.html'" class="card-hover bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-6 relative overflow-hidden">
+                    <span class="badge badge-new absolute top-4 right-4">✨ NEW</span>
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-shopping-bag text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">Boutique OM</h4>
+                        <p class="text-blue-200 text-sm mb-4">Maillots, écharpes, accessoires officiels</p>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-3xl font-black text-white">6</div>
+                            <div class="text-blue-200 text-xs">Produits disponibles</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">89.99€</div>
+                            <div class="text-blue-200 text-xs">dès</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-blue-200">
+                            <i class="fas fa-tshirt text-white"></i>
+                            <span>Maillots Domicile & Extérieur</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-blue-200">
+                            <i class="fas fa-scarf text-white"></i>
+                            <span>Écharpe • Casquette • Ballon</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-white hover:bg-gray-100 text-blue-900 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-shopping-cart mr-2"></i>VISITER LA BOUTIQUE
+                    </button>
+                </div>
+
+                <!-- Tombola Card -->
+                <div onclick="window.location.href='/tombola.html'" class="card-hover bg-gradient-to-br from-pink-900 to-pink-700 rounded-2xl p-6 relative overflow-hidden">
+                    <span class="badge badge-beta absolute top-4 right-4">BETA</span>
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-gift text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">Tombola Quotidienne</h4>
+                        <p class="text-pink-200 text-sm mb-4">Gagnez des lots incroyables chaque jour</p>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-3xl font-black text-white">0</div>
+                            <div class="text-pink-200 text-xs">Tirages actifs</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">0</div>
+                            <div class="text-pink-200 text-xs">Participations</div>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-3 mb-4">
+                        <p class="text-xs text-pink-200 text-center">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Aucun tirage actif pour le moment
+                        </p>
+                    </div>
+                    <button class="w-full bg-white hover:bg-gray-100 text-pink-900 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-eye mr-2"></i>VOIR LES TIRAGES
+                    </button>
+                </div>
+
+                <!-- Mes Tickets Card -->
+                <div onclick="window.location.href='/mes-tickets.html'" class="card-hover bg-gradient-to-br from-green-900 to-green-700 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-ticket text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">Mes Tickets</h4>
+                        <p class="text-green-200 text-sm mb-4">Consultez votre historique de jeux</p>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-green-200">
+                            <i class="fas fa-history text-white"></i>
+                            <span>Historique complet</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-green-200">
+                            <i class="fas fa-download text-white"></i>
+                            <span>Téléchargement PDF</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-green-200">
+                            <i class="fas fa-envelope text-white"></i>
+                            <span>Confirmation par email</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-white hover:bg-gray-100 text-green-900 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-list mr-2"></i>VOIR MES TICKETS
+                    </button>
+                </div>
+
+                <!-- Wallet Card -->
+                <div onclick="alert('Wallet: 125.50 €\n\nFonctionnalités:\n✅ Recharger\n✅ Retirer\n✅ Historique')" class="card-hover bg-gradient-to-br from-orange-900 to-orange-700 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-wallet text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">Mon Wallet PCC</h4>
+                        <p class="text-orange-200 text-sm mb-4">Gérez votre solde et transactions</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-4 mb-4">
+                        <div class="text-sm text-orange-200 mb-1">Solde actuel</div>
+                        <div class="text-4xl font-black text-white">125.50€</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="flex-1 bg-white hover:bg-gray-100 text-orange-900 font-bold py-3 rounded-xl transition">
+                            <i class="fas fa-plus mr-1"></i>Recharger
+                        </button>
+                        <button class="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold py-3 rounded-xl transition">
+                            <i class="fas fa-history mr-1"></i>Historique
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Support Card -->
+                <div onclick="alert('Support PaieCashFan\n\n📧 Email: support@paiecashfan.com\n📱 WhatsApp: +33 X XX XX XX XX\n💬 Chat en direct disponible 24/7')" class="card-hover bg-gradient-to-br from-red-900 to-red-700 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fas fa-headset text-white text-3xl"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-2">Support & Aide</h4>
+                        <p class="text-red-200 text-sm mb-4">Notre équipe est là pour vous aider</p>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-red-200">
+                            <i class="fas fa-clock text-white"></i>
+                            <span>Disponible 24/7</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-red-200">
+                            <i class="fas fa-comments text-white"></i>
+                            <span>Chat en direct</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-red-200">
+                            <i class="fas fa-book text-white"></i>
+                            <span>FAQ complète</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-white hover:bg-gray-100 text-red-900 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-paper-plane mr-2"></i>CONTACTER LE SUPPORT
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-40 backdrop-blur-lg border-t border-white border-opacity-10 py-8 px-4 mt-12">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-4">
+                <div class="w-16 h-16 gradient-purple rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-coins text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">PaieCashFan</h3>
+                <p class="text-gray-400 text-sm">Votre plateforme de divertissement</p>
+            </div>
+            
+            <div class="flex justify-center gap-4 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                    <i class="fab fa-facebook text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                    <i class="fab fa-youtube text-xl"></i>
+                </a>
+            </div>
+            
+            <div class="text-xs text-gray-500 space-y-1">
+                <p>&copy; 2026 PaieCashFan. Tous droits réservés.</p>
+                <p>
+                    <a href="#" class="hover:text-white transition">Conditions d'utilisation</a> • 
+                    <a href="#" class="hover:text-white transition">Politique de confidentialité</a> • 
+                    <a href="#" class="hover:text-white transition">Jeu responsable</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
