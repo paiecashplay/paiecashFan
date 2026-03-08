@@ -211,13 +211,35 @@
             <span class="sponsor-badge mt-3">Sponsorisé par PUMA</span>
         </div>
         
+        <!-- Toggle Mode de Jeu -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                <i class="fas fa-gamepad text-purple-500 mr-2"></i>
+                Choisissez votre mode de jeu
+            </h2>
+            <div class="flex gap-4 justify-center">
+                <button onclick="switchMode('packs')" id="btn-mode-packs" class="px-6 py-3 rounded-xl font-bold transition bg-purple-600 text-white">
+                    <i class="fas fa-box mr-2"></i>MODE PACKS
+                </button>
+                <button onclick="switchMode('lots')" id="btn-mode-lots" class="px-6 py-3 rounded-xl font-bold transition bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    <i class="fas fa-gift mr-2"></i>MODE LOTS
+                </button>
+            </div>
+        </div>
+        
         <!-- Section Informations -->
         <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">
                 <i class="fas fa-info-circle text-blue-500 mr-2"></i>
                 Comment jouer ?
             </h2>
-            <ul class="space-y-2 text-gray-700">
+            <ul id="info-packs" class="space-y-2 text-gray-700">
+                <li><i class="fas fa-box text-purple-500 mr-2"></i> <strong>Choisissez un pack</strong> de tickets</li>
+                <li><i class="fas fa-ticket-alt text-blue-500 mr-2"></i> <strong>Plus de tickets</strong> = plus de chances</li>
+                <li><i class="fas fa-coins text-green-500 mr-2"></i> Prix en <strong>PCC (PaieCash Coins)</strong></li>
+                <li><i class="fas fa-magic text-orange-500 mr-2"></i> Grattage automatique en 3 secondes</li>
+            </ul>
+            <ul id="info-lots" class="space-y-2 text-gray-700 hidden">
                 <li><i class="fas fa-mouse-pointer text-purple-500 mr-2"></i> <strong>Passez la souris</strong> sur un lot pour le découvrir</li>
                 <li><i class="fas fa-hand-pointer text-blue-500 mr-2"></i> <strong>Cliquez sur le lot</strong> que vous voulez tenter de gagner</li>
                 <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix selon catégorie : <strong>1€, 5€ ou 10€</strong></li>
@@ -225,8 +247,70 @@
             </ul>
         </div>
         
-        <!-- Section Lots à gratter -->
-        <div id="prizes-section" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+        <!-- Section MODE PACKS -->
+        <div id="packs-section" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-box text-purple-500 mr-2"></i>
+                MODE SCRATCH - Packs de Tickets
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Pack 1 ticket -->
+                <div onclick="selectPack(1, 10)" class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition border-2 border-blue-300">
+                    <div class="text-center">
+                        <i class="fas fa-ticket-alt text-blue-600 text-4xl mb-3"></i>
+                        <p class="text-2xl font-bold text-gray-800 mb-2">10 PCC</p>
+                        <p class="text-lg font-semibold text-blue-600 mb-1">1 ticket</p>
+                        <p class="text-sm text-gray-600">chances: 1/1000</p>
+                    </div>
+                </div>
+                
+                <!-- Pack 3 tickets -->
+                <div onclick="selectPack(3, 25)" class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition border-2 border-green-400 relative">
+                    <div class="absolute -top-3 -right-3 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        ⭐ POPULAIRE
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-ticket-alt text-green-600 text-4xl mb-3"></i>
+                        <p class="text-2xl font-bold text-gray-800 mb-2">25 PCC</p>
+                        <div class="mb-1">
+                            <span class="text-lg font-semibold text-green-600">3 tickets</span>
+                            <span class="text-sm text-orange-600 font-bold ml-2">⚡ +50%</span>
+                        </div>
+                        <p class="text-sm text-gray-600">chances: 3/1000</p>
+                    </div>
+                </div>
+                
+                <!-- Pack 6 tickets -->
+                <div onclick="selectPack(6, 50)" class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition border-2 border-purple-400">
+                    <div class="text-center">
+                        <i class="fas fa-ticket-alt text-purple-600 text-4xl mb-3"></i>
+                        <p class="text-2xl font-bold text-gray-800 mb-2">50 PCC</p>
+                        <div class="mb-1">
+                            <span class="text-lg font-semibold text-purple-600">6 tickets</span>
+                            <span class="text-sm text-orange-600 font-bold ml-2">⚡ x2</span>
+                        </div>
+                        <p class="text-sm text-gray-600">chances: 6/1000</p>
+                    </div>
+                </div>
+                
+                <!-- Pack 15 tickets -->
+                <div onclick="selectPack(15, 100)" class="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition border-2 border-yellow-400">
+                    <div class="text-center">
+                        <i class="fas fa-ticket-alt text-yellow-600 text-4xl mb-3"></i>
+                        <p class="text-2xl font-bold text-gray-800 mb-2">100 PCC</p>
+                        <div class="mb-1">
+                            <span class="text-lg font-semibold text-yellow-600">15 tickets</span>
+                            <span class="text-sm text-orange-600 font-bold ml-2">⚡ x3</span>
+                        </div>
+                        <p class="text-sm text-gray-600">chances: 15/1000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section MODE LOTS -->
+        <div id="prizes-section" class="bg-white rounded-2xl shadow-xl p-6 mb-6 hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
                 <i class="fas fa-gift text-red-500 mr-2"></i>
                 Lots disponibles - Passez la souris pour découvrir
@@ -307,8 +391,10 @@
         
         let allPrizes = [];
         let selectedPrize = null;
+        let selectedPack = null;
         let gameResult = null;
         let canvas, ctx;
+        let currentMode = 'packs'; // 'packs' ou 'lots'
         
         // Prix par catégorie
         const CATEGORY_PRICES = {
@@ -316,6 +402,73 @@
             'medium': 5.0,
             'small': 1.0
         };
+        
+        // Conversion PCC -> EUR (10 PCC = 1€)
+        const PCC_TO_EUR = 0.1;
+        
+        // Basculer entre modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Mettre à jour les boutons
+            const btnPacks = document.getElementById('btn-mode-packs');
+            const btnLots = document.getElementById('btn-mode-lots');
+            
+            if (mode === 'packs') {
+                btnPacks.className = 'px-6 py-3 rounded-xl font-bold transition bg-purple-600 text-white';
+                btnLots.className = 'px-6 py-3 rounded-xl font-bold transition bg-gray-200 text-gray-700 hover:bg-gray-300';
+                
+                document.getElementById('packs-section').classList.remove('hidden');
+                document.getElementById('prizes-section').classList.add('hidden');
+                document.getElementById('info-packs').classList.remove('hidden');
+                document.getElementById('info-lots').classList.add('hidden');
+            } else {
+                btnPacks.className = 'px-6 py-3 rounded-xl font-bold transition bg-gray-200 text-gray-700 hover:bg-gray-300';
+                btnLots.className = 'px-6 py-3 rounded-xl font-bold transition bg-purple-600 text-white';
+                
+                document.getElementById('packs-section').classList.add('hidden');
+                document.getElementById('prizes-section').classList.remove('hidden');
+                document.getElementById('info-packs').classList.add('hidden');
+                document.getElementById('info-lots').classList.remove('hidden');
+                
+                // Charger les lots si pas déjà fait
+                if (allPrizes.length === 0) {
+                    loadPrizes();
+                }
+            }
+        }
+        
+        // Sélectionner un pack
+        function selectPack(tickets, pcc) {
+            selectedPack = {
+                tickets: tickets,
+                pcc: pcc,
+                euro: pcc * PCC_TO_EUR
+            };
+            
+            // Afficher info du pack sélectionné
+            document.getElementById('selected-prize-info').innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-box text-4xl text-purple-600 mb-3"></i>
+                    <p class="text-xl font-bold text-gray-800 mb-2">Pack ${tickets} ticket${tickets > 1 ? 's' : ''}</p>
+                    <p class="text-2xl font-bold text-purple-600 mb-2">${pcc} PCC</p>
+                    <p class="text-lg font-bold text-green-600">Prix : ${selectedPack.euro.toFixed(2)}€</p>
+                    <p class="text-sm text-gray-600 mt-2">Chances : ${tickets}/1000</p>
+                </div>
+            `;
+            
+            // Mettre à jour les boutons de paiement
+            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${selectedPack.euro.toFixed(2)}€)`;
+            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${selectedPack.euro.toFixed(2)}€)`;
+            
+            // Cacher la grille et montrer les options de paiement
+            document.getElementById('packs-section').classList.add('hidden');
+            document.getElementById('game-area').classList.remove('hidden');
+            showPaymentChoice();
+            
+            // Scroll vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         
         // Charger les lots
         async function loadPrizes() {
@@ -457,24 +610,42 @@
         // Annuler la sélection
         function cancelSelection() {
             selectedPrize = null;
-            document.getElementById('prizes-section').classList.remove('hidden');
+            selectedPack = null;
+            
+            if (currentMode === 'packs') {
+                document.getElementById('packs-section').classList.remove('hidden');
+            } else {
+                document.getElementById('prizes-section').classList.remove('hidden');
+            }
+            
             document.getElementById('game-area').classList.add('hidden');
         }
         
         // Jouer avec Carte Bancaire
         async function playWithCard() {
-            if (!selectedPrize) return;
             showLoading();
             
-            const price = CATEGORY_PRICES[selectedPrize.category];
+            let amount, prize_id;
+            
+            if (currentMode === 'packs' && selectedPack) {
+                amount = selectedPack.euro;
+                prize_id = null; // Pack mode : lot aléatoire
+            } else if (currentMode === 'lots' && selectedPrize) {
+                amount = CATEGORY_PRICES[selectedPrize.category];
+                prize_id = selectedPrize.id;
+            } else {
+                alert('Erreur : aucune sélection');
+                showPaymentChoice();
+                return;
+            }
             
             try {
                 const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
                     user_id: USER_ID,
                     organization_id: ORGANIZATION_ID,
                     payment_method: 'card',
-                    amount: price,
-                    prize_id: selectedPrize.id
+                    amount: amount,
+                    prize_id: prize_id
                 });
                 
                 if (response.data.success && response.data.payment_required) {
@@ -492,18 +663,29 @@
         
         // Jouer avec Wallet
         async function playWithWallet() {
-            if (!selectedPrize) return;
             showLoading();
             
-            const price = CATEGORY_PRICES[selectedPrize.category];
+            let amount, prize_id;
+            
+            if (currentMode === 'packs' && selectedPack) {
+                amount = selectedPack.euro;
+                prize_id = null; // Pack mode : lot aléatoire
+            } else if (currentMode === 'lots' && selectedPrize) {
+                amount = CATEGORY_PRICES[selectedPrize.category];
+                prize_id = selectedPrize.id;
+            } else {
+                alert('Erreur : aucune sélection');
+                showPaymentChoice();
+                return;
+            }
             
             try {
                 const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
                     user_id: USER_ID,
                     organization_id: ORGANIZATION_ID,
                     payment_method: 'wallet',
-                    amount: price,
-                    prize_id: selectedPrize.id
+                    amount: amount,
+                    prize_id: prize_id
                 });
                 
                 if (response.data.success) {
@@ -801,13 +983,15 @@
         
         // Initialisation
         window.addEventListener('DOMContentLoaded', () => {
-            loadPrizes();
+            // Charger les lots seulement si on bascule en mode lots
+            // Par défaut on est en mode packs
             
             // Retour depuis Stripe
             const urlParams = new URLSearchParams(window.location.search);
             const sessionId = urlParams.get('session_id');
             
             if (sessionId) {
+                document.getElementById('packs-section').classList.add('hidden');
                 document.getElementById('prizes-section').classList.add('hidden');
                 document.getElementById('game-area').classList.remove('hidden');
                 showLoading();
