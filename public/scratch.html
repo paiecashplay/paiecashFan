@@ -99,41 +99,49 @@
             display: inline-block;
         }
         
-        /* Animation brillante pour les lots */
-        .prize-card {
+        /* Carte cachée (avant survol) */
+        .prize-card-hidden {
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
         
-        .prize-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        .prize-card-hidden:hover {
+            transform: scale(1.05);
         }
         
-        .prize-card::before {
-            content: '';
+        /* Overlay argenté (effet grattage) */
+        .scratch-overlay-card {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255, 255, 255, 0.3) 50%,
-                transparent 70%
-            );
-            animation: shine 3s infinite;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #c0c0c0 0%, #808080 50%, #a0a0a0 100%);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
         }
         
-        @keyframes shine {
-            0% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
+        .prize-card-hidden:hover .scratch-overlay-card {
+            opacity: 0;
+        }
+        
+        /* Carte révélée */
+        .prize-card-revealed {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .prize-card-revealed:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #667eea;
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
         }
         
         .prize-icon {
@@ -155,15 +163,18 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-weight: 900;
+        }
+        
+        .play-btn {
             animation: pulse 2s ease-in-out infinite;
         }
         
         @keyframes pulse {
             0%, 100% {
-                opacity: 1;
+                transform: scale(1);
             }
             50% {
-                opacity: 0.7;
+                transform: scale(1.05);
             }
         }
     </style>
@@ -171,7 +182,7 @@
 <body class="p-4">
     
     <!-- Container Principal -->
-    <div class="max-w-2xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         
         <!-- Header avec Sponsor -->
         <div class="text-center mb-8 text-white">
@@ -191,20 +202,8 @@
             <h1 class="text-4xl font-bold mb-2">
                 <i class="fas fa-ticket-alt mr-3"></i>SCRATCH
             </h1>
-            <p class="text-lg opacity-90">Grattez votre ticket et tentez de gagner des lots exclusifs !</p>
+            <p class="text-lg opacity-90">Choisissez votre lot et tentez votre chance !</p>
             <span class="sponsor-badge mt-3">Sponsorisé par PUMA</span>
-        </div>
-        
-        <!-- Section Lots disponibles (AVANT de jouer) -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
-                <i class="fas fa-gift text-red-500 mr-2"></i>
-                Lots disponibles aujourd'hui
-            </h2>
-            <div id="prizes-list" class="space-y-3">
-                <div class="loader mx-auto"></div>
-                <p class="text-center text-gray-500">Chargement des lots...</p>
-            </div>
         </div>
         
         <!-- Section Informations -->
@@ -214,32 +213,56 @@
                 Comment jouer ?
             </h2>
             <ul class="space-y-2 text-gray-700">
-                <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix du ticket : <strong>1,00 €</strong></li>
-                <li><i class="fas fa-magic text-purple-500 mr-2"></i> Grattage automatique en 3 secondes</li>
-                <li><i class="fas fa-clock text-orange-500 mr-2"></i> Nouveaux lots chaque jour</li>
+                <li><i class="fas fa-mouse-pointer text-purple-500 mr-2"></i> <strong>Passez la souris</strong> sur un lot pour le découvrir</li>
+                <li><i class="fas fa-hand-pointer text-blue-500 mr-2"></i> <strong>Cliquez sur le lot</strong> que vous voulez tenter de gagner</li>
+                <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix selon catégorie : <strong>1€, 5€ ou 10€</strong></li>
+                <li><i class="fas fa-magic text-orange-500 mr-2"></i> Grattage automatique en 3 secondes</li>
             </ul>
         </div>
         
-        <!-- Zone de jeu -->
-        <div id="game-area" class="bg-white rounded-2xl shadow-xl p-6 text-center">
+        <!-- Section Lots à gratter -->
+        <div id="prizes-section" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-gift text-red-500 mr-2"></i>
+                Lots disponibles - Passez la souris pour découvrir
+            </h2>
+            
+            <div id="prizes-grid" class="space-y-6">
+                <div class="loader mx-auto"></div>
+                <p class="text-center text-gray-500">Chargement des lots...</p>
+            </div>
+        </div>
+        
+        <!-- Zone de jeu (après sélection d'un lot) -->
+        <div id="game-area" class="bg-white rounded-2xl shadow-xl p-6 text-center hidden">
             
             <!-- Étape 1 : Choix du paiement -->
             <div id="payment-choice" class="space-y-4">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Choisissez votre mode de paiement</h3>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Lot sélectionné</h3>
+                <div id="selected-prize-info" class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl mb-4">
+                    <!-- Info du lot sélectionné -->
+                </div>
+                
+                <h3 class="text-xl font-bold text-gray-700 mb-4">Choisissez votre mode de paiement</h3>
                 
                 <button onclick="playWithCard()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg">
                     <i class="fas fa-credit-card mr-2"></i>
-                    Payer par Carte Bancaire (1,00 €)
+                    <span id="card-btn-text">Payer par Carte Bancaire</span>
                 </button>
                 
                 <button onclick="playWithWallet()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition transform hover:scale-105 shadow-lg">
                     <i class="fas fa-wallet mr-2"></i>
-                    Payer avec Wallet (1,00 €)
+                    <span id="wallet-btn-text">Payer avec Wallet</span>
                 </button>
                 
                 <button onclick="playWithMobile()" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-orange-700 transition transform hover:scale-105 shadow-lg">
                     <i class="fas fa-mobile-alt mr-2"></i>
                     Payer par Mobile Money (Bientôt)
+                </button>
+                
+                <button onclick="cancelSelection()" class="mt-4 text-gray-600 hover:text-gray-800 font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Choisir un autre lot
                 </button>
             </div>
             
@@ -262,7 +285,7 @@
                 </div>
             </div>
             
-            <!-- Étape 4 : Résultat final avec partage social -->
+            <!-- Étape 4 : Résultat final -->
             <div id="result-state" class="hidden space-y-6">
                 <!-- Injecté dynamiquement -->
             </div>
@@ -275,115 +298,178 @@
     <script>
         const API_BASE_URL = window.location.origin;
         const USER_ID = localStorage.getItem('user_id') || `user-${Date.now()}`;
-        const ORGANIZATION_ID = 'om-001'; // Olympique de Marseille par défaut
+        const ORGANIZATION_ID = 'om-001';
         
+        let allPrizes = [];
+        let selectedPrize = null;
         let gameResult = null;
         let canvas, ctx;
         
-        // Charger les lots disponibles
+        // Prix par catégorie
+        const CATEGORY_PRICES = {
+            'big': 10.0,
+            'medium': 5.0,
+            'small': 1.0
+        };
+        
+        // Charger les lots
         async function loadPrizes() {
             try {
                 const response = await axios.get(`${API_BASE_URL}/api/games/scratch/prizes/${ORGANIZATION_ID}`);
-                const prizes = response.data.prizes || [];
-                
-                const prizesList = document.getElementById('prizes-list');
-                if (prizes.length === 0) {
-                    prizesList.innerHTML = '<p class="text-center text-gray-500">Aucun lot disponible</p>';
-                    return;
-                }
-                
-                // Grouper par catégorie
-                const grouped = {
-                    big: prizes.filter(p => p.category === 'big'),
-                    medium: prizes.filter(p => p.category === 'medium'),
-                    small: prizes.filter(p => p.category === 'small')
-                };
-                
-                let html = '';
-                
-                if (grouped.big.length > 0) {
-                    html += `
-                        <div class="mb-4">
-                            <h3 class="font-bold text-lg text-purple-600 mb-2">🏆 GROS LOTS</h3>
-                            ${grouped.big.map(prize => `
-                                <div class="prize-card flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl mb-3 shadow-md">
-                                    <div class="flex items-center gap-3">
-                                        <div class="prize-icon w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-trophy text-white text-lg"></i>
-                                        </div>
-                                        <div class="text-left">
-                                            <p class="font-bold text-gray-800 text-lg">${prize.name}</p>
-                                            <p class="text-sm text-gray-600">${prize.description || 'Lot exclusif'}</p>
-                                        </div>
-                                    </div>
-                                    <span class="prize-value text-2xl">${prize.value}€</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-                
-                if (grouped.medium.length > 0) {
-                    html += `
-                        <div class="mb-4">
-                            <h3 class="font-bold text-lg text-blue-600 mb-2">🎁 LOTS MOYENS</h3>
-                            ${grouped.medium.map(prize => `
-                                <div class="prize-card flex items-center justify-between p-4 bg-blue-50 rounded-xl mb-3 shadow-md">
-                                    <div class="flex items-center gap-3">
-                                        <div class="prize-icon w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-gift text-white text-lg"></i>
-                                        </div>
-                                        <div class="text-left">
-                                            <p class="font-bold text-gray-800">${prize.name}</p>
-                                            <p class="text-sm text-gray-600">${prize.description || 'Lot disponible'}</p>
-                                        </div>
-                                    </div>
-                                    <span class="prize-value text-xl">${prize.value}€</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-                
-                if (grouped.small.length > 0) {
-                    html += `
-                        <div>
-                            <h3 class="font-bold text-lg text-green-600 mb-2">✨ LOTS QUOTIDIENS</h3>
-                            ${grouped.small.map(prize => `
-                                <div class="prize-card flex items-center justify-between p-4 bg-green-50 rounded-xl mb-3 shadow-md">
-                                    <div class="flex items-center gap-3">
-                                        <div class="prize-icon w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-star text-white"></i>
-                                        </div>
-                                        <div class="text-left">
-                                            <p class="font-bold text-gray-800">${prize.name}</p>
-                                            <p class="text-sm text-gray-600">${prize.description || 'Lot quotidien'}</p>
-                                        </div>
-                                    </div>
-                                    <span class="prize-value text-lg">${prize.value}€</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-                
-                prizesList.innerHTML = html;
-                
+                allPrizes = response.data.prizes || [];
+                displayPrizesGrid();
             } catch (error) {
                 console.error('Erreur chargement lots:', error);
+                document.getElementById('prizes-grid').innerHTML = '<p class="text-center text-red-500">Erreur de chargement</p>';
             }
+        }
+        
+        // Afficher la grille de lots
+        function displayPrizesGrid() {
+            const grid = document.getElementById('prizes-grid');
+            
+            if (allPrizes.length === 0) {
+                grid.innerHTML = '<p class="text-center text-gray-500">Aucun lot disponible</p>';
+                return;
+            }
+            
+            // Grouper par catégorie
+            const grouped = {
+                big: allPrizes.filter(p => p.category === 'big'),
+                medium: allPrizes.filter(p => p.category === 'medium'),
+                small: allPrizes.filter(p => p.category === 'small')
+            };
+            
+            let html = '';
+            
+            // GROS LOTS
+            if (grouped.big.length > 0) {
+                html += `
+                    <div>
+                        <h3 class="font-bold text-xl text-purple-600 mb-4">🏆 GROS LOTS - Mise : 10€</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${grouped.big.map(prize => createPrizeCard(prize, 'big')).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // LOTS MOYENS
+            if (grouped.medium.length > 0) {
+                html += `
+                    <div>
+                        <h3 class="font-bold text-xl text-blue-600 mb-4">🎁 LOTS MOYENS - Mise : 5€</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${grouped.medium.map(prize => createPrizeCard(prize, 'medium')).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // LOTS QUOTIDIENS
+            if (grouped.small.length > 0) {
+                html += `
+                    <div>
+                        <h3 class="font-bold text-xl text-green-600 mb-4">✨ LOTS QUOTIDIENS - Mise : 1€</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${grouped.small.map(prize => createPrizeCard(prize, 'small')).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+        }
+        
+        // Créer une carte de lot (cachée initialement)
+        function createPrizeCard(prize, category) {
+            const price = CATEGORY_PRICES[category];
+            const categoryInfo = {
+                'big': { icon: 'fa-trophy', color: 'from-purple-400 to-pink-500', bg: 'from-purple-50 to-pink-50' },
+                'medium': { icon: 'fa-gift', color: 'from-blue-400 to-blue-500', bg: 'from-blue-50 to-blue-100' },
+                'small': { icon: 'fa-star', color: 'from-green-400 to-green-500', bg: 'from-green-50 to-green-100' }
+            };
+            const info = categoryInfo[category];
+            
+            return `
+                <div class="prize-card-hidden bg-gradient-to-r ${info.bg} rounded-xl p-6 shadow-lg relative overflow-hidden" 
+                     onclick="selectPrize('${prize.id}')">
+                    
+                    <!-- Overlay argenté (disparaît au survol) -->
+                    <div class="scratch-overlay-card">
+                        <i class="fas ${info.icon} text-white text-4xl mb-3"></i>
+                        <p class="text-white font-bold text-lg">????</p>
+                        <p class="text-white text-sm mt-2">Survol pour découvrir</p>
+                        <p class="text-white font-bold text-lg mt-3">Mise : ${price}€</p>
+                    </div>
+                    
+                    <!-- Contenu réel (révélé au survol) -->
+                    <div class="text-center">
+                        <div class="prize-icon w-16 h-16 bg-gradient-to-br ${info.color} rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <i class="fas ${info.icon} text-white text-2xl"></i>
+                        </div>
+                        <p class="font-bold text-gray-800 text-lg mb-2">${prize.name}</p>
+                        <p class="text-sm text-gray-600 mb-3">${prize.description || 'Lot exclusif'}</p>
+                        <p class="prize-value text-2xl mb-3">${prize.value}€</p>
+                        <div class="play-btn bg-gradient-to-r ${info.color} text-white font-bold py-2 px-4 rounded-lg inline-block">
+                            <i class="fas fa-play mr-2"></i>JOUER (${price}€)
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Sélectionner un lot
+        function selectPrize(prizeId) {
+            selectedPrize = allPrizes.find(p => p.id === prizeId);
+            if (!selectedPrize) return;
+            
+            const price = CATEGORY_PRICES[selectedPrize.category];
+            
+            // Afficher info du lot sélectionné
+            document.getElementById('selected-prize-info').innerHTML = `
+                <div class="text-center">
+                    <p class="text-xl font-bold text-gray-800 mb-2">${selectedPrize.name}</p>
+                    <p class="text-gray-600 mb-2">${selectedPrize.description || ''}</p>
+                    <p class="text-2xl font-bold text-purple-600">Valeur : ${selectedPrize.value}€</p>
+                    <p class="text-lg font-bold text-green-600 mt-2">Mise : ${price}€</p>
+                </div>
+            `;
+            
+            // Mettre à jour les boutons de paiement
+            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${price}€)`;
+            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${price}€)`;
+            
+            // Cacher la grille et montrer les options de paiement
+            document.getElementById('prizes-section').classList.add('hidden');
+            document.getElementById('game-area').classList.remove('hidden');
+            showPaymentChoice();
+            
+            // Scroll vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Annuler la sélection
+        function cancelSelection() {
+            selectedPrize = null;
+            document.getElementById('prizes-section').classList.remove('hidden');
+            document.getElementById('game-area').classList.add('hidden');
         }
         
         // Jouer avec Carte Bancaire
         async function playWithCard() {
+            if (!selectedPrize) return;
             showLoading();
+            
+            const price = CATEGORY_PRICES[selectedPrize.category];
             
             try {
                 const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
                     user_id: USER_ID,
                     organization_id: ORGANIZATION_ID,
                     payment_method: 'card',
-                    amount: 1.0
+                    amount: price,
+                    prize_id: selectedPrize.id
                 });
                 
                 if (response.data.success && response.data.payment_required) {
@@ -392,7 +478,6 @@
                     alert('Erreur lors de la création du paiement');
                     showPaymentChoice();
                 }
-                
             } catch (error) {
                 console.error('Erreur paiement carte:', error);
                 alert('Erreur : ' + (error.response?.data?.message || error.message));
@@ -402,14 +487,18 @@
         
         // Jouer avec Wallet
         async function playWithWallet() {
+            if (!selectedPrize) return;
             showLoading();
+            
+            const price = CATEGORY_PRICES[selectedPrize.category];
             
             try {
                 const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
                     user_id: USER_ID,
                     organization_id: ORGANIZATION_ID,
                     payment_method: 'wallet',
-                    amount: 1.0
+                    amount: price,
+                    prize_id: selectedPrize.id
                 });
                 
                 if (response.data.success) {
@@ -419,7 +508,6 @@
                     alert('Erreur : ' + response.data.error);
                     showPaymentChoice();
                 }
-                
             } catch (error) {
                 console.error('Erreur paiement wallet:', error);
                 alert('Erreur : ' + (error.response?.data?.message || error.message));
@@ -432,7 +520,7 @@
             alert('Paiement Mobile Money (Orange Money, Wave) bientôt disponible !');
         }
         
-        // Grattage automatique (2-3 secondes)
+        // Grattage automatique
         function startAutoScratch() {
             showScratch();
             
@@ -443,7 +531,7 @@
             canvas.width = card.offsetWidth;
             canvas.height = card.offsetHeight;
             
-            // Remplir avec texture argentée
+            // Texture argentée
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#c0c0c0');
             gradient.addColorStop(0.5, '#808080');
@@ -451,19 +539,16 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Texte "GRATTEZ"
             ctx.fillStyle = 'white';
             ctx.font = 'bold 28px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('GRATTEZ ICI', canvas.width / 2, canvas.height / 2);
             
-            // Afficher résultat en arrière-plan
             displayResult();
             
-            // Animation de grattage automatique
+            // Animation automatique
             let progress = 0;
             const scratchInterval = setInterval(() => {
-                // Gratter de manière aléatoire
                 for (let i = 0; i < 20; i++) {
                     const x = Math.random() * canvas.width;
                     const y = Math.random() * canvas.height;
@@ -479,10 +564,9 @@
                     clearInterval(scratchInterval);
                     revealAll();
                 }
-            }, 60); // ~3 secondes total
+            }, 60);
         }
         
-        // Révéler tout
         function revealAll() {
             canvas.style.display = 'none';
             document.getElementById('result-content').classList.remove('hidden');
@@ -496,7 +580,6 @@
             }, 2000);
         }
         
-        // Afficher le résultat sous la carte
         function displayResult() {
             const resultContent = document.getElementById('result-content');
             
@@ -520,7 +603,6 @@
             }
         }
         
-        // Afficher résultat final avec partage social
         function showFinalResult() {
             const resultState = document.getElementById('result-state');
             
@@ -535,45 +617,32 @@
                             <p class="text-xl font-bold text-green-600">Valeur : ${gameResult.prize.value}€</p>
                         </div>
                         
-                        <!-- Lien sponsor PUMA -->
                         <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl mb-4">
                             <p class="text-sm text-gray-600 mb-2">Produit offert par</p>
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Puma_Logo.svg/100px-Puma_Logo.svg.png" 
                                  alt="PUMA" class="h-8 mx-auto mb-2">
-                            <a href="/puma-products.html" target="_blank" 
-                               class="text-purple-600 font-bold hover:underline">
-                                <i class="fas fa-shopping-bag mr-1"></i>
-                                Découvrir la boutique PUMA
-                            </a>
                         </div>
                         
-                        <!-- Boutons partage social -->
                         <div class="mb-6">
                             <p class="text-gray-700 font-bold mb-3">Partagez votre victoire :</p>
                             <div class="flex justify-center gap-3">
-                                <button onclick="shareOnTikTok()" 
-                                        class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
+                                <button onclick="shareOnTikTok()" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
                                     <i class="fab fa-tiktok text-xl"></i>
                                 </button>
-                                <button onclick="shareOnFacebook()" 
-                                        class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition">
+                                <button onclick="shareOnFacebook()" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition">
                                     <i class="fab fa-facebook text-xl"></i>
                                 </button>
-                                <button onclick="shareOnInstagram()" 
-                                        class="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-3 rounded-full hover:from-purple-700 hover:to-pink-600 transition">
+                                <button onclick="shareOnInstagram()" class="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-3 rounded-full hover:from-purple-700 hover:to-pink-600 transition">
                                     <i class="fab fa-instagram text-xl"></i>
                                 </button>
-                                <button onclick="shareOnWhatsApp()" 
-                                        class="bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition">
+                                <button onclick="shareOnWhatsApp()" class="bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition">
                                     <i class="fab fa-whatsapp text-xl"></i>
                                 </button>
                             </div>
                         </div>
                         
-                        <p class="text-gray-600 mb-6">Votre lot sera envoyé à votre adresse email dans les 24h</p>
                         <button onclick="location.reload()" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-purple-700 transition">
-                            <i class="fas fa-redo mr-2"></i>
-                            Rejouer (1,00 €)
+                            <i class="fas fa-redo mr-2"></i>Rejouer
                         </button>
                     </div>
                 `;
@@ -582,10 +651,9 @@
                     <div class="text-center">
                         <i class="fas fa-sad-tear text-gray-400 text-6xl mb-4"></i>
                         <h2 class="text-2xl font-bold text-gray-700 mb-4">Ce n'est pas gagnant</h2>
-                        <p class="text-gray-600 mb-6">Retentez votre chance ! La prochaine fois sera peut-être la bonne 🍀</p>
+                        <p class="text-gray-600 mb-6">Retentez votre chance ! 🍀</p>
                         <button onclick="location.reload()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105">
-                            <i class="fas fa-redo mr-2"></i>
-                            Rejouer (1,00 €)
+                            <i class="fas fa-redo mr-2"></i>Rejouer
                         </button>
                     </div>
                 `;
@@ -595,34 +663,28 @@
             resultState.classList.remove('hidden');
         }
         
-        // Partage TikTok
+        // Partage social
         function shareOnTikTok() {
-            const text = `🎉 Je viens de gagner ${gameResult.prize.name} sur PaieCashFan ! Tentez votre chance vous aussi ! ⚽`;
-            alert('📱 Partagez cette victoire sur TikTok et gagnez +2 tickets gratuits !\n\nTexte à copier:\n' + text);
+            alert('📱 Partagez sur TikTok et gagnez +2 tickets !');
             trackSocialShare('tiktok', 2);
         }
         
-        // Partage Facebook
         function shareOnFacebook() {
-            const url = window.location.href;
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
             trackSocialShare('facebook', 0.5);
         }
         
-        // Partage Instagram
         function shareOnInstagram() {
-            alert('📸 Partagez cette page en story Instagram et mentionnez @paiecashfan pour recevoir +2 tickets gratuits !');
+            alert('📸 Partagez en story Instagram et gagnez +2 tickets !');
             trackSocialShare('instagram', 2);
         }
         
-        // Partage WhatsApp
         function shareOnWhatsApp() {
-            const text = `🎉 Je viens de gagner ${gameResult.prize.name} sur PaieCashFan ! Venez jouer vous aussi ! ${window.location.href}`;
+            const text = `🎉 Je viens de gagner ${gameResult.prize.name} sur PaieCashFan ! ${window.location.href}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             trackSocialShare('whatsapp', 0);
         }
         
-        // Tracking partage social
         async function trackSocialShare(platform, reward) {
             try {
                 await axios.post(`${API_BASE_URL}/api/games/track-social`, {
@@ -635,14 +697,13 @@
                 });
                 
                 if (reward > 0) {
-                    alert(`🎉 Bravo ! Tu as gagné +${reward} ${reward === 1 ? 'ticket' : reward < 1 ? '€' : 'tickets'} !`);
+                    alert(`🎉 +${reward} ${reward === 1 ? 'ticket' : reward < 1 ? '€' : 'tickets'} !`);
                 }
             } catch (err) {
-                console.error('Erreur tracking social:', err);
+                console.error('Erreur tracking:', err);
             }
         }
         
-        // Créer des confettis
         function createConfetti() {
             for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
@@ -659,7 +720,6 @@
             }
         }
         
-        // Gestion des états d'affichage
         function showPaymentChoice() {
             document.getElementById('payment-choice').classList.remove('hidden');
             document.getElementById('loading-state').classList.add('hidden');
@@ -681,16 +741,19 @@
             document.getElementById('result-state').classList.add('hidden');
         }
         
-        // Initialisation au chargement
+        // Initialisation
         window.addEventListener('DOMContentLoaded', () => {
             loadPrizes();
             
-            // Si on revient depuis Stripe
+            // Retour depuis Stripe
             const urlParams = new URLSearchParams(window.location.search);
             const sessionId = urlParams.get('session_id');
             
             if (sessionId) {
+                document.getElementById('prizes-section').classList.add('hidden');
+                document.getElementById('game-area').classList.remove('hidden');
                 showLoading();
+                
                 axios.get(`${API_BASE_URL}/api/games/scratch/result/${sessionId}`)
                     .then(response => {
                         if (response.data.success) {
@@ -698,13 +761,13 @@
                             startAutoScratch();
                         } else {
                             alert('Erreur : ' + response.data.error);
-                            showPaymentChoice();
+                            location.href = '/scratch.html';
                         }
                     })
                     .catch(error => {
-                        console.error('Erreur récupération résultat:', error);
+                        console.error('Erreur:', error);
                         alert('Erreur : ' + (error.response?.data?.message || error.message));
-                        showPaymentChoice();
+                        location.href = '/scratch.html';
                     });
             }
         });
