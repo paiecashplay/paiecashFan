@@ -110,15 +110,59 @@
             overflow-y: auto;
         }
         
-        /* Style Lyra Form */
-        #lyraForm {
+        /* Style Lyra Form - Design amélioré */
+        #lyraFormContainer {
             margin-top: 20px;
+            min-height: 400px;
         }
         
         .kr-embedded {
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
             border-radius: 12px !important;
-            padding: 20px !important;
+            padding: 30px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+        }
+        
+        .kr-embedded input {
+            font-size: 16px !important;
+            padding: 14px !important;
+            border-radius: 8px !important;
+        }
+        
+        .kr-embedded button {
+            font-size: 18px !important;
+            padding: 16px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+        
+        .kr-label {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            margin-bottom: 8px !important;
+        }
+        
+        /* Toast animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -371,8 +415,8 @@
             
             updateCartUI()
             
-            // Show notification
-            showNotification('Produit ajouté au panier !', 'success')
+            // Show toast notification instead of blocking alert
+            showToast('✅ Produit ajouté au panier !')
         }
 
         function updateCartUI() {
@@ -464,7 +508,7 @@
             console.log('🛒 Début checkout, panier:', cart)
             
             if (cart.length === 0) {
-                alert('⚠️ Votre panier est vide. Ajoutez des produits avant de payer.')
+                showToast('⚠️ Votre panier est vide', 3000)
                 return
             }
             
@@ -474,14 +518,14 @@
             console.log('📧 Email:', email, 'Nom:', name)
             
             if (!email || email.trim() === '') {
-                alert('⚠️ Veuillez saisir votre email avant de continuer.')
+                showToast('⚠️ Veuillez saisir votre email', 3000)
                 document.getElementById('customerEmail').focus()
                 return
             }
             
             try {
                 console.log('💳 Début création commande...')
-                alert('⏳ Création de votre commande en cours...')
+                showToast('⏳ Création de votre commande en cours...')
                 
                 // 1. Créer la commande
                 const orderResponse = await fetch(`${API_BASE_URL}/api/shop/order/create`, {
@@ -555,7 +599,7 @@
                 
             } catch (error) {
                 console.error('❌ Erreur checkout:', error)
-                alert('❌ Erreur: ' + error.message)
+                showToast('❌ Erreur: ' + error.message, 5000)
             }
         }
 
@@ -566,17 +610,26 @@
             
             if (!formToken) {
                 console.error('❌ FormToken manquant !')
-                alert('Erreur: FormToken manquant')
+                showToast('❌ Erreur: FormToken manquant', 4000)
                 return
             }
             
             if (!lyraPublicKey) {
                 console.error('❌ Clé publique Lyra manquante !')
-                alert('Erreur: Configuration Lyra incomplète. Clé publique manquante.')
+                showToast('❌ Erreur: Configuration Lyra incomplète', 4000)
                 return
             }
             
             try {
+                // Supprimer tout formulaire existant pour éviter l'erreur CLIENT_725
+                console.log('🧹 Nettoyage des formulaires existants...')
+                try {
+                    await KR.removeForms()
+                    console.log('✅ Formulaires supprimés')
+                } catch (e) {
+                    console.log('ℹ️ Aucun formulaire à supprimer:', e.message)
+                }
+                
                 console.log('📝 Configuration Krypton avec clé publique...')
                 
                 // Configuration avec la clé publique (ASYNC)
@@ -641,12 +694,12 @@
                     errorMessage = error.message
                 }
                 
-                alert('❌ Erreur de paiement: ' + errorMessage)
+                showToast('❌ Erreur de paiement: ' + errorMessage, 5000)
             })
             
             } catch (error) {
                 console.error('❌ Erreur init Lyra:', error)
-                alert('❌ Erreur initialisation formulaire: ' + error.message)
+                showToast('❌ Erreur initialisation: ' + error.message, 5000)
             }
         }
 
@@ -660,10 +713,29 @@
             currentOrder = null
         }
 
-        // Notification helper
-        function showNotification(message, type = 'info') {
-            // Simple alert for now
-            alert(message)
+        // Toast notification (non-blocking)
+        function showToast(message, duration = 2000) {
+            const toast = document.createElement('div')
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: rgba(47, 174, 224, 0.95);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `
+            toast.textContent = message
+            document.body.appendChild(toast)
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease'
+                setTimeout(() => toast.remove(), 300)
+            }, duration)
         }
 
         // Init
