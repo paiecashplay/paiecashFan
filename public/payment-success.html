@@ -52,20 +52,32 @@
             <div id="participationInfo" class="hidden">
                 <div class="bg-purple-50 rounded-2xl p-6 mb-8">
                     <div class="grid grid-cols-2 gap-4 text-left">
-                        <div>
-                            <p class="text-sm text-gray-500">Campagne</p>
+                        <div class="col-span-2">
+                            <p class="text-sm text-gray-500">👤 Participant</p>
+                            <p id="userName" class="font-bold text-gray-800 text-lg"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-sm text-gray-500">⚽ Équipe</p>
+                            <p id="teamName" class="font-bold text-gray-800 text-lg"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-sm text-gray-500">🎯 Campagne</p>
                             <p id="campaignName" class="font-bold text-gray-800"></p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Entrées</p>
+                            <p class="text-sm text-gray-500">📅 Date</p>
+                            <p id="paymentDate" class="font-bold text-gray-800"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">🎟️ Entrées</p>
                             <p id="entriesCount" class="font-bold text-gray-800"></p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Montant</p>
+                            <p class="text-sm text-gray-500">💰 Montant</p>
                             <p id="amount" class="font-bold text-gray-800"></p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Statut</p>
+                            <p class="text-sm text-gray-500">✅ Statut</p>
                             <p class="font-bold text-green-600">
                                 <i class="fas fa-check-circle"></i> Payé
                             </p>
@@ -134,15 +146,56 @@
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('participationInfo').classList.remove('hidden');
                     
-                    if (data.success && data.metadata) {
-                        // Afficher les infos
-                        document.getElementById('campaignName').textContent = data.metadata.campaign_id || 'N/A';
-                        document.getElementById('entriesCount').textContent = data.metadata.entries_count || '1';
-                        document.getElementById('amount').textContent = 'Voir Stripe';
+                    if (data.success) {
+                        const { metadata, participation, amount_total, created } = data;
                         
-                        // Générer numéros factices (les vrais sont créés par webhook)
-                        const tickets = Array.from({length: parseInt(data.metadata.entries_count) || 1}, 
-                            () => Math.floor(Math.random() * 1000000)).join(', ');
+                        // Afficher nom utilisateur
+                        const userName = participation?.display_name || metadata?.user_id || 'Participant';
+                        document.getElementById('userName').textContent = userName;
+                        
+                        // Afficher équipe
+                        const teamName = participation?.organization_name || 'Olympique de Marseille';
+                        document.getElementById('teamName').textContent = teamName;
+                        
+                        // Afficher nom de campagne
+                        const campaignName = participation?.campaign_name || metadata?.campaign_id || 'N/A';
+                        const prizeName = participation?.prize_name || '';
+                        document.getElementById('campaignName').textContent = 
+                            prizeName ? `${campaignName} - ${prizeName}` : campaignName;
+                        
+                        // Afficher date
+                        const paymentDate = new Date(created * 1000).toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        document.getElementById('paymentDate').textContent = paymentDate;
+                        
+                        // Afficher nombre d'entrées
+                        const entriesCount = participation?.entries_count || metadata?.entries_count || '1';
+                        document.getElementById('entriesCount').textContent = entriesCount;
+                        
+                        // Afficher montant
+                        const amount = amount_total ? (amount_total / 100).toFixed(2) + '€' : 
+                                       (participation?.entry_fee_paid || '0') + '€';
+                        document.getElementById('amount').textContent = amount;
+                        
+                        // Afficher numéros de tickets (vrais depuis DB)
+                        let tickets = 'En cours de génération...';
+                        if (participation?.ticket_numbers) {
+                            try {
+                                const ticketArray = JSON.parse(participation.ticket_numbers);
+                                tickets = ticketArray.join(', ');
+                            } catch (e) {
+                                tickets = participation.ticket_numbers;
+                            }
+                        } else {
+                            // Fallback : numéros temporaires
+                            tickets = Array.from({length: parseInt(entriesCount) || 1}, 
+                                () => Math.floor(Math.random() * 1000000)).join(', ');
+                        }
                         document.getElementById('ticketNumbers').textContent = tickets;
                     }
                     

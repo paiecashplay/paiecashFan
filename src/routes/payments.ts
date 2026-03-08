@@ -187,7 +187,7 @@ payments.post('/webhook', async (c) => {
 // GET /api/payments/session/:sessionId - Vérifier statut session
 payments.get('/session/:sessionId', async (c) => {
   try {
-    const { STRIPE_SECRET_KEY } = c.env
+    const { STRIPE_SECRET_KEY, DB } = c.env
     
     if (!STRIPE_SECRET_KEY) {
       return c.json({ success: false, error: 'Stripe non configuré' }, 500)
@@ -200,10 +200,44 @@ payments.get('/session/:sessionId', async (c) => {
     const sessionId = c.req.param('sessionId')
     const session = await stripe.checkout.sessions.retrieve(sessionId)
 
+    // Récupérer les données complètes depuis la DB
+    let participationData = null
+    if (DB && session.metadata) {
+      const { campaign_id, user_id } = session.metadata
+      
+      // Requête pour récupérer campagne + organisation + participation
+      const result = await DB.prepare(`
+        SELECT 
+          c.name as campaign_name,
+          c.prize_name,
+          c.entry_fee,
+          o.name as organization_name,
+          p.ticket_numbers,
+          p.entries_count,
+          p.entry_fee_paid,
+          p.created_at,
+          u.display_name,
+          u.email
+        FROM campaigns c
+        LEFT JOIN organizations o ON c.organization_id = o.id
+        LEFT JOIN participations p ON p.campaign_id = c.id
+        LEFT JOIN users u ON p.user_id = u.id
+        WHERE c.id = ? 
+        AND p.user_id = ?
+        ORDER BY p.created_at DESC
+        LIMIT 1
+      `).bind(campaign_id, user_id).first()
+      
+      participationData = result
+    }
+
     return c.json({
       success: true,
       status: session.payment_status,
-      metadata: session.metadata
+      amount_total: session.amount_total,
+      created: session.created,
+      metadata: session.metadata,
+      participation: participationData
     })
 
   } catch (error) {
