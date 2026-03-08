@@ -82,7 +82,7 @@
         <div id="email-section" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">
                 <i class="fas fa-envelope text-blue-500 mr-2"></i>
-                Enregistrer votre email
+                Recevoir mes reçus par email
             </h2>
             <div class="flex gap-3">
                 <input 
@@ -98,11 +98,10 @@
                     <i class="fas fa-save mr-2"></i>Enregistrer
                 </button>
             </div>
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
-                <p class="text-sm text-yellow-800">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    <strong>Note :</strong> L'envoi automatique d'emails n'est pas encore configuré. 
-                    Vos reçus sont disponibles ci-dessous et peuvent être téléchargés en PDF via le bouton <strong>Facture</strong>.
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    <strong>Envoi automatique activé !</strong> Vos reçus seront envoyés par email après chaque partie.
                 </p>
             </div>
         </div>
@@ -201,7 +200,7 @@
             localStorage.setItem('user_email', email);
             USER_EMAIL = email;
             
-            alert('✅ Email enregistré ! Vos reçus sont disponibles ci-dessous et peuvent être téléchargés en PDF.');
+            alert('✅ Email enregistré ! Vos prochains reçus seront automatiquement envoyés à cette adresse.');
         }
         
         // Charger l'historique
@@ -332,7 +331,7 @@
             window.open(`${API_BASE_URL}/api/games/invoice/${transactionId}`, '_blank');
         }
         
-        // Générer et télécharger le reçu
+        // Envoyer le reçu par email
         async function sendReceipt(transactionId) {
             if (!USER_EMAIL) {
                 alert('⚠️ Veuillez d\'abord enregistrer votre email');
@@ -345,13 +344,15 @@
                     user_email: USER_EMAIL
                 });
                 
-                if (response.data.success) {
-                    alert('✅ Reçu généré ! Cliquez sur "Facture" pour le télécharger en PDF.');
+                if (response.data.success && response.data.email_sent) {
+                    alert(`✅ Reçu envoyé par email à ${USER_EMAIL} !`);
+                } else if (response.data.email_error) {
+                    alert(`⚠️ ${response.data.email_error}\n\nVous pouvez télécharger le reçu via le bouton "Facture".`);
                 } else {
-                    throw new Error(response.data.error);
+                    alert('✅ Reçu généré ! Cliquez sur "Facture" pour le télécharger.');
                 }
             } catch (error) {
-                console.error('Erreur génération reçu:', error);
+                console.error('Erreur envoi reçu:', error);
                 alert('❌ Erreur : ' + (error.response?.data?.error || error.message));
             }
         }

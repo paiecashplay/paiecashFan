@@ -767,35 +767,123 @@ games.post('/send-receipt', async (c) => {
       }
     }
 
-    // TODO: Intégrer avec un service email (SendGrid, Resend, etc.)
-    // Pour l'instant, le reçu est généré et stocké en base de données
-    // L'utilisateur peut le consulter dans /mes-tickets.html ou le télécharger en PDF
-    // 
-    // Pour activer l'envoi email automatique :
-    // 1. Créer un compte sur SendGrid/Resend/Mailgun
-    // 2. Obtenir la clé API
-    // 3. Configurer : wrangler secret put EMAIL_API_KEY
-    // 4. Décommenter le code ci-dessous :
-    //
-    // await fetch('https://api.sendgrid.com/v3/mail/send', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${env.EMAIL_API_KEY}`,
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     personalizations: [{ to: [{ email: user_email }] }],
-    //     from: { email: 'noreply@paiecashfan.com' },
-    //     subject: `Reçu ${invoiceNumber} - PaieCashFan`,
-    //     content: [{ type: 'text/html', value: invoiceHTML }]
-    //   })
-    // })
+    // Générer HTML de l'email
+    const emailHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f7fa; }
+    .container { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+    .header h1 { color: #667eea; margin: 0; font-size: 28px; }
+    .header p { color: #666; margin: 5px 0 0 0; }
+    .info-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .info-box strong { color: #667eea; }
+    .status-win { color: #10b981; font-weight: bold; font-size: 18px; }
+    .status-loss { color: #ef4444; font-weight: bold; font-size: 18px; }
+    .prize-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; border: 2px solid #fbbf24; }
+    .prize-box h3 { margin: 0 0 10px 0; color: #92400e; }
+    .total { background: #667eea; color: white; padding: 20px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0; }
+    .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 20px 0; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 PaieCashFan</h1>
+      <p>Reçu de Transaction</p>
+      <p style="font-size: 18px; font-weight: bold; color: #667eea;">N° ${invoiceNumber}</p>
+    </div>
+
+    <div class="info-box">
+      <p><strong>Date :</strong> ${new Date(transaction.created_at).toLocaleString('fr-FR')}</p>
+      <p><strong>Organisation :</strong> ${transaction.organization_name || 'PaieCashFan'}</p>
+      <p><strong>Jeu :</strong> ${transaction.game_type?.toUpperCase() || 'SCRATCH'}</p>
+      <p><strong>Mode de paiement :</strong> ${transaction.payment_method === 'wallet' ? 'Wallet' : transaction.payment_method === 'card' ? 'Carte Bancaire' : 'Mobile Money'}</p>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+      <p style="font-size: 16px; color: #666; margin-bottom: 10px;">Résultat :</p>
+      <p class="${transaction.prize_won ? 'status-win' : 'status-loss'}">
+        ${transaction.prize_won ? '✅ GAGNANT !' : '❌ Non gagnant'}
+      </p>
+    </div>
+
+    ${transaction.prize_won ? `
+    <div class="prize-box">
+      <h3>🏆 Lot Gagné</h3>
+      <p style="font-size: 20px; font-weight: bold; color: #92400e; margin: 10px 0;">${transaction.prize_name}</p>
+      <p style="font-size: 16px; color: #78350f;">Valeur : ${transaction.prize_value}€</p>
+    </div>
+    ` : ''}
+
+    <div class="total">
+      TOTAL PAYÉ : ${transaction.amount_paid?.toFixed(2)}€
+    </div>
+
+    <div style="text-align: center;">
+      <a href="${env.FRONTEND_URL || 'https://paiecashfan.com'}/mes-tickets.html" class="button">
+        📋 Voir mon historique
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>Merci d'avoir joué avec PaieCashFan !</p>
+      <p>Pour toute question : support@paiecashfan.com</p>
+      <p>© 2026 PaieCashFan - Tous droits réservés</p>
+    </div>
+  </div>
+</body>
+</html>
+    `
+
+    // Envoi email via Resend
+    let emailSent = false
+    let emailError = null
+
+    if (env.RESEND_API_KEY) {
+      try {
+        // Pour le test, utiliser onboarding@resend.dev
+        // En production, remplacer par un domaine vérifié
+        const fromEmail = 'PaieCashFan <onboarding@resend.dev>'
+        
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: [user_email],
+            subject: `Reçu ${invoiceNumber} - PaieCashFan`,
+            html: emailHTML
+          })
+        })
+
+        if (resendResponse.ok) {
+          emailSent = true
+          console.log('✅ Email envoyé via Resend à', user_email)
+        } else {
+          const errorData = await resendResponse.json()
+          emailError = errorData.message || 'Erreur Resend'
+          console.error('❌ Erreur Resend:', errorData)
+        }
+      } catch (error) {
+        emailError = error instanceof Error ? error.message : 'Unknown error'
+        console.error('❌ Erreur envoi email:', error)
+      }
+    }
 
     return c.json({
       success: true,
-      message: 'Reçu généré (email non configuré - consultez Mes Tickets)',
-      receipt: receiptData,
-      note: 'L\'envoi email automatique nécessite la configuration d\'un service email (SendGrid, Resend, etc.)'
+      message: emailSent ? 'Reçu envoyé par email' : 'Reçu généré (email non envoyé)',
+      email_sent: emailSent,
+      email_error: emailError,
+      receipt: receiptData
     })
 
   } catch (error) {
