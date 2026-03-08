@@ -2291,6 +2291,14 @@
     
     <!-- SCRIPT URGENT : Charger openLoto() immédiatement pour éviter "not defined" -->
     <script>
+        // ========== CONFIGURATION API ==========
+        // Détection automatique de l'environnement
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3001/api' 
+            : '/api'; // Utilise le même domaine en production
+        
+        console.log('🔧 API_BASE_URL:', API_BASE_URL);
+        
         // Fonction globale accessible immédiatement
         window.openLoto = function() {
             console.log('🎰 openLoto() GLOBAL appelé');
@@ -3721,7 +3729,7 @@ function switchTombolaTab(tabName) {
 // ========== CHARGEMENT DONNÉES TOMBOLA ==========
 async function loadTombolaStats() {
     try {
-        const response = await fetch('/api/tombola/stats');
+        const response = await fetch(`${API_BASE_URL}/tombola/stats`);
         const data = await response.json();
         
         if (data.success) {
@@ -3739,7 +3747,7 @@ async function loadTombolaCampaigns() {
     container.innerHTML = '<div class="loading-placeholder"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
     
     try {
-        const response = await fetch('/api/tombola/campaigns');
+        const response = await fetch(`${API_BASE_URL}/tombola/campaigns`);
         const data = await response.json();
         
         if (data.success && data.campaigns && data.campaigns.length > 0) {
@@ -3827,7 +3835,7 @@ async function loadTombolaLots() {
     container.innerHTML = '<div class="loading-placeholder"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
     
     try {
-        const response = await fetch('/api/tombola/lots');
+        const response = await fetch(`${API_BASE_URL}/tombola/lots`);
         const data = await response.json();
         
         if (data.success && data.lots && data.lots.length > 0) {
@@ -4029,7 +4037,7 @@ async function confirmPayment() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
     
     try {
-        const response = await fetch('/api/tombola/participate', {
+        const response = await fetch(`${API_BASE_URL}/tombola/participate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
