@@ -542,8 +542,8 @@
                 
                 console.log('🔐 Initialisation formulaire Lyra avec token...')
                 
-                // Initialiser le formulaire Lyra
-                initLyraForm(paymentData.formToken)
+                // Initialiser le formulaire Lyra (async)
+                await initLyraForm(paymentData.formToken)
                 
             } catch (error) {
                 console.error('❌ Erreur checkout:', error)
@@ -551,8 +551,8 @@
             }
         }
 
-        // Initialiser formulaire Lyra
-        function initLyraForm(formToken) {
+        // Initialiser formulaire Lyra (ASYNC)
+        async function initLyraForm(formToken) {
             console.log('🔐 initLyraForm appelé avec formToken:', formToken ? 'OK' : 'MANQUANT')
             console.log('🔑 Clé publique Lyra:', lyraPublicKey || 'MANQUANTE')
             
@@ -571,17 +571,19 @@
             try {
                 console.log('📝 Configuration Krypton avec clé publique...')
                 
-                // Configuration avec la clé publique
-                KR.setFormConfig({
+                // Configuration avec la clé publique (ASYNC)
+                await KR.setFormConfig({
                     formToken: formToken,
                     'kr-public-key': lyraPublicKey,
                     'kr-language': 'fr-FR'
                 })
                 
-                console.log('🔗 Attachement du formulaire...')
-                KR.attachForm('#lyraForm')
+                console.log('🔗 Rendu du formulaire Lyra...')
                 
-                console.log('✅ Formulaire Lyra initialisé')
+                // Utiliser renderElements() au lieu de attachForm() (nouvelle API)
+                await KR.renderElements('#lyraForm')
+                
+                console.log('✅ Formulaire Lyra rendu avec succès')
                 
                 // Event listeners
                 KR.onSubmit(async function(paymentData) {
@@ -620,7 +622,18 @@
             
             KR.onError(function(error) {
                 console.error('❌ Erreur paiement Lyra:', error)
-                alert('❌ Erreur de paiement: ' + (error.message || 'Erreur inconnue'))
+                console.error('❌ Détails erreur:', JSON.stringify(error, null, 2))
+                
+                let errorMessage = 'Erreur inconnue'
+                if (error && error.detailedErrorMessage) {
+                    errorMessage = error.detailedErrorMessage
+                } else if (error && error.errorMessage) {
+                    errorMessage = error.errorMessage
+                } else if (error && error.message) {
+                    errorMessage = error.message
+                }
+                
+                alert('❌ Erreur de paiement: ' + errorMessage)
             })
             
             } catch (error) {
