@@ -226,7 +226,13 @@
             </div>
             
             <!-- Lyra Payment Form -->
-            <div id="lyraForm"></div>
+            <div class="kr-embedded" kr-popin>
+                <div class="kr-pan"></div>
+                <div class="kr-expiry"></div>
+                <div class="kr-security-code"></div>
+                <button class="kr-payment-button"></button>
+                <div class="kr-form-error"></div>
+            </div>
             
             <div id="paymentStatus" class="mt-4 hidden">
                 <!-- Payment status messages -->
@@ -580,8 +586,8 @@
                 
                 console.log('🔗 Rendu du formulaire Lyra...')
                 
-                // Utiliser renderElements() au lieu de attachForm() (nouvelle API)
-                await KR.renderElements('#lyraForm')
+                // Utiliser renderElements() avec le sélecteur de la div embedded
+                await KR.renderElements('.kr-embedded')
                 
                 console.log('✅ Formulaire Lyra rendu avec succès')
                 
