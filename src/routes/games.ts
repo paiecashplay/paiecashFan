@@ -768,16 +768,34 @@ games.post('/send-receipt', async (c) => {
     }
 
     // TODO: Intégrer avec un service email (SendGrid, Resend, etc.)
-    // await sendEmail({
-    //   to: user_email,
-    //   subject: `Reçu ${invoiceNumber} - PaieCashFan`,
-    //   html: generateReceiptHTML(receiptData)
+    // Pour l'instant, le reçu est généré et stocké en base de données
+    // L'utilisateur peut le consulter dans /mes-tickets.html ou le télécharger en PDF
+    // 
+    // Pour activer l'envoi email automatique :
+    // 1. Créer un compte sur SendGrid/Resend/Mailgun
+    // 2. Obtenir la clé API
+    // 3. Configurer : wrangler secret put EMAIL_API_KEY
+    // 4. Décommenter le code ci-dessous :
+    //
+    // await fetch('https://api.sendgrid.com/v3/mail/send', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': `Bearer ${env.EMAIL_API_KEY}`,
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     personalizations: [{ to: [{ email: user_email }] }],
+    //     from: { email: 'noreply@paiecashfan.com' },
+    //     subject: `Reçu ${invoiceNumber} - PaieCashFan`,
+    //     content: [{ type: 'text/html', value: invoiceHTML }]
+    //   })
     // })
 
     return c.json({
       success: true,
-      message: 'Reçu généré',
-      receipt: receiptData
+      message: 'Reçu généré (email non configuré - consultez Mes Tickets)',
+      receipt: receiptData,
+      note: 'L\'envoi email automatique nécessite la configuration d\'un service email (SendGrid, Resend, etc.)'
     })
 
   } catch (error) {
@@ -966,24 +984,6 @@ games.get('/invoice/:transaction_id', async (c) => {
     <p>Valeur: ${transaction.prize_value}€</p>
   </div>
   ` : ''}
-
-  <div class="section">
-    <h3>Répartition des Revenus</h3>
-    <table>
-      <tr>
-        <td>Club (${transaction.organization_name || 'OM'})</td>
-        <td><strong>${transaction.club_commission?.toFixed(2)}€</strong> (10%)</td>
-      </tr>
-      <tr>
-        <td>Actions Sociales</td>
-        <td><strong>${transaction.social_action_fee?.toFixed(2)}€</strong> (1%)</td>
-      </tr>
-      <tr>
-        <td>PaieCashFan</td>
-        <td><strong>${transaction.paiecash_revenue?.toFixed(2)}€</strong> (89%)</td>
-      </tr>
-    </table>
-  </div>
 
   <div class="total">
     TOTAL PAYÉ: ${transaction.amount_paid?.toFixed(2)}€
