@@ -2292,13 +2292,8 @@
     <!-- SCRIPT URGENT : Charger openLoto() immédiatement pour éviter "not defined" -->
     <script>
         // ========== CONFIGURATION API ==========
-        // Détection automatique de l'environnement
-        const hostname = window.location.hostname;
-        const isSandbox = hostname.includes('sandbox.novita.ai') || hostname === 'localhost';
-        
-        const API_BASE_URL = isSandbox
-            ? `${window.location.protocol}//${hostname.replace('3000-', '3001-')}/api`
-            : '/api'; // Utilise le même domaine en production
+        // Utiliser toujours /api (le serveur proxy gère le routage)
+        const API_BASE_URL = '/api';
         
         console.log('🔧 API_BASE_URL:', API_BASE_URL);
         

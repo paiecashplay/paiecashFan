@@ -6,6 +6,10 @@ const app = express();
 const PORT = 3000;
 const API_PORT = 3001;
 
+// Middleware pour parser JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Démarrer Wrangler en arrière-plan pour l'API
 console.log(`🔧 Démarrage backend API sur port ${API_PORT}...`);
 const wrangler = spawn('npx', [
@@ -33,14 +37,28 @@ wrangler.stderr.on('data', (data) => {
 app.use('/api', async (req, res) => {
     try {
         const url = `http://127.0.0.1:${API_PORT}/api${req.url}`;
-        const response = await fetch(url, {
+        
+        const options = {
             method: req.method,
-            headers: req.headers,
-            body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
-        });
+            headers: {
+                'Content-Type': 'application/json',
+                ...req.headers
+            }
+        };
+        
+        // Ajouter le body pour POST/PUT/PATCH
+        if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+            options.body = JSON.stringify(req.body);
+        }
+        
+        const response = await fetch(url, options);
         const data = await response.text();
-        res.status(response.status).send(data);
+        
+        res.status(response.status)
+           .set('Content-Type', response.headers.get('content-type'))
+           .send(data);
     } catch (error) {
+        console.error('❌ Erreur proxy API:', error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 });
