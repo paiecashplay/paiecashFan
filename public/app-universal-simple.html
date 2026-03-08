@@ -2293,8 +2293,11 @@
     <script>
         // ========== CONFIGURATION API ==========
         // Détection automatique de l'environnement
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:3001/api' 
+        const hostname = window.location.hostname;
+        const isSandbox = hostname.includes('sandbox.novita.ai') || hostname === 'localhost';
+        
+        const API_BASE_URL = isSandbox
+            ? `${window.location.protocol}//${hostname.replace('3000-', '3001-')}/api`
             : '/api'; // Utilise le même domaine en production
         
         console.log('🔧 API_BASE_URL:', API_BASE_URL);

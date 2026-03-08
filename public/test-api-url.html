@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API URL</title>
+</head>
+<body>
+    <h1>Test détection API URL</h1>
+    <div id="results"></div>
+    
+    <script>
+        const hostname = window.location.hostname;
+        const isSandbox = hostname.includes('sandbox.novita.ai') || hostname === 'localhost';
+        
+        const API_BASE_URL = isSandbox
+            ? `${window.location.protocol}//${hostname.replace('3000-', '3001-')}/api`
+            : '/api';
+        
+        document.getElementById('results').innerHTML = `
+            <p><strong>Hostname:</strong> ${hostname}</p>
+            <p><strong>Is Sandbox:</strong> ${isSandbox}</p>
+            <p><strong>API_BASE_URL:</strong> ${API_BASE_URL}</p>
+            <p><strong>Test URL:</strong> ${API_BASE_URL}/tombola/stats</p>
+        `;
+        
+        console.log('🔧 API_BASE_URL:', API_BASE_URL);
+        
+        // Test fetch
+        fetch(`${API_BASE_URL}/tombola/stats`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('results').innerHTML += `
+                    <p style="color: green;"><strong>✅ API Test réussi:</strong> ${JSON.stringify(data)}</p>
+                `;
+            })
+            .catch(err => {
+                document.getElementById('results').innerHTML += `
+                    <p style="color: red;"><strong>❌ Erreur API:</strong> ${err.message}</p>
+                `;
+            });
+    </script>
+</body>
+</html>
