@@ -9,26 +9,27 @@ const games = new Hono<{ Bindings: CloudflareBindings }>()
 
 interface Commission {
   clubCommission: number
-  platformFee: number
-  prizePool: number
-  sponsorAmount: number
+  socialActionFee: number
+  paiecashRevenue: number
 }
 
 /**
  * Calculer la répartition financière
- * Club: 10%, Plateforme: 20%, Sponsor (lots): 50%, Gains: 60%
+ * NOUVEAU MODÈLE:
+ * - Club: 10% (commission classique)
+ * - Actions sociales: 1% (bonus partage, parrainage)
+ * - PaieCash: 89% (publicité, hébergement, salariés)
+ * - Sponsor: 0€ (paie pour visibilité seulement)
  */
 function calculateCommissions(amount: number): Commission {
-  const clubCommission = amount * 0.10  // 10% pour le club
-  const platformFee = amount * 0.20     // 20% pour la plateforme
-  const sponsorAmount = amount * 0.50   // 50% pour le sponsor (financement lots)
-  const prizePool = amount * 0.60       // 60% pour la cagnotte gains
+  const clubCommission = amount * 0.10    // 10% pour le club
+  const socialActionFee = amount * 0.01   // 1% pour actions sociales
+  const paiecashRevenue = amount * 0.89   // 89% pour PaieCash
   
   return {
     clubCommission,
-    platformFee,
-    prizePool,
-    sponsorAmount
+    socialActionFee,
+    paiecashRevenue
   }
 }
 
@@ -58,10 +59,11 @@ async function recordGameTransaction(
   await DB.prepare(`
     INSERT INTO game_transactions (
       id, user_id, organization_id, game_type, game_id,
-      amount_paid, club_commission, platform_fee, prize_pool,
-      sponsor_id, sponsor_amount, pack_type, discount_applied,
+      amount_paid, club_commission, social_action_fee, paiecash_revenue,
+      platform_fee, prize_pool, sponsor_amount,
+      sponsor_id, pack_type, discount_applied,
       referral_code, referral_bonus, payment_method, payment_id, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed')
   `).bind(
     transactionId,
     data.user_id,
@@ -70,10 +72,12 @@ async function recordGameTransaction(
     data.game_id,
     data.amount_paid,
     commissions.clubCommission,
-    commissions.platformFee,
-    commissions.prizePool,
+    commissions.socialActionFee,
+    commissions.paiecashRevenue,
+    0.0, // platform_fee (legacy)
+    0.0, // prize_pool (legacy)
+    0.0, // sponsor_amount (legacy)
     data.sponsor_id || null,
-    commissions.sponsorAmount,
     data.pack_type || 'solo',
     data.discount_applied || 0.0,
     data.referral_code || null,
@@ -576,6 +580,107 @@ games.get('/packs', async (c) => {
 
   } catch (error) {
     console.error('Erreur récupération packs:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════
+// POST /api/games/track-sponsor - Tracking sponsor (FOMO)
+// ═══════════════════════════════════════════════════════════
+games.post('/track-sponsor', async (c) => {
+  try {
+    const { DB } = c.env
+    if (!DB) {
+      return c.json({ success: false, error: 'DB non disponible' }, 500)
+    }
+
+    const {
+      sponsor_id,
+      organization_id,
+      user_id,
+      interaction_type,
+      details
+    } = await c.req.json()
+
+    // Scores d'engagement
+    const engagementScores: Record<string, number> = {
+      view: 1.0,
+      click: 3.0,
+      play: 5.0,
+      win: 10.0,
+      purchase: 20.0
+    }
+
+    await recordSponsorInteraction(DB, {
+      sponsor_id,
+      organization_id,
+      user_id,
+      game_type: 'scratch',
+      interaction_type,
+      engagement_score: engagementScores[interaction_type] || 1.0
+    })
+
+    return c.json({
+      success: true,
+      message: 'Interaction enregistrée',
+      score: engagementScores[interaction_type] || 1.0
+    })
+
+  } catch (error) {
+    console.error('Erreur tracking sponsor:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════
+// POST /api/games/track-social - Tracking partage social (FOMO)
+// ═══════════════════════════════════════════════════════════
+games.post('/track-social', async (c) => {
+  try {
+    const { DB } = c.env
+    if (!DB) {
+      return c.json({ success: false, error: 'DB non disponible' }, 500)
+    }
+
+    const {
+      user_id,
+      organization_id,
+      platform,
+      content_type,
+      content_id,
+      reward_amount,
+      game_type = 'scratch'
+    } = await c.req.json()
+
+    const shareId = `share-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+
+    await DB.prepare(`
+      INSERT INTO social_shares (
+        id, user_id, game_type, platform, bonus_earned
+      ) VALUES (?, ?, ?, ?, ?)
+    `).bind(
+      shareId,
+      user_id,
+      game_type,
+      platform,
+      reward_amount
+    ).run()
+
+    return c.json({
+      success: true,
+      message: 'Partage enregistré',
+      reward: reward_amount,
+      share_id: shareId
+    })
+
+  } catch (error) {
+    console.error('Erreur tracking social:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
