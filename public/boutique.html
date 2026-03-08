@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique OM - PaieCashFan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Lyra Embedded Form SDK -->
+    <script src="https://static.payzen.eu/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"></script>
+    <link rel="stylesheet" href="https://static.payzen.eu/static/js/krypton-client/V4.0/ext/classic-reset.css">
+    <script src="https://static.payzen.eu/static/js/krypton-client/V4.0/ext/classic.js"></script>
+    
+    <style>
+        :root {
+            --om-blue: #2faee0;
+            --om-white: #ffffff;
+            --dark: #0f172a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--om-blue);
+            box-shadow: 0 10px 30px rgba(47, 174, 224, 0.3);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: var(--om-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: #2596be;
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Style Lyra Form */
+        #lyraForm {
+            margin-top: 20px;
+        }
+        
+        .kr-embedded {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <!-- Header -->
+    <header class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold mb-2">
+                <i class="fas fa-store mr-3" style="color: var(--om-blue);"></i>
+                Boutique Officielle OM
+            </h1>
+            <p class="text-gray-400">Maillots, accessoires et équipements officiels</p>
+        </div>
+        <button onclick="toggleCart()" class="relative btn-primary">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            Panier
+            <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+        </button>
+    </header>
+
+    <!-- Filters -->
+    <div class="mb-6 flex gap-3 flex-wrap">
+        <button onclick="filterCategory('all')" class="btn-primary active" data-category="all">
+            Tous les produits
+        </button>
+        <button onclick="filterCategory('jersey')" class="btn-primary" data-category="jersey">
+            Maillots
+        </button>
+        <button onclick="filterCategory('accessories')" class="btn-primary" data-category="accessories">
+            Accessoires
+        </button>
+        <button onclick="filterCategory('equipment')" class="btn-primary" data-category="equipment">
+            Équipement
+        </button>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Products will be loaded here -->
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">
+                    <i class="fas fa-shopping-cart mr-2" style="color: var(--om-blue);"></i>
+                    Mon Panier
+                </h2>
+                <button onclick="toggleCart()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div id="cartItems" class="mb-6">
+                <!-- Cart items will be here -->
+            </div>
+            
+            <div class="border-t border-gray-700 pt-4 mb-6">
+                <div class="flex justify-between text-xl font-bold mb-4">
+                    <span>Total :</span>
+                    <span id="cartTotal" style="color: var(--om-blue);">0,00 €</span>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="customerEmail" 
+                           class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
+                           placeholder="votre@email.com" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Nom complet</label>
+                    <input type="text" id="customerName" 
+                           class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
+                           placeholder="Jean Dupont">
+                </div>
+                
+                <button onclick="checkout()" class="btn-primary w-full text-lg">
+                    <i class="fas fa-lock mr-2"></i>
+                    Payer avec Lyra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">
+                    <i class="fas fa-credit-card mr-2" style="color: var(--om-blue);"></i>
+                    Paiement Sécurisé
+                </h2>
+                <button onclick="closePayment()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
+                <p class="text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Montant à payer : <strong id="paymentAmount">0,00 €</strong>
+                </p>
+            </div>
+            
+            <!-- Lyra Payment Form -->
+            <div id="lyraForm"></div>
+            
+            <div id="paymentStatus" class="mt-4 hidden">
+                <!-- Payment status messages -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content text-center">
+            <div class="mb-6">
+                <i class="fas fa-check-circle text-6xl" style="color: #10b981;"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">Commande Validée !</h2>
+            <p class="text-gray-300 mb-6">Votre commande a été enregistrée avec succès.</p>
+            <div class="mb-6 p-4 bg-gray-800 rounded-lg">
+                <p class="text-sm text-gray-400 mb-2">Numéro de commande</p>
+                <p id="successOrderId" class="text-xl font-mono">-</p>
+            </div>
+            <button onclick="closeSuccess()" class="btn-primary">
+                <i class="fas fa-home mr-2"></i>
+                Retour à la boutique
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = window.location.origin
+        const CLUB_ID = 'om-001'
+        const USER_ID = 'user-' + Math.random().toString(36).substring(7) // Demo user ID
+        
+        // State
+        let allProducts = []
+        let cart = []
+        let currentOrder = null
+
+        // Load products
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/shop/products/${CLUB_ID}`)
+                const data = await response.json()
+                
+                if (data.success) {
+                    allProducts = data.products
+                    renderProducts(allProducts)
+                }
+            } catch (error) {
+                console.error('Erreur chargement produits:', error)
+            }
+        }
+
+        // Render products
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid')
+            grid.innerHTML = products.map(product => `
+                <div class="product-card" data-category="${product.category}">
+                    <div class="product-image">
+                        <i class="fas fa-tshirt text-6xl" style="color: var(--om-blue);"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+                    <p class="text-gray-400 text-sm mb-4">${product.description || ''}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold" style="color: var(--om-blue);">
+                            ${product.price.toFixed(2)} €
+                        </span>
+                        <button onclick='addToCart(${JSON.stringify(product)})' 
+                                class="btn-primary">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-box mr-1"></i>
+                        Stock: ${product.stock}
+                    </p>
+                </div>
+            `).join('')
+        }
+
+        // Filter by category
+        function filterCategory(category) {
+            // Update active button
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category)
+            })
+            
+            if (category === 'all') {
+                renderProducts(allProducts)
+            } else {
+                const filtered = allProducts.filter(p => p.category === category)
+                renderProducts(filtered)
+            }
+        }
+
+        // Cart functions
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id)
+            
+            if (existingItem) {
+                existingItem.quantity++
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                })
+            }
+            
+            updateCartUI()
+            
+            // Show notification
+            showNotification('Produit ajouté au panier !', 'success')
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge')
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
+            
+            if (totalItems > 0) {
+                badge.textContent = totalItems
+                badge.style.display = 'flex'
+            } else {
+                badge.style.display = 'none'
+            }
+        }
+
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems')
+            const cartTotal = document.getElementById('cartTotal')
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-400 text-center py-8">Panier vide</p>'
+                cartTotal.textContent = '0,00 €'
+                return
+            }
+            
+            let total = 0
+            cartItems.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity
+                total += itemTotal
+                
+                return `
+                    <div class="flex items-center gap-4 mb-4 p-4 bg-gray-800 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-bold">${item.name}</h4>
+                            <p class="text-sm text-gray-400">${item.price.toFixed(2)} € x ${item.quantity}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQuantity('${item.id}', -1)" 
+                                    class="w-8 h-8 bg-gray-700 rounded hover:bg-gray-600">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="w-8 text-center font-bold">${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', 1)" 
+                                    class="w-8 h-8 bg-gray-700 rounded hover:bg-gray-600">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                            <button onclick="removeFromCart('${item.id}')" 
+                                    class="w-8 h-8 bg-red-600 rounded hover:bg-red-700 ml-2">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `
+            }).join('')
+            
+            cartTotal.textContent = total.toFixed(2) + ' €'
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId)
+            if (item) {
+                item.quantity += delta
+                if (item.quantity <= 0) {
+                    removeFromCart(productId)
+                } else {
+                    updateCartUI()
+                    renderCart()
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId)
+            updateCartUI()
+            renderCart()
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal')
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active')
+            } else {
+                renderCart()
+                modal.classList.add('active')
+            }
+        }
+
+        // Checkout avec Lyra
+        async function checkout() {
+            if (cart.length === 0) {
+                showNotification('Votre panier est vide', 'error')
+                return
+            }
+            
+            const email = document.getElementById('customerEmail').value
+            const name = document.getElementById('customerName').value
+            
+            if (!email) {
+                showNotification('Email requis', 'error')
+                return
+            }
+            
+            try {
+                showNotification('Création de la commande...', 'info')
+                
+                // 1. Créer la commande
+                const orderResponse = await fetch(`${API_BASE_URL}/api/shop/order/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        club_id: CLUB_ID,
+                        products: cart.map(item => ({
+                            product_id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity
+                        })),
+                        customer_email: email,
+                        customer_name: name
+                    })
+                })
+                
+                const orderData = await orderResponse.json()
+                
+                if (!orderData.success) {
+                    throw new Error(orderData.error || 'Erreur création commande')
+                }
+                
+                currentOrder = orderData.order
+                
+                // 2. Créer le paiement Lyra
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+                const amountCents = Math.round(total * 100)
+                
+                const paymentResponse = await fetch(`${API_BASE_URL}/api/lyra/create-payment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: amountCents,
+                        currency: 'EUR',
+                        orderId: currentOrder.id,
+                        customer: {
+                            email: email,
+                            reference: USER_ID
+                        },
+                        metadata: {
+                            club_id: CLUB_ID,
+                            invoice_number: currentOrder.invoice_number
+                        }
+                    })
+                })
+                
+                const paymentData = await paymentResponse.json()
+                
+                if (!paymentData.success) {
+                    throw new Error(paymentData.error || 'Erreur création paiement')
+                }
+                
+                // 3. Afficher le formulaire Lyra
+                document.getElementById('cartModal').classList.remove('active')
+                document.getElementById('paymentModal').classList.add('active')
+                document.getElementById('paymentAmount').textContent = total.toFixed(2) + ' €'
+                
+                // Initialiser le formulaire Lyra
+                initLyraForm(paymentData.formToken)
+                
+            } catch (error) {
+                console.error('Erreur checkout:', error)
+                showNotification(error.message, 'error')
+            }
+        }
+
+        // Initialiser formulaire Lyra
+        function initLyraForm(formToken) {
+            KR.setFormConfig({
+                formToken: formToken,
+                'kr-language': 'fr-FR'
+            })
+            
+            KR.attachForm('#lyraForm')
+            
+            // Event listeners
+            KR.onSubmit(async function(paymentData) {
+                console.log('✅ Paiement Lyra réussi:', paymentData)
+                
+                try {
+                    // Confirmer la commande
+                    const confirmResponse = await fetch(`${API_BASE_URL}/api/shop/order/confirm`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_id: currentOrder.id,
+                            lyra_transaction_uuid: paymentData.clientAnswer?.transactions?.[0]?.uuid
+                        })
+                    })
+                    
+                    const confirmData = await confirmResponse.json()
+                    
+                    if (confirmData.success) {
+                        // Afficher succès
+                        document.getElementById('paymentModal').classList.remove('active')
+                        document.getElementById('successOrderId').textContent = currentOrder.id
+                        document.getElementById('successModal').classList.add('active')
+                        
+                        // Vider le panier
+                        cart = []
+                        updateCartUI()
+                    }
+                    
+                    return true
+                } catch (error) {
+                    console.error('Erreur confirmation:', error)
+                    return false
+                }
+            })
+            
+            KR.onError(function(error) {
+                console.error('❌ Erreur paiement Lyra:', error)
+                showNotification('Erreur de paiement: ' + error.message, 'error')
+            })
+        }
+
+        // Close modals
+        function closePayment() {
+            document.getElementById('paymentModal').classList.remove('active')
+        }
+
+        function closeSuccess() {
+            document.getElementById('successModal').classList.remove('active')
+            currentOrder = null
+        }
+
+        // Notification helper
+        function showNotification(message, type = 'info') {
+            // Simple alert for now
+            alert(message)
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts()
+        })
+    </script>
+</body>
+</html>

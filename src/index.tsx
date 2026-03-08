@@ -16,6 +16,7 @@ import tombola from './routes/tombola'
 import payments from './routes/payments'
 import games from './routes/games'
 import lyra from './routes/lyra'
+import shop from './routes/shop'
 
 const app = new Hono()
 
@@ -36,6 +37,9 @@ app.route('/api/payments', payments)
 
 // Mount Lyra routes (NEW - PayZen pour boutiques clubs)
 app.route('/api/lyra', lyra)
+
+// Mount Shop routes (NEW - Boutiques clubs avec Lyra)
+app.route('/api/shop', shop)
 
 // Mount Games routes (NEW - Scratch, Loto, Bonus...)
 app.route('/api/games', games)
