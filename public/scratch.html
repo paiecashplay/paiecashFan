@@ -186,9 +186,14 @@
         
         <!-- Header avec Sponsor -->
         <div class="text-center mb-8 text-white">
-            <a href="/app-universal-simple.html?club=Marseille" class="inline-block mb-4">
-                <i class="fas fa-arrow-left mr-2"></i> Retour
-            </a>
+            <div class="flex justify-between items-center gap-4 mb-4">
+                <a href="/app-universal-simple.html?club=Marseille" class="inline-block text-white hover:underline">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour
+                </a>
+                <a href="/mes-tickets.html" class="inline-block text-white hover:underline font-semibold">
+                    <i class="fas fa-ticket-alt mr-2"></i> Mes Tickets
+                </a>
+            </div>
             
             <!-- Logos Club + Sponsor -->
             <div class="flex justify-center items-center gap-4 mb-4">
@@ -603,8 +608,22 @@
             }
         }
         
-        function showFinalResult() {
+        async function showFinalResult() {
             const resultState = document.getElementById('result-state');
+            
+            // Envoyer automatiquement le reçu si email enregistré
+            const userEmail = localStorage.getItem('user_email');
+            if (userEmail && gameResult.transaction_id) {
+                try {
+                    await axios.post(`${API_BASE_URL}/api/games/send-receipt`, {
+                        transaction_id: gameResult.transaction_id,
+                        user_email: userEmail
+                    });
+                    console.log('✅ Reçu envoyé automatiquement à', userEmail);
+                } catch (err) {
+                    console.error('Erreur envoi automatique reçu:', err);
+                }
+            }
             
             if (gameResult.is_winner && gameResult.prize) {
                 resultState.innerHTML = `
@@ -622,6 +641,20 @@
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Puma_Logo.svg/100px-Puma_Logo.svg.png" 
                                  alt="PUMA" class="h-8 mx-auto mb-2">
                         </div>
+                        
+                        ${userEmail ? `
+                        <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                            <i class="fas fa-envelope text-blue-600 mr-2"></i>
+                            <span class="text-sm text-blue-800">Reçu envoyé à <strong>${userEmail}</strong></span>
+                        </div>
+                        ` : `
+                        <div class="bg-orange-50 p-3 rounded-lg mb-4">
+                            <i class="fas fa-exclamation-circle text-orange-600 mr-2"></i>
+                            <span class="text-sm text-orange-800">
+                                <a href="/mes-tickets.html" class="underline font-bold">Enregistrez votre email</a> pour recevoir vos reçus
+                            </span>
+                        </div>
+                        `}
                         
                         <div class="mb-6">
                             <p class="text-gray-700 font-bold mb-3">Partagez votre victoire :</p>
@@ -641,9 +674,14 @@
                             </div>
                         </div>
                         
-                        <button onclick="location.reload()" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-purple-700 transition">
-                            <i class="fas fa-redo mr-2"></i>Rejouer
-                        </button>
+                        <div class="flex justify-center gap-3">
+                            <button onclick="location.href='/mes-tickets.html'" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition">
+                                <i class="fas fa-ticket-alt mr-2"></i>Mes Tickets
+                            </button>
+                            <button onclick="location.reload()" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-purple-700 transition">
+                                <i class="fas fa-redo mr-2"></i>Rejouer
+                            </button>
+                        </div>
                     </div>
                 `;
             } else {
@@ -651,10 +689,30 @@
                     <div class="text-center">
                         <i class="fas fa-sad-tear text-gray-400 text-6xl mb-4"></i>
                         <h2 class="text-2xl font-bold text-gray-700 mb-4">Ce n'est pas gagnant</h2>
-                        <p class="text-gray-600 mb-6">Retentez votre chance ! 🍀</p>
-                        <button onclick="location.reload()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105">
-                            <i class="fas fa-redo mr-2"></i>Rejouer
-                        </button>
+                        <p class="text-gray-600 mb-4">Retentez votre chance ! 🍀</p>
+                        
+                        ${userEmail ? `
+                        <div class="bg-blue-50 p-3 rounded-lg mb-6">
+                            <i class="fas fa-envelope text-blue-600 mr-2"></i>
+                            <span class="text-sm text-blue-800">Reçu envoyé à <strong>${userEmail}</strong></span>
+                        </div>
+                        ` : `
+                        <div class="bg-orange-50 p-3 rounded-lg mb-6">
+                            <i class="fas fa-info-circle text-orange-600 mr-2"></i>
+                            <span class="text-sm text-orange-800">
+                                <a href="/mes-tickets.html" class="underline font-bold">Consultez votre historique</a> et recevez vos reçus
+                            </span>
+                        </div>
+                        `}
+                        
+                        <div class="flex justify-center gap-3">
+                            <button onclick="location.href='/mes-tickets.html'" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition">
+                                <i class="fas fa-ticket-alt mr-2"></i>Mes Tickets
+                            </button>
+                            <button onclick="location.reload()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105">
+                                <i class="fas fa-redo mr-2"></i>Rejouer
+                            </button>
+                        </div>
                     </div>
                 `;
             }

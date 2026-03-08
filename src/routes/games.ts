@@ -289,7 +289,7 @@ games.post('/scratch/play', async (c) => {
       ).run()
 
       // Enregistrer la transaction avec commission club
-      await recordGameTransaction(DB, {
+      const transactionId = await recordGameTransaction(DB, {
         user_id,
         organization_id,
         game_type: 'scratch',
@@ -329,6 +329,7 @@ games.post('/scratch/play', async (c) => {
         success: true,
         payment_required: false,
         game_id: gameId,
+        transaction_id: transactionId,
         is_winner: isWinner,
         prize: prizeData ? {
           id: prizeData.id,
@@ -681,6 +682,326 @@ games.post('/track-social', async (c) => {
 
   } catch (error) {
     console.error('Erreur tracking social:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════
+// REÇUS ET HISTORIQUE
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Envoyer un reçu par email après une transaction
+ * POST /api/games/send-receipt
+ */
+games.post('/send-receipt', async (c) => {
+  try {
+    const { env } = c
+    const { transaction_id, user_email } = await c.req.json()
+
+    if (!transaction_id || !user_email) {
+      return c.json({
+        success: false,
+        error: 'transaction_id et user_email requis'
+      }, 400)
+    }
+
+    // Récupérer la transaction
+    const transaction = await env.DB.prepare(`
+      SELECT 
+        gt.*,
+        p.name as prize_name,
+        p.value as prize_value,
+        o.name as organization_name
+      FROM game_transactions gt
+      LEFT JOIN scratch_prizes p ON gt.game_id = 'scratch-' || substr(gt.id, 4)
+      LEFT JOIN organizations o ON gt.organization_id = o.id
+      WHERE gt.id = ?
+    `).bind(transaction_id).first()
+
+    if (!transaction) {
+      return c.json({
+        success: false,
+        error: 'Transaction introuvable'
+      }, 404)
+    }
+
+    // Générer le numéro de facture s'il n'existe pas
+    let invoiceNumber = transaction.invoice_number
+    if (!invoiceNumber) {
+      const date = new Date(transaction.created_at)
+      const dateStr = date.toISOString().split('T')[0].replace(/-/g, '')
+      invoiceNumber = `INV-${dateStr}-${transaction.id.slice(-6).toUpperCase()}`
+      
+      await env.DB.prepare(`
+        UPDATE game_transactions 
+        SET invoice_number = ?, user_email = ?, receipt_sent = 1, receipt_sent_at = datetime('now')
+        WHERE id = ?
+      `).bind(invoiceNumber, user_email, transaction_id).run()
+    }
+
+    // Dans un vrai système, vous enverriez un email ici
+    // Pour l'instant, on retourne les données du reçu
+    const receiptData = {
+      invoice_number: invoiceNumber,
+      transaction_id: transaction.id,
+      date: transaction.created_at,
+      user_email: user_email,
+      organization: transaction.organization_name || 'PaieCashFan',
+      game_type: transaction.game_type?.toUpperCase() || 'SCRATCH',
+      amount_paid: transaction.amount_paid,
+      payment_method: transaction.payment_method,
+      status: transaction.status,
+      is_winner: !!transaction.prize_won,
+      prize: transaction.prize_won ? {
+        name: transaction.prize_name,
+        value: transaction.prize_value
+      } : null,
+      commissions: {
+        club: transaction.club_commission,
+        social: transaction.social_action_fee,
+        paiecash: transaction.paiecash_revenue
+      }
+    }
+
+    // TODO: Intégrer avec un service email (SendGrid, Resend, etc.)
+    // await sendEmail({
+    //   to: user_email,
+    //   subject: `Reçu ${invoiceNumber} - PaieCashFan`,
+    //   html: generateReceiptHTML(receiptData)
+    // })
+
+    return c.json({
+      success: true,
+      message: 'Reçu généré',
+      receipt: receiptData
+    })
+
+  } catch (error) {
+    console.error('Erreur envoi reçu:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+/**
+ * Récupérer l'historique des tickets d'un utilisateur
+ * GET /api/games/my-tickets/:user_id
+ */
+games.get('/my-tickets/:user_id', async (c) => {
+  try {
+    const { env } = c
+    const user_id = c.req.param('user_id')
+
+    if (!user_id) {
+      return c.json({
+        success: false,
+        error: 'user_id requis'
+      }, 400)
+    }
+
+    // Récupérer toutes les transactions de l'utilisateur
+    const transactions = await env.DB.prepare(`
+      SELECT 
+        gt.id,
+        gt.game_type,
+        gt.game_id,
+        gt.amount_paid,
+        gt.payment_method,
+        gt.status,
+        gt.created_at,
+        gt.invoice_number,
+        gt.prize_won,
+        gt.club_commission,
+        gt.social_action_fee,
+        gt.paiecash_revenue,
+        p.name as prize_name,
+        p.value as prize_value,
+        p.description as prize_description,
+        o.name as organization_name
+      FROM game_transactions gt
+      LEFT JOIN scratch_prizes p ON gt.prize_won = p.id
+      LEFT JOIN organizations o ON gt.organization_id = o.id
+      WHERE gt.user_id = ?
+      ORDER BY gt.created_at DESC
+    `).bind(user_id).all()
+
+    // Calculer les statistiques
+    const stats = {
+      total_games: transactions.results?.length || 0,
+      total_spent: 0,
+      total_won: 0,
+      win_count: 0,
+      loss_count: 0
+    }
+
+    transactions.results?.forEach((tx: any) => {
+      stats.total_spent += tx.amount_paid || 0
+      if (tx.prize_won) {
+        stats.win_count++
+        stats.total_won += tx.prize_value || 0
+      } else {
+        stats.loss_count++
+      }
+    })
+
+    return c.json({
+      success: true,
+      tickets: transactions.results || [],
+      stats: stats
+    })
+
+  } catch (error) {
+    console.error('Erreur récupération historique:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+/**
+ * Télécharger une facture PDF
+ * GET /api/games/invoice/:transaction_id
+ */
+games.get('/invoice/:transaction_id', async (c) => {
+  try {
+    const { env } = c
+    const transaction_id = c.req.param('transaction_id')
+
+    // Récupérer la transaction
+    const transaction = await env.DB.prepare(`
+      SELECT 
+        gt.*,
+        p.name as prize_name,
+        p.value as prize_value,
+        o.name as organization_name
+      FROM game_transactions gt
+      LEFT JOIN scratch_prizes p ON gt.prize_won = p.id
+      LEFT JOIN organizations o ON gt.organization_id = o.id
+      WHERE gt.id = ?
+    `).bind(transaction_id).first()
+
+    if (!transaction) {
+      return c.json({
+        success: false,
+        error: 'Transaction introuvable'
+      }, 404)
+    }
+
+    // Générer HTML de facture
+    const invoiceHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Facture ${transaction.invoice_number}</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #667eea; padding-bottom: 20px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .section { background: #f5f7fa; padding: 15px; border-radius: 8px; }
+    .section h3 { margin-top: 0; color: #667eea; }
+    .total { background: #667eea; color: white; padding: 20px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; }
+    .footer { margin-top: 30px; text-align: center; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #667eea; color: white; }
+    .status-win { color: #10b981; font-weight: bold; }
+    .status-loss { color: #ef4444; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 PaieCashFan</h1>
+    <h2>Reçu de Transaction</h2>
+    <p><strong>N° ${transaction.invoice_number}</strong></p>
+  </div>
+
+  <div class="info-grid">
+    <div class="section">
+      <h3>Informations Client</h3>
+      <p><strong>ID:</strong> ${transaction.user_id}</p>
+      <p><strong>Email:</strong> ${transaction.user_email || 'Non renseigné'}</p>
+    </div>
+    
+    <div class="section">
+      <h3>Détails Transaction</h3>
+      <p><strong>Date:</strong> ${new Date(transaction.created_at).toLocaleString('fr-FR')}</p>
+      <p><strong>ID Transaction:</strong> ${transaction.id}</p>
+      <p><strong>Organisation:</strong> ${transaction.organization_name || 'PaieCashFan'}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Jeu</th>
+        <th>Mode de paiement</th>
+        <th>Montant</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>${transaction.game_type?.toUpperCase() || 'SCRATCH'}</td>
+        <td>${transaction.payment_method === 'wallet' ? 'Wallet' : transaction.payment_method === 'card' ? 'Carte Bancaire' : 'Mobile Money'}</td>
+        <td>${transaction.amount_paid?.toFixed(2)}€</td>
+        <td class="${transaction.prize_won ? 'status-win' : 'status-loss'}">
+          ${transaction.prize_won ? '✅ GAGNANT' : '❌ Non gagnant'}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  ${transaction.prize_won ? `
+  <div class="section">
+    <h3>🏆 Lot Gagné</h3>
+    <p><strong>${transaction.prize_name}</strong></p>
+    <p>Valeur: ${transaction.prize_value}€</p>
+  </div>
+  ` : ''}
+
+  <div class="section">
+    <h3>Répartition des Revenus</h3>
+    <table>
+      <tr>
+        <td>Club (${transaction.organization_name || 'OM'})</td>
+        <td><strong>${transaction.club_commission?.toFixed(2)}€</strong> (10%)</td>
+      </tr>
+      <tr>
+        <td>Actions Sociales</td>
+        <td><strong>${transaction.social_action_fee?.toFixed(2)}€</strong> (1%)</td>
+      </tr>
+      <tr>
+        <td>PaieCashFan</td>
+        <td><strong>${transaction.paiecash_revenue?.toFixed(2)}€</strong> (89%)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="total">
+    TOTAL PAYÉ: ${transaction.amount_paid?.toFixed(2)}€
+  </div>
+
+  <div class="footer">
+    <p>Merci d'avoir joué avec PaieCashFan !</p>
+    <p>Pour toute question: support@paiecashfan.com</p>
+    <p>© 2026 PaieCashFan - Tous droits réservés</p>
+  </div>
+</body>
+</html>
+    `
+
+    return c.html(invoiceHTML)
+
+  } catch (error) {
+    console.error('Erreur génération facture:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
