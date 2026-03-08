@@ -1097,4 +1097,398 @@ games.get('/invoice/:transaction_id', async (c) => {
   }
 })
 
+/**
+ * ==========================================
+ * 🎲 API LOTO - Grille de numéros garantis
+ * ==========================================
+ */
+
+/**
+ * GET /api/games/loto/prizes
+ * Récupérer tous les lots LOTO disponibles
+ */
+games.get('/loto/prizes', async (c) => {
+  try {
+    const { env } = c
+
+    const prizes = await env.DB.prepare(`
+      SELECT * FROM loto_prizes 
+      ORDER BY value DESC
+    `).all()
+
+    return c.json({
+      success: true,
+      prizes: prizes.results || []
+    })
+  } catch (error) {
+    console.error('Erreur récupération lots LOTO:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
+/**
+ * POST /api/games/loto/play
+ * Jouer au LOTO avec paiement (2€)
+ * Body: {
+ *   user_id: string,
+ *   organization_id: string,
+ *   numbers: number[] (5 numéros entre 1-50),
+ *   chance: number (1 numéro entre 1-10),
+ *   payment_method: 'card' | 'wallet' | 'mobile_money',
+ *   payment_id?: string (pour carte Stripe),
+ *   user_email?: string
+ * }
+ */
+games.post('/loto/play', async (c) => {
+  try {
+    const { env } = c
+    
+    // Désactiver temporairement les foreign keys
+    await env.DB.exec('PRAGMA foreign_keys=OFF')
+    
+    const body = await c.req.json()
+    const {
+      user_id,
+      organization_id = 'om-001',
+      numbers,
+      chance,
+      payment_method,
+      payment_id,
+      user_email
+    } = body
+
+    // S'assurer que l'organisation existe
+    const org = await env.DB.prepare(`
+      SELECT id FROM organizations WHERE id = ?
+    `).bind(organization_id).first()
+
+    if (!org) {
+      return c.json({
+        success: false,
+        error: 'Organisation introuvable'
+      }, 404)
+    }
+
+    // Validation
+    if (!user_id || !numbers || !chance) {
+      return c.json({
+        success: false,
+        error: 'user_id, numbers et chance requis'
+      }, 400)
+    }
+
+    if (!Array.isArray(numbers) || numbers.length !== 5) {
+      return c.json({
+        success: false,
+        error: 'Vous devez choisir exactement 5 numéros'
+      }, 400)
+    }
+
+    if (numbers.some(n => n < 1 || n > 50)) {
+      return c.json({
+        success: false,
+        error: 'Les numéros doivent être entre 1 et 50'
+      }, 400)
+    }
+
+    if (chance < 1 || chance > 10) {
+      return c.json({
+        success: false,
+        error: 'Le numéro chance doit être entre 1 et 10'
+      }, 400)
+    }
+
+    // Prix fixe : 2€ par grille
+    const LOTO_PRICE = 2.0
+
+    // Simulation tirage aléatoire
+    const winningNumbers = Array.from({ length: 5 }, () => Math.floor(Math.random() * 50) + 1)
+    const winningChance = Math.floor(Math.random() * 10) + 1
+
+    // Calcul des correspondances
+    const matchedNumbers = numbers.filter(n => winningNumbers.includes(n)).length
+    const matchedChance = chance === winningChance ? 1 : 0
+
+    console.log('🎲 LOTO Tirage:', {
+      user_numbers: numbers,
+      user_chance: chance,
+      winning_numbers: winningNumbers,
+      winning_chance: winningChance,
+      matched_numbers: matchedNumbers,
+      matched_chance: matchedChance
+    })
+
+    // Déterminer le lot gagné (GARANTIE : toujours un lot minimum)
+    let prize = null
+    let match_requirement = `${matchedNumbers}`
+    if (matchedChance === 1) {
+      match_requirement += '+1'
+    }
+
+    console.log('🎯 Recherche lot pour:', match_requirement)
+
+    // Récupérer le lot correspondant
+    const prizeQuery = await env.DB.prepare(`
+      SELECT * FROM loto_prizes 
+      WHERE match_requirement = ?
+      ORDER BY value DESC
+      LIMIT 1
+    `).bind(match_requirement).first()
+
+    if (prizeQuery) {
+      prize = prizeQuery
+      console.log('✅ Lot trouvé:', prize.name)
+    } else {
+      // Si aucun lot exact, donner le lot de consolation
+      console.log('⚠️ Pas de lot trouvé, attribution consolation')
+      const consolationPrize = await env.DB.prepare(`
+        SELECT * FROM loto_prizes 
+        WHERE category = 'consolation'
+        ORDER BY value DESC
+        LIMIT 1
+      `).first()
+      prize = consolationPrize || null
+    }
+
+    // Si toujours pas de lot, créer un lot de base
+    if (!prize) {
+      prize = {
+        id: 'consolation-default',
+        name: 'Produit frais offert',
+        value: 2.0,
+        category: 'consolation',
+        match_requirement: '0N'
+      }
+    }
+
+    // Générer les IDs
+    const gameId = `loto-${Date.now()}-${Math.random().toString(36).substring(7)}`
+    const transactionId = `tx-${Date.now()}-${Math.random().toString(36).substring(7)}`
+    const invoiceNumber = `INV-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+
+    // Enregistrer la partie dans loto_games
+    await env.DB.prepare(`
+      INSERT INTO loto_games (
+        id, user_id, organization_id, 
+        selected_numbers, selected_chance,
+        winning_numbers, winning_chance,
+        matched_numbers, matched_chance,
+        prize_id, prize_value,
+        amount_paid, payment_method, payment_id,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `).bind(
+      gameId,
+      user_id,
+      organization_id,
+      JSON.stringify(numbers),
+      chance,
+      JSON.stringify(winningNumbers),
+      winningChance,
+      matchedNumbers,
+      matchedChance,
+      prize?.id || null,
+      prize?.value || 0,
+      LOTO_PRICE,
+      payment_method,
+      payment_id || null
+    ).run()
+
+    // Calculer les commissions
+    const {
+      clubCommission,
+      socialActionFee,
+      paiecashRevenue
+    } = calculateCommissions(LOTO_PRICE)
+
+    // Enregistrer la transaction
+    await env.DB.prepare(`
+      INSERT INTO game_transactions (
+        id, user_id, organization_id,
+        game_type, game_id,
+        amount_paid,
+        club_commission, social_action_fee, paiecash_revenue,
+        platform_fee, prize_pool, sponsor_amount, sponsor_id,
+        pack_type, discount_applied,
+        referral_code, referral_bonus,
+        payment_method, payment_id,
+        status,
+        user_email, receipt_sent, receipt_sent_at,
+        invoice_number, prize_won,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `).bind(
+      transactionId,
+      user_id,
+      organization_id,
+      'LOTO',
+      gameId,
+      LOTO_PRICE,
+      clubCommission,
+      socialActionFee,
+      paiecashRevenue,
+      0, // platform_fee
+      0, // prize_pool
+      0, // sponsor_amount
+      null, // sponsor_id
+      'solo',
+      0,
+      null,
+      0,
+      payment_method,
+      payment_id || null,
+      'completed',
+      user_email || null,
+      0, // receipt_sent
+      null, // receipt_sent_at
+      invoiceNumber,
+      null // prize_won - LOTO ne stocke pas ici (dans loto_games)
+    ).run()
+
+    console.log('✅ LOTO partie enregistrée:', {
+      gameId,
+      transactionId,
+      prize: prize?.name,
+      value: prize?.value
+    })
+
+    // Envoyer l'email si email fourni
+    let emailSent = false
+    if (user_email && env.RESEND_API_KEY) {
+      try {
+        const emailBody = {
+          from: 'PaieCashFan <onboarding@resend.dev>',
+          to: user_email,
+          subject: `🎲 Résultat LOTO - ${invoiceNumber}`,
+          html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: white; padding: 30px; border: 1px solid #e5e7eb; }
+                .prize-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 20px 0; border-radius: 8px; }
+                .numbers { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+                .number { background: #667eea; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+                .chance { background: #f59e0b; }
+                .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin: 10px 0; }
+                .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #666; font-size: 14px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>🎲 LOTO PaieCashFan</h1>
+                  <p style="margin: 0; font-size: 18px;">Résultat de votre tirage</p>
+                </div>
+                <div class="content">
+                  <h2>📋 Détails de la partie</h2>
+                  <p><strong>N° de transaction :</strong> ${transactionId}</p>
+                  <p><strong>N° de facture :</strong> ${invoiceNumber}</p>
+                  <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                  <p><strong>Montant payé :</strong> ${LOTO_PRICE.toFixed(2)} €</p>
+                  
+                  <h3>Vos numéros :</h3>
+                  <div class="numbers">
+                    ${numbers.map(n => `<div class="number">${n}</div>`).join('')}
+                    <div class="number chance">${chance}</div>
+                  </div>
+                  
+                  <h3>Numéros gagnants :</h3>
+                  <div class="numbers">
+                    ${winningNumbers.map(n => `<div class="number">${n}</div>`).join('')}
+                    <div class="number chance">${winningChance}</div>
+                  </div>
+                  
+                  <div class="prize-box">
+                    <h2 style="margin-top: 0; color: #10b981;">🎉 ${prize?.name || 'Lot gagné'}</h2>
+                    <p style="font-size: 18px; margin: 10px 0;"><strong>Valeur : ${(prize?.value || 0).toFixed(2)} €</strong></p>
+                    <p style="margin: 0;">Correspondances : ${matchedNumbers} numéro(s)${matchedChance ? ' + Chance ✨' : ''}</p>
+                  </div>
+                  
+                  <p style="text-align: center;">
+                    <a href="https://3000-icomwnne7u5jo8rhs9r05-b237eb32.sandbox.novita.ai/mes-tickets.html" class="button">
+                      Voir mon historique
+                    </a>
+                  </p>
+                  
+                  <div class="footer">
+                    <p><strong>PaieCashFan</strong> - Jeux sponsorisés par la Grande Distribution</p>
+                    <p style="font-size: 12px; color: #999;">Avec votre ticket, vous gagnez toujours !</p>
+                  </div>
+                </div>
+              </div>
+            </body>
+            </html>
+          `
+        }
+
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(emailBody)
+        })
+
+        const result = await response.json()
+        if (response.ok) {
+          emailSent = true
+          // Marquer le reçu comme envoyé
+          await env.DB.prepare(`
+            UPDATE game_transactions 
+            SET receipt_sent = 1, receipt_sent_at = datetime('now')
+            WHERE id = ?
+          `).bind(transactionId).run()
+        } else {
+          console.error('❌ Erreur Resend:', result)
+        }
+      } catch (emailError) {
+        console.error('❌ Erreur envoi email:', emailError)
+      }
+    }
+
+    // Retourner le résultat
+    return c.json({
+      success: true,
+      game_id: gameId,
+      transaction_id: transactionId,
+      invoice_number: invoiceNumber,
+      user_numbers: numbers,
+      user_chance: chance,
+      winning_numbers: winningNumbers,
+      winning_chance: winningChance,
+      matched_numbers: matchedNumbers,
+      matched_chance: matchedChance,
+      prize: {
+        id: prize?.id,
+        name: prize?.name,
+        value: prize?.value,
+        category: prize?.category
+      },
+      amount_paid: LOTO_PRICE,
+      commissions: {
+        club: clubCommission,
+        social: socialActionFee,
+        paiecash: paiecashRevenue
+      },
+      email_sent: emailSent
+    })
+
+  } catch (error) {
+    console.error('❌ Erreur LOTO play:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
 export default games
