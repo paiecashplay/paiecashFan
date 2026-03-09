@@ -804,22 +804,22 @@ const equipesDatabase = {
     // ========== ALGÉRIE ==========
     "algerie": {
         name: "Algérie 🇩🇿",
-        logo: "🇩🇿",
+        logo: "/logos/algerie-faf.png",
         colors: ["#006233", "#FFFFFF"],
         appUrl: "app-universal-simple.html?club=Alg%C3%A9rie&logo=🇩🇿&sport=Football+Federation&league=CAF",
         categories: [
             {
                 title: "🇩🇿 Équipes Nationales",
                 teams: [
-                    { name: "Fennecs", fullName: "Équipe Nationale A", logo: "🇩🇿", coach: "Pepe", description: "Fennecs d'Algérie", achievements: "CAN 1990, 2019", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Alg%C3%A9rie+ENA&logo=🇩🇿&sport=Football&league=CAF" }
+                    { name: "Fennecs", fullName: "Équipe Nationale A", logo: "/logos/algerie-faf.png", coach: "Pepe", description: "Fennecs d'Algérie", achievements: "CAN 1990, 2019", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Alg%C3%A9rie+ENA&logo=🇩🇿&sport=Football&league=CAF" }
                 ]
             },
             {
                 title: "⚽ Clubs Ligue Professionnelle 1",
                 teams: [
-                    { name: "USM Alger", fullName: "Union Sportive de la Médina d'Alger", logo: "🇩🇿", founded: 1937, stadium: "Stade Omar Hamadi", titles: 11, description: "Club le plus titré d'Algérie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=USM+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
-                    { name: "MC Alger", fullName: "Mouloudia Club d'Alger", logo: "🇩🇿", founded: 1921, stadium: "Stade du 5 Juillet 1962", titles: 9, description: "Le Doyen du football algérien", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=MC+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
-                    { name: "CR Belouizdad", fullName: "Club de la Renaissance de Belouizdad", logo: "🇩🇿", founded: 1914, stadium: "Stade du 5 Juillet 1962", titles: 8, description: "Club historique d'Alger", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=CR+Belouizdad&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" }
+                    { name: "USM Alger", fullName: "Union Sportive de la Médina d'Alger", logo: "/logos/usm-alger.png", founded: 1937, stadium: "Stade Omar Hamadi", titles: 11, description: "Club le plus titré d'Algérie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=USM+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
+                    { name: "MC Alger", fullName: "Mouloudia Club d'Alger", logo: "/logos/mc-alger.png", founded: 1921, stadium: "Stade du 5 Juillet 1962", titles: 9, description: "Le Doyen du football algérien", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=MC+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
+                    { name: "CR Belouizdad", fullName: "Club de la Renaissance de Belouizdad", logo: "/logos/cr-belouizdad.png", founded: 1914, stadium: "Stade du 5 Juillet 1962", titles: 8, description: "Club historique d'Alger", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=CR+Belouizdad&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" }
                 ]
             }
         ]
