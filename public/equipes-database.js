@@ -772,7 +772,36 @@ const equipesDatabase = {
 
 // Fonction pour obtenir les données d'un club/fédération
 function getClubData(clubId) {
-    return equipesDatabase[clubId.toLowerCase()] || null;
+    if (!clubId) return null;
+    // Normaliser l'ID : décoder l'URL, enlever les accents, normaliser les séparateurs
+    let id = clubId;
+    try { id = decodeURIComponent(id); } catch(e) {}
+    id = id.toLowerCase().trim()
+        .replace(/\u2019|\u2018/g, "'")
+        .replace(/\u00e9|\u00e8|\u00ea/g, 'e')
+        .replace(/\u00e0|\u00e2/g, 'a')
+        .replace(/\u00f4/g, 'o')
+        .replace(/\u00fb|\u00fc/g, 'u')
+        .replace(/\u00ee|\u00ef/g, 'i')
+        .replace(/\u00e7/g, 'c');
+    // Cherche d'abord la clé exacte normalisée
+    if (equipesDatabase[id]) return equipesDatabase[id];
+    // Cherche la clé originale non normalisée
+    if (equipesDatabase[clubId.toLowerCase()]) return equipesDatabase[clubId.toLowerCase()];
+    // Recherche partielle : la clé contient l'ID ou vice versa
+    for (const [k, v] of Object.entries(equipesDatabase)) {
+        const kNorm = k.toLowerCase()
+            .replace(/\u00e9|\u00e8|\u00ea/g, 'e')
+            .replace(/\u00e0|\u00e2/g, 'a')
+            .replace(/\u00f4/g, 'o')
+            .replace(/\u00fb|\u00fc/g, 'u')
+            .replace(/\u00ee|\u00ef/g, 'i')
+            .replace(/\u00e7/g, 'c');
+        if (kNorm === id || kNorm.replace(/[-\s']/g,'') === id.replace(/[-\s']/g,'')) {
+            return v;
+        }
+    }
+    return null;
 }
 
 // Fonction pour obtenir l'URL de l'application d'un club

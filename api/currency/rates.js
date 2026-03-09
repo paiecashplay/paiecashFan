@@ -139,10 +139,17 @@ const CLUB_CURRENCY_MAP = {
     // Sénégal
     'senegal': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇸🇳' },
     'sénégal': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇸🇳' },
-    // Côte d'Ivoire
+    // Côte d'Ivoire (toutes les variantes d'URL possibles)
     'cote d\'ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
     'côte d\'ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'cote-divoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'cote-d\'ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'côte-d\'ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
     'ivory coast': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'cdi': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'liga1 ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
+    'liga1+ivoire': { currency: 'XOF', symbol: 'FCFA', name: 'Franc CFA', flag: '🇨🇮' },
     // Nigeria
     'nigeria': { currency: 'NGN', symbol: '₦', name: 'Naira nigérian', flag: '🇳🇬' },
     'nigéria': { currency: 'NGN', symbol: '₦', name: 'Naira nigérian', flag: '🇳🇬' },
@@ -201,13 +208,32 @@ export default async function handler(req, res) {
     const { club, league } = req.query;
 
     // Déterminer la devise du club - chercher dans club ET league séparément
-    const clubKey = (club || '').toLowerCase().trim();
-    const leagueKey = (league || '').toLowerCase().trim();
+    // Normaliser les clés : décoder les caractères URL et normaliser les accents
+    const normalizeKey = (s) => {
+        try { s = decodeURIComponent(s); } catch(e) {}
+        return s.toLowerCase().trim()
+            .replace(/\u2019|\u2018/g, "'")
+            .replace(/\u00e9/g, 'e').replace(/\u00e8/g, 'e').replace(/\u00ea/g, 'e')
+            .replace(/\u00e0/g, 'a').replace(/\u00e2/g, 'a')
+            .replace(/\u00f4/g, 'o').replace(/\u00fb/g, 'u').replace(/\u00fc/g, 'u')
+            .replace(/\u00ee/g, 'i').replace(/\u00ef/g, 'i')
+            .replace(/\u00e7/g, 'c');
+    };
+    const clubKey = normalizeKey(club || '');
+    const leagueKey = normalizeKey(league || '');
+    // Aussi garder les clés originales pour la recherche
+    const clubKeyOrig = (club || '').toLowerCase().trim();
+    const leagueKeyOrig = (league || '').toLowerCase().trim();
     let currencyInfo = null;
     
-    // Chercher d'abord dans le nom du club
+    // Chercher d'abord dans le nom du club (version normalisée + originale)
     for (const [k, v] of Object.entries(CLUB_CURRENCY_MAP)) {
-        if (clubKey && (clubKey.includes(k) || k.includes(clubKey))) {
+        const kNorm = normalizeKey(k);
+        if (clubKey && (clubKey.includes(kNorm) || kNorm.includes(clubKey))) {
+            currencyInfo = v;
+            break;
+        }
+        if (clubKeyOrig && (clubKeyOrig.includes(k) || k.includes(clubKeyOrig))) {
             currencyInfo = v;
             break;
         }
@@ -216,7 +242,12 @@ export default async function handler(req, res) {
     // Si pas trouvé, chercher dans la league
     if (!currencyInfo) {
         for (const [k, v] of Object.entries(CLUB_CURRENCY_MAP)) {
-            if (leagueKey && (leagueKey.includes(k) || k.includes(leagueKey))) {
+            const kNorm = normalizeKey(k);
+            if (leagueKey && (leagueKey.includes(kNorm) || kNorm.includes(leagueKey))) {
+                currencyInfo = v;
+                break;
+            }
+            if (leagueKeyOrig && (leagueKeyOrig.includes(k) || k.includes(leagueKeyOrig))) {
                 currencyInfo = v;
                 break;
             }
