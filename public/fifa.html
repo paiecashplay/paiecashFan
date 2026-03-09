@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAF - Confédération Africaine de Football</title>
+    <title>FIFA - Fédération Internationale de Football Association</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -31,10 +31,10 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #00A651 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 166, 81, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 65, 112, 0.3);
             position: relative;
         }
 
@@ -90,12 +90,12 @@
         }
 
         .stat-box {
-            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
             color: white;
             padding: 1.5rem 2.5rem;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 65, 112, 0.3);
         }
 
         .stat-number {
@@ -117,12 +117,12 @@
             flex-wrap: wrap;
         }
 
-        .caf-filter-btn {
+        .fifa-filter-btn {
             padding: 0.8rem 1.5rem;
             background: var(--bg-card);
-            border: 2px solid #00A651;
+            border: 2px solid #004170;
             border-radius: 25px;
-            color: #00A651;
+            color: #0066B3;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
@@ -130,12 +130,12 @@
             white-space: nowrap;
         }
 
-        .caf-filter-btn:hover,
-        .caf-filter-btn.active {
-            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+        .fifa-filter-btn:hover,
+        .fifa-filter-btn.active {
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 65, 112, 0.4);
         }
 
         .grid {
@@ -145,7 +145,7 @@
             margin-top: 2rem;
         }
 
-        .caf-card {
+        .fifa-card {
             background: var(--bg-card);
             border-radius: 16px;
             padding: 1.5rem;
@@ -156,29 +156,29 @@
             overflow: hidden;
         }
 
-        .caf-card::before {
+        .fifa-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #00A651 0%, #FFC627 100%);
+            background: linear-gradient(90deg, #004170 0%, #FFC627 100%);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
-        .caf-card:hover::before {
+        .fifa-card:hover::before {
             transform: scaleX(1);
         }
 
-        .caf-card:hover {
+        .fifa-card:hover {
             transform: translateY(-8px);
-            border-color: #00A651;
-            box-shadow: 0 12px 40px rgba(0, 166, 81, 0.3);
+            border-color: #004170;
+            box-shadow: 0 12px 40px rgba(0, 65, 112, 0.3);
         }
 
-        .caf-card-header {
+        .fifa-card-header {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -187,11 +187,11 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .caf-card-flag {
+        .fifa-card-flag {
             font-size: 2.5rem;
         }
 
-        .caf-card-logo-container {
+        .fifa-card-logo-container {
             width: 50px;
             height: 50px;
             display: flex;
@@ -202,47 +202,47 @@
             overflow: hidden;
         }
 
-        .caf-card-logo {
+        .fifa-card-logo {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
 
-        .caf-card-info {
+        .fifa-card-info {
             flex: 1;
         }
 
-        .caf-card-name {
+        .fifa-card-name {
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.3rem;
         }
 
-        .caf-card-code {
+        .fifa-card-code {
             font-size: 0.85rem;
-            color: #00A651;
+            color: #0066B3;
             font-weight: 600;
         }
 
-        .caf-card-details {
+        .fifa-card-details {
             font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        .caf-detail-row {
+        .fifa-detail-row {
             display: flex;
             justify-content: space-between;
             margin: 0.3rem 0;
         }
 
-        .caf-detail-label {
+        .fifa-detail-label {
             font-weight: 600;
             color: var(--text-primary);
         }
 
-        .caf-region-badge {
+        .fifa-confederation-badge {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -254,11 +254,11 @@
             font-weight: bold;
         }
 
-        .caf-app-link {
+        .fifa-app-link {
             display: block;
             margin-top: 1rem;
             padding: 0.8rem;
-            background: linear-gradient(135deg, #00A651 0%, #078930 100%);
+            background: linear-gradient(135deg, #004170 0%, #0066B3 100%);
             color: white;
             text-align: center;
             text-decoration: none;
@@ -267,9 +267,9 @@
             transition: all 0.3s ease;
         }
 
-        .caf-app-link:hover {
+        .fifa-app-link:hover {
             transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 65, 112, 0.4);
         }
 
         .footer {
@@ -286,48 +286,51 @@
         <a href="index.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <h1><i class="fas fa-globe-africa"></i> CAF - Confédération Africaine de Football</h1>
-        <p>54 Fédérations Membres • 5 Régions • Fondée en 1957</p>
+        <h1><i class="fas fa-globe"></i> FIFA - Fédération Internationale de Football Association</h1>
+        <p>211 Associations Membres • 6 Confédérations • Fondée en 1904</p>
     </div>
 
     <div class="container">
         <div class="stats-container">
             <div class="stat-box">
-                <div class="stat-number">54</div>
-                <div class="stat-label">Fédérations</div>
+                <div class="stat-number">211</div>
+                <div class="stat-label">Associations</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">5</div>
-                <div class="stat-label">Régions</div>
+                <div class="stat-number">6</div>
+                <div class="stat-label">Confédérations</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">1957</div>
+                <div class="stat-number">1904</div>
                 <div class="stat-label">Fondation</div>
             </div>
         </div>
 
-        <div class="filters-container" id="caf-filters">
-            <button class="caf-filter-btn active" data-region="all" onclick="filterCAFRegion('all')">
-                Toutes les régions
+        <div class="filters-container" id="fifa-filters">
+            <button class="fifa-filter-btn active" data-confederation="all" onclick="filterFIFAConfederation('all')">
+                Toutes les confédérations
             </button>
-            <button class="caf-filter-btn" data-region="Afrique du Nord" onclick="filterCAFRegion('Afrique du Nord')">
-                🏜️ Afrique du Nord
+            <button class="fifa-filter-btn" data-confederation="UEFA" onclick="filterFIFAConfederation('UEFA')">
+                🇪🇺 UEFA (Europe)
             </button>
-            <button class="caf-filter-btn" data-region="Afrique de l'Ouest" onclick="filterCAFRegion('Afrique de l\'Ouest')">
-                🌴 Afrique de l'Ouest
+            <button class="fifa-filter-btn" data-confederation="CAF" onclick="filterFIFAConfederation('CAF')">
+                🌍 CAF (Afrique)
             </button>
-            <button class="caf-filter-btn" data-region="Afrique Centrale" onclick="filterCAFRegion('Afrique Centrale')">
-                🌳 Afrique Centrale
+            <button class="fifa-filter-btn" data-confederation="AFC" onclick="filterFIFAConfederation('AFC')">
+                🌏 AFC (Asie)
             </button>
-            <button class="caf-filter-btn" data-region="Afrique de l'Est" onclick="filterCAFRegion('Afrique de l\'Est')">
-                🦁 Afrique de l'Est
+            <button class="fifa-filter-btn" data-confederation="CONCACAF" onclick="filterFIFAConfederation('CONCACAF')">
+                🌎 CONCACAF (Amérique du Nord)
             </button>
-            <button class="caf-filter-btn" data-region="Afrique Australe" onclick="filterCAFRegion('Afrique Australe')">
-                🦓 Afrique Australe
+            <button class="fifa-filter-btn" data-confederation="CONMEBOL" onclick="filterFIFAConfederation('CONMEBOL')">
+                🌎 CONMEBOL (Amérique du Sud)
+            </button>
+            <button class="fifa-filter-btn" data-confederation="OFC" onclick="filterFIFAConfederation('OFC')">
+                🌊 OFC (Océanie)
             </button>
         </div>
 
-        <div id="caf-federations-grid" class="grid"></div>
+        <div id="fifa-federations-grid" class="grid"></div>
     </div>
 
     <div class="footer">
@@ -335,46 +338,74 @@
         <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport 🚀</p>
     </div>
 
+    <script src="fifa-members.js"></script>
     <script src="caf-members.js"></script>
+    <script src="uefa-members.js"></script>
     <script>
-        let currentCAFFilter = 'all';
+        let currentFIFAFilter = 'all';
 
-        function createCAFCard(fed) {
+        // Combiner toutes les associations
+        let allFIFAMembers = [];
+        
+        // Ajouter les associations de FIFA_MEMBERS (AFC, CONCACAF, CONMEBOL, OFC)
+        if (typeof fifaMembersWithLogos !== 'undefined') {
+            allFIFAMembers = allFIFAMembers.concat(fifaMembersWithLogos);
+        }
+        
+        // Ajouter les associations CAF
+        if (typeof cafMembersWithLogos !== 'undefined') {
+            const cafForFifa = cafMembersWithLogos.map(fed => ({
+                ...fed,
+                confederation: 'CAF'
+            }));
+            allFIFAMembers = allFIFAMembers.concat(cafForFifa);
+        }
+        
+        // Ajouter les associations UEFA
+        if (typeof uefaMembersWithLogos !== 'undefined') {
+            const uefaForFifa = uefaMembersWithLogos.map(fed => ({
+                ...fed,
+                confederation: 'UEFA'
+            }));
+            allFIFAMembers = allFIFAMembers.concat(uefaForFifa);
+        }
+
+        function createFIFACard(fed) {
             const card = document.createElement('div');
-            card.className = 'caf-card';
-            card.setAttribute('data-region', fed.region);
+            card.className = 'fifa-card';
+            card.setAttribute('data-confederation', fed.confederation);
             
             card.innerHTML = `
-                <span class="caf-region-badge">${fed.region}</span>
-                <div class="caf-card-header">
-                    <div class="caf-card-flag">${fed.flag}</div>
-                    <div class="caf-card-logo-container">
+                <span class="fifa-confederation-badge">${fed.confederation}</span>
+                <div class="fifa-card-header">
+                    <div class="fifa-card-flag">${fed.flag}</div>
+                    <div class="fifa-card-logo-container">
                         <img src="${fed.logo}" 
                              alt="${fed.name} Logo" 
-                             class="caf-card-logo" 
+                             class="fifa-card-logo" 
                              loading="lazy"
                              onerror="this.style.display='none'">
                     </div>
-                    <div class="caf-card-info">
-                        <div class="caf-card-name">${fed.name}</div>
-                        <div class="caf-card-code">${fed.code}</div>
+                    <div class="fifa-card-info">
+                        <div class="fifa-card-name">${fed.name}</div>
+                        <div class="fifa-card-code">${fed.code}</div>
                     </div>
                 </div>
-                <div class="caf-card-details">
-                    <div class="caf-detail-row">
-                        <span class="caf-detail-label">Président:</span>
-                        <span>${fed.president}</span>
+                <div class="fifa-card-details">
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Confédération:</span>
+                        <span>${fed.confederation}</span>
                     </div>
-                    <div class="caf-detail-row">
-                        <span class="caf-detail-label">Fondation:</span>
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Fondation:</span>
                         <span>${fed.founded}</span>
                     </div>
-                    <div class="caf-detail-row">
-                        <span class="caf-detail-label">Membre FIFA:</span>
+                    <div class="fifa-detail-row">
+                        <span class="fifa-detail-label">Membre FIFA:</span>
                         <span>${fed.fifaMember}</span>
                     </div>
                 </div>
-                <a href="${fed.path}" class="caf-app-link" target="_blank">
+                <a href="${fed.path}" class="fifa-app-link" target="_blank">
                     🚀 Voir l'application
                 </a>
             `;
@@ -382,41 +413,40 @@
             return card;
         }
 
-        function displayCAFFederations(filter = 'all') {
-            const cafGrid = document.getElementById('caf-federations-grid');
-            if (!cafGrid) return;
+        function displayFIFAFederations(filter = 'all') {
+            const fifaGrid = document.getElementById('fifa-federations-grid');
+            if (!fifaGrid) return;
             
-            cafGrid.innerHTML = '';
+            fifaGrid.innerHTML = '';
             
-            if (typeof cafMembersWithLogos !== 'undefined') {
-                const filteredFederations = filter === 'all' 
-                    ? cafMembersWithLogos 
-                    : cafMembersWithLogos.filter(fed => fed.region === filter);
-                
-                filteredFederations.forEach(fed => {
-                    cafGrid.appendChild(createCAFCard(fed));
-                });
-            }
+            const filteredFederations = filter === 'all' 
+                ? allFIFAMembers 
+                : allFIFAMembers.filter(fed => fed.confederation === filter);
+            
+            filteredFederations.forEach(fed => {
+                fifaGrid.appendChild(createFIFACard(fed));
+            });
         }
 
-        function filterCAFRegion(region) {
-            currentCAFFilter = region;
+        function filterFIFAConfederation(confederation) {
+            currentFIFAFilter = confederation;
             
             // Update active button
-            document.querySelectorAll('.caf-filter-btn').forEach(btn => {
+            document.querySelectorAll('.fifa-filter-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.getAttribute('data-region') === region) {
+                if (btn.getAttribute('data-confederation') === confederation) {
                     btn.classList.add('active');
                 }
             });
 
             // Render filtered federations
-            displayCAFFederations(region);
+            displayFIFAFederations(confederation);
         }
 
         // Initial display
         window.addEventListener('DOMContentLoaded', () => {
-            displayCAFFederations('all');
+            console.log(`Total FIFA members loaded: ${allFIFAMembers.length}`);
+            displayFIFAFederations('all');
         });
     </script>
 </body>

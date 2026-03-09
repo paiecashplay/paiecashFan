@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONMEBOL - Confédération Sudaméricaine de Football</title>
+    <title>AFC - Confédération Asiatique de Football</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -31,7 +31,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #FF0000 0%, #0066B3 100%);
             padding: 2rem;
             text-align: center;
             box-shadow: 0 4px 20px rgba(206, 17, 38, 0.3);
@@ -90,7 +90,7 @@
         }
 
         .stat-box {
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #FF0000 0%, #0066B3 100%);
             color: white;
             padding: 1.5rem 2.5rem;
             border-radius: 12px;
@@ -134,7 +134,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(90deg, #FF0000 0%, #0066B3 100%);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
@@ -145,7 +145,7 @@
 
         .conmebol-card:hover {
             transform: translateY(-8px);
-            border-color: #CE1126;
+            border-color: #FF0000;
             box-shadow: 0 12px 40px rgba(206, 17, 38, 0.3);
         }
 
@@ -192,7 +192,7 @@
 
         .conmebol-card-code {
             font-size: 0.85rem;
-            color: #FFC627;
+            color: #0066B3;
             font-weight: 600;
         }
 
@@ -217,7 +217,7 @@
             display: block;
             margin-top: 1rem;
             padding: 0.8rem;
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #FF0000 0%, #0066B3 100%);
             color: white;
             text-align: center;
             text-decoration: none;
@@ -245,8 +245,8 @@
         <a href="index.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <h1><i class="fas fa-globe-americas"></i> CONMEBOL - Confédération Sudaméricaine de Football</h1>
-        <p>10 Associations Membres • Fondée en 1916</p>
+        <h1><i class="fas fa-globe-asia"></i> AFC - Confédération Asiatique de Football</h1>
+        <p>47 Fédérations Membres • Fondée en 1954</p>
     </div>
 
     <div class="container">
@@ -261,7 +261,7 @@
             </div>
             <div class="stat-box">
                 <div class="stat-number">47</div>
-                <div class="stat-label">Copa América</div>
+                <div class="stat-label">Coupe d'Asie</div>
             </div>
         </div>
 
@@ -273,9 +273,9 @@
         <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport 🚀</p>
     </div>
 
-    <script src="conmebol-members.js"></script>
+    <script src="afc-members.js"></script>
     <script>
-        function createCONMEBOLCard(fed) {
+        function createAFCCard(fed) {
             const card = document.createElement('div');
             card.className = 'conmebol-card';
             
@@ -304,7 +304,7 @@
                         <span>${fed.founded}</span>
                     </div>
                     <div class="conmebol-detail-row">
-                        <span class="conmebol-detail-label">Membre CONMEBOL:</span>
+                        <span class="conmebol-detail-label">Membre AFC:</span>
                         <span>${fed.conmebolMember}</span>
                     </div>
                 </div>
@@ -316,22 +316,22 @@
             return card;
         }
 
-        function displayCONMEBOLFederations() {
+        function displayAFCFederations() {
             const conmebolGrid = document.getElementById('conmebol-federations-grid');
             if (!conmebolGrid) return;
             
             conmebolGrid.innerHTML = '';
             
-            if (typeof conmebolMembersWithLogos !== 'undefined') {
-                conmebolMembersWithLogos.forEach(fed => {
-                    conmebolGrid.appendChild(createCONMEBOLCard(fed));
+            if (typeof afcMembersWithLogos !== 'undefined') {
+                afcMembersWithLogos.forEach(fed => {
+                    conmebolGrid.appendChild(createAFCCard(fed));
                 });
             }
         }
 
         // Initial display
         window.addEventListener('DOMContentLoaded', () => {
-            displayCONMEBOLFederations();
+            displayAFCFederations();
         });
     </script>
 </body>

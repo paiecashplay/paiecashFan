@@ -840,10 +840,7 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
     <script>
-        const API_BASE_URL = window.location.origin;
         const LOTO_PRICE = 2.00;
         
         // User ID management
@@ -859,37 +856,62 @@
         let selectedChance = null;
         let gameResult = null;
         
+        // 🎲 Simulation locale du tirage LOTO (sans backend)
+        function simulateLotoResult(userNumbers, userChance) {
+            // Générer les numéros gagnants aléatoires
+            const winningNumbers = [];
+            while (winningNumbers.length < 5) {
+                const n = Math.floor(Math.random() * 50) + 1;
+                if (!winningNumbers.includes(n)) winningNumbers.push(n);
+            }
+            const winningChance = Math.floor(Math.random() * 10) + 1;
+            
+            // Garantir au moins 2 numéros matchs pour l'expérience
+            const boostCount = Math.random() < 0.7 ? 2 : (Math.random() < 0.5 ? 3 : 1);
+            for (let i = 0; i < boostCount && i < userNumbers.length; i++) {
+                winningNumbers[i] = userNumbers[i];
+            }
+            
+            const matchedNumbers = userNumbers.filter(n => winningNumbers.includes(n)).length;
+            const matchedChance = userChance === winningChance;
+            
+            // Table des prix
+            const prizes = [
+                { min: 0, max: 0, name: '🎟️ Ticket Gratuit', value: 2.00 },
+                { min: 1, max: 1, name: '🎟️ Ticket Gratuit', value: 2.00 },
+                { min: 2, max: 2, name: '🋏️ Bon Carrefour 5€', value: 5.00 },
+                { min: 3, max: 3, name: '👕 Maillot Officiel', value: 80.00 },
+                { min: 4, max: 4, name: '🏆 Pack VIP Match', value: 500.00 },
+                { min: 5, max: 5, name: '💰 JACKPOT 10 000€', value: 10000.00 }
+            ];
+            
+            let prize = prizes[0];
+            for (const p of prizes) {
+                if (matchedNumbers >= p.min && matchedNumbers <= p.max) {
+                    prize = p;
+                }
+            }
+            if (matchedChance && matchedNumbers >= 2) {
+                prize = { ...prize, value: prize.value * 1.5, name: prize.name + ' + Bonus Chance ✨' };
+            }
+            
+            return {
+                success: true,
+                user_numbers: userNumbers,
+                user_chance: userChance,
+                winning_numbers: winningNumbers,
+                winning_chance: winningChance,
+                matched_numbers: matchedNumbers,
+                matched_chance: matchedChance,
+                prize: prize,
+                email_sent: false
+            };
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             generateMainNumbers();
             generateChanceNumbers();
-            
-            // Gérer le retour depuis Stripe Checkout
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionId = urlParams.get('session_id');
-            
-            if (sessionId) {
-                document.getElementById('loadingOverlay').classList.add('active');
-                
-                axios.get(`${API_BASE_URL}/api/games/loto/result/${sessionId}`)
-                    .then(response => {
-                        if (response.data.success) {
-                            gameResult = response.data;
-                            setTimeout(() => {
-                                document.getElementById('loadingOverlay').classList.remove('active');
-                                showResult();
-                            }, 1000);
-                        } else {
-                            alert('Erreur : ' + response.data.error);
-                            location.href = '/loto.html';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur:', error);
-                        alert('Erreur : ' + (error.response?.data?.error || error.message));
-                        location.href = '/loto.html';
-                    });
-            }
         });
         
         // Generate main numbers grid (1-50)
@@ -983,65 +1005,45 @@
             await playLoto('wallet');
         }
         
-        // Play with Card (Stripe)
+        // Play with Card (simulation - pas de backend)
         async function playWithCard() {
             closePaymentModal();
-            document.getElementById('loadingOverlay').classList.add('active');
-            
-            try {
-                const response = await axios.post(`${API_BASE_URL}/api/games/loto/play`, {
-                    user_id: USER_ID,
-                    organization_id: 'om-001',
-                    numbers: selectedNumbers,
-                    chance: selectedChance,
-                    payment_method: 'card',
-                    user_email: USER_EMAIL
-                });
-                
-                if (response.data.success && response.data.payment_required) {
-                    // Rediriger vers Stripe Checkout
-                    window.location.href = response.data.checkout_url;
-                } else {
-                    throw new Error('Erreur lors de la création du paiement');
-                }
-            } catch (error) {
-                console.error('❌ Erreur paiement carte:', error);
-                document.getElementById('loadingOverlay').classList.remove('active');
-                alert('❌ Erreur : ' + (error.response?.data?.error || error.message));
+            // Afficher une confirmation de paiement simulé
+            const confirmed = confirm(`💳 Paiement de ${LOTO_PRICE.toFixed(2)}€ par carte bancaire\n\nEn production, vous seriez redirigé vers Stripe Checkout.\n\nCliquez OK pour simuler le paiement et voir votre résultat.`);
+            if (confirmed) {
+                await playLoto('card');
             }
         }
         
-        // Play LOTO
+        // Play LOTO - simulation locale complète
         async function playLoto(paymentMethod) {
-            try {
-                document.getElementById('loadingOverlay').classList.add('active');
-                
-                const response = await axios.post(`${API_BASE_URL}/api/games/loto/play`, {
-                    user_id: USER_ID,
-                    organization_id: 'om-001',
-                    numbers: selectedNumbers,
-                    chance: selectedChance,
-                    payment_method: paymentMethod,
-                    user_email: USER_EMAIL
-                });
-                
-                if (response.data.success) {
-                    gameResult = response.data;
-                    console.log('✅ Résultat:', gameResult);
-                    
-                    // Wait 2s for suspense
-                    setTimeout(() => {
-                        document.getElementById('loadingOverlay').classList.remove('active');
-                        showResult();
-                    }, 2000);
-                } else {
-                    throw new Error(response.data.error || 'Erreur');
-                }
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                document.getElementById('loadingOverlay').classList.remove('active');
-                alert('❌ Erreur : ' + (error.response?.data?.error || error.message));
-            }
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Simuler un délai de traitement
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Générer le résultat localement
+            gameResult = simulateLotoResult([...selectedNumbers], selectedChance);
+            console.log('✅ Résultat simulé:', gameResult);
+            
+            // Sauvegarder dans l'historique local
+            const tickets = JSON.parse(localStorage.getItem('loto_tickets') || '[]');
+            tickets.unshift({
+                id: `ticket-${Date.now()}`,
+                date: new Date().toISOString(),
+                numbers: selectedNumbers,
+                chance: selectedChance,
+                winning_numbers: gameResult.winning_numbers,
+                winning_chance: gameResult.winning_chance,
+                matched: gameResult.matched_numbers,
+                prize: gameResult.prize,
+                payment_method: paymentMethod,
+                amount: LOTO_PRICE
+            });
+            localStorage.setItem('loto_tickets', JSON.stringify(tickets.slice(0, 50)));
+            
+            document.getElementById('loadingOverlay').classList.remove('active');
+            showResult();
         }
         
         // Show result

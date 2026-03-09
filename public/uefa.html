@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONMEBOL - Confédération Sudaméricaine de Football</title>
+    <title>UEFA - Union Européenne de Football</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -31,10 +31,10 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #003087 0%, #0066B3 100%);
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(206, 17, 38, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 48, 135, 0.3);
             position: relative;
         }
 
@@ -90,12 +90,12 @@
         }
 
         .stat-box {
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #003087 0%, #0066B3 100%);
             color: white;
             padding: 1.5rem 2.5rem;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(206, 17, 38, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 48, 135, 0.3);
         }
 
         .stat-number {
@@ -109,6 +109,35 @@
             opacity: 0.95;
         }
 
+        .filters-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .uefa-filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border: 2px solid #003087;
+            border-radius: 25px;
+            color: #0066B3;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .uefa-filter-btn:hover,
+        .uefa-filter-btn.active {
+            background: linear-gradient(135deg, #003087 0%, #0066B3 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 48, 135, 0.4);
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -116,7 +145,7 @@
             margin-top: 2rem;
         }
 
-        .conmebol-card {
+        .uefa-card {
             background: var(--bg-card);
             border-radius: 16px;
             padding: 1.5rem;
@@ -127,29 +156,29 @@
             overflow: hidden;
         }
 
-        .conmebol-card::before {
+        .uefa-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(90deg, #003087 0%, #0066B3 100%);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
-        .conmebol-card:hover::before {
+        .uefa-card:hover::before {
             transform: scaleX(1);
         }
 
-        .conmebol-card:hover {
+        .uefa-card:hover {
             transform: translateY(-8px);
-            border-color: #CE1126;
-            box-shadow: 0 12px 40px rgba(206, 17, 38, 0.3);
+            border-color: #003087;
+            box-shadow: 0 12px 40px rgba(0, 48, 135, 0.3);
         }
 
-        .conmebol-card-header {
+        .uefa-card-header {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -158,11 +187,11 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .conmebol-card-flag {
+        .uefa-card-flag {
             font-size: 2.5rem;
         }
 
-        .conmebol-card-logo-container {
+        .uefa-card-logo-container {
             width: 50px;
             height: 50px;
             display: flex;
@@ -173,51 +202,63 @@
             overflow: hidden;
         }
 
-        .conmebol-card-logo {
+        .uefa-card-logo {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
 
-        .conmebol-card-info {
+        .uefa-card-info {
             flex: 1;
         }
 
-        .conmebol-card-name {
+        .uefa-card-name {
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.3rem;
         }
 
-        .conmebol-card-code {
+        .uefa-card-code {
             font-size: 0.85rem;
-            color: #FFC627;
+            color: #0066B3;
             font-weight: 600;
         }
 
-        .conmebol-card-details {
+        .uefa-card-details {
             font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        .conmebol-detail-row {
+        .uefa-detail-row {
             display: flex;
             justify-content: space-between;
             margin: 0.3rem 0;
         }
 
-        .conmebol-detail-label {
+        .uefa-detail-label {
             font-weight: 600;
             color: var(--text-primary);
         }
 
-        .conmebol-app-link {
+        .uefa-region-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #0066B3 0%, #00A0E3 100%);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .uefa-app-link {
             display: block;
             margin-top: 1rem;
             padding: 0.8rem;
-            background: linear-gradient(135deg, #CE1126 0%, #FFC627 100%);
+            background: linear-gradient(135deg, #003087 0%, #0066B3 100%);
             color: white;
             text-align: center;
             text-decoration: none;
@@ -226,9 +267,9 @@
             transition: all 0.3s ease;
         }
 
-        .conmebol-app-link:hover {
+        .uefa-app-link:hover {
             transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(206, 17, 38, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 48, 135, 0.4);
         }
 
         .footer {
@@ -245,27 +286,57 @@
         <a href="index.html" class="back-button">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <h1><i class="fas fa-globe-americas"></i> CONMEBOL - Confédération Sudaméricaine de Football</h1>
-        <p>10 Associations Membres • Fondée en 1916</p>
+        <h1><i class="fas fa-globe-europe"></i> UEFA - Union Européenne de Football</h1>
+        <p>55 Fédérations Membres • 8 Régions • Fondée en 1954</p>
     </div>
 
     <div class="container">
         <div class="stats-container">
             <div class="stat-box">
-                <div class="stat-number">10</div>
-                <div class="stat-label">Associations</div>
+                <div class="stat-number">55</div>
+                <div class="stat-label">Fédérations</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">1916</div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">Régions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">1954</div>
                 <div class="stat-label">Fondation</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-number">47</div>
-                <div class="stat-label">Copa América</div>
             </div>
         </div>
 
-        <div id="conmebol-federations-grid" class="grid"></div>
+        <div class="filters-container" id="uefa-filters">
+            <button class="uefa-filter-btn active" data-region="all" onclick="filterUEFARegion('all')">
+                Toutes les régions
+            </button>
+            <button class="uefa-filter-btn" data-region="Europe de l'Ouest" onclick="filterUEFARegion('Europe de l\'Ouest')">
+                🏰 Europe de l'Ouest
+            </button>
+            <button class="uefa-filter-btn" data-region="Europe du Nord" onclick="filterUEFARegion('Europe du Nord')">
+                ❄️ Europe du Nord
+            </button>
+            <button class="uefa-filter-btn" data-region="Europe du Sud" onclick="filterUEFARegion('Europe du Sud')">
+                ☀️ Europe du Sud
+            </button>
+            <button class="uefa-filter-btn" data-region="Europe de l'Est" onclick="filterUEFARegion('Europe de l\'Est')">
+                🌾 Europe de l'Est
+            </button>
+            <button class="uefa-filter-btn" data-region="Balkans" onclick="filterUEFARegion('Balkans')">
+                ⛰️ Balkans
+            </button>
+            <button class="uefa-filter-btn" data-region="Caucase" onclick="filterUEFARegion('Caucase')">
+                🏔️ Caucase
+            </button>
+            <button class="uefa-filter-btn" data-region="Asie Centrale" onclick="filterUEFARegion('Asie Centrale')">
+                🐎 Asie Centrale
+            </button>
+            <button class="uefa-filter-btn" data-region="Pays Baltes" onclick="filterUEFARegion('Pays Baltes')">
+                🌊 Pays Baltes
+            </button>
+        </div>
+
+        <div id="uefa-federations-grid" class="grid"></div>
     </div>
 
     <div class="footer">
@@ -273,42 +344,46 @@
         <p style="margin-top: 0.5rem; font-size: 0.9rem;">Paiement crypto pour tous les fans de sport 🚀</p>
     </div>
 
-    <script src="conmebol-members.js"></script>
+    <script src="uefa-members.js"></script>
     <script>
-        function createCONMEBOLCard(fed) {
+        let currentUEFAFilter = 'all';
+
+        function createUEFACard(fed) {
             const card = document.createElement('div');
-            card.className = 'conmebol-card';
+            card.className = 'uefa-card';
+            card.setAttribute('data-region', fed.region);
             
             card.innerHTML = `
-                <div class="conmebol-card-header">
-                    <div class="conmebol-card-flag">${fed.flag}</div>
-                    <div class="conmebol-card-logo-container">
+                <span class="uefa-region-badge">${fed.region}</span>
+                <div class="uefa-card-header">
+                    <div class="uefa-card-flag">${fed.flag}</div>
+                    <div class="uefa-card-logo-container">
                         <img src="${fed.logo}" 
                              alt="${fed.name} Logo" 
-                             class="conmebol-card-logo" 
+                             class="uefa-card-logo" 
                              loading="lazy"
                              onerror="this.style.display='none'">
                     </div>
-                    <div class="conmebol-card-info">
-                        <div class="conmebol-card-name">${fed.name}</div>
-                        <div class="conmebol-card-code">${fed.code}</div>
+                    <div class="uefa-card-info">
+                        <div class="uefa-card-name">${fed.name}</div>
+                        <div class="uefa-card-code">${fed.code}</div>
                     </div>
                 </div>
-                <div class="conmebol-card-details">
-                    <div class="conmebol-detail-row">
-                        <span class="conmebol-detail-label">Président:</span>
+                <div class="uefa-card-details">
+                    <div class="uefa-detail-row">
+                        <span class="uefa-detail-label">Président:</span>
                         <span>${fed.president}</span>
                     </div>
-                    <div class="conmebol-detail-row">
-                        <span class="conmebol-detail-label">Fondation:</span>
+                    <div class="uefa-detail-row">
+                        <span class="uefa-detail-label">Fondation:</span>
                         <span>${fed.founded}</span>
                     </div>
-                    <div class="conmebol-detail-row">
-                        <span class="conmebol-detail-label">Membre CONMEBOL:</span>
-                        <span>${fed.conmebolMember}</span>
+                    <div class="uefa-detail-row">
+                        <span class="uefa-detail-label">Membre UEFA:</span>
+                        <span>${fed.uefaMember}</span>
                     </div>
                 </div>
-                <a href="${fed.path}" class="conmebol-app-link" target="_blank">
+                <a href="${fed.path}" class="uefa-app-link" target="_blank">
                     🚀 Voir l'application
                 </a>
             `;
@@ -316,22 +391,41 @@
             return card;
         }
 
-        function displayCONMEBOLFederations() {
-            const conmebolGrid = document.getElementById('conmebol-federations-grid');
-            if (!conmebolGrid) return;
+        function displayUEFAFederations(filter = 'all') {
+            const uefaGrid = document.getElementById('uefa-federations-grid');
+            if (!uefaGrid) return;
             
-            conmebolGrid.innerHTML = '';
+            uefaGrid.innerHTML = '';
             
-            if (typeof conmebolMembersWithLogos !== 'undefined') {
-                conmebolMembersWithLogos.forEach(fed => {
-                    conmebolGrid.appendChild(createCONMEBOLCard(fed));
+            if (typeof uefaMembersWithLogos !== 'undefined') {
+                const filteredFederations = filter === 'all' 
+                    ? uefaMembersWithLogos 
+                    : uefaMembersWithLogos.filter(fed => fed.region === filter);
+                
+                filteredFederations.forEach(fed => {
+                    uefaGrid.appendChild(createUEFACard(fed));
                 });
             }
         }
 
+        function filterUEFARegion(region) {
+            currentUEFAFilter = region;
+            
+            // Update active button
+            document.querySelectorAll('.uefa-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-region') === region) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Render filtered federations
+            displayUEFAFederations(region);
+        }
+
         // Initial display
         window.addEventListener('DOMContentLoaded', () => {
-            displayCONMEBOLFederations();
+            displayUEFAFederations('all');
         });
     </script>
 </body>

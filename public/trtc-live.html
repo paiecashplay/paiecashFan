@@ -302,66 +302,15 @@
         let videoEnabled = true;
         
         // Initialize TRTC
+        // Initialize TRTC (mode demo - Cloudflare Workers backend required)
         async function initTRTC() {
-            try {
-                // Get credentials from backend
-                const res = await fetch(`${API_BASE}/trtc/join-room`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ club, userId })
-                });
-                
-                const data = await res.json();
-                
-                if (!data.success) {
-                    throw new Error(data.error || 'Erreur serveur');
-                }
-                
-                const { sdkAppId, userId: finalUserId, userSig, roomId } = data;
-                
-                // Create TRTC client
-                trtcClient = TRTC.create();
-                
-                // Listen to remote streams
-                trtcClient.on(TRTC.EVENT.REMOTE_VIDEO_AVAILABLE, ({ userId, streamType }) => {
-                    trtcClient.startRemoteVideo({ userId, streamType, view: `video-${userId}` });
-                });
-                
-                trtcClient.on(TRTC.EVENT.REMOTE_AUDIO_AVAILABLE, ({ userId }) => {
-                    console.log(`Remote audio available: ${userId}`);
-                });
-                
-                trtcClient.on(TRTC.EVENT.REMOTE_USER_ENTER, ({ userId }) => {
-                    console.log(`User entered: ${userId}`);
-                    addRemoteUser(userId);
-                });
-                
-                trtcClient.on(TRTC.EVENT.REMOTE_USER_EXIT, ({ userId }) => {
-                    console.log(`User exited: ${userId}`);
-                    removeRemoteUser(userId);
-                });
-                
-                // Enter room
-                await trtcClient.enterRoom({
-                    roomId: parseInt(roomId.replace(/\D/g, '') || Date.now().toString().slice(-8)),
-                    sdkAppId,
-                    userId: finalUserId,
-                    userSig
-                });
-                
-                console.log('Entered room:', roomId);
-                
-                // Start local stream
-                await startLocalStream(finalUserId);
-                
-                // Hide loading
-                document.getElementById('loading').style.display = 'none';
-                
-            } catch (error) {
-                console.error('Error initializing TRTC:', error);
-                alert('Erreur de connexion: ' + error.message);
-                window.history.back();
+            const loadingEl = document.getElementById('loading');
+            if (loadingEl) loadingEl.style.display = 'none';
+            const videoGrid = document.getElementById('videoGrid');
+            if (videoGrid) {
+                videoGrid.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;background:rgba(255,255,255,0.05);border-radius:16px;border:2px dashed rgba(255,255,255,0.2);padding:30px;text-align:center;margin:10px;"><div style="font-size:60px;margin-bottom:20px;">&#128249;</div><h3 style="color:white;font-size:22px;margin-bottom:12px;">' + club + ' Live</h3><p style="color:rgba(255,255,255,0.7);margin-bottom:20px;max-width:400px;">Le co-streaming en direct necessite le backend Cloudflare Workers avec Tencent TRTC SDK.</p><button onclick="window.history.back()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:12px 28px;border-radius:10px;cursor:pointer;font-size:16px;font-weight:600;">&#8592; Retour au club</button></div>';
             }
+            console.log('Mode demo - backend TRTC non disponible sur Vercel statique');
         }
         
         // Start local stream
