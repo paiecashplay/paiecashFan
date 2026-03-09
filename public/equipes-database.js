@@ -642,6 +642,131 @@ const equipesDatabase = {
         colors: ["#FCDC04", "#D90000"],
         appUrl: "equipes-ouganda.html",
         categories: []
+    },
+
+    // ========== CAMEROUN ==========
+    "cameroun": {
+        name: "Cameroun 🇨🇲",
+        logo: "🇨🇲",
+        colors: ["#007A5E", "#CE1126"],
+        appUrl: "app-universal-simple.html?club=Cameroun&logo=🇨🇲&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇨🇲 Équipes Nationales",
+                teams: [
+                    { name: "Lions Indomptables", fullName: "Équipe Nationale A", logo: "🇨🇲", coach: "Marc Brys", description: "Lions Indomptables du Cameroun", achievements: "CAN 1984, 1988, 2000, 2002, 2017", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Cameroun+ENA&logo=🇨🇲&sport=Football&league=CAF" },
+                    { name: "Lions U23", fullName: "Équipe Nationale U23", logo: "🇨🇲", coach: "Martin Ndtoungou Mpile", description: "Espoirs camerounais", achievements: "CAN U23", sport: "Football", category: "U23", type: "nationale", appUrl: "app-universal-simple.html?club=Cameroun+U23&logo=🇨🇲&sport=Football&league=CAF" },
+                    { name: "Lionnes Indomptables", fullName: "Équipe Nationale Féminine", logo: "🇨🇲", coach: "Gabriel Zabo", description: "Lionnes Indomptables", achievements: "CAN Féminine 2016", sport: "Football", category: "Féminine", type: "nationale", appUrl: "app-universal-simple.html?club=Cameroun+F%C3%A9minine&logo=🇨🇲&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Élite One (D1)",
+                teams: [
+                    { name: "Canon Yaoundé", fullName: "Canon Sportif de Yaoundé", logo: "🇨🇲", founded: 1930, stadium: "Stade Ahmadou Ahidjo", titles: 10, description: "Club le plus titré du Cameroun", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Canon+Yaound%C3%A9&logo=🇨🇲&sport=Football&league=Elite+One" },
+                    { name: "Coton Sport", fullName: "Coton Sport de Garoua", logo: "🇨🇲", founded: 1986, stadium: "Stade Roumdé Adjia", titles: 14, description: "Champion du Cameroun en titre", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Coton+Sport&logo=🇨🇲&sport=Football&league=Elite+One" },
+                    { name: "Tonnerre Yaoundé", fullName: "Tonnerre Kalara Club", logo: "🇨🇲", founded: 1934, stadium: "Stade Ahmadou Ahidjo", titles: 8, description: "Légende du football camerounais", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Tonnerre+Yaound%C3%A9&logo=🇨🇲&sport=Football&league=Elite+One" },
+                    { name: "Union Douala", fullName: "Union Sportive de Douala", logo: "🇨🇲", founded: 1958, stadium: "Stade de la Réunion", titles: 6, description: "Club historique de Douala", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Union+Douala&logo=🇨🇲&sport=Football&league=Elite+One" },
+                    { name: "Eding Sport", fullName: "Eding Sport FC", logo: "🇨🇲", founded: 2002, stadium: "Stade Municipal de Sa’a", titles: 3, description: "Club de Sa’a", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Eding+Sport&logo=🇨🇲&sport=Football&league=Elite+One" },
+                    { name: "PWD Bamenda", fullName: "PWD Bamenda FC", logo: "🇨🇲", founded: 1959, stadium: "Stade Municipal de Bamenda", titles: 2, description: "Club des Hautes Terres", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=PWD+Bamenda&logo=🇨🇲&sport=Football&league=Elite+One" }
+                ]
+            }
+        ]
+    },
+
+    // ========== CÔTE D'IVOIRE ==========
+    "cote-divoire": {
+        name: "Côte d'Ivoire 🇨🇮",
+        logo: "🇨🇮",
+        colors: ["#F77F00", "#009A44"],
+        appUrl: "app-universal-simple.html?club=C%C3%B4te+d'Ivoire&logo=🇨🇮&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇨🇮 Équipes Nationales",
+                teams: [
+                    { name: "Eléphants", fullName: "Équipe Nationale A", logo: "🇨🇮", coach: "Emerse Faé", description: "Eléphants de Côte d'Ivoire", achievements: "CAN 1992, 2015, 2023", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=C%C3%B4te+d'Ivoire+ENA&logo=🇨🇮&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs LIGA 1 Ivoirienne",
+                teams: [
+                    { name: "ASEC Mimosas", fullName: "ASEC Mimosas d'Abidjan", logo: "🇨🇮", founded: 1948, stadium: "Stade Félix Houphouët-Boigny", titles: 26, description: "Club le plus titré de Côte d'Ivoire", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=ASEC+Mimosas&logo=🇨🇮&sport=Football&league=LIGA1+Ivoire" },
+                    { name: "Africa Sports", fullName: "Africa Sports National d'Abidjan", logo: "🇨🇮", founded: 1947, stadium: "Stade Félix Houphouët-Boigny", titles: 14, description: "Club historique d'Abidjan", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Africa+Sports&logo=🇨🇮&sport=Football&league=LIGA1+Ivoire" },
+                    { name: "Stade d'Abidjan", fullName: "Stade d'Abidjan FC", logo: "🇨🇮", founded: 1936, stadium: "Stade Félix Houphouët-Boigny", titles: 9, description: "Doyen des clubs ivoiriens", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Stade+d'Abidjan&logo=🇨🇮&sport=Football&league=LIGA1+Ivoire" }
+                ]
+            }
+        ]
+    },
+
+    // ========== SÉNÉGAL ==========
+    "senegal": {
+        name: "Sénégal 🇸🇳",
+        logo: "🇸🇳",
+        colors: ["#00853F", "#FDEF42"],
+        appUrl: "app-universal-simple.html?club=S%C3%A9n%C3%A9gal&logo=🇸🇳&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇸🇳 Équipes Nationales",
+                teams: [
+                    { name: "Lions de la Teranga", fullName: "Équipe Nationale A", logo: "🇸🇳", coach: "Aliou Cissé", description: "Lions de la Teranga", achievements: "CAN 2021, 2022", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=S%C3%A9n%C3%A9gal+ENA&logo=🇸🇳&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue 1 Sénégalaise",
+                teams: [
+                    { name: "Jaraaf", fullName: "ASC Jaraaf de Dakar", logo: "🇸🇳", founded: 1969, stadium: "Stade Léopold Sédar Senghor", titles: 11, description: "Club le plus titré du Sénégal", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Jaraaf&logo=🇸🇳&sport=Football&league=Ligue1+S%C3%A9n%C3%A9gal" },
+                    { name: "Diaraf", fullName: "ASC Diaraf de Dakar", logo: "🇸🇳", founded: 1956, stadium: "Stade Léopold Sédar Senghor", titles: 9, description: "Club historique de Dakar", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Diaraf&logo=🇸🇳&sport=Football&league=Ligue1+S%C3%A9n%C3%A9gal" },
+                    { name: "Generation Foot", fullName: "Génération Foot", logo: "🇸🇳", founded: 1999, stadium: "Stade Lat Dior", titles: 4, description: "Académie et club professionnel", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Generation+Foot&logo=🇸🇳&sport=Football&league=Ligue1+S%C3%A9n%C3%A9gal" }
+                ]
+            }
+        ]
+    },
+
+    // ========== NIGERIA ==========
+    "nigeria": {
+        name: "Nigeria 🇳🇬",
+        logo: "🇳🇬",
+        colors: ["#008751", "#FFFFFF"],
+        appUrl: "app-universal-simple.html?club=Nigeria&logo=🇳🇬&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇳🇬 Équipes Nationales",
+                teams: [
+                    { name: "Super Eagles", fullName: "Équipe Nationale A", logo: "🇳🇬", coach: "Augustine Eguavoen", description: "Super Eagles du Nigeria", achievements: "CAN 1980, 1994, 2013 • JO 1996", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Nigeria+ENA&logo=🇳🇬&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Nigeria Premier League",
+                teams: [
+                    { name: "Enyimba FC", fullName: "Enyimba International FC", logo: "🇳🇬", founded: 1976, stadium: "Enyimba International Stadium", titles: 8, description: "Club le plus titré du Nigeria", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Enyimba&logo=🇳🇬&sport=Football&league=Nigeria+Premier+League" },
+                    { name: "Kano Pillars", fullName: "Kano Pillars FC", logo: "🇳🇬", founded: 1990, stadium: "Sani Abacha Stadium", titles: 4, description: "Club du nord du Nigeria", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Kano+Pillars&logo=🇳🇬&sport=Football&league=Nigeria+Premier+League" },
+                    { name: "Rivers United", fullName: "Rivers United FC", logo: "🇳🇬", founded: 2016, stadium: "Adokiye Amiesimaka Stadium", titles: 2, description: "Champion du Nigeria 2022, 2023", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Rivers+United&logo=🇳🇬&sport=Football&league=Nigeria+Premier+League" }
+                ]
+            }
+        ]
+    },
+
+    // ========== ALGÉRIE ==========
+    "algerie": {
+        name: "Algérie 🇩🇿",
+        logo: "🇩🇿",
+        colors: ["#006233", "#FFFFFF"],
+        appUrl: "app-universal-simple.html?club=Alg%C3%A9rie&logo=🇩🇿&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇩🇿 Équipes Nationales",
+                teams: [
+                    { name: "Fennecs", fullName: "Équipe Nationale A", logo: "🇩🇿", coach: "Pepe", description: "Fennecs d'Algérie", achievements: "CAN 1990, 2019", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Alg%C3%A9rie+ENA&logo=🇩🇿&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue Professionnelle 1",
+                teams: [
+                    { name: "USM Alger", fullName: "Union Sportive de la Médina d'Alger", logo: "🇩🇿", founded: 1937, stadium: "Stade Omar Hamadi", titles: 11, description: "Club le plus titré d'Algérie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=USM+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
+                    { name: "MC Alger", fullName: "Mouloudia Club d'Alger", logo: "🇩🇿", founded: 1921, stadium: "Stade du 5 Juillet 1962", titles: 9, description: "Le Doyen du football algérien", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=MC+Alger&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" },
+                    { name: "CR Belouizdad", fullName: "Club de la Renaissance de Belouizdad", logo: "🇩🇿", founded: 1914, stadium: "Stade du 5 Juillet 1962", titles: 8, description: "Club historique d'Alger", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=CR+Belouizdad&logo=🇩🇿&sport=Football&league=Ligue+Pro+1" }
+                ]
+            }
+        ]
     }
 };
 

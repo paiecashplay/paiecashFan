@@ -6,6 +6,7 @@
     <title>LOTO Hub - PaieCashFan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="currency-converter.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -195,11 +196,11 @@
         <p>Jouez, grattez, participez aux tombolas — et gagnez des lots incroyables !</p>
         <div class="stats-bar">
             <div class="stat">
-                <div class="stat-value">10 000€</div>
+                <div class="stat-value" id="hub-jackpot-stat">10 000€</div>
                 <div class="stat-label">Jackpot Carrefour</div>
             </div>
             <div class="stat">
-                <div class="stat-value">2€</div>
+                <div class="stat-value" id="hub-price-stat">2€</div>
                 <div class="stat-label">Prix/Grille Loto</div>
             </div>
             <div class="stat">
@@ -220,7 +221,7 @@
                 <div class="jackpot-icon">🏆</div>
                 <div class="jackpot-text">
                     <h3>Supercagnotte Mondiale</h3>
-                    <div class="amount">10 000 €</div>
+                    <div class="amount" id="hub-jackpot-banner">10 000 €</div>
                 </div>
             </div>
             <div class="jackpot-right">
@@ -235,11 +236,11 @@
         <!-- LOTO Chiffres -->
         <div class="game-card card-loto" onclick="goToGame('loto')">
             <div class="game-icon">🎲</div>
-            <div class="game-badge">⭐ JACKPOT 10 000€</div>
+            <div class="game-badge">⭐ JACKPOT <span id="hub-jackpot-badge">10 000€</span></div>
             <h2>LOTO CHIFFRES</h2>
             <p>Choisissez 5 numéros de 1 à 50 + 1 numéro chance. Paiement sécurisé par carte bancaire (Stripe) ou wallet.</p>
             <button class="play-btn">
-                <i class="fas fa-play"></i> JOUER — 2€/grille
+                <i class="fas fa-play"></i> JOUER — <span id="hub-play-price">2€</span>/grille
             </button>
         </div>
 
@@ -339,9 +340,25 @@
             const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
             document.getElementById('nextDraw').textContent = `${h}:${m}:${s}`;
         }
-        updateCountdown();
+         updateCountdown();
         setInterval(updateCountdown, 1000);
-
+        // Conversion de devises
+        (async () => {
+            if (typeof CurrencyConverter !== 'undefined') {
+                const currInfo = await CurrencyConverter.init(club, league);
+                if (currInfo && currInfo.currency !== 'EUR') {
+                    const j10k = CurrencyConverter.convert(10000).localFormatted;
+                    const p2   = CurrencyConverter.convert(2).localFormatted;
+                    // Mettre à jour tous les montants hardcodés
+                    const el = (id) => document.getElementById(id);
+                    if (el('hub-jackpot-stat'))   el('hub-jackpot-stat').textContent   = j10k;
+                    if (el('hub-jackpot-banner')) el('hub-jackpot-banner').textContent = j10k;
+                    if (el('hub-jackpot-badge'))  el('hub-jackpot-badge').textContent  = j10k;
+                    if (el('hub-price-stat'))     el('hub-price-stat').textContent     = p2;
+                    if (el('hub-play-price'))     el('hub-play-price').textContent     = p2;
+                }
+            }
+        })();
         // Navigation vers les jeux (en passant le club en paramètre)
         function goToGame(game) {
             const params = new URLSearchParams({ club, league, logo, sport });

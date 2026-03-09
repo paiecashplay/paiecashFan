@@ -268,7 +268,7 @@
 </head>
 <body>
     <div class="header" id="header">
-        <a href="javascript:history.back()" class="back-button">
+        <a id="backBtn" href="javascript:history.back()" class="back-button">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
         <h1 id="headerTitle">Équipes</h1>
@@ -311,6 +311,10 @@
         // Récupérer le paramètre club depuis l'URL
         const urlParams = new URLSearchParams(window.location.search);
         const clubId = urlParams.get('club') || 'maroc';
+        // Paramètres supplémentaires pour le bouton Retour
+        const _league = urlParams.get('league') || '';
+        const _logo   = urlParams.get('logo')   || '⚽';
+        const _sport  = urlParams.get('sport')  || 'Football';
 
         // Récupérer les données du club depuis la base de données
         const clubData = getClubData(clubId);
@@ -585,10 +589,10 @@
                             name: team.name,
                             shortName: team.name,
                             logo: team.logo,
-                            category: team.league || team.description || '',
-                            sport: 'Football',
-                            description: team.coach ? `Coach: ${team.coach}` : (team.achievements || team.stadium || ''),
-                            appUrl: team.url || clubData.appUrl
+                            category: team.category || team.league || '',
+                            sport: team.sport || 'Football',
+                            description: team.description || (team.coach ? `Coach: ${team.coach}` : '') || team.achievements || team.stadium || '',
+                            appUrl: team.appUrl || team.url || clubData.appUrl
                         };
                         grid.appendChild(createCard(equipe));
                         
@@ -671,8 +675,20 @@
             }
         }
 
-        // Charger les équipes au chargement de la page
-        document.addEventListener('DOMContentLoaded', displayEquipes);
+        // Configurer le bouton Retour avec les bons paramètres
+        document.addEventListener('DOMContentLoaded', () => {
+            displayEquipes();
+            // Construire l'URL de retour vers l'app
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn && clubData && clubData.appUrl) {
+                // Utiliser l'appUrl du club si disponible
+                backBtn.href = clubData.appUrl;
+            } else if (backBtn) {
+                // Fallback : construire l'URL avec les paramètres disponibles
+                const backParams = new URLSearchParams({ club: clubId, league: _league, logo: _logo, sport: _sport });
+                backBtn.href = `app-universal-simple.html?${backParams}`;
+            }
+        });
     </script>
 </body>
 </html>
