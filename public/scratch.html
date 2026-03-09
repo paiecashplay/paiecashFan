@@ -384,10 +384,16 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script src="currency-converter.js"></script>
     <script>
         const API_BASE_URL = window.location.origin;
         const USER_ID = localStorage.getItem('user_id') || `user-${Date.now()}`;
         const ORGANIZATION_ID = 'om-001';
+        
+        // Paramètres URL du club
+        const _urlP = new URLSearchParams(window.location.search);
+        const _clubParam = _urlP.get('club') || '';
+        const _leagueParam = _urlP.get('league') || '';
         
         let allPrizes = [];
         let selectedPrize = null;
@@ -995,9 +1001,31 @@
         }
         
         // Initialisation
-        window.addEventListener('DOMContentLoaded', () => {
-            // Charger les lots seulement si on bascule en mode lots
-            // Par défaut on est en mode packs
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Initialiser la conversion de devises
+            if (typeof CurrencyConverter !== 'undefined' && (_clubParam || _leagueParam)) {
+                const currInfo = await CurrencyConverter.init(_clubParam, _leagueParam);
+                if (currInfo && currInfo.currency !== 'EUR') {
+                    // Mettre à jour les prix des packs (PCC -> devise locale)
+                    // 10 PCC = 1€, donc 10 PCC = 1 * rate devise
+                    const packPrices = [
+                        { pcc: 10, eur: 1, selector: null },
+                        { pcc: 25, eur: 2.5, selector: null },
+                        { pcc: 50, eur: 5, selector: null },
+                        { pcc: 100, eur: 10, selector: null }
+                    ];
+                    // Ajouter badge devise dans le header
+                    const h1El = document.querySelector('h1');
+                    if (h1El) h1El.innerHTML += ` ${CurrencyConverter.getCurrencyBadge()}`;
+                    // Ajouter barre info devise
+                    const infoBar = document.createElement('div');
+                    infoBar.className = 'currency-info-bar';
+                    infoBar.style.cssText = 'background:rgba(255,255,255,0.15);border-radius:8px;padding:8px 16px;margin:8px 0;font-size:0.85em;text-align:center;color:white;';
+                    infoBar.innerHTML = `${currInfo.flag} Prix affichés en <strong>${currInfo.currency}</strong> · 1€ = ${currInfo.rate.toFixed(2)} ${currInfo.symbol}`;
+                    const headerDiv = document.querySelector('.text-center.mb-8');
+                    if (headerDiv) headerDiv.appendChild(infoBar);
+                }
+            }
             
             // Retour depuis Stripe
             const urlParams = new URLSearchParams(window.location.search);

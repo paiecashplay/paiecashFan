@@ -606,6 +606,42 @@ const equipesDatabase = {
                 ]
             }
         ]
+    },
+
+    // ========== TANZANIE ==========
+    "tanzanie": {
+        name: "Tanzanie 🇹🇿",
+        logo: "🇹🇿",
+        colors: ["#1EB53A", "#00A3DD"],
+        appUrl: "equipes-tanzanie.html",
+        categories: []
+    },
+
+    // ========== MAURITANIE ==========
+    "mauritanie": {
+        name: "Mauritanie 🇲🇷",
+        logo: "🇲🇷",
+        colors: ["#00A95C", "#FFC72C"],
+        appUrl: "equipes-mauritanie.html",
+        categories: []
+    },
+
+    // ========== KENYA ==========
+    "kenya": {
+        name: "Kenya 🇰🇪",
+        logo: "🇰🇪",
+        colors: ["#006600", "#DC143C"],
+        appUrl: "equipes-kenya.html",
+        categories: []
+    },
+
+    // ========== OUGANDA ==========
+    "ouganda": {
+        name: "Ouganda 🇺🇬",
+        logo: "🇺🇬",
+        colors: ["#FCDC04", "#D90000"],
+        appUrl: "equipes-ouganda.html",
+        categories: []
     }
 };
 
@@ -624,39 +660,3 @@ function getClubAppUrl(clubId) {
 function getClubEquipesUrl(clubId) {
     return `equipes.html?club=${clubId.toLowerCase()}`;
 }
-
-    // ========== TANZANIE ==========
-    "tanzanie": {
-        name: "Tanzanie 🇹🇿",
-        logo: "🇹🇿",
-        colors: ["#1EB53A", "#00A3DD"], // Vert et bleu
-        appUrl: "equipes-tanzanie.html",
-        categories: []
-    },
-
-    // ========== MAURITANIE ==========
-    "mauritanie": {
-        name: "Mauritanie 🇲🇷",
-        logo: "🇲🇷",
-        colors: ["#00A95C", "#FFC72C"], // Vert et jaune
-        appUrl: "equipes-mauritanie.html",
-        categories: []
-    },
-
-    // ========== KENYA ==========
-    "kenya": {
-        name: "Kenya 🇰🇪",
-        logo: "🇰🇪",
-        colors: ["#006600", "#DC143C"], // Vert et rouge
-        appUrl: "equipes-kenya.html",
-        categories: []
-    },
-
-    // ========== OUGANDA ==========
-    "ouganda": {
-        name: "Ouganda 🇺🇬",
-        logo: "🇺🇬",
-        colors: ["#FCDC04", "#D90000"], // Jaune et rouge
-        appUrl: "equipes-ouganda.html",
-        categories: []
-    },
