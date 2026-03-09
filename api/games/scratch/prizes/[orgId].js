@@ -11,7 +11,7 @@ const SCRATCH_PRIZES = [
   { id: 'ticket_gratuit', name: 'Ticket Gratuit', description: 'Un ticket scratch offert pour la prochaine partie', value: 2, category: 'replay', is_active: true },
 ];
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

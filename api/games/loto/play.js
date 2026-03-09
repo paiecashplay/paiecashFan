@@ -1,7 +1,7 @@
 // Vercel Serverless Function - POST /api/games/loto/play
 // Gère le paiement Stripe Checkout (carte) et le tirage immédiat (wallet)
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 // Lots LOTO (sans base de données - statiques)
 const LOTO_PRIZES = [
@@ -56,7 +56,7 @@ function doTirage(numbers, chance) {
   };
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');

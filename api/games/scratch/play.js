@@ -1,7 +1,7 @@
 // Vercel Serverless Function - POST /api/games/scratch/play
 // Gère le paiement Stripe Checkout (carte) et le tirage immédiat (wallet)
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 // Lots Scratch (statiques, sans base de données)
 const SCRATCH_PRIZES = [
@@ -28,7 +28,7 @@ function drawScratchPrize() {
   return SCRATCH_PRIZES[SCRATCH_PRIZES.length - 1];
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

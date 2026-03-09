@@ -1,9 +1,9 @@
 // Vercel Serverless Function - POST /api/tombola/participate
 // Enregistre une participation à une tombola
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

@@ -1,7 +1,7 @@
 // Vercel Serverless Function - GET /api/games/scratch/result/:sessionId
 // Récupère le résultat du tirage SCRATCH après paiement Stripe Checkout
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 const SCRATCH_PRIZES = [
   { id: 'billet_vip', name: 'Billet VIP Match', description: 'Place VIP pour le prochain match à domicile', value: 150, category: 'experience', probability: 2 },
@@ -27,7 +27,7 @@ function drawScratchPrize() {
   return SCRATCH_PRIZES[SCRATCH_PRIZES.length - 1];
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

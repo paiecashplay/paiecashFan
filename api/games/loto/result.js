@@ -1,7 +1,7 @@
 // Vercel Serverless Function - GET /api/games/loto/result?session_id=xxx
 // Récupère le résultat du tirage LOTO après paiement Stripe Checkout
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 const LOTO_PRIZES = [
   { id: 'jackpot', name: 'JACKPOT - Carrefour 10 000€', value: 10000, category: 'jackpot', match_requirement: '5+1' },
@@ -50,7 +50,7 @@ function doTirage(numbers, chance) {
   };
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
