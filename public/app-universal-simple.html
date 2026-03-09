@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- 🎬 STORIES CSS -->
-    <!-- <link rel="stylesheet" href="css/stories.css"> -->
+    <link rel="stylesheet" href="css/stories.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1557,6 +1557,10 @@
         }
 
         /* ====================================
+           🎰 STYLES TOMBOLA QUOTIDIENNE (Genspark)
+        ==================================== */
+
+        /* ====================================
            🎰 STYLES TOMBOLA QUOTIDIENNE
         ==================================== */
         
@@ -2395,6 +2399,8 @@
         
         console.log('✅ Toutes les fonctions de jeux chargées en global');
     </script>
+
+    </style>
 </head>
 <body>
 
@@ -2962,10 +2968,10 @@
     </div>
 
     <!-- 🌍 Données fédérations CAF -->
-    <!-- <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script> -->
+    <script src="🌍_CAF_MEMBERS_WITH_LOGOS.js"></script>
     
     <!-- 🌍 Système I18N Multi-Langues - RÉACTIVÉ ✅ -->
-    <!-- <script src="🌍_MULTI_LANGUES_I18N.js"></script> -->
+    <script src="🌍_MULTI_LANGUES_I18N.js"></script>
 
     <!-- 🎲 LOTO FUNCTIONS -->
     <script>
@@ -3585,56 +3591,24 @@ function applyClubTheme(clubName) {
 
 // Ouvrir la modal LOTO (page d'accueil)
 function openLoto() {
-    try {
-        console.log('🎰 openLoto() appelé');
-        
-        const modal = document.getElementById('lotoModal');
-        if (!modal) {
-            console.error('❌ lotoModal introuvable');
-            return;
-        }
-        console.log('✅ lotoModal trouvé');
-        
-        const headerClubName = document.getElementById('headerClubName');
-        if (!headerClubName) {
-            console.error('❌ headerClubName introuvable');
-            return;
-        }
-        const clubName = headerClubName.textContent;
-        console.log('✅ clubName:', clubName);
-        
-        const lotoHomeClubName = document.getElementById('lotoHomeClubName');
-        if (!lotoHomeClubName) {
-            console.error('❌ lotoHomeClubName introuvable');
-            return;
-        }
-        lotoHomeClubName.textContent = clubName.toUpperCase();
-        console.log('✅ lotoHomeClubName mis à jour');
-        
-        // Appliquer le thème du club
-        console.log('🎨 Application thème...');
-        applyClubTheme(clubName);
-        console.log('✅ Thème appliqué');
-        
-        // Afficher la modal et la page d'accueil
-        modal.style.display = 'flex';
-        document.getElementById('lotoHome').style.display = 'block';
-        document.getElementById('lotoScratch').style.display = 'none';
-        document.getElementById('lotoNumbers').style.display = 'none';
-        document.getElementById('lotoTombola').style.display = 'none';
-        console.log('✅ Modal affichée');
-        
-        document.body.style.overflow = 'hidden';
-        
-        // Démarrer le compte à rebours
-        console.log('⏰ Démarrage countdown...');
-        startLotoCountdown();
-        console.log('✅ openLoto() terminé avec succès');
-        
-    } catch (error) {
-        console.error('❌ ERREUR dans openLoto():', error);
-        alert('Erreur lors de l\'ouverture du Loto: ' + error.message);
-    }
+    const modal = document.getElementById('lotoModal');
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
+    
+    // Appliquer le thème du club
+    applyClubTheme(clubName);
+    
+    // Afficher la modal et la page d'accueil
+    modal.style.display = 'flex';
+    document.getElementById('lotoHome').style.display = 'block';
+    document.getElementById('lotoScratch').style.display = 'none';
+    document.getElementById('lotoNumbers').style.display = 'none';
+    if (document.getElementById('lotoTombola')) document.getElementById('lotoTombola').style.display = 'none';
+    
+    document.body.style.overflow = 'hidden';
+    
+    // Démarrer le compte à rebours
+    startLotoCountdown();
 }
 
 // Fermer la modal LOTO
@@ -3655,6 +3629,7 @@ function backToLotoHome() {
     document.getElementById('lotoHome').style.display = 'block';
     document.getElementById('lotoScratch').style.display = 'none';
     document.getElementById('lotoNumbers').style.display = 'none';
+    if (document.getElementById('lotoTombola')) document.getElementById('lotoTombola').style.display = 'none';
     
     // Réinitialiser les états
     resetScratchMode();
@@ -3683,6 +3658,289 @@ function openNumbersMode() {
     updateNumbersDisplay();
 }
 
+// ========== COMPTE À REBOURS ==========
+function startLotoCountdown() {
+    const countdownEl = document.getElementById('lotoCountdown');
+    if (!countdownEl) return;
+    
+    // Calculer le temps jusqu'au prochain dimanche 21h
+    const now = new Date();
+    const nextDraw = new Date();
+    nextDraw.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7));
+    nextDraw.setHours(21, 0, 0, 0);
+    
+    function updateCountdown() {
+        const now = new Date();
+        const diff = nextDraw - now;
+        
+        if (diff <= 0) {
+            countdownEl.textContent = '00:00:00';
+            return;
+        }
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        countdownEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+// ========== MODE SCRATCH ==========
+
+function selectScratchTicket(price, count) {
+    selectedScratchPrice = price;
+    selectedScratchCount = count;
+    
+    // Mettre à jour l'affichage
+    document.getElementById('scratchPrice').textContent = price;
+    
+    // Retirer la classe selected
+    document.querySelectorAll('.scratch-ticket-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Ajouter au ticket cliqué
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+    }
+}
+
+function buyScratchTicket() {
+    if (userBalance < selectedScratchPrice) {
+        alert('❌ Solde insuffisant !');
+        return;
+    }
+    
+    // Déduire le montant
+    userBalance -= selectedScratchPrice;
+    
+    // Afficher la carte à gratter
+    document.getElementById('scratchTicketSelection').style.display = 'none';
+    document.getElementById('scratchCardContainer').style.display = 'block';
+    
+    // Mettre à jour les infos
+    const clubName = document.getElementById('headerClubName').textContent;
+    document.getElementById('scratchClubName').textContent = clubName;
+    document.getElementById('scratchTicketCount').textContent = selectedScratchCount;
+    document.getElementById('scratchCost').textContent = selectedScratchPrice;
+    
+    // Initialiser le canvas
+    initScratchCanvas();
+    
+    // Démarrer le timer
+    startScratchTimer();
+}
+
+function initScratchCanvas() {
+    scratchCanvas = document.getElementById('scratchCanvas');
+    if (!scratchCanvas) return;
+    
+    scratchCtx = scratchCanvas.getContext('2d');
+    
+    // Définir la taille
+    const rect = scratchCanvas.getBoundingClientRect();
+    scratchCanvas.width = rect.width * 2;
+    scratchCanvas.height = rect.height * 2;
+    scratchCtx.scale(2, 2);
+    
+    // Dessiner le fond (récompense)
+    scratchCtx.fillStyle = 'linear-gradient(135deg, #10b981, #059669)';
+    scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+    
+    // Dessiner la couche à gratter
+    const gradient = scratchCtx.createLinearGradient(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    gradient.addColorStop(0, '#fbbf24');
+    gradient.addColorStop(1, '#10b981');
+    scratchCtx.fillStyle = gradient;
+    scratchCtx.fillRect(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
+    
+    // Ajouter le texte
+    scratchCtx.fillStyle = 'white';
+    scratchCtx.font = 'bold 24px Arial';
+    scratchCtx.textAlign = 'center';
+    scratchCtx.textBaseline = 'middle';
+    scratchCtx.fillText('TAP TO SCRATCH', scratchCanvas.width / 4, scratchCanvas.height / 4);
+    
+    // Événements de grattage
+    let isScratching = false;
+    
+    scratchCanvas.addEventListener('mousedown', () => isScratching = true);
+    scratchCanvas.addEventListener('mouseup', () => isScratching = false);
+    scratchCanvas.addEventListener('mousemove', scratch);
+    scratchCanvas.addEventListener('touchstart', () => isScratching = true);
+    scratchCanvas.addEventListener('touchend', () => isScratching = false);
+    scratchCanvas.addEventListener('touchmove', scratch);
+}
+
+function scratch(e) {
+    if (!scratchCtx) return;
+    
+    const rect = scratchCanvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    
+    scratchCtx.globalCompositeOperation = 'destination-out';
+    scratchCtx.beginPath();
+    scratchCtx.arc(x, y, 20, 0, Math.PI * 2);
+    scratchCtx.fill();
+}
+
+function startScratchTimer() {
+    let seconds = 6;
+    const timerEl = document.getElementById('scratchTimer');
+    
+    const interval = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds + 's';
+        
+        if (seconds <= 0) {
+            clearInterval(interval);
+            showScratchResult();
+        }
+    }, 1000);
+}
+
+function showScratchResult() {
+    // Cacher le canvas
+    document.getElementById('scratchCardContainer').style.display = 'none';
+    
+    // Calculer le gain (aléatoire)
+    const multipliers = [0, 0, 0, 1, 1, 2, 2, 3, 5];
+    const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+    const winAmount = selectedScratchPrice * multiplier;
+    
+    // Mettre à jour le solde
+    userBalance += winAmount;
+    
+    // Afficher le résultat
+    document.getElementById('scratchResult').style.display = 'block';
+    document.getElementById('scratchWinAmount').textContent = winAmount;
+    document.getElementById('resultCost').textContent = selectedScratchPrice + ' PCC';
+    document.getElementById('resultMultiplier').textContent = 'x' + multiplier;
+    document.getElementById('resultTotal').textContent = '+' + winAmount + ' PCC';
+    document.getElementById('resultNewBalance').textContent = userBalance + ' PCC';
+    
+    // Lancer les confettis si gain
+    if (winAmount > 0) {
+        startConfetti();
+    }
+}
+
+function playScratchAgain() {
+    resetScratchMode();
+    openScratchMode();
+}
+
+function resetScratchMode() {
+    selectedScratchPrice = 25;
+    selectedScratchCount = 3;
+}
+
+// ========== ANIMATION DE CONFETTIS ==========
+
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+class Confetti {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 10 + 5;
+        this.speedY = Math.random() * 3 + 2;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 10;
+        
+        // Couleurs dynamiques basées sur le thème du club
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-primary').trim();
+        const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-secondary').trim();
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-accent').trim();
+        
+        const colors = [
+            primaryColor,
+            secondaryColor,
+            accentColor,
+            '#FFD700', // Or
+            '#FF6B6B', // Rouge
+            '#4ECDC4', // Cyan
+            '#95E1D3', // Vert menthe
+            '#F38181'  // Rose
+        ];
+        
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.opacity = 1;
+    }
+    
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+        this.speedY += 0.1; // Gravité
+        
+        // Fade out progressif
+        if (this.y > window.innerHeight - 100) {
+            this.opacity -= 0.02;
+        }
+    }
+    
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        
+        // Dessiner un rectangle (confetti)
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 2);
+        
+        ctx.restore();
+    }
+}
+
+function createConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Créer 150 confettis
+    confettiParticles = [];
+    for (let i = 0; i < 150; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * -0.5; // Commencer au-dessus de l'écran
+        confettiParticles.push(new Confetti(x, y));
+    }
+}
+
+function animateConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Mettre à jour et dessiner chaque confetti
+    confettiParticles = confettiParticles.filter(confetti => {
+        confetti.update();
+        confetti.draw(ctx);
+        return confetti.opacity > 0; // Garder seulement les confettis visibles
+    });
+    
+    // Continuer l'animation si des confettis sont encore visibles
+    if (confettiParticles.length > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+    } else {
+        stopConfetti();
+    }
+}
+
+
+// ========== MODE TOMBOLA (Genspark) ==========
 // ========== MODE TOMBOLA ==========
 function openTombolaMode() {
     console.log('🎰 Ouverture mode Tombola');
@@ -4181,287 +4439,6 @@ function filterLots() {
     console.log('🔍 Filtrer lots:', category);
     // TODO: Implémenter le filtrage
     loadTombolaLots();
-}
-
-// ========== COMPTE À REBOURS ==========
-function startLotoCountdown() {
-    const countdownEl = document.getElementById('lotoCountdown');
-    if (!countdownEl) return;
-    
-    // Calculer le temps jusqu'au prochain dimanche 21h
-    const now = new Date();
-    const nextDraw = new Date();
-    nextDraw.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7));
-    nextDraw.setHours(21, 0, 0, 0);
-    
-    function updateCountdown() {
-        const now = new Date();
-        const diff = nextDraw - now;
-        
-        if (diff <= 0) {
-            countdownEl.textContent = '00:00:00';
-            return;
-        }
-        
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        countdownEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-    
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-}
-
-// ========== MODE SCRATCH ==========
-
-function selectScratchTicket(price, count) {
-    selectedScratchPrice = price;
-    selectedScratchCount = count;
-    
-    // Mettre à jour l'affichage
-    document.getElementById('scratchPrice').textContent = price;
-    
-    // Retirer la classe selected
-    document.querySelectorAll('.scratch-ticket-card').forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    // Ajouter au ticket cliqué
-    if (event && event.currentTarget) {
-        event.currentTarget.classList.add('selected');
-    }
-}
-
-function buyScratchTicket() {
-    if (userBalance < selectedScratchPrice) {
-        alert('❌ Solde insuffisant !');
-        return;
-    }
-    
-    // Déduire le montant
-    userBalance -= selectedScratchPrice;
-    
-    // Afficher la carte à gratter
-    document.getElementById('scratchTicketSelection').style.display = 'none';
-    document.getElementById('scratchCardContainer').style.display = 'block';
-    
-    // Mettre à jour les infos
-    const clubName = document.getElementById('headerClubName').textContent;
-    document.getElementById('scratchClubName').textContent = clubName;
-    document.getElementById('scratchTicketCount').textContent = selectedScratchCount;
-    document.getElementById('scratchCost').textContent = selectedScratchPrice;
-    
-    // Initialiser le canvas
-    initScratchCanvas();
-    
-    // Démarrer le timer
-    startScratchTimer();
-}
-
-function initScratchCanvas() {
-    scratchCanvas = document.getElementById('scratchCanvas');
-    if (!scratchCanvas) return;
-    
-    scratchCtx = scratchCanvas.getContext('2d');
-    
-    // Définir la taille
-    const rect = scratchCanvas.getBoundingClientRect();
-    scratchCanvas.width = rect.width * 2;
-    scratchCanvas.height = rect.height * 2;
-    scratchCtx.scale(2, 2);
-    
-    // Dessiner le fond (récompense)
-    scratchCtx.fillStyle = 'linear-gradient(135deg, #10b981, #059669)';
-    scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-    
-    // Dessiner la couche à gratter
-    const gradient = scratchCtx.createLinearGradient(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
-    gradient.addColorStop(0, '#fbbf24');
-    gradient.addColorStop(1, '#10b981');
-    scratchCtx.fillStyle = gradient;
-    scratchCtx.fillRect(0, 0, scratchCanvas.width / 2, scratchCanvas.height / 2);
-    
-    // Ajouter le texte
-    scratchCtx.fillStyle = 'white';
-    scratchCtx.font = 'bold 24px Arial';
-    scratchCtx.textAlign = 'center';
-    scratchCtx.textBaseline = 'middle';
-    scratchCtx.fillText('TAP TO SCRATCH', scratchCanvas.width / 4, scratchCanvas.height / 4);
-    
-    // Événements de grattage
-    let isScratching = false;
-    
-    scratchCanvas.addEventListener('mousedown', () => isScratching = true);
-    scratchCanvas.addEventListener('mouseup', () => isScratching = false);
-    scratchCanvas.addEventListener('mousemove', scratch);
-    scratchCanvas.addEventListener('touchstart', () => isScratching = true);
-    scratchCanvas.addEventListener('touchend', () => isScratching = false);
-    scratchCanvas.addEventListener('touchmove', scratch);
-}
-
-function scratch(e) {
-    if (!scratchCtx) return;
-    
-    const rect = scratchCanvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-    const y = (e.clientY || e.touches[0].clientY) - rect.top;
-    
-    scratchCtx.globalCompositeOperation = 'destination-out';
-    scratchCtx.beginPath();
-    scratchCtx.arc(x, y, 20, 0, Math.PI * 2);
-    scratchCtx.fill();
-}
-
-function startScratchTimer() {
-    let seconds = 6;
-    const timerEl = document.getElementById('scratchTimer');
-    
-    const interval = setInterval(() => {
-        seconds--;
-        timerEl.textContent = seconds + 's';
-        
-        if (seconds <= 0) {
-            clearInterval(interval);
-            showScratchResult();
-        }
-    }, 1000);
-}
-
-function showScratchResult() {
-    // Cacher le canvas
-    document.getElementById('scratchCardContainer').style.display = 'none';
-    
-    // Calculer le gain (aléatoire)
-    const multipliers = [0, 0, 0, 1, 1, 2, 2, 3, 5];
-    const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
-    const winAmount = selectedScratchPrice * multiplier;
-    
-    // Mettre à jour le solde
-    userBalance += winAmount;
-    
-    // Afficher le résultat
-    document.getElementById('scratchResult').style.display = 'block';
-    document.getElementById('scratchWinAmount').textContent = winAmount;
-    document.getElementById('resultCost').textContent = selectedScratchPrice + ' PCC';
-    document.getElementById('resultMultiplier').textContent = 'x' + multiplier;
-    document.getElementById('resultTotal').textContent = '+' + winAmount + ' PCC';
-    document.getElementById('resultNewBalance').textContent = userBalance + ' PCC';
-    
-    // Lancer les confettis si gain
-    if (winAmount > 0) {
-        startConfetti();
-    }
-}
-
-function playScratchAgain() {
-    resetScratchMode();
-    openScratchMode();
-}
-
-function resetScratchMode() {
-    selectedScratchPrice = 25;
-    selectedScratchCount = 3;
-}
-
-// ========== ANIMATION DE CONFETTIS ==========
-
-let confettiParticles = [];
-let confettiAnimationId = null;
-
-class Confetti {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.size = Math.random() * 10 + 5;
-        this.speedY = Math.random() * 3 + 2;
-        this.speedX = (Math.random() - 0.5) * 2;
-        this.rotation = Math.random() * 360;
-        this.rotationSpeed = (Math.random() - 0.5) * 10;
-        
-        // Couleurs dynamiques basées sur le thème du club
-        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-primary').trim();
-        const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-secondary').trim();
-        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--loto-accent').trim();
-        
-        const colors = [
-            primaryColor,
-            secondaryColor,
-            accentColor,
-            '#FFD700', // Or
-            '#FF6B6B', // Rouge
-            '#4ECDC4', // Cyan
-            '#95E1D3', // Vert menthe
-            '#F38181'  // Rose
-        ];
-        
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.opacity = 1;
-    }
-    
-    update() {
-        this.y += this.speedY;
-        this.x += this.speedX;
-        this.rotation += this.rotationSpeed;
-        this.speedY += 0.1; // Gravité
-        
-        // Fade out progressif
-        if (this.y > window.innerHeight - 100) {
-            this.opacity -= 0.02;
-        }
-    }
-    
-    draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = this.opacity;
-        ctx.translate(this.x, this.y);
-        ctx.rotate((this.rotation * Math.PI) / 180);
-        
-        // Dessiner un rectangle (confetti)
-        ctx.fillStyle = this.color;
-        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 2);
-        
-        ctx.restore();
-    }
-}
-
-function createConfetti() {
-    const canvas = document.getElementById('confettiCanvas');
-    if (!canvas) return;
-    
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    // Créer 150 confettis
-    confettiParticles = [];
-    for (let i = 0; i < 150; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height * -0.5; // Commencer au-dessus de l'écran
-        confettiParticles.push(new Confetti(x, y));
-    }
-}
-
-function animateConfetti() {
-    const canvas = document.getElementById('confettiCanvas');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Mettre à jour et dessiner chaque confetti
-    confettiParticles = confettiParticles.filter(confetti => {
-        confetti.update();
-        confetti.draw(ctx);
-        return confetti.opacity > 0; // Garder seulement les confettis visibles
-    });
-    
-    // Continuer l'animation si des confettis sont encore visibles
-    if (confettiParticles.length > 0) {
-        confettiAnimationId = requestAnimationFrame(animateConfetti);
-    } else {
-        stopConfetti();
-    }
 }
 
 function startConfetti() {
@@ -5664,6 +5641,10 @@ function shareResult() {
                 </div>
             </div>
 
+        </div>
+    </div>
+
+
             <!-- ÉCRAN 4: MODE TOMBOLA -->
             <div id="lotoTombola" class="loto-screen" style="display: none;">
                 <button class="loto-back-btn" onclick="closeTombolaMode()">
@@ -5930,12 +5911,9 @@ function shareResult() {
                     <i class="fas fa-lock"></i> Confirmer le paiement
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- 🎬 STORIES SYSTÈME -->
-    <!-- <script src="js/storiesManager.js"></script> -->
-    <!-- 
+        
+        <!-- 🎬 STORIES SYSTÈME -->
+    <script src="js/storiesManager.js"></script>
     <script>
         // Initialiser les stories au chargement
         document.addEventListener('DOMContentLoaded', function() {
@@ -5949,7 +5927,6 @@ function shareResult() {
             }
         });
     </script>
-    -->
 
 </body>
 </html>
