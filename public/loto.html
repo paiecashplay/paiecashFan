@@ -870,25 +870,23 @@
             generateMainNumbers();
             generateChanceNumbers();
             
-            // Initialiser la conversion de devises
-            if (typeof CurrencyConverter !== 'undefined' && (_clubParam || _leagueParam)) {
+            // Initialiser la conversion de devises universelle
+            if (typeof CurrencyConverter !== 'undefined') {
                 const currInfo = await CurrencyConverter.init(_clubParam, _leagueParam);
                 if (currInfo && currInfo.currency !== 'EUR') {
-                    // Mettre à jour le prix affiché
-                    const priceAmountEl = document.querySelector('.price-amount');
-                    if (priceAmountEl) {
-                        const converted = CurrencyConverter.convert(2);
-                        priceAmountEl.innerHTML = `<span style="font-size:0.9em">${converted.localFormatted}</span><br><span style="font-size:0.55em;opacity:0.7">(${converted.eurFormatted})</span>`;
-                    }
                     // Badge devise dans le hero
                     const heroP = document.querySelector('.hero p');
                     if (heroP) heroP.innerHTML += ` ${CurrencyConverter.getCurrencyBadge()}`;
-                    // Jackpot converti
-                    const heroStatLabel = document.querySelector('.hero-stat-label');
-                    if (heroStatLabel && heroStatLabel.textContent.includes('10 000')) {
-                        const j = CurrencyConverter.convert(10000);
-                        heroStatLabel.textContent = `${j.localFormatted} Carrefour`;
-                    }
+                    // Bannière de conversion sous le titre
+                    const heroStats = document.querySelector('.hero-stats');
+                    if (heroStats) heroStats.insertAdjacentHTML('beforebegin', CurrencyConverter.getConversionBanner());
+                    // Conversion universelle de TOUS les montants € dans le DOM
+                    CurrencyConverter.convertAllDomAmounts(document.body);
+                    // Observer les changements DOM (résultats dynamiques)
+                    const _ccObserver = new MutationObserver(() => {
+                        CurrencyConverter.convertAllDomAmounts(document.body);
+                    });
+                    _ccObserver.observe(document.body, { childList: true, subtree: true });
                 }
             }
             

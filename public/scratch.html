@@ -1002,28 +1002,23 @@
         
         // Initialisation
         window.addEventListener('DOMContentLoaded', async () => {
-            // Initialiser la conversion de devises
-            if (typeof CurrencyConverter !== 'undefined' && (_clubParam || _leagueParam)) {
+            // Initialiser la conversion de devises universelle
+            if (typeof CurrencyConverter !== 'undefined') {
                 const currInfo = await CurrencyConverter.init(_clubParam, _leagueParam);
                 if (currInfo && currInfo.currency !== 'EUR') {
-                    // Mettre à jour les prix des packs (PCC -> devise locale)
-                    // 10 PCC = 1€, donc 10 PCC = 1 * rate devise
-                    const packPrices = [
-                        { pcc: 10, eur: 1, selector: null },
-                        { pcc: 25, eur: 2.5, selector: null },
-                        { pcc: 50, eur: 5, selector: null },
-                        { pcc: 100, eur: 10, selector: null }
-                    ];
-                    // Ajouter badge devise dans le header
+                    // Badge devise dans le header
                     const h1El = document.querySelector('h1');
                     if (h1El) h1El.innerHTML += ` ${CurrencyConverter.getCurrencyBadge()}`;
-                    // Ajouter barre info devise
-                    const infoBar = document.createElement('div');
-                    infoBar.className = 'currency-info-bar';
-                    infoBar.style.cssText = 'background:rgba(255,255,255,0.15);border-radius:8px;padding:8px 16px;margin:8px 0;font-size:0.85em;text-align:center;color:white;';
-                    infoBar.innerHTML = `${currInfo.flag} Prix affichés en <strong>${currInfo.currency}</strong> · 1€ = ${currInfo.rate.toFixed(2)} ${currInfo.symbol}`;
-                    const headerDiv = document.querySelector('.text-center.mb-8');
-                    if (headerDiv) headerDiv.appendChild(infoBar);
+                    // Bannière de conversion
+                    const headerDiv = document.querySelector('.text-center.mb-8') || document.querySelector('header') || document.body.firstElementChild;
+                    if (headerDiv) headerDiv.insertAdjacentHTML('afterend', CurrencyConverter.getConversionBanner());
+                    // Conversion universelle de TOUS les montants € dans le DOM
+                    CurrencyConverter.convertAllDomAmounts(document.body);
+                    // Observer les changements DOM (résultats dynamiques)
+                    const _ccObserver = new MutationObserver(() => {
+                        CurrencyConverter.convertAllDomAmounts(document.body);
+                    });
+                    _ccObserver.observe(document.body, { childList: true, subtree: true });
                 }
             }
             

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tombola Quotidienne - PaieCashFan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="currency-converter.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -410,6 +411,31 @@
 
         // Initialize on load
         init();
+
+        // Conversion de devises universelle
+        (async () => {
+            if (typeof CurrencyConverter !== 'undefined') {
+                const params = new URLSearchParams(window.location.search);
+                const club = params.get('club') || '';
+                const league = params.get('league') || '';
+                const currInfo = await CurrencyConverter.init(club, league);
+                if (currInfo && currInfo.currency !== 'EUR') {
+                    // Badge dans le titre principal
+                    const h1 = document.querySelector('h1');
+                    if (h1) h1.innerHTML += ` ${CurrencyConverter.getCurrencyBadge()}`;
+                    // Bannière
+                    const header = document.querySelector('header') || document.querySelector('.bg-gradient-to-r') || document.body.firstElementChild;
+                    if (header) header.insertAdjacentHTML('afterend', CurrencyConverter.getConversionBanner());
+                    // Conversion universelle de tous les montants
+                    CurrencyConverter.convertAllDomAmounts(document.body);
+                    // Observer les changements DOM (pour les campagnes chargées dynamiquement)
+                    const observer = new MutationObserver(() => {
+                        CurrencyConverter.convertAllDomAmounts(document.body);
+                    });
+                    observer.observe(document.body, { childList: true, subtree: true });
+                }
+            }
+        })();
     </script>
 
 </body>
