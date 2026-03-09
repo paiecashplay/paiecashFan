@@ -18,5 +18,6 @@ module.exports = async function handler(req, res) {
     success: true,
     publicKey,
     endpoint: process.env.LYRA_ENDPOINT || 'https://api.payzen.eu',
+    jsUrl: 'https://static.payzen.eu/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js',
   });
 };
