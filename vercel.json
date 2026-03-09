@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/games/loto/play", "destination": "/api/games/loto/play" },
+    { "source": "/api/games/loto/result/:sessionId", "destination": "/api/games/loto/result/[sessionId]" },
+    { "source": "/api/games/scratch/play", "destination": "/api/games/scratch/play" },
+    { "source": "/api/games/scratch/result/:sessionId", "destination": "/api/games/scratch/result/[sessionId]" },
+    { "source": "/api/games/scratch/prizes/:orgId", "destination": "/api/games/scratch/prizes/[orgId]" },
+    { "source": "/api/games/send-receipt", "destination": "/api/games/send-receipt" },
+    { "source": "/api/games/track-social", "destination": "/api/games/track-social" },
+    { "source": "/api/lyra/config", "destination": "/api/lyra/config" },
+    { "source": "/api/lyra/create-payment", "destination": "/api/lyra/create-payment" },
+    { "source": "/api/shop/products/:clubId", "destination": "/api/shop/products" },
+    { "source": "/api/shop/order/create", "destination": "/api/shop/order/create" },
+    { "source": "/api/shop/order/confirm", "destination": "/api/shop/order/confirm" },
+    { "source": "/api/tombola/campaigns", "destination": "/api/tombola/campaigns" },
+    { "source": "/api/tombola/participate", "destination": "/api/tombola/participate" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}

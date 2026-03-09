@@ -203,68 +203,58 @@
         let currentTab = 'campaigns';
         let currentLotFilter = 'all';
 
-        // Initialize (données locales - pas de backend)
-        function init() {
-            loadCampaigns();
-            loadLots();
-            loadMyParticipations();
+        // Initialize
+        async function init() {
+            await Promise.all([
+                loadCampaigns(),
+                loadLots(),
+                loadMyParticipations()
+            ]);
             updateStats();
         }
 
-        // Load campaigns (données statiques)
-        function loadCampaigns() {
-            const today = new Date();
-            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-            const nextMonth = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-            campaigns = [
-                {
-                    id: 'camp-1',
-                    title: 'Tombola Championnat 🏆',
-                    description: 'Tentez de gagner des places VIP pour le prochain match à domicile !',
-                    end_date: nextWeek.toISOString(),
-                    current_participations: 342,
-                    max_participations: 500,
-                    entry_fee: 5
-                },
-                {
-                    id: 'camp-2',
-                    title: 'Super Tombola Saison 🌟',
-                    description: 'Maillot signé par toute l\'équipe + rencontre avec les joueurs',
-                    end_date: nextMonth.toISOString(),
-                    current_participations: 128,
-                    max_participations: 1000,
-                    entry_fee: 10
-                },
-                {
-                    id: 'camp-3',
-                    title: 'Tombola Solidaire ❤️',
-                    description: 'Participez et soutenez les actions sociales du club',
-                    end_date: nextMonth.toISOString(),
-                    current_participations: 87,
-                    max_participations: 300,
-                    entry_fee: 2
-                }
-            ];
-            renderCampaigns();
+        // Load campaigns
+        async function loadCampaigns() {
+            try {
+                const response = await fetch('/api/tombola/campaigns');
+                const data = await response.json();
+                campaigns = data.campaigns || [];
+                renderCampaigns();
+            } catch (error) {
+                console.error('Error loading campaigns:', error);
+                campaigns = [];
+                renderCampaigns();
+            }
         }
 
-        // Load lots (données statiques)
-        function loadLots() {
-            lots = [
-                { id: 'lot-1', name: 'Maillot Officiel Signé', description: 'Maillot dédicacé par toute l\'équipe', perceived_value: 150, category: 'experience' },
-                { id: 'lot-2', name: 'Pack VIP Match', description: '2 places VIP + parking + restauration', perceived_value: 300, category: 'experience' },
-                { id: 'lot-3', name: 'Week-end à Paris', description: 'Hôtel 4★ + match + visite de la ville', perceived_value: 800, category: 'voyage' },
-                { id: 'lot-4', name: 'Bon Carrefour 100€', description: 'Bon d\'achat valable dans tous les Carrefour', perceived_value: 100, category: 'cash' },
-                { id: 'lot-5', name: 'Trottinette Électrique', description: 'Trottinette électrique haut de gamme', perceived_value: 500, category: 'automobile' },
-                { id: 'lot-6', name: 'Abonnement Saison', description: 'Abonnement complet pour la saison prochaine', perceived_value: 400, category: 'superbonus' }
-            ];
-            renderLots();
+        // Load lots
+        async function loadLots() {
+            try {
+                const response = await fetch('/api/tombola/lots');
+                const data = await response.json();
+                lots = data.lots || [];
+                renderLots();
+            } catch (error) {
+                console.error('Error loading lots:', error);
+                lots = [];
+                renderLots();
+            }
         }
 
-        // Load my participations (depuis localStorage)
-        function loadMyParticipations() {
-            myParticipations = JSON.parse(localStorage.getItem('tombola_participations') || '[]');
-            renderMyParticipations();
+        // Load my participations
+        async function loadMyParticipations() {
+            try {
+                // Mock user ID - en production, récupérer depuis le token JWT
+                const userId = 'user-test-001';
+                const response = await fetch(`/api/tombola/my-participations?user_id=${userId}`);
+                const data = await response.json();
+                myParticipations = data.participations || [];
+                renderMyParticipations();
+            } catch (error) {
+                console.error('Error loading participations:', error);
+                myParticipations = [];
+                renderMyParticipations();
+            }
         }
 
         // Update stats
@@ -401,36 +391,9 @@
             renderLots();
         }
 
-        // Participate to campaign (simulation locale)
+        // Participate to campaign
         function participateToCampaign(campaignId) {
-            const campaign = campaigns.find(c => c.id === campaignId);
-            if (!campaign) return;
-            
-            const confirmed = confirm(`🎫 Participer à : ${campaign.title}\n\nPrix d'entrée : ${campaign.entry_fee}€\n\nEn production, vous seriez redirigé vers le paiement Stripe/Wallet.\n\nCliquez OK pour simuler la participation.`);
-            if (!confirmed) return;
-            
-            // Générer un ticket
-            const ticketCode = `PCF-${Date.now().toString(36).toUpperCase()}`;
-            const participation = {
-                id: `part-${Date.now()}`,
-                campaign_id: campaignId,
-                campaign_title: campaign.title,
-                ticket_code: ticketCode,
-                participation_date: new Date().toISOString(),
-                amount_paid: campaign.entry_fee,
-                status: 'pending'
-            };
-            
-            const saved = JSON.parse(localStorage.getItem('tombola_participations') || '[]');
-            saved.unshift(participation);
-            localStorage.setItem('tombola_participations', JSON.stringify(saved));
-            
-            myParticipations = saved;
-            renderMyParticipations();
-            updateStats();
-            
-            alert(`✅ Participation enregistrée !\n\nVotre ticket : ${ticketCode}\n\nConsultez l'onglet "Mes Tickets" pour le retrouver.`);
-            switchTab('my-tickets');
+            alert(`Participation à la campagne ${campaignId}\n\nFonctionnalité disponible prochainement !\n\n✅ Paiement Wallet\n✅ Paiement Stripe\n✅ Confirmation par email`);
         }
 
         // Get category label

@@ -383,69 +383,11 @@
         
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     <script>
+        const API_BASE_URL = window.location.origin;
         const USER_ID = localStorage.getItem('user_id') || `user-${Date.now()}`;
-        localStorage.setItem('user_id', USER_ID);
         const ORGANIZATION_ID = 'om-001';
-        
-        // 🎲 Simulation locale du Scratch (sans backend)
-        function simulateScratchResult(prizeId, category) {
-            // Lots disponibles par catégorie
-            const prizeCatalog = {
-                big: [
-                    { id: 'big-1', name: 'Maillot Officiel Signé', description: 'Maillot dédicacé par les joueurs', value: 150, category: 'big' },
-                    { id: 'big-2', name: 'Pack VIP Match', description: '2 places VIP + parking', value: 300, category: 'big' },
-                    { id: 'big-3', name: 'Séjour Déplacement', description: 'Voyage + hôtel pour un match extérieur', value: 500, category: 'big' }
-                ],
-                medium: [
-                    { id: 'med-1', name: 'Écharpe Officielle', description: 'Écharpe de la saison en cours', value: 25, category: 'medium' },
-                    { id: 'med-2', name: 'Bon Boutique 20€', description: 'Valable sur la boutique officielle', value: 20, category: 'medium' },
-                    { id: 'med-3', name: 'Casquette Officielle', description: 'Casquette brodée du club', value: 30, category: 'medium' }
-                ],
-                small: [
-                    { id: 'sml-1', name: 'Autocollant Pack', description: 'Pack de 10 stickers officiels', value: 5, category: 'small' },
-                    { id: 'sml-2', name: 'Ticket Gratuit', description: 'Un ticket LOTO offert', value: 2, category: 'small' },
-                    { id: 'sml-3', name: 'Bon Carrefour 5€', description: 'Bon d\'achat Carrefour', value: 5, category: 'small' }
-                ]
-            };
-            
-            // Probabilité de gagner selon la catégorie
-            const winProbability = { big: 0.15, medium: 0.35, small: 0.55 };
-            const cat = category || 'small';
-            const isWinner = Math.random() < (winProbability[cat] || 0.3);
-            
-            let prize = null;
-            if (isWinner) {
-                const prizes = prizeCatalog[cat] || prizeCatalog.small;
-                // Si un lot spécifique est demandé
-                if (prizeId) {
-                    prize = Object.values(prizeCatalog).flat().find(p => p.id === prizeId) || prizes[0];
-                } else {
-                    prize = prizes[Math.floor(Math.random() * prizes.length)];
-                }
-            }
-            
-            const result = {
-                success: true,
-                is_winner: isWinner,
-                prize: prize,
-                game_id: `scratch-${Date.now()}`,
-                transaction_id: `txn-${Date.now()}`
-            };
-            
-            // Sauvegarder dans l'historique local
-            const tickets = JSON.parse(localStorage.getItem('scratch_tickets') || '[]');
-            tickets.unshift({
-                id: result.game_id,
-                date: new Date().toISOString(),
-                is_winner: isWinner,
-                prize: prize,
-                category: cat
-            });
-            localStorage.setItem('scratch_tickets', JSON.stringify(tickets.slice(0, 50)));
-            
-            return result;
-        }
         
         let allPrizes = [];
         let selectedPrize = null;
@@ -528,20 +470,16 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // Charger les lots (données locales - pas de backend)
-        function loadPrizes() {
-            allPrizes = [
-                { id: 'big-1', name: 'Maillot Officiel Signé', description: 'Maillot dédicacé par les joueurs', value: 150, category: 'big' },
-                { id: 'big-2', name: 'Pack VIP Match', description: '2 places VIP + parking', value: 300, category: 'big' },
-                { id: 'big-3', name: 'Séjour Déplacement', description: 'Voyage + hôtel pour un match extérieur', value: 500, category: 'big' },
-                { id: 'med-1', name: 'Écharpe Officielle', description: 'Écharpe de la saison en cours', value: 25, category: 'medium' },
-                { id: 'med-2', name: 'Bon Boutique 20€', description: 'Valable sur la boutique officielle', value: 20, category: 'medium' },
-                { id: 'med-3', name: 'Casquette Officielle', description: 'Casquette brodée du club', value: 30, category: 'medium' },
-                { id: 'sml-1', name: 'Autocollant Pack', description: 'Pack de 10 stickers officiels', value: 5, category: 'small' },
-                { id: 'sml-2', name: 'Ticket Gratuit', description: 'Un ticket LOTO offert', value: 2, category: 'small' },
-                { id: 'sml-3', name: 'Bon Carrefour 5€', description: 'Bon d\'achat Carrefour', value: 5, category: 'small' }
-            ];
-            displayPrizesGrid();
+        // Charger les lots
+        async function loadPrizes() {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/games/scratch/prizes/${ORGANIZATION_ID}`);
+                allPrizes = response.data.prizes || [];
+                displayPrizesGrid();
+            } catch (error) {
+                console.error('Erreur chargement lots:', error);
+                document.getElementById('prizes-grid').innerHTML = '<p class="text-center text-red-500">Erreur de chargement</p>';
+            }
         }
         
         // Afficher la grille de lots
@@ -683,53 +621,85 @@
             document.getElementById('game-area').classList.add('hidden');
         }
         
-        // Jouer avec Carte Bancaire (simulation - pas de backend)
+        // Jouer avec Carte Bancaire
         async function playWithCard() {
-            let amount, prize_id, category;
+            showLoading();
+            
+            let amount, prize_id;
             
             if (currentMode === 'packs' && selectedPack) {
                 amount = selectedPack.euro;
-                prize_id = null;
-                category = 'small';
+                prize_id = null; // Pack mode : lot aléatoire
             } else if (currentMode === 'lots' && selectedPrize) {
                 amount = CATEGORY_PRICES[selectedPrize.category];
                 prize_id = selectedPrize.id;
-                category = selectedPrize.category;
             } else {
                 alert('Erreur : aucune sélection');
                 showPaymentChoice();
                 return;
             }
             
-            const confirmed = confirm(`💳 Paiement de ${amount.toFixed(2)}€ par carte bancaire\n\nEn production, vous seriez redirigé vers Stripe Checkout.\n\nCliquez OK pour simuler le paiement.`);
-            if (!confirmed) { showPaymentChoice(); return; }
-            
-            showLoading();
-            await new Promise(r => setTimeout(r, 1500));
-            gameResult = simulateScratchResult(prize_id, category);
-            startAutoScratch();
+            try {
+                const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
+                    user_id: USER_ID,
+                    organization_id: ORGANIZATION_ID,
+                    payment_method: 'card',
+                    amount: amount,
+                    prize_id: prize_id
+                });
+                
+                if (response.data.success && response.data.payment_required) {
+                    window.location.href = response.data.checkout_url;
+                } else {
+                    alert('Erreur lors de la création du paiement');
+                    showPaymentChoice();
+                }
+            } catch (error) {
+                console.error('Erreur paiement carte:', error);
+                alert('Erreur : ' + (error.response?.data?.message || error.message));
+                showPaymentChoice();
+            }
         }
         
-        // Jouer avec Wallet (simulation locale)
+        // Jouer avec Wallet
         async function playWithWallet() {
-            let prize_id, category;
+            showLoading();
+            
+            let amount, prize_id;
             
             if (currentMode === 'packs' && selectedPack) {
-                prize_id = null;
-                category = 'small';
+                amount = selectedPack.euro;
+                prize_id = null; // Pack mode : lot aléatoire
             } else if (currentMode === 'lots' && selectedPrize) {
+                amount = CATEGORY_PRICES[selectedPrize.category];
                 prize_id = selectedPrize.id;
-                category = selectedPrize.category;
             } else {
                 alert('Erreur : aucune sélection');
                 showPaymentChoice();
                 return;
             }
             
-            showLoading();
-            await new Promise(r => setTimeout(r, 1500));
-            gameResult = simulateScratchResult(prize_id, category);
-            startAutoScratch();
+            try {
+                const response = await axios.post(`${API_BASE_URL}/api/games/scratch/play`, {
+                    user_id: USER_ID,
+                    organization_id: ORGANIZATION_ID,
+                    payment_method: 'wallet',
+                    amount: amount,
+                    prize_id: prize_id
+                });
+                
+                if (response.data.success) {
+                    gameResult = response.data;
+                    startAutoScratch();
+                } else {
+                    alert('Erreur : ' + response.data.error);
+                    showPaymentChoice();
+                }
+            } catch (error) {
+                console.error('Erreur paiement wallet:', error);
+                alert('Erreur : ' + (error.response?.data?.message || error.message));
+                showPaymentChoice();
+            }
         }
         
         // Jouer avec Mobile Money
@@ -822,8 +792,23 @@
         
         async function showFinalResult() {
             const resultState = document.getElementById('result-state');
+            
+            // Envoyer automatiquement le reçu si email enregistré
             const userEmail = localStorage.getItem('user_email');
-            const receiptSent = false; // Pas de backend - reçu local uniquement
+            let receiptSent = false;
+            
+            if (userEmail && gameResult.transaction_id) {
+                try {
+                    await axios.post(`${API_BASE_URL}/api/games/send-receipt`, {
+                        transaction_id: gameResult.transaction_id,
+                        user_email: userEmail
+                    });
+                    receiptSent = true;
+                    console.log('✅ Reçu généré pour', userEmail);
+                } catch (err) {
+                    console.error('Erreur génération reçu:', err);
+                }
+            }
             
             if (gameResult.is_winner && gameResult.prize) {
                 resultState.innerHTML = `
@@ -953,11 +938,22 @@
             trackSocialShare('whatsapp', 0);
         }
         
-        function trackSocialShare(platform, reward) {
-            // Tracking local - pas de backend
-            console.log(`📊 Partage ${platform} tracké localement`);
-            if (reward > 0) {
-                alert(`🎉 +${reward} ${reward === 1 ? 'ticket' : reward < 1 ? '€' : 'tickets'} ! (Fonctionnalité disponible en production)`);
+        async function trackSocialShare(platform, reward) {
+            try {
+                await axios.post(`${API_BASE_URL}/api/games/track-social`, {
+                    user_id: USER_ID,
+                    organization_id: ORGANIZATION_ID,
+                    platform: platform,
+                    content_type: 'game_win',
+                    content_id: gameResult.game_id,
+                    reward_amount: reward
+                });
+                
+                if (reward > 0) {
+                    alert(`🎉 +${reward} ${reward === 1 ? 'ticket' : reward < 1 ? '€' : 'tickets'} !`);
+                }
+            } catch (err) {
+                console.error('Erreur tracking:', err);
             }
         }
         
@@ -1000,8 +996,35 @@
         
         // Initialisation
         window.addEventListener('DOMContentLoaded', () => {
-            // Initialisation en mode packs par défaut - pas de backend nécessaire
-            console.log('✅ Scratch initialisé en mode standalone');
+            // Charger les lots seulement si on bascule en mode lots
+            // Par défaut on est en mode packs
+            
+            // Retour depuis Stripe
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            
+            if (sessionId) {
+                document.getElementById('packs-section').classList.add('hidden');
+                document.getElementById('prizes-section').classList.add('hidden');
+                document.getElementById('game-area').classList.remove('hidden');
+                showLoading();
+                
+                axios.get(`${API_BASE_URL}/api/games/scratch/result/${sessionId}`)
+                    .then(response => {
+                        if (response.data.success) {
+                            gameResult = response.data;
+                            startAutoScratch();
+                        } else {
+                            alert('Erreur : ' + response.data.error);
+                            location.href = '/scratch.html';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Erreur : ' + (error.response?.data?.message || error.message));
+                        location.href = '/scratch.html';
+                    });
+            }
         });
     </script>
     
