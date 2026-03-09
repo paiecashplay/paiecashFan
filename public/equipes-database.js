@@ -828,24 +828,24 @@ const equipesDatabase = {
     // ========== ÉGYPTE ==========
     "egypte": {
         name: "Égypte 🇪🇬",
-        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Egyptian_Football_Association.png/200px-Egyptian_Football_Association.png",
+        logo: "/logos/egypte-fa.png",
         colors: ["#CE1126", "#000000"],
         appUrl: "app-universal-simple.html?club=Egypte&logo=🇪🇬&sport=Football+Federation&league=CAF",
         categories: [
             {
                 title: "🇪🇬 Équipes Nationales",
                 teams: [
-                    { name: "Pharaons", fullName: "Équipe Nationale A", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Egyptian_Football_Association.png/200px-Egyptian_Football_Association.png", coach: "Hossam Hassan", description: "Les Pharaons d'Égypte", achievements: "CAN 1957, 1959, 1986, 1998, 2006, 2008, 2010 (7 titres)", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Egypte+ENA&logo=🇪🇬&sport=Football&league=CAF" },
+                    { name: "Pharaons", fullName: "Équipe Nationale A", logo: "/logos/egypte-fa.png", coach: "Hossam Hassan", description: "Les Pharaons d'Égypte", achievements: "CAN 1957, 1959, 1986, 1998, 2006, 2008, 2010 (7 titres)", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Egypte+ENA&logo=🇪🇬&sport=Football&league=CAF" },
                     { name: "Pharaons U23", fullName: "Équipe Nationale Olympique", logo: "🇪🇬", description: "Sélection olympique égyptienne", sport: "Football", category: "U23", type: "nationale", appUrl: "app-universal-simple.html?club=Egypte+U23&logo=🇪🇬&sport=Football&league=CAF" }
                 ]
             },
             {
                 title: "⚽ Clubs Egyptian Premier League",
                 teams: [
-                    { name: "Al Ahly", fullName: "Al Ahly Sporting Club", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b3/Al_Ahly_SC_Logo.svg/200px-Al_Ahly_SC_Logo.svg.png", founded: 1907, stadium: "Al-Salam Stadium", titles: 44, description: "Le club le plus titré d'Afrique", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al+Ahly&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
-                    { name: "Zamalek", fullName: "Zamalek Sporting Club", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Zamalek_SC_logo.svg/200px-Zamalek_SC_logo.svg.png", founded: 1911, stadium: "Cairo International Stadium", titles: 13, description: "Le grand rival d'Al Ahly", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Zamalek&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
-                    { name: "Pyramids FC", fullName: "Pyramids Football Club", logo: "🇪🇬", founded: 2008, stadium: "Air Defence Stadium", titles: 1, description: "Club ambitieux du Caire", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Pyramids+FC&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
-                    { name: "Ismaily", fullName: "Ismaily Sporting Club", logo: "🇪🇬", founded: 1924, stadium: "Ismailia Stadium", titles: 3, description: "Club historique d'Ismaïlia", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Ismaily&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" }
+                    { name: "Al Ahly", fullName: "Al Ahly Sporting Club", logo: "/logos/al-ahly.png", founded: 1907, stadium: "Al-Salam Stadium", titles: 44, description: "Le club le plus titré d'Afrique", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al+Ahly&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Zamalek", fullName: "Zamalek Sporting Club", logo: "/logos/zamalek.png", founded: 1911, stadium: "Cairo International Stadium", titles: 13, description: "Le grand rival d'Al Ahly", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Zamalek&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Pyramids FC", fullName: "Pyramids Football Club", logo: "/logos/pyramids-fc.png", founded: 2008, stadium: "Air Defence Stadium", titles: 1, description: "Club ambitieux du Caire", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Pyramids+FC&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Ismaily", fullName: "Ismaily Sporting Club", logo: "/logos/ismaily.png", founded: 1924, stadium: "Ismailia Stadium", titles: 3, description: "Club historique d'Ismaïlia", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Ismaily&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" }
                 ]
             }
         ]
