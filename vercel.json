@@ -25,6 +25,7 @@
     { "src": "/api/shop/order/confirm", "dest": "/api/shop/order/confirm.js" },
     { "src": "/api/tombola/campaigns", "dest": "/api/tombola/campaigns.js" },
     { "src": "/api/tombola/participate", "dest": "/api/tombola/participate.js" },
+    { "src": "/api/currency/rates", "dest": "/api/currency/rates.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
