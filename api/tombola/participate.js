@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ success: false, error: 'Stripe non configuré' });
       }
 
-      const stripe = new Stripe(stripeKey, { apiVersion: '2024-12-18' });
+      const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
       const origin = req.headers.origin || 'https://paiecashfan.vercel.app';
 
       const session = await stripe.checkout.sessions.create({

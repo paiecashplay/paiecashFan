@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ success: false, error: 'Stripe non configuré (STRIPE_SECRET_KEY manquant)' });
       }
 
-      const stripe = new Stripe(stripeKey, { apiVersion: '2024-12-18' });
+      const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
       const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/') || 'https://paiecashfan.vercel.app';
 
       const session = await stripe.checkout.sessions.create({
