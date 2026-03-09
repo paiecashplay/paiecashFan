@@ -1094,7 +1094,7 @@
                 <div class="prize-won">
                     <div class="prize-won-icon">🎁</div>
                     <div class="prize-won-name">${prize.name}</div>
-                    <div class="prize-won-value">Valeur : ${prize.value.toFixed(2)} €</div>
+                    <div class="prize-won-value">Valeur : ${(typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.convert(prize.value).localFormatted : prize.value.toFixed(2) + ' €'}</div>
                     <div class="prize-won-match">
                         ${matched_numbers} numéro(s) trouvé(s)${matched_chance ? ' + Chance ✨' : ''}
                     </div>

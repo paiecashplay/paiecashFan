@@ -242,7 +242,7 @@
             <ul id="info-lots" class="space-y-2 text-gray-700 hidden">
                 <li><i class="fas fa-mouse-pointer text-purple-500 mr-2"></i> <strong>Passez la souris</strong> sur un lot pour le découvrir</li>
                 <li><i class="fas fa-hand-pointer text-blue-500 mr-2"></i> <strong>Cliquez sur le lot</strong> que vous voulez tenter de gagner</li>
-                <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix selon catégorie : <strong>1€, 5€ ou 10€</strong></li>
+                <li><i class="fas fa-euro-sign text-green-500 mr-2"></i> Prix selon catégorie : <strong id="scratch-price-info">1€, 5€ ou 10€</strong></li>
                 <li><i class="fas fa-magic text-orange-500 mr-2"></i> Grattage automatique en 3 secondes</li>
             </ul>
         </div>
@@ -453,19 +453,22 @@
             };
             
             // Afficher info du pack sélectionné
+            const _packPriceFormatted = (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur())
+                ? CurrencyConverter.convert(selectedPack.euro).localFormatted
+                : `${selectedPack.euro.toFixed(2)}€`;
             document.getElementById('selected-prize-info').innerHTML = `
                 <div class="text-center">
                     <i class="fas fa-box text-4xl text-purple-600 mb-3"></i>
                     <p class="text-xl font-bold text-gray-800 mb-2">Pack ${tickets} ticket${tickets > 1 ? 's' : ''}</p>
                     <p class="text-2xl font-bold text-purple-600 mb-2">${pcc} PCC</p>
-                    <p class="text-lg font-bold text-green-600">Prix : ${selectedPack.euro.toFixed(2)}€</p>
+                    <p class="text-lg font-bold text-green-600">Prix : ${_packPriceFormatted}</p>
                     <p class="text-sm text-gray-600 mt-2">Chances : ${tickets}/1000</p>
                 </div>
             `;
             
             // Mettre à jour les boutons de paiement
-            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${selectedPack.euro.toFixed(2)}€)`;
-            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${selectedPack.euro.toFixed(2)}€)`;
+            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${_packPriceFormatted})`;
+            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${_packPriceFormatted})`;
             
             // Cacher la grille et montrer les options de paiement
             document.getElementById('packs-section').classList.add('hidden');
@@ -506,11 +509,18 @@
             
             let html = '';
             
+            // Fonction helper pour formater un prix
+            const _fmtPrice = (eurAmount) => {
+                if (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur())
+                    return CurrencyConverter.convert(eurAmount).localFormatted;
+                return `${eurAmount}€`;
+            };
+
             // GROS LOTS
             if (grouped.big.length > 0) {
                 html += `
                     <div>
-                        <h3 class="font-bold text-xl text-purple-600 mb-4">🏆 GROS LOTS - Mise : 10€</h3>
+                        <h3 class="font-bold text-xl text-purple-600 mb-4">🏆 GROS LOTS - Mise : ${_fmtPrice(10)}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             ${grouped.big.map(prize => createPrizeCard(prize, 'big')).join('')}
                         </div>
@@ -522,7 +532,7 @@
             if (grouped.medium.length > 0) {
                 html += `
                     <div>
-                        <h3 class="font-bold text-xl text-blue-600 mb-4">🎁 LOTS MOYENS - Mise : 5€</h3>
+                        <h3 class="font-bold text-xl text-blue-600 mb-4">🎁 LOTS MOYENS - Mise : ${_fmtPrice(5)}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             ${grouped.medium.map(prize => createPrizeCard(prize, 'medium')).join('')}
                         </div>
@@ -534,7 +544,7 @@
             if (grouped.small.length > 0) {
                 html += `
                     <div>
-                        <h3 class="font-bold text-xl text-green-600 mb-4">✨ LOTS QUOTIDIENS - Mise : 1€</h3>
+                        <h3 class="font-bold text-xl text-green-600 mb-4">✨ LOTS QUOTIDIENS - Mise : ${_fmtPrice(1)}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             ${grouped.small.map(prize => createPrizeCard(prize, 'small')).join('')}
                         </div>
@@ -554,6 +564,10 @@
                 'small': { icon: 'fa-star', color: 'from-green-400 to-green-500', bg: 'from-green-50 to-green-100' }
             };
             const info = categoryInfo[category];
+            // Formater les prix en monnaie locale si disponible
+            const _cc = (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur());
+            const priceFormatted = _cc ? CurrencyConverter.convert(price).localFormatted : `${price}€`;
+            const prizeValueFormatted = _cc ? CurrencyConverter.convert(prize.value).localFormatted : `${prize.value}€`;
             
             return `
                 <div class="prize-card-hidden bg-gradient-to-r ${info.bg} rounded-xl p-6 shadow-lg relative overflow-hidden" 
@@ -564,7 +578,7 @@
                         <i class="fas ${info.icon} text-white text-4xl mb-3"></i>
                         <p class="text-white font-bold text-lg">????</p>
                         <p class="text-white text-sm mt-2">Survol pour découvrir</p>
-                        <p class="text-white font-bold text-lg mt-3">Mise : ${price}€</p>
+                        <p class="text-white font-bold text-lg mt-3">Mise : ${priceFormatted}</p>
                     </div>
                     
                     <!-- Contenu réel (révélé au survol) -->
@@ -574,9 +588,9 @@
                         </div>
                         <p class="font-bold text-gray-800 text-lg mb-2">${prize.name}</p>
                         <p class="text-sm text-gray-600 mb-3">${prize.description || 'Lot exclusif'}</p>
-                        <p class="prize-value text-2xl mb-3">${prize.value}€</p>
+                        <p class="prize-value text-2xl mb-3">${prizeValueFormatted}</p>
                         <div class="play-btn bg-gradient-to-r ${info.color} text-white font-bold py-2 px-4 rounded-lg inline-block">
-                            <i class="fas fa-play mr-2"></i>JOUER (${price}€)
+                            <i class="fas fa-play mr-2"></i>JOUER (${priceFormatted})
                         </div>
                     </div>
                 </div>
@@ -589,20 +603,23 @@
             if (!selectedPrize) return;
             
             const price = CATEGORY_PRICES[selectedPrize.category];
+            const _cc2 = (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur());
+            const _priceF = _cc2 ? CurrencyConverter.convert(price).localFormatted : `${price}€`;
+            const _valueF = _cc2 ? CurrencyConverter.convert(selectedPrize.value).localFormatted : `${selectedPrize.value}€`;
             
             // Afficher info du lot sélectionné
             document.getElementById('selected-prize-info').innerHTML = `
                 <div class="text-center">
                     <p class="text-xl font-bold text-gray-800 mb-2">${selectedPrize.name}</p>
                     <p class="text-gray-600 mb-2">${selectedPrize.description || ''}</p>
-                    <p class="text-2xl font-bold text-purple-600">Valeur : ${selectedPrize.value}€</p>
-                    <p class="text-lg font-bold text-green-600 mt-2">Mise : ${price}€</p>
+                    <p class="text-2xl font-bold text-purple-600">Valeur : ${_valueF}</p>
+                    <p class="text-lg font-bold text-green-600 mt-2">Mise : ${_priceF}</p>
                 </div>
             `;
             
             // Mettre à jour les boutons de paiement
-            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${price}€)`;
-            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${price}€)`;
+            document.getElementById('card-btn-text').textContent = `Payer par Carte Bancaire (${_priceF})`;
+            document.getElementById('wallet-btn-text').textContent = `Payer avec Wallet (${_priceF})`;
             
             // Cacher la grille et montrer les options de paiement
             document.getElementById('prizes-section').classList.add('hidden');
@@ -777,12 +794,14 @@
             const resultContent = document.getElementById('result-content');
             
             if (gameResult.is_winner && gameResult.prize) {
+                const _cc3 = (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur());
+                const _winValueF = _cc3 ? CurrencyConverter.convert(gameResult.prize.value).localFormatted : `${gameResult.prize.value}€`;
                 resultContent.innerHTML = `
                     <div class="prize-animation">
                         <i class="fas fa-trophy text-yellow-400 text-6xl mb-4"></i>
                         <h3 class="text-3xl font-bold text-green-600 mb-2">BRAVO !</h3>
                         <p class="text-xl font-bold text-gray-800">${gameResult.prize.name}</p>
-                        <p class="text-lg text-gray-600">Valeur : ${gameResult.prize.value}€</p>
+                        <p class="text-lg text-gray-600">Valeur : ${_winValueF}</p>
                     </div>
                 `;
             } else {
@@ -816,7 +835,9 @@
                 }
             }
             
+            const _cc4 = (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur());
             if (gameResult.is_winner && gameResult.prize) {
+                const _finalValueF = _cc4 ? CurrencyConverter.convert(gameResult.prize.value).localFormatted : `${gameResult.prize.value}€`;
                 resultState.innerHTML = `
                     <div class="text-center">
                         <i class="fas fa-trophy text-yellow-400 text-6xl mb-4 animate-bounce"></i>
@@ -824,7 +845,7 @@
                         <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl mb-4">
                             <p class="text-2xl font-bold text-gray-800 mb-2">${gameResult.prize.name}</p>
                             <p class="text-lg text-gray-600 mb-1">${gameResult.prize.description || ''}</p>
-                            <p class="text-xl font-bold text-green-600">Valeur : ${gameResult.prize.value}€</p>
+                            <p class="text-xl font-bold text-green-600">Valeur : ${_finalValueF}</p>
                         </div>
                         
                         <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl mb-4">
@@ -1014,6 +1035,14 @@
                     if (headerDiv) headerDiv.insertAdjacentHTML('afterend', CurrencyConverter.getConversionBanner());
                     // Conversion universelle de TOUS les montants € dans le DOM
                     CurrencyConverter.convertAllDomAmounts(document.body);
+                    // Mettre à jour le texte statique des prix
+                    const priceInfoEl = document.getElementById('scratch-price-info');
+                    if (priceInfoEl) {
+                        const p1 = CurrencyConverter.convert(1).localFormatted;
+                        const p5 = CurrencyConverter.convert(5).localFormatted;
+                        const p10 = CurrencyConverter.convert(10).localFormatted;
+                        priceInfoEl.textContent = `${p1}, ${p5} ou ${p10}`;
+                    }
                 }
             }
             

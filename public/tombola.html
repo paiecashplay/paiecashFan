@@ -293,7 +293,7 @@
                             </div>
                         </div>
                         <div class="bg-white bg-opacity-10 rounded-xl p-3 mb-4">
-                            <div class="text-2xl font-black text-white">${campaign.entry_fee}€</div>
+                            <div class="text-2xl font-black text-white">${(typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.convert(campaign.entry_fee).localFormatted : campaign.entry_fee + '€'}</div>
                             <div class="text-xs text-pink-200">Prix d'entrée</div>
                         </div>
                         <button onclick="participateToCampaign('${campaign.id}')" class="w-full bg-white hover:bg-gray-100 text-pink-900 font-bold py-3 rounded-xl transition">
@@ -327,7 +327,7 @@
                             <p class="text-purple-200 text-sm mb-3">${lot.description || ''}</p>
                         </div>
                         <div class="bg-white bg-opacity-10 rounded-xl p-3">
-                            <div class="text-2xl font-black text-white">${lot.perceived_value}€</div>
+                            <div class="text-2xl font-black text-white">${(typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.convert(lot.perceived_value).localFormatted : lot.perceived_value + '€'}</div>
                             <div class="text-xs text-purple-200">Valeur perçue</div>
                         </div>
                     </div>
@@ -358,7 +358,7 @@
                         </div>
                         <div class="text-sm text-blue-200 space-y-1">
                             <div><i class="fas fa-calendar mr-2"></i>${new Date(participation.participation_date).toLocaleDateString('fr-FR')}</div>
-                            <div><i class="fas fa-euro-sign mr-2"></i>${participation.amount_paid}€</div>
+                            <div><i class="fas fa-euro-sign mr-2"></i>${(typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.convert(participation.amount_paid).localFormatted : participation.amount_paid + '€'}</div>
                         </div>
                     </div>
                 `).join('');

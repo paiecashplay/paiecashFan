@@ -2,6 +2,11 @@
  * CurrencyConverter — Conversion universelle de devises pour PaieCashFan
  * Fonctionne pour TOUS les clubs (français et étrangers)
  * Appelle /api/currency/rates pour obtenir le taux en temps réel
+ * 
+ * Comportement :
+ * - Clubs français (EUR) : prix affichés en euros, aucune conversion
+ * - Clubs internationaux : prix affichés UNIQUEMENT en monnaie locale (MAD, NGN, XOF, DZD, etc.)
+ *   → Pas d'affichage du prix en euros entre parenthèses
  */
 
 const CurrencyConverter = {
@@ -62,36 +67,34 @@ const CurrencyConverter = {
         return `${amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${symbol}`;
     },
 
-    // Afficher le prix avec conversion dans un élément HTML
+    // Afficher le prix dans un élément HTML — uniquement en monnaie locale
     displayPrice(element, amountEUR) {
         const result = this.convert(amountEUR);
-        if (result.isEUR) {
-            element.innerHTML = `<span class="price-local">${result.localFormatted}</span>`;
-        } else {
-            element.innerHTML = `<span class="price-local">${result.localFormatted}</span> <span class="price-eur">(${result.eurFormatted})</span>`;
-        }
+        element.innerHTML = `<span class="price-local">${result.localFormatted}</span>`;
     },
 
     // Obtenir le badge de devise pour affichage dans le header
     getCurrencyBadge() {
         if (this.isEur()) return '';
         const info = this.currencyInfo;
-        return `<span class="currency-badge">${info.flag} ${info.symbol} · Taux: 1€ = ${this.formatAmount(info.rate, info)}</span>`;
+        return `<span class="currency-badge">${info.flag} ${info.symbol}</span>`;
     },
 
-    // Bannière de conversion
+    // Bannière d'information sur la devise utilisée
     getConversionBanner() {
         if (this.isEur()) return '';
         const info = this.currencyInfo;
-        return `<div class="currency-info-bar">${info.flag} Prix affichés en <strong>${info.symbol}</strong> · 1€ = ${this.formatAmount(info.rate, info)}</div>`;
+        return `<div class="currency-info-bar">${info.flag} Prix affichés en <strong>${info.name} (${info.symbol})</strong></div>`;
     },
 
     // ============================================================
     // CONVERSION UNIVERSELLE : convertit tous les montants € dans le DOM
+    // Affiche UNIQUEMENT la monnaie locale — pas d'euros entre parenthèses
     // ============================================================
     convertAllDomAmounts(container) {
-        if (this.isEur()) return; // Pas de conversion pour les clubs français
-        const root = container || document;
+        if (this.isEur()) return; // Pas de conversion pour les clubs français/EUR
+
+        const root = container || document.body;
 
         // Regex pour détecter un montant en euros : "10 000€", "2€", "2,00 €", "10-20€", "5 000 €"
         const euroRegex = /(\d[\d\s]*(?:[,\.]\d+)?(?:\s*-\s*\d[\d\s]*(?:[,\.]\d+)?)?)\s*€/g;
@@ -104,21 +107,22 @@ const CurrencyConverter = {
                     if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
                         const c1 = this.convert(parts[0]);
                         const c2 = this.convert(parts[1]);
-                        return `${c1.localFormatted}-${c2.localFormatted} <span style="opacity:0.65;font-size:0.85em">(${parts[0]}-${parts[1]} €)</span>`;
+                        // Afficher uniquement en monnaie locale, sans euros
+                        return `${c1.localFormatted} - ${c2.localFormatted}`;
                     }
                 }
                 const clean = numStr.replace(/\s/g,'').replace(',','.');
                 const num = parseFloat(clean);
                 if (isNaN(num) || num === 0) return match;
                 const c = this.convert(num);
-                return `${c.localFormatted} <span style="opacity:0.65;font-size:0.85em">(${c.eurFormatted})</span>`;
+                // Afficher UNIQUEMENT le montant local, sans euros entre parenthèses
+                return c.localFormatted;
             });
         };
 
         // Parcourir tous les noeuds texte du DOM
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
             acceptNode(node) {
-                // Ignorer les scripts, styles, et noeuds déjà convertis
                 const parent = node.parentElement;
                 if (!parent) return NodeFilter.FILTER_REJECT;
                 const tag = parent.tagName;
@@ -153,7 +157,6 @@ const CurrencyConverter = {
         const c = club || params.get('club') || '';
         const l = league || params.get('league') || '';
         await this.init(c, l);
-        // Attendre que le DOM soit prêt
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.convertAllDomAmounts());
         } else {
@@ -167,7 +170,6 @@ const CurrencyConverter = {
 const _currencyStyle = document.createElement('style');
 _currencyStyle.textContent = `
     .price-local { font-weight: bold; }
-    .price-eur { font-size: 0.8em; opacity: 0.7; margin-left: 4px; }
     .currency-badge {
         display: inline-block;
         background: rgba(255,255,255,0.15);
