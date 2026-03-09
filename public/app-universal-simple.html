@@ -3861,60 +3861,66 @@ function shareResult() {
         function navigateToEquipes() {
             const urlParams = new URLSearchParams(window.location.search);
             const clubName = urlParams.get('club') || 'Maroc';
+            const league   = urlParams.get('league') || '';
+            const logo     = urlParams.get('logo') || '⚽';
+            const sport    = urlParams.get('sport') || 'Football';
             
             // Mapping des noms de clubs vers leurs identifiants
             const clubMapping = {
-                'Paris SG': 'psg',
-                'Paris Saint-Germain': 'psg',
-                'PSG': 'psg',
-                'Olympique de Marseille': 'marseille',
-                'Marseille': 'marseille',
-                'OM': 'marseille',
-                'Olympique Lyonnais': 'lyon',
-                'Lyon': 'lyon',
-                'OL': 'lyon',
-                'AS Monaco': 'monaco',
-                'Monaco': 'monaco',
-                'OGC Nice': 'nice',
-                'Nice': 'nice',
-                'RC Lens': 'lens',
-                'Lens': 'lens',
-                'LOSC Lille': 'lille',
-                'Lille': 'lille',
-                'Stade Rennais': 'rennes',
-                'Rennes': 'rennes',
-                'FC Nantes': 'nantes',
-                'Nantes': 'nantes',
-                'RC Strasbourg': 'strasbourg',
-                'Strasbourg': 'strasbourg',
-                'Stade Brestois': 'brest',
-                'Brest': 'brest',
-                'Montpellier HSC': 'montpellier',
-                'Montpellier': 'montpellier',
-                'Stade de Reims': 'reims',
-                'Reims': 'reims',
-                'Maroc': 'maroc',
-                'MA': 'maroc',
-                'Tanzanie': 'tanzanie',
-                'Tanzania': 'tanzanie',
-                'Young Africans SC': 'tanzanie',
-                'Simba SC': 'tanzanie',
-                'Azam FC': 'tanzanie',
-                'Mauritanie': 'mauritanie',
-                'Mauritania': 'mauritanie',
-                'FC Nouadhibou': 'mauritanie',
-                'AS Douanes': 'mauritanie',
-                'Kenya': 'kenya',
-                'Gor Mahia': 'kenya',
-                'AFC Leopards': 'kenya',
-                'Ouganda': 'ouganda',
-                'Uganda': 'ouganda',
-                'KCCA FC': 'ouganda',
-                'Vipers SC': 'ouganda'
+                // France
+                'Paris SG': 'psg', 'Paris Saint-Germain': 'psg', 'PSG': 'psg',
+                'Olympique de Marseille': 'marseille', 'Marseille': 'marseille', 'OM': 'marseille',
+                'Olympique Lyonnais': 'lyon', 'Lyon': 'lyon', 'OL': 'lyon',
+                'AS Monaco': 'monaco', 'Monaco': 'monaco',
+                'OGC Nice': 'nice', 'Nice': 'nice',
+                'RC Lens': 'lens', 'Lens': 'lens',
+                'LOSC Lille': 'lille', 'Lille': 'lille',
+                'Stade Rennais': 'rennes', 'Rennes': 'rennes',
+                'FC Nantes': 'nantes', 'Nantes': 'nantes',
+                'RC Strasbourg': 'strasbourg', 'Strasbourg': 'strasbourg',
+                'Stade Brestois': 'brest', 'Brest': 'brest',
+                'Montpellier HSC': 'montpellier', 'Montpellier': 'montpellier',
+                'Stade de Reims': 'reims', 'Reims': 'reims',
+                // Afrique du Nord
+                'Maroc': 'maroc', 'MA': 'maroc', 'Morocco': 'maroc',
+                'Algérie': 'algerie', 'Algeria': 'algerie', 'DZ': 'algerie',
+                'Égypte': 'egypte', 'Egypt': 'egypte', 'EG': 'egypte',
+                'Tunisie': 'tunisie', 'Tunisia': 'tunisie', 'TN': 'tunisie',
+                'Libye': 'libye', 'Libya': 'libye', 'LY': 'libye',
+                // Afrique de l'Ouest
+                'Sénégal': 'senegal', 'Senegal': 'senegal', 'SN': 'senegal',
+                'Nigeria': 'nigeria', 'NG': 'nigeria',
+                'Ghana': 'ghana', 'GH': 'ghana',
+                "Côte d'Ivoire": 'cote-divoire', "Cote d'Ivoire": 'cote-divoire', 'CI': 'cote-divoire',
+                'Mali': 'mali', 'ML': 'mali',
+                'Guinée': 'guinee', 'Guinea': 'guinee', 'GN': 'guinee',
+                'Burkina Faso': 'burkina-faso', 'BF': 'burkina-faso',
+                // Afrique Centrale
+                'Cameroun': 'cameroun', 'Cameroon': 'cameroun', 'CM': 'cameroun',
+                'Congo RDC': 'congo-rdc', 'RDC': 'congo-rdc', 'Congo': 'congo-rdc',
+                'Angola': 'angola', 'AO': 'angola',
+                // Afrique de l'Est
+                'Tanzanie': 'tanzanie', 'Tanzania': 'tanzanie',
+                'Young Africans SC': 'tanzanie', 'Simba SC': 'tanzanie', 'Azam FC': 'tanzanie',
+                'Kenya': 'kenya', 'Gor Mahia': 'kenya', 'AFC Leopards': 'kenya',
+                'Ouganda': 'ouganda', 'Uganda': 'ouganda', 'KCCA FC': 'ouganda', 'Vipers SC': 'ouganda',
+                'Éthiopie': 'ethiopie', 'Ethiopia': 'ethiopie', 'ET': 'ethiopie',
+                // Afrique Australe
+                'Afrique du Sud': 'afrique-du-sud', 'South Africa': 'afrique-du-sud', 'ZA': 'afrique-du-sud',
+                'Zimbabwe': 'zimbabwe', 'ZW': 'zimbabwe',
+                // Mauritanie
+                'Mauritanie': 'mauritanie', 'Mauritania': 'mauritanie',
+                'FC Nouadhibou': 'mauritanie', 'AS Douanes': 'mauritanie'
             };
             
-            // Obtenir l'ID du club
-            let clubId = clubMapping[clubName] || clubName.toLowerCase().replace(/\s+/g, '-');
+            // Obtenir l'ID du club (normaliser les accents et apostrophes)
+            let clubId = clubMapping[clubName];
+            if (!clubId) {
+                clubId = clubName.toLowerCase()
+                    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                    .replace(/['']/g, '')
+                    .replace(/\s+/g, '-');
+            }
             
             // Clubs spéciaux avec leur propre page
             if (clubId === 'maroc') {
@@ -3928,8 +3934,8 @@ function shareResult() {
             } else if (clubId === 'ouganda') {
                 window.location.href = 'equipes-ouganda.html';
             } else {
-                // Tous les autres clubs utilisent equipes.html avec paramètre
-                window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}`;
+                // Tous les autres clubs utilisent equipes.html avec paramètre + paramètres de retour
+                window.location.href = `equipes.html?club=${encodeURIComponent(clubId)}&league=${encodeURIComponent(league)}&logo=${encodeURIComponent(logo)}&sport=${encodeURIComponent(sport)}`;
             }
         }
         

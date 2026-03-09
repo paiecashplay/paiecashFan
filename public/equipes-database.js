@@ -7,7 +7,7 @@ const equipesDatabase = {
     // ========== MAROC ==========
     "maroc": {
         name: "Maroc 🇲🇦",
-        logo: "🇲🇦",
+        logo: "/logos/maroc-frmf.png",
         colors: ["#C1272D", "#006233"], // Rouge et vert
         appUrl: "app-universal-simple.html?club=Maroc&logo=🇲🇦&sport=Football&league=Fédération",
         categories: [
@@ -490,7 +490,7 @@ const equipesDatabase = {
     // ========== CAF (Confédération Africaine de Football) ==========
     "caf": {
         name: "CAF",
-        logo: "🌍",
+        logo: "/logos/caf.png",
         colors: ["#006233", "#FCD116"], // Vert et jaune (couleurs africaines)
         appUrl: "app-universal-simple.html?club=CAF&logo=🌍&sport=Football&league=Fédération",
         categories: [
@@ -612,9 +612,23 @@ const equipesDatabase = {
     "tanzanie": {
         name: "Tanzanie 🇹🇿",
         logo: "🇹🇿",
-        colors: ["#1EB53A", "#00A3DD"],
-        appUrl: "equipes-tanzanie.html",
-        categories: []
+        colors: ["#1EB53A", "#FCD116"],
+        appUrl: "app-universal-simple.html?club=Tanzanie&logo=🇹🇿&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇹🇿 Équipes Nationales",
+                teams: [
+                    { name: "Taifa Stars", fullName: "Équipe Nationale A", logo: "🇹🇿", description: "Les Taifa Stars de Tanzanie", achievements: "CECAFA Cup 1974, 2017", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Tanzanie+ENA&logo=🇹🇿&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Tanzania Premier League",
+                teams: [
+                    { name: "Simba SC", fullName: "Simba Sports Club", logo: "🇹🇿", founded: 1936, stadium: "Benjamin Mkapa Stadium", titles: 26, description: "Club le plus titré de Tanzanie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Simba+SC&logo=🇹🇿&sport=Football&league=Tanzania+Premier+League" },
+                    { name: "Young Africans", fullName: "Young Africans SC", logo: "🇹🇿", founded: 1935, stadium: "Benjamin Mkapa Stadium", titles: 28, description: "Le grand rival de Simba", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Young+Africans&logo=🇹🇿&sport=Football&league=Tanzania+Premier+League" }
+                ]
+            }
+        ]
     },
 
     // ========== MAURITANIE ==========
@@ -622,32 +636,74 @@ const equipesDatabase = {
         name: "Mauritanie 🇲🇷",
         logo: "🇲🇷",
         colors: ["#00A95C", "#FFC72C"],
-        appUrl: "equipes-mauritanie.html",
-        categories: []
+        appUrl: "app-universal-simple.html?club=Mauritanie&logo=🇲🇷&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇲🇷 Équipes Nationales",
+                teams: [
+                    { name: "Mourabitounes", fullName: "Équipe Nationale A", logo: "🇲🇷", description: "Les Mourabitounes de Mauritanie", achievements: "Première participation CAN 2019", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Mauritanie+ENA&logo=🇲🇷&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue 1 Mauritanie",
+                teams: [
+                    { name: "FC Tevragh-Zeina", fullName: "FC Tevragh-Zeina", logo: "🇲🇷", founded: 1999, stadium: "Stade Olympique de Nouakchott", titles: 5, description: "Club le plus titré de Mauritanie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=FC+Tevragh-Zeina&logo=🇲🇷&sport=Football&league=Ligue+1+Mauritanie" },
+                    { name: "ASC Ksar", fullName: "ASC Ksar", logo: "🇲🇷", founded: 1962, stadium: "Stade Olympique de Nouakchott", titles: 4, description: "Club historique de Nouakchott", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=ASC+Ksar&logo=🇲🇷&sport=Football&league=Ligue+1+Mauritanie" }
+                ]
+            }
+        ]
     },
 
     // ========== KENYA ==========
     "kenya": {
         name: "Kenya 🇰🇪",
         logo: "🇰🇪",
-        colors: ["#006600", "#DC143C"],
-        appUrl: "equipes-kenya.html",
-        categories: []
+        colors: ["#006600", "#BB0000"],
+        appUrl: "app-universal-simple.html?club=Kenya&logo=🇰🇪&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇰🇪 Équipes Nationales",
+                teams: [
+                    { name: "Harambee Stars", fullName: "Équipe Nationale A", logo: "🇰🇪", description: "Les Harambee Stars du Kenya", achievements: "CECAFA Cup 1975, 1981, 1982", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Kenya+ENA&logo=🇰🇪&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Kenya Premier League",
+                teams: [
+                    { name: "Gor Mahia", fullName: "Gor Mahia FC", logo: "🇰🇪", founded: 1968, stadium: "Nyayo National Stadium", titles: 20, description: "Club le plus titré du Kenya", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Gor+Mahia&logo=🇰🇪&sport=Football&league=Kenya+Premier+League" },
+                    { name: "AFC Leopards", fullName: "AFC Leopards SC", logo: "🇰🇪", founded: 1964, stadium: "Nyayo National Stadium", titles: 13, description: "Grand rival de Gor Mahia", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=AFC+Leopards&logo=🇰🇪&sport=Football&league=Kenya+Premier+League" }
+                ]
+            }
+        ]
     },
 
     // ========== OUGANDA ==========
     "ouganda": {
         name: "Ouganda 🇺🇬",
         logo: "🇺🇬",
-        colors: ["#FCDC04", "#D90000"],
-        appUrl: "equipes-ouganda.html",
-        categories: []
+        colors: ["#000000", "#FCDC04"],
+        appUrl: "app-universal-simple.html?club=Ouganda&logo=🇺🇬&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇺🇬 Équipes Nationales",
+                teams: [
+                    { name: "Cranes", fullName: "Équipe Nationale A", logo: "🇺🇬", description: "Les Cranes d'Ouganda", achievements: "CECAFA Cup 1976, 2003", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Ouganda+ENA&logo=🇺🇬&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Uganda Premier League",
+                teams: [
+                    { name: "KCCA FC", fullName: "Kampala Capital City Authority FC", logo: "🇺🇬", founded: 2008, stadium: "StarTimes Stadium", titles: 14, description: "Club le plus titré d'Ouganda", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=KCCA+FC&logo=🇺🇬&sport=Football&league=Uganda+Premier+League" },
+                    { name: "Express FC", fullName: "Express Football Club", logo: "🇺🇬", founded: 1957, stadium: "Mutesa II Wankulukuku Stadium", titles: 9, description: "Club historique de Kampala", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Express+FC&logo=🇺🇬&sport=Football&league=Uganda+Premier+League" }
+                ]
+            }
+        ]
     },
 
     // ========== CAMEROUN ==========
     "cameroun": {
         name: "Cameroun 🇨🇲",
-        logo: "🇨🇲",
+        logo: "/logos/cameroun-fecafoot.png",
         colors: ["#007A5E", "#CE1126"],
         appUrl: "app-universal-simple.html?club=Cameroun&logo=🇨🇲&sport=Football+Federation&league=CAF",
         categories: [
@@ -676,7 +732,7 @@ const equipesDatabase = {
     // ========== CÔTE D'IVOIRE ==========
     "cote-divoire": {
         name: "Côte d'Ivoire 🇨🇮",
-        logo: "🇨🇮",
+        logo: "/logos/cote-ivoire-fif.png",
         colors: ["#F77F00", "#009A44"],
         appUrl: "app-universal-simple.html?club=C%C3%B4te+d'Ivoire&logo=🇨🇮&sport=Football+Federation&league=CAF",
         categories: [
@@ -724,7 +780,7 @@ const equipesDatabase = {
     // ========== NIGERIA ==========
     "nigeria": {
         name: "Nigeria 🇳🇬",
-        logo: "🇳🇬",
+        logo: "/logos/nigeria-nff.png",
         colors: ["#008751", "#FFFFFF"],
         appUrl: "app-universal-simple.html?club=Nigeria&logo=🇳🇬&sport=Football+Federation&league=CAF",
         categories: [
@@ -767,7 +823,292 @@ const equipesDatabase = {
                 ]
             }
         ]
-    }
+    },
+
+    // ========== ÉGYPTE ==========
+    "egypte": {
+        name: "Égypte 🇪🇬",
+        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Egyptian_Football_Association.png/200px-Egyptian_Football_Association.png",
+        colors: ["#CE1126", "#000000"],
+        appUrl: "app-universal-simple.html?club=Egypte&logo=🇪🇬&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇪🇬 Équipes Nationales",
+                teams: [
+                    { name: "Pharaons", fullName: "Équipe Nationale A", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Egyptian_Football_Association.png/200px-Egyptian_Football_Association.png", coach: "Hossam Hassan", description: "Les Pharaons d'Égypte", achievements: "CAN 1957, 1959, 1986, 1998, 2006, 2008, 2010 (7 titres)", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Egypte+ENA&logo=🇪🇬&sport=Football&league=CAF" },
+                    { name: "Pharaons U23", fullName: "Équipe Nationale Olympique", logo: "🇪🇬", description: "Sélection olympique égyptienne", sport: "Football", category: "U23", type: "nationale", appUrl: "app-universal-simple.html?club=Egypte+U23&logo=🇪🇬&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Egyptian Premier League",
+                teams: [
+                    { name: "Al Ahly", fullName: "Al Ahly Sporting Club", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b3/Al_Ahly_SC_Logo.svg/200px-Al_Ahly_SC_Logo.svg.png", founded: 1907, stadium: "Al-Salam Stadium", titles: 44, description: "Le club le plus titré d'Afrique", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al+Ahly&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Zamalek", fullName: "Zamalek Sporting Club", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Zamalek_SC_logo.svg/200px-Zamalek_SC_logo.svg.png", founded: 1911, stadium: "Cairo International Stadium", titles: 13, description: "Le grand rival d'Al Ahly", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Zamalek&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Pyramids FC", fullName: "Pyramids Football Club", logo: "🇪🇬", founded: 2008, stadium: "Air Defence Stadium", titles: 1, description: "Club ambitieux du Caire", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Pyramids+FC&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" },
+                    { name: "Ismaily", fullName: "Ismaily Sporting Club", logo: "🇪🇬", founded: 1924, stadium: "Ismailia Stadium", titles: 3, description: "Club historique d'Ismaïlia", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Ismaily&logo=🇪🇬&sport=Football&league=Egyptian+Premier+League" }
+                ]
+            }
+        ]
+    },
+
+    // ========== TUNISIE ==========
+    "tunisie": {
+        name: "Tunisie 🇹🇳",
+        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Federation_Tunisienne_de_Football_logo.png/200px-Federation_Tunisienne_de_Football_logo.png",
+        colors: ["#E70013", "#FFFFFF"],
+        appUrl: "app-universal-simple.html?club=Tunisie&logo=🇹🇳&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇹🇳 Équipes Nationales",
+                teams: [
+                    { name: "Aigles de Carthage", fullName: "Équipe Nationale A", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Federation_Tunisienne_de_Football_logo.png/200px-Federation_Tunisienne_de_Football_logo.png", coach: "Faouzi Benzarti", description: "Les Aigles de Carthage", achievements: "CAN 2004", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Tunisie+ENA&logo=🇹🇳&sport=Football&league=CAF" },
+                    { name: "Aigles U23", fullName: "Équipe Nationale Olympique", logo: "🇹🇳", description: "Sélection olympique tunisienne", sport: "Football", category: "U23", type: "nationale", appUrl: "app-universal-simple.html?club=Tunisie+U23&logo=🇹🇳&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue Professionnelle 1",
+                teams: [
+                    { name: "Espérance Tunis", fullName: "Espérance Sportive de Tunis", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Esperance_Sportive_de_Tunis.png/200px-Esperance_Sportive_de_Tunis.png", founded: 1919, stadium: "Stade Olympique de Radès", titles: 32, description: "Club le plus titré de Tunisie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Esperance+Tunis&logo=🇹🇳&sport=Football&league=Ligue+Pro+1+Tunisie" },
+                    { name: "Club Africain", fullName: "Club Africain", logo: "🇹🇳", founded: 1920, stadium: "Stade Olympique de Radès", titles: 13, description: "Grand rival de l'Espérance", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Club+Africain&logo=🇹🇳&sport=Football&league=Ligue+Pro+1+Tunisie" },
+                    { name: "Étoile du Sahel", fullName: "Étoile Sportive du Sahel", logo: "🇹🇳", founded: 1925, stadium: "Stade Taïeb Mhiri", titles: 12, description: "Club de Sousse", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Etoile+Sahel&logo=🇹🇳&sport=Football&league=Ligue+Pro+1+Tunisie" },
+                    { name: "CS Sfaxien", fullName: "Club Sportif Sfaxien", logo: "🇹🇳", founded: 1928, stadium: "Stade Taïeb Mhiri", titles: 9, description: "Le club de Sfax", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=CS+Sfaxien&logo=🇹🇳&sport=Football&league=Ligue+Pro+1+Tunisie" }
+                ]
+            }
+        ]
+    },
+
+    // ========== LIBYE ==========
+    "libye": {
+        name: "Libye 🇱🇾",
+        logo: "🇱🇾",
+        colors: ["#000000", "#FFFFFF"],
+        appUrl: "app-universal-simple.html?club=Libye&logo=🇱🇾&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇱🇾 Équipes Nationales",
+                teams: [
+                    { name: "Chevaliers de la Méditerranée", fullName: "Équipe Nationale A", logo: "🇱🇾", description: "Équipe nationale de Libye", achievements: "Finaliste CAN 1982", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Libye+ENA&logo=🇱🇾&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Libyan Premier League",
+                teams: [
+                    { name: "Al-Ahly Tripoli", fullName: "Al-Ahly Tripoli SC", logo: "🇱🇾", founded: 1950, stadium: "Stade du 11 Juin", titles: 8, description: "Club historique de Tripoli", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ahly+Tripoli&logo=🇱🇾&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Ittihad Tripoli", fullName: "Al-Ittihad Tripoli SC", logo: "🇱🇾", founded: 1944, stadium: "Stade du 11 Juin", titles: 6, description: "Club populaire de Tripoli", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ittihad+Tripoli&logo=🇱🇾&sport=Football&league=Libyan+Premier+League" }
+                ]
+            }
+        ]
+    },
+
+    // ========== GHANA ==========
+    "ghana": {
+        name: "Ghana 🇬🇭",
+        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e3/Ghana_Football_Association_logo.svg/200px-Ghana_Football_Association_logo.svg.png",
+        colors: ["#006B3F", "#FCD116"],
+        appUrl: "app-universal-simple.html?club=Ghana&logo=🇬🇭&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇬🇭 Équipes Nationales",
+                teams: [
+                    { name: "Black Stars", fullName: "Équipe Nationale A", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e3/Ghana_Football_Association_logo.svg/200px-Ghana_Football_Association_logo.svg.png", coach: "Otto Addo", description: "Les Black Stars du Ghana", achievements: "CAN 1963, 1965, 1978, 1982", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Ghana+ENA&logo=🇬🇭&sport=Football&league=CAF" },
+                    { name: "Black Satellites", fullName: "Équipe Nationale U20", logo: "🇬🇭", description: "Champions du Monde U20 2009", sport: "Football", category: "U20", type: "nationale", appUrl: "app-universal-simple.html?club=Ghana+U20&logo=🇬🇭&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ghana Premier League",
+                teams: [
+                    { name: "Asante Kotoko", fullName: "Asante Kotoko Sporting Club", logo: "🇬🇭", founded: 1935, stadium: "Baba Yara Stadium", titles: 25, description: "Club le plus titré du Ghana", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Asante+Kotoko&logo=🇬🇭&sport=Football&league=Ghana+Premier+League" },
+                    { name: "Hearts of Oak", fullName: "Accra Hearts of Oak SC", logo: "🇬🇭", founded: 1911, stadium: "Accra Sports Stadium", titles: 21, description: "Club historique d'Accra", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Hearts+of+Oak&logo=🇬🇭&sport=Football&league=Ghana+Premier+League" },
+                    { name: "Medeama SC", fullName: "Medeama Sporting Club", logo: "🇬🇭", founded: 1956, stadium: "Akoon Community Park", titles: 2, description: "Club de Tarkwa", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Medeama+SC&logo=🇬🇭&sport=Football&league=Ghana+Premier+League" }
+                ]
+            }
+        ]
+    },
+
+    // ========== MALI ==========
+    "mali": {
+        name: "Mali 🇲🇱",
+        logo: "/logos/mali-femafoot.png",
+        colors: ["#009A00", "#CE1126"],
+        appUrl: "app-universal-simple.html?club=Mali&logo=🇲🇱&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇲🇱 Équipes Nationales",
+                teams: [
+                    { name: "Aigles du Mali", fullName: "Équipe Nationale A", logo: "🇲🇱", coach: "Eric Chelle", description: "Les Aigles du Mali", achievements: "Finaliste CAN 1972", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Mali+ENA&logo=🇲🇱&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue 1 Mali",
+                teams: [
+                    { name: "Stade Malien", fullName: "Stade Malien de Bamako", logo: "🇲🇱", founded: 1960, stadium: "Stade du 26 Mars", titles: 19, description: "Club le plus titré du Mali", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Stade+Malien&logo=🇲🇱&sport=Football&league=Ligue+1+Mali" },
+                    { name: "Djoliba AC", fullName: "Djoliba Athletic Club", logo: "🇲🇱", founded: 1960, stadium: "Stade du 26 Mars", titles: 17, description: "Grand rival du Stade Malien", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Djoliba+AC&logo=🇲🇱&sport=Football&league=Ligue+1+Mali" }
+                ]
+            }
+        ]
+    },
+
+    // ========== GUINÉE ==========
+    "guinee": {
+        name: "Guinée 🇬🇳",
+        logo: "🇬🇳",
+        colors: ["#CE1126", "#FCD116"],
+        appUrl: "app-universal-simple.html?club=Guinee&logo=🇬🇳&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇬🇳 Équipes Nationales",
+                teams: [
+                    { name: "Syli National", fullName: "Équipe Nationale A", logo: "🇬🇳", description: "Le Syli National de Guinée", achievements: "Demi-finaliste CAN 1976", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Guinee+ENA&logo=🇬🇳&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue 1 Guinée",
+                teams: [
+                    { name: "Horoya AC", fullName: "Horoya Athletic Club", logo: "🇬🇳", founded: 1952, stadium: "Stade du 28 Septembre", titles: 20, description: "Club le plus titré de Guinée", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Horoya+AC&logo=🇬🇳&sport=Football&league=Ligue+1+Guinee" },
+                    { name: "Hafia FC", fullName: "Hafia Football Club", logo: "🇬🇳", founded: 1954, stadium: "Stade du 28 Septembre", titles: 15, description: "3x Champion d'Afrique (1972, 1975, 1977)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Hafia+FC&logo=🇬🇳&sport=Football&league=Ligue+1+Guinee" }
+                ]
+            }
+        ]
+    },
+
+    // ========== BURKINA FASO ==========
+    "burkina-faso": {
+        name: "Burkina Faso 🇧🇫",
+        logo: "/logos/burkina-faso-fbf.jpg",
+        colors: ["#EF2B2D", "#009A44"],
+        appUrl: "app-universal-simple.html?club=Burkina+Faso&logo=🇧🇫&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇧🇫 Équipes Nationales",
+                teams: [
+                    { name: "Étalons", fullName: "Équipe Nationale A", logo: "🇧🇫", description: "Les Étalons du Burkina Faso", achievements: "Finaliste CAN 2013", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Burkina+ENA&logo=🇧🇫&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ligue 1 Burkina",
+                teams: [
+                    { name: "ASFA Yennenga", fullName: "ASFA Yennenga", logo: "🇧🇫", founded: 1959, stadium: "Stade du 4 Août", titles: 10, description: "Club le plus titré du Burkina", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=ASFA+Yennenga&logo=🇧🇫&sport=Football&league=Ligue+1+Burkina" },
+                    { name: "Étoile Filante", fullName: "Étoile Filante de Ouagadougou", logo: "🇧🇫", founded: 1946, stadium: "Stade du 4 Août", titles: 8, description: "Club historique de Ouagadougou", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Etoile+Filante&logo=🇧🇫&sport=Football&league=Ligue+1+Burkina" }
+                ]
+            }
+        ]
+    },
+
+    // ========== ÉTHIOPIE ==========
+    "ethiopie": {
+        name: "Éthiopie 🇪🇹",
+        logo: "🇪🇹",
+        colors: ["#078930", "#FCDD09"],
+        appUrl: "app-universal-simple.html?club=Ethiopie&logo=🇪🇹&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇪🇹 Équipes Nationales",
+                teams: [
+                    { name: "Walias", fullName: "Équipe Nationale A", logo: "🇪🇹", description: "Les Walias d'Éthiopie", achievements: "CAN 1962", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Ethiopie+ENA&logo=🇪🇹&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Ethiopian Premier League",
+                teams: [
+                    { name: "St. George SA", fullName: "Saint George Sporting Association", logo: "🇪🇹", founded: 1935, stadium: "Addis Ababa Stadium", titles: 28, description: "Club le plus titré d'Éthiopie", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=St+George+SA&logo=🇪🇹&sport=Football&league=Ethiopian+Premier+League" },
+                    { name: "Ethiopian Coffee", fullName: "Ethiopian Coffee SC", logo: "🇪🇹", founded: 1948, stadium: "Addis Ababa Stadium", titles: 9, description: "Club historique d'Addis-Abeba", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Ethiopian+Coffee&logo=🇪🇹&sport=Football&league=Ethiopian+Premier+League" }
+                ]
+            }
+        ]
+    },
+
+    // ========== AFRIQUE DU SUD ==========
+    "afrique-du-sud": {
+        name: "Afrique du Sud 🇿🇦",
+        logo: "/logos/afrique-du-sud-safa.png",
+        colors: ["#007A4D", "#FFB81C"],
+        appUrl: "app-universal-simple.html?club=Afrique+du+Sud&logo=🇿🇦&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇿🇦 Équipes Nationales",
+                teams: [
+                    { name: "Bafana Bafana", fullName: "Équipe Nationale A", logo: "🇿🇦", coach: "Hugo Broos", description: "Les Bafana Bafana d'Afrique du Sud", achievements: "CAN 1996", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Afrique+du+Sud+ENA&logo=🇿🇦&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs DStv Premiership",
+                teams: [
+                    { name: "Kaizer Chiefs", fullName: "Kaizer Chiefs FC", logo: "🇿🇦", founded: 1970, stadium: "FNB Stadium", titles: 18, description: "Club le plus populaire d'Afrique du Sud", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Kaizer+Chiefs&logo=🇿🇦&sport=Football&league=DStv+Premiership" },
+                    { name: "Orlando Pirates", fullName: "Orlando Pirates FC", logo: "🇿🇦", founded: 1937, stadium: "Orlando Stadium", titles: 4, description: "Grand rival des Kaizer Chiefs", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Orlando+Pirates&logo=🇿🇦&sport=Football&league=DStv+Premiership" },
+                    { name: "Mamelodi Sundowns", fullName: "Mamelodi Sundowns FC", logo: "🇿🇦", founded: 1970, stadium: "Loftus Versfeld Stadium", titles: 13, description: "Champion d'Afrique 2016", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Mamelodi+Sundowns&logo=🇿🇦&sport=Football&league=DStv+Premiership" }
+                ]
+            }
+        ]
+    },
+
+    // ========== ZIMBABWE ==========
+    "zimbabwe": {
+        name: "Zimbabwe 🇿🇼",
+        logo: "🇿🇼",
+        colors: ["#006400", "#FFD200"],
+        appUrl: "app-universal-simple.html?club=Zimbabwe&logo=🇿🇼&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇿🇼 Équipes Nationales",
+                teams: [
+                    { name: "Warriors", fullName: "Équipe Nationale A", logo: "🇿🇼", description: "Les Warriors du Zimbabwe", achievements: "COSAFA Cup 2000, 2003", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Zimbabwe+ENA&logo=🇿🇼&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Zimbabwe Premier Soccer League",
+                teams: [
+                    { name: "Dynamos FC", fullName: "Dynamos Football Club", logo: "🇿🇼", founded: 1963, stadium: "National Sports Stadium", titles: 20, description: "Club le plus titré du Zimbabwe", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Dynamos+FC&logo=🇿🇼&sport=Football&league=Zimbabwe+PSL" },
+                    { name: "CAPS United", fullName: "CAPS United FC", logo: "🇿🇼", founded: 1965, stadium: "National Sports Stadium", titles: 12, description: "Club historique de Harare", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=CAPS+United&logo=🇿🇼&sport=Football&league=Zimbabwe+PSL" }
+                ]
+            }
+        ]
+    },
+
+    // ========== ANGOLA ==========
+    "angola": {
+        name: "Angola 🇦🇴",
+        logo: "🇦🇴",
+        colors: ["#CC0000", "#000000"],
+        appUrl: "app-universal-simple.html?club=Angola&logo=🇦🇴&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇦🇴 Équipes Nationales",
+                teams: [
+                    { name: "Palancas Negras", fullName: "Équipe Nationale A", logo: "🇦🇴", description: "Les Palancas Negras d'Angola", achievements: "Demi-finaliste CAN 2010", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Angola+ENA&logo=🇦🇴&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Girabola",
+                teams: [
+                    { name: "Petro de Luanda", fullName: "Atlético Petróleos de Luanda", logo: "🇦🇴", founded: 1947, stadium: "Estádio 11 de Novembro", titles: 16, description: "Club le plus titré d'Angola", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Petro+Luanda&logo=🇦🇴&sport=Football&league=Girabola" },
+                    { name: "Primeiro de Agosto", fullName: "Primeiro de Agosto", logo: "🇦🇴", founded: 1977, stadium: "Estádio 11 de Novembro", titles: 13, description: "Club ambitieux de Luanda", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Primeiro+Agosto&logo=🇦🇴&sport=Football&league=Girabola" }
+                ]
+            }
+        ]
+    },
+
+    // ========== CONGO RDC ==========
+    "congo-rdc": {
+        name: "Congo RDC 🇨🇩",
+        logo: "🇨🇩",
+        colors: ["#007FFF", "#F7D618"],
+        appUrl: "app-universal-simple.html?club=Congo+RDC&logo=🇨🇩&sport=Football+Federation&league=CAF",
+        categories: [
+            {
+                title: "🇨🇩 Équipes Nationales",
+                teams: [
+                    { name: "Léopards", fullName: "Équipe Nationale A", logo: "🇨🇩", description: "Les Léopards du Congo RDC", achievements: "CAN 1968, 1974", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Congo+RDC+ENA&logo=🇨🇩&sport=Football&league=CAF" }
+                ]
+            },
+            {
+                title: "⚽ Clubs Linafoot",
+                teams: [
+                    { name: "TP Mazembe", fullName: "Tout Puissant Mazembe", logo: "🇨🇩", founded: 1939, stadium: "Stade TP Mazembe", titles: 20, description: "5x Champion d'Afrique", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=TP+Mazembe&logo=🇨🇩&sport=Football&league=Linafoot" },
+                    { name: "AS Vita Club", fullName: "Association Sportive Vita Club", logo: "🇨🇩", founded: 1935, stadium: "Stade des Martyrs", titles: 14, description: "Club historique de Kinshasa", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=AS+Vita+Club&logo=🇨🇩&sport=Football&league=Linafoot" }
+                ]
+            }
+        ]
+    },
 };
 
 // Fonction pour obtenir les données d'un club/fédération

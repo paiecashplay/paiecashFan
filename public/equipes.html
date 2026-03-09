@@ -523,7 +523,7 @@
             const card = document.createElement('div');
             card.className = 'card';
 
-            const isImageLogo = equipe.logo && (equipe.logo.includes('assets/') || equipe.logo.includes('.png') || equipe.logo.includes('.svg') || equipe.logo.includes('.jpg'));
+            const isImageLogo = equipe.logo && (equipe.logo.includes('assets/') || equipe.logo.includes('/logos/') || equipe.logo.includes('http') || equipe.logo.includes('.png') || equipe.logo.includes('.svg') || equipe.logo.includes('.jpg') || equipe.logo.includes('.webp'));
             const logoHTML = isImageLogo 
                 ? `<img src="${equipe.logo}" alt="${equipe.name}">`
                 : equipe.logo;
@@ -562,7 +562,7 @@
             }
 
             // Mettre à jour le header
-            const isImageLogo = clubData.logo && (clubData.logo.includes('assets/') || clubData.logo.includes('.png') || clubData.logo.includes('.svg') || clubData.logo.includes('.jpg'));
+            const isImageLogo = clubData.logo && (clubData.logo.includes('assets/') || clubData.logo.includes('/logos/') || clubData.logo.includes('http') || clubData.logo.includes('.png') || clubData.logo.includes('.svg') || clubData.logo.includes('.jpg') || clubData.logo.includes('.webp'));
             if (isImageLogo) {
                 document.getElementById('headerTitle').innerHTML = `<img src="${clubData.logo}" alt="${clubData.name}" style="height: 50px; vertical-align: middle; margin-right: 15px;"> ${clubData.name}`;
             } else {
@@ -680,13 +680,26 @@
             displayEquipes();
             // Construire l'URL de retour vers l'app
             const backBtn = document.getElementById('backBtn');
-            if (backBtn && clubData && clubData.appUrl) {
-                // Utiliser l'appUrl du club si disponible
-                backBtn.href = clubData.appUrl;
-            } else if (backBtn) {
-                // Fallback : construire l'URL avec les paramètres disponibles
-                const backParams = new URLSearchParams({ club: clubId, league: _league, logo: _logo, sport: _sport });
-                backBtn.href = `app-universal-simple.html?${backParams}`;
+            if (backBtn) {
+                // Priorité aux paramètres de l'URL courante (league, logo, sport passés par navigateToEquipes)
+                if (_league || _logo !== '⚽' || _sport !== 'Football') {
+                    // Paramètres disponibles depuis l'URL → reconstruire l'URL de l'app
+                    const clubNameForBack = clubData ? clubData.name.replace(/ 🇲🇦|🇩🇿|🇪🇬|🇹🇳|🇱🇾|🇸🇳|🇳🇬|🇬🇭|🇨🇮|🇲🇱|🇬🇳|🇧🇫|🇨🇲|🇨🇩|🇦🇴|🇹🇿|🇰🇪|🇺🇬|🇪🇹|🇿🇦|🇿🇼|🇲🇷/g, '').trim() : clubId;
+                    const backParams = new URLSearchParams({ 
+                        club: clubNameForBack, 
+                        league: _league, 
+                        logo: _logo, 
+                        sport: _sport 
+                    });
+                    backBtn.href = `app-universal-simple.html?${backParams}`;
+                } else if (clubData && clubData.appUrl) {
+                    // Fallback : utiliser l'appUrl du club si disponible
+                    backBtn.href = clubData.appUrl;
+                } else {
+                    // Dernier recours
+                    const backParams = new URLSearchParams({ club: clubId, league: _league, logo: _logo, sport: _sport });
+                    backBtn.href = `app-universal-simple.html?${backParams}`;
+                }
             }
         });
     </script>
