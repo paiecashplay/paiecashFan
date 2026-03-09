@@ -880,27 +880,44 @@ const equipesDatabase = {
     // ========== LIBYE ==========
     "libye": {
         name: "Libye 🇱🇾",
-        logo: "🇱🇾",
-        colors: ["#000000", "#FFFFFF"],
-        appUrl: "app-universal-simple.html?club=Libye&logo=🇱🇾&sport=Football+Federation&league=CAF",
+        logo: "/logos/libye-lff.png",
+        colors: ["#000000", "#FFFFFF", "#009A44"],
+        appUrl: "app-universal-simple.html?club=Libye&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football+Federation&league=CAF",
         categories: [
             {
                 title: "🇱🇾 Équipes Nationales",
                 teams: [
-                    { name: "Chevaliers de la Méditerranée", fullName: "Équipe Nationale A", logo: "🇱🇾", description: "Équipe nationale de Libye", achievements: "Finaliste CAN 1982", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Libye+ENA&logo=🇱🇾&sport=Football&league=CAF" }
+                    { name: "Chevaliers de la Méditerranée", fullName: "Équipe Nationale A", logo: "/logos/libye-lff.png", description: "Équipe nationale de Libye", achievements: "Finaliste CAN 1982", sport: "Football", category: "Séniors", type: "nationale", appUrl: "app-universal-simple.html?club=Libye+ENA&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=CAF" }
                 ]
             },
             {
                 title: "⚽ Clubs Libyan Premier League",
                 teams: [
-                    { name: "Al-Ahly Tripoli", fullName: "Al-Ahly Tripoli SC", logo: "🇱🇾", founded: 1950, stadium: "Stade du 11 Juin", titles: 8, description: "Club historique de Tripoli", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ahly+Tripoli&logo=🇱🇾&sport=Football&league=Libyan+Premier+League" },
-                    { name: "Al-Ittihad Tripoli", fullName: "Al-Ittihad Tripoli SC", logo: "🇱🇾", founded: 1944, stadium: "Stade du 11 Juin", titles: 6, description: "Club populaire de Tripoli", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ittihad+Tripoli&logo=🇱🇾&sport=Football&league=Libyan+Premier+League" }
+                    { name: "Al-Ahly Tripoli", fullName: "Al-Ahly Tripoli SC", logo: "/logos/al-ahly-tripoli.png", founded: 1950, stadium: "Stade du 11 Juin", titles: 14, description: "Club le plus titré de Tripoli (14 titres)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ahly+Tripoli&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Ittihad Tripoli", fullName: "Al-Ittihad Tripoli SC", logo: "/logos/al-ittihad-tripoli.png", founded: 1944, stadium: "Stade Jumayl", titles: 18, description: "Club le plus titré de Libye (18 titres)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ittihad+Tripoli&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Ahly Benghazi", fullName: "Al-Ahly Benghazi SC", logo: "/logos/al-ahly-benghazi.png", founded: 1947, stadium: "Martyrs of February Stadium", titles: 4, description: "Grand club de Benghazi (4 titres)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ahly+Benghazi&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Nasr Benghazi", fullName: "Al-Nasr Benghazi SC", logo: "/logos/al-nasr-benghazi.png", founded: 1954, stadium: "Martyrs of February Stadium", titles: 3, description: "Champion 2023-24", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Nasr+Benghazi&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Tahaddy Benghazi", fullName: "Al-Tahaddy Benghazi SC", logo: "/logos/al-tahaddy-benghazi.png", founded: 1954, stadium: "March 28 Stadium", titles: 3, description: "Club historique de Benghazi (3 titres)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Tahaddy+Benghazi&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Madina Tripoli", fullName: "Al-Madina Tripoli SC", logo: "/logos/al-madina.png", founded: 1953, stadium: "GMR Stadium", titles: 3, description: "Club de Tripoli (3 titres)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Madina+Tripoli&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Hilal Benghazi", fullName: "Al-Hilal Benghazi SC", logo: "/logos/al-hilal-benghazi.png", founded: 1956, stadium: "Martyrs of February Stadium", titles: 0, description: "Club de Benghazi", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Hilal+Benghazi&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Akhdar", fullName: "Al-Akhdar SC", logo: "/logos/al-akhdar.png", founded: 1958, stadium: "Sheikh Chadae Stadium", titles: 0, description: "Club de Bayda (Cyrénaïque)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Akhdar&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Ta'awon Ajdabiya", fullName: "Al-Ta'awon SC Ajdabiya", logo: "/logos/al-taawon-ejdabiya.png", founded: 1960, stadium: "10 June Stadium", titles: 0, description: "Club d'Ajdabiya", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Taawon+Ajdabiya&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Suqoor Tobruk", fullName: "Al-Suqoor SC Tobruk", logo: "🇱🇾", founded: 1965, stadium: "Tobruk Stadium", titles: 0, description: "Club de Tobrouk", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Suqoor+Tobruk&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Sadaqa Shahhat", fullName: "Al-Sadaqa SC Shahhat", logo: "🇱🇾", founded: 1970, stadium: "Shahhat Stadium", titles: 0, description: "Club de Shahhat", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Sadaqa+Shahhat&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Morouj Marj", fullName: "Al-Morouj SC Marj", logo: "🇱🇾", founded: 1968, stadium: "Al Marj Stadium", titles: 0, description: "Club de Marj", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Morouj+Marj&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Anwar Al-Abyar", fullName: "Al-Anwar SC Al-Abyar", logo: "🇱🇾", founded: 1972, stadium: "Martyrs of Al-Abyar Stadium", titles: 0, description: "Club d'Al-Abyar", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Anwar+Al-Abyar&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Ittihad Misrata", fullName: "Al-Ittihad Misrata SC", logo: "🇱🇾", founded: 1960, stadium: "Al-Shumooa Stadium", titles: 0, description: "Club de Misrata", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Ittihad+Misrata&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Asswehly Misrata", fullName: "Asswehly SC Misrata", logo: "🇱🇾", founded: 1975, stadium: "Al-Shumooa Stadium", titles: 0, description: "Club de Misrata", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Asswehly+Misrata&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Bashayr Misrata", fullName: "Al-Bashayr SC Misrata", logo: "🇱🇾", founded: 1980, stadium: "Al-Shumooa Stadium", titles: 0, description: "Club de Misrata", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Bashayr+Misrata&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Olympic Azzaweya", fullName: "Olympic Azzaweya SC", logo: "🇱🇾", founded: 1963, stadium: "Olympic Stadium Zawiya", titles: 1, description: "Club de Zawiya (1 titre 2003-04)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Olympic+Azzaweya&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Asaria Zawiya", fullName: "Asaria SC Zawiya", logo: "🇱🇾", founded: 1970, stadium: "Olympic Stadium Zawiya", titles: 0, description: "Club de Zawiya", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Asaria+Zawiya&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Al-Khums", fullName: "Al-Khums SC", logo: "🇱🇾", founded: 1958, stadium: "Al-Khums Stadium", titles: 0, description: "Club d'Al Khums (Leptis Magna)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Al-Khums&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" },
+                    { name: "Abu Salem Tripoli", fullName: "Abu Salem SC Tripoli", logo: "🇱🇾", founded: 1965, stadium: "Abu Salem Stadium", titles: 0, description: "Club de Tripoli", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Abu+Salem+Tripoli&logo=%F0%9F%87%B1%F0%9F%87%BE&sport=Football&league=Libyan+Premier+League" }
                 ]
             }
         ]
     },
-
-    // ========== GHANA ==========
+        // ========== GHANA ==========
     "ghana": {
         name: "Ghana 🇬🇭",
         logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e3/Ghana_Football_Association_logo.svg/200px-Ghana_Football_Association_logo.svg.png",
