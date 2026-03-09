@@ -187,7 +187,7 @@
         <!-- Header avec Sponsor -->
         <div class="text-center mb-8 text-white">
             <div class="flex justify-between items-center gap-4 mb-4">
-                <a href="/app-universal-simple.html?club=Marseille" class="inline-block text-white hover:underline">
+                <a href="#" onclick="goBackToApp()" class="inline-block text-white hover:underline">
                     <i class="fas fa-arrow-left mr-2"></i> Retour
                 </a>
                 <a href="/mes-tickets.html" class="inline-block text-white hover:underline font-semibold">
@@ -394,6 +394,19 @@
         const _urlP = new URLSearchParams(window.location.search);
         const _clubParam = _urlP.get('club') || '';
         const _leagueParam = _urlP.get('league') || '';
+        const _logoParam = _urlP.get('logo') || '⚽';
+        const _sportParam = _urlP.get('sport') || 'Football';
+        
+        // Fonction pour revenir à l'app avec les bons paramètres
+        function goBackToApp() {
+            const backParams = new URLSearchParams({
+                club: _clubParam,
+                league: _leagueParam,
+                logo: _logoParam,
+                sport: _sportParam
+            });
+            window.location.href = `/app-universal-simple.html?${backParams.toString()}`;
+        }
         
         let allPrizes = [];
         let selectedPrize = null;

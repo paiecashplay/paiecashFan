@@ -754,6 +754,35 @@
             // Charger les produits
             loadProducts()
 
+            // Corriger le bouton Retour pour renvoyer vers l'app avec les bons paramètres
+            (function() {
+                const _bParams = new URLSearchParams(window.location.search);
+                const _bClub = _bParams.get('club') || '';
+                const _bLeague = _bParams.get('league') || '';
+                const _bLogo = _bParams.get('logo') || '⚽';
+                const _bSport = _bParams.get('sport') || 'Football';
+                const backParams = new URLSearchParams({
+                    club: _bClub,
+                    league: _bLeague,
+                    logo: _bLogo,
+                    sport: _bSport
+                });
+                const appUrl = `/app-universal-simple.html?${backParams.toString()}`;
+                // Ajouter un bouton Retour dans le header
+                const header = document.querySelector('header');
+                if (header) {
+                    const backBtn = document.createElement('a');
+                    backBtn.href = appUrl;
+                    backBtn.className = 'inline-flex items-center gap-2 text-gray-300 hover:text-white transition';
+                    backBtn.style.cssText = 'font-size:14px; font-weight:600; text-decoration:none; margin-right:16px;';
+                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Retour';
+                    header.insertBefore(backBtn, header.firstChild);
+                    // Rendre le header flex avec alignement
+                    header.style.display = 'flex';
+                    header.style.alignItems = 'center';
+                }
+            })();
+
             // Conversion de devises universelle
             if (typeof CurrencyConverter !== 'undefined') {
                 const params = new URLSearchParams(window.location.search);

@@ -412,6 +412,24 @@
         // Initialize on load
         init();
 
+        // Corriger le bouton Retour pour renvoyer vers l'app avec les bons paramètres
+        (function() {
+            const _tParams = new URLSearchParams(window.location.search);
+            const _tClub = _tParams.get('club') || '';
+            const _tLeague = _tParams.get('league') || '';
+            const _tLogo = _tParams.get('logo') || '⚽';
+            const _tSport = _tParams.get('sport') || 'Football';
+            const backParams = new URLSearchParams({
+                club: _tClub,
+                league: _tLeague,
+                logo: _tLogo,
+                sport: _tSport
+            });
+            const appUrl = `/app-universal-simple.html?${backParams.toString()}`;
+            const backBtn = document.querySelector('button[onclick*="home.html"]');
+            if (backBtn) backBtn.setAttribute('onclick', `window.location.href='${appUrl}'`);
+        })();
+
         // Conversion de devises universelle
         (async () => {
             if (typeof CurrencyConverter !== 'undefined') {

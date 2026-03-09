@@ -679,7 +679,7 @@
             <a href="/mes-tickets.html" class="btn btn-secondary">
                 <i class="fas fa-history"></i> Mes Tickets
             </a>
-            <a href="/" class="btn btn-primary">
+            <a href="#" id="loto-accueil-btn" class="btn btn-primary">
                 <i class="fas fa-home"></i> Accueil
             </a>
         </div>
@@ -851,6 +851,25 @@
         const _urlP = new URLSearchParams(window.location.search);
         const _clubParam = _urlP.get('club') || '';
         const _leagueParam = _urlP.get('league') || '';
+        const _logoParam = _urlP.get('logo') || '⚽';
+        const _sportParam = _urlP.get('sport') || 'Football';
+        
+        // Corriger le lien Accueil pour renvoyer vers l'app avec les bons paramètres
+        (function() {
+            const backParams = new URLSearchParams({
+                club: _clubParam,
+                league: _leagueParam,
+                logo: _logoParam,
+                sport: _sportParam
+            });
+            const appUrl = `/app-universal-simple.html?${backParams.toString()}`;
+            // Bouton Accueil dans le header
+            const accueilBtn = document.querySelector('a.btn.btn-primary');
+            if (accueilBtn) accueilBtn.href = appUrl;
+            // Logo cliquable dans le header
+            const logoDiv = document.querySelector('.logo[onclick]');
+            if (logoDiv) logoDiv.setAttribute('onclick', `location.href='${appUrl}'`);
+        })();
         
         // User ID management
         let USER_ID = localStorage.getItem('USER_ID');
