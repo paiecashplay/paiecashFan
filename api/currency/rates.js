@@ -200,15 +200,59 @@ export default async function handler(req, res) {
 
     const { club, league } = req.query;
 
-    // Déterminer la devise du club
-    const key = (club || league || '').toLowerCase().trim();
+    // Déterminer la devise du club - chercher dans club ET league séparément
+    const clubKey = (club || '').toLowerCase().trim();
+    const leagueKey = (league || '').toLowerCase().trim();
     let currencyInfo = null;
     
-    // Chercher dans le mapping
+    // Chercher d'abord dans le nom du club
     for (const [k, v] of Object.entries(CLUB_CURRENCY_MAP)) {
-        if (key.includes(k) || k.includes(key)) {
+        if (clubKey && (clubKey.includes(k) || k.includes(clubKey))) {
             currencyInfo = v;
             break;
+        }
+    }
+    
+    // Si pas trouvé, chercher dans la league
+    if (!currencyInfo) {
+        for (const [k, v] of Object.entries(CLUB_CURRENCY_MAP)) {
+            if (leagueKey && (leagueKey.includes(k) || k.includes(leagueKey))) {
+                currencyInfo = v;
+                break;
+            }
+        }
+    }
+    
+    // Détection par pays dans le nom du club (ex: "Wydad Casablanca" → Maroc)
+    const countryKeywords = {
+        'casablanca': 'maroc', 'rabat': 'maroc', 'fes': 'maroc', 'marrakech': 'maroc',
+        'lagos': 'nigeria', 'abuja': 'nigeria', 'kano': 'nigeria',
+        'accra': 'ghana', 'kumasi': 'ghana',
+        'dakar': 'senegal', 'saint-louis': 'senegal',
+        'abidjan': 'cote d\'ivoire', 'bouake': 'cote d\'ivoire',
+        'yaounde': 'cameroun', 'douala': 'cameroun',
+        'alger': 'algerie', 'oran': 'algerie', 'constantine': 'algerie',
+        'tunis': 'tunisie', 'sfax': 'tunisie',
+        'cairo': 'egypte', 'le caire': 'egypte', 'alexandrie': 'egypte',
+        'johannesburg': 'afrique du sud', 'cape town': 'afrique du sud',
+        'nairobi': 'kenya', 'mombasa': 'kenya',
+        'dar es salaam': 'tanzanie', 'dodoma': 'tanzanie',
+        'kampala': 'ouganda',
+        'harare': 'zimbabwe', 'bulawayo': 'zimbabwe',
+        'lusaka': 'zambie', 'ndola': 'zambie',
+        'maputo': 'mozambique',
+        'luanda': 'angola',
+        'libreville': 'gabon',
+        'brazzaville': 'congo', 'kinshasa': 'rdc'
+    };
+    if (!currencyInfo) {
+        for (const [city, country] of Object.entries(countryKeywords)) {
+            if (clubKey.includes(city)) {
+                for (const [k, v] of Object.entries(CLUB_CURRENCY_MAP)) {
+                    if (k === country) { currencyInfo = v; break; }
+                }
+                if (currencyInfo) break;
+            }
         }
     }
     
