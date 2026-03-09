@@ -428,11 +428,6 @@
                     if (header) header.insertAdjacentHTML('afterend', CurrencyConverter.getConversionBanner());
                     // Conversion universelle de tous les montants
                     CurrencyConverter.convertAllDomAmounts(document.body);
-                    // Observer les changements DOM (pour les campagnes chargées dynamiquement)
-                    const observer = new MutationObserver(() => {
-                        CurrencyConverter.convertAllDomAmounts(document.body);
-                    });
-                    observer.observe(document.body, { childList: true, subtree: true });
                 }
             }
         })();

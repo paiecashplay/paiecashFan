@@ -882,11 +882,6 @@
                     if (heroStats) heroStats.insertAdjacentHTML('beforebegin', CurrencyConverter.getConversionBanner());
                     // Conversion universelle de TOUS les montants € dans le DOM
                     CurrencyConverter.convertAllDomAmounts(document.body);
-                    // Observer les changements DOM (résultats dynamiques)
-                    const _ccObserver = new MutationObserver(() => {
-                        CurrencyConverter.convertAllDomAmounts(document.body);
-                    });
-                    _ccObserver.observe(document.body, { childList: true, subtree: true });
                 }
             }
             
