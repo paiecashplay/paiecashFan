@@ -2302,36 +2302,16 @@
         console.log('🔧 API_BASE_URL:', API_BASE_URL);
         
         // Fonction globale accessible immédiatement
+        // ➡️ Redirige vers le hub LOTO Genspark (paiements Stripe/Lyra, scratch, tombola)
         window.openLoto = function() {
-            console.log('🎰 openLoto() GLOBAL appelé');
-            try {
-                const modal = document.getElementById('lotoModal');
-                if (!modal) {
-                    console.error('❌ lotoModal introuvable - DOM pas encore chargé?');
-                    // Réessayer après chargement DOM
-                    if (document.readyState === 'loading') {
-                        document.addEventListener('DOMContentLoaded', function() {
-                            window.openLoto();
-                        });
-                    }
-                    return;
-                }
-                
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                
-                // Masquer toutes les sections sauf Home
-                const sections = ['lotoHome', 'lotoScratch', 'lotoNumbers', 'lotoTombola'];
-                sections.forEach((id, idx) => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = (idx === 0) ? 'block' : 'none';
-                });
-                
-                console.log('✅ Modal Loto ouverte');
-            } catch (error) {
-                console.error('❌ Erreur openLoto():', error);
-                alert('Erreur: ' + error.message);
-            }
+            console.log('🎰 openLoto() → Redirection vers loto-hub.html');
+            const urlParams = new URLSearchParams(window.location.search);
+            const club = urlParams.get('club') || document.getElementById('headerClubName')?.textContent || 'PaieCashFan';
+            const league = urlParams.get('league') || '';
+            const logo = urlParams.get('logo') || '⚽';
+            const sport = urlParams.get('sport') || 'Football';
+            const params = new URLSearchParams({ club, league, logo, sport });
+            window.location.href = '/loto-hub.html?' + params.toString();
         };
         
         // ✨ SCRATCH MODE
@@ -3589,26 +3569,15 @@ function applyClubTheme(clubName) {
 
 // ========== NAVIGATION ==========
 
-// Ouvrir la modal LOTO (page d'accueil)
+// Ouvrir le hub LOTO Genspark (paiements Stripe/Lyra, scratch, tombola)
 function openLoto() {
-    const modal = document.getElementById('lotoModal');
-    const clubName = document.getElementById('headerClubName').textContent;
-    document.getElementById('lotoHomeClubName').textContent = clubName.toUpperCase();
-    
-    // Appliquer le thème du club
-    applyClubTheme(clubName);
-    
-    // Afficher la modal et la page d'accueil
-    modal.style.display = 'flex';
-    document.getElementById('lotoHome').style.display = 'block';
-    document.getElementById('lotoScratch').style.display = 'none';
-    document.getElementById('lotoNumbers').style.display = 'none';
-    if (document.getElementById('lotoTombola')) document.getElementById('lotoTombola').style.display = 'none';
-    
-    document.body.style.overflow = 'hidden';
-    
-    // Démarrer le compte à rebours
-    startLotoCountdown();
+    const urlParams = new URLSearchParams(window.location.search);
+    const club = urlParams.get('club') || document.getElementById('headerClubName')?.textContent || 'PaieCashFan';
+    const league = urlParams.get('league') || '';
+    const logo = urlParams.get('logo') || '⚽';
+    const sport = urlParams.get('sport') || 'Football';
+    const params = new URLSearchParams({ club, league, logo, sport });
+    window.location.href = '/loto-hub.html?' + params.toString();
 }
 
 // Fermer la modal LOTO
