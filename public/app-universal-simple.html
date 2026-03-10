@@ -8,6 +8,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- 🎬 STORIES CSS -->
     <link rel="stylesheet" href="css/stories.css">
+    <!-- 💳 LYRA PAYMENT SDK -->
+    <script src="https://static.payzen.eu/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
+        kr-public-key="__publickey_placeholder__"
+        kr-language="fr-FR"
+        kr-post-url-success="none"
+        kr-post-url-refused="none"
+        id="lyraSDK"></script>
+    <link rel="stylesheet" href="https://static.payzen.eu/static/js/krypton-client/V4.0/ext/classic-reset.css">
+    <script src="https://static.payzen.eu/static/js/krypton-client/V4.0/ext/classic.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -3819,10 +3828,14 @@ function shareResult() {
                                     </div>
                                 </div>
 
+                                <!-- Conteneur formulaire Lyra CB -->
+                                <div id="boutiqueLyraContainer" style="display:none;margin-top:12px;padding:14px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                                    <div class="kr-embedded" kr-form-token=""></div>
+                                </div>
                                 <button id="boutiqueOrderBtn" onclick="boutiqueOrder('${clubName}')" style="width:100%;margin-top:16px;padding:16px;background:linear-gradient(135deg,${color1},${color2});color:${textColor};border:none;border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;opacity:0.5;pointer-events:none;">
                                     🛒 Commander maintenant
                                 </button>
-                                <p style="color:rgba(255,255,255,0.35);font-size:0.72rem;text-align:center;margin-top:10px;">✅ Paiement sécurisé • 🚚 Livraison suivie • 🔄 Retour 30 jours</p>
+                                <p style="color:rgba(255,255,255,0.35);font-size:0.72rem;text-align:center;margin-top:10px;">✅ Paiement sécurisé Lyra • 🚚 Livraison suivie • 🔄 Retour 30 jours</p>
                             </div>
                         </div>
 
@@ -3870,13 +3883,105 @@ function shareResult() {
                 document.getElementById('boutiqueProductsGrid').innerHTML = renderProducts(filter);
             };
 
-            window.boutiqueOrder = function(name) {
+            // Clé publique Lyra chargée depuis l'API
+            let lyraPublicKeyBoutique = null;
+            // Charger la clé publique Lyra au démarrage de la boutique
+            (async function loadLyraKey() {
+                try {
+                    const r = await fetch('/api/lyra/config');
+                    const d = await r.json();
+                    if (d.success && d.publicKey) {
+                        lyraPublicKeyBoutique = d.publicKey;
+                        if (typeof KR !== 'undefined') {
+                            await KR.setFormConfig({ 'kr-public-key': lyraPublicKeyBoutique });
+                        }
+                    }
+                } catch(e) { console.warn('Lyra config non disponible:', e.message); }
+            })();
+
+            window.boutiqueOrder = async function(name) {
                 if (cartItems.length === 0) return;
-                const total = formatPrice(getCartTotal());
-                const items = cartItems.map(i => '• ' + i.name + ' x' + i.qty).join('\n');
-                alert('✅ Commande confirmée !\n\n' + items + '\n\nTotal : ' + total + '\n\nVotre commande ' + name + ' sera livrée sous 7-14 jours.\nMerci d\'avoir choisi PaieCash !');
-                cartItems = [];
-                updateBoutiqueCart();
+                const totalRaw = getCartTotal();
+                const selectedMethod = document.querySelector('input[name="payBoutique"]:checked');
+                const method = selectedMethod ? selectedMethod.value : 'wallet';
+
+                if (method === 'card') {
+                    // --- PAIEMENT LYRA CB ---
+                    const btn = document.getElementById('boutiqueOrderBtn');
+                    btn.textContent = '⏳ Initialisation paiement...';
+                    btn.style.opacity = '0.7';
+                    btn.style.pointerEvents = 'none';
+                    try {
+                        // Créer le paiement via l'API Lyra
+                        const orderId = 'SHOP-' + Date.now();
+                        const resp = await fetch('/api/lyra/create-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                amount: totalRaw,
+                                currency: (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.getLocalCurrency() : 'EUR',
+                                order_id: orderId,
+                                customer_email: '',
+                                customer_name: 'Fan PaieCash',
+                                description: 'Boutique ' + name + ' — ' + cartItems.map(i => i.name + ' x' + i.qty).join(', ')
+                            })
+                        });
+                        const data = await resp.json();
+                        if (!data.success || !data.formToken) {
+                            throw new Error(data.error || 'Erreur création paiement');
+                        }
+                        // Afficher le formulaire Lyra
+                        const lyraContainer = document.getElementById('boutiqueLyraContainer');
+                        lyraContainer.style.display = 'block';
+                        btn.style.display = 'none';
+                        // Initialiser le formulaire Lyra
+                        if (typeof KR !== 'undefined') {
+                            try { await KR.removeForms(); } catch(e) {}
+                            await KR.setFormConfig({
+                                formToken: data.formToken,
+                                'kr-public-key': lyraPublicKeyBoutique || data.publicKey,
+                                'kr-language': 'fr-FR'
+                            });
+                            await KR.renderElements('#boutiqueLyraContainer .kr-embedded');
+                            KR.onSubmit(function(paymentData) {
+                                lyraContainer.style.display = 'none';
+                                const successMsg = document.createElement('div');
+                                successMsg.style.cssText = 'padding:20px;text-align:center;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:12px;margin-top:12px;';
+                                successMsg.innerHTML = '<div style="font-size:36px;margin-bottom:8px;">✅</div><div style="color:#10b981;font-weight:800;font-size:1.1rem;">Paiement confirmé !</div><div style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin-top:6px;">Commande ' + orderId + '</div><div style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:4px;">Livraison sous 7-14 jours</div>';
+                                lyraContainer.parentNode.insertBefore(successMsg, lyraContainer.nextSibling);
+                                cartItems = [];
+                                updateBoutiqueCart();
+                                return true;
+                            });
+                        } else {
+                            throw new Error('SDK Lyra non chargé');
+                        }
+                    } catch(err) {
+                        console.error('Erreur paiement Lyra:', err);
+                        const btn2 = document.getElementById('boutiqueOrderBtn');
+                        if (btn2) {
+                            btn2.textContent = '🛒 Commander maintenant';
+                            btn2.style.opacity = '1';
+                            btn2.style.pointerEvents = 'auto';
+                            btn2.style.display = 'block';
+                        }
+                        const errDiv = document.createElement('div');
+                        errDiv.style.cssText = 'padding:12px;background:rgba(239,68,68,0.15);border:1px solid #ef4444;border-radius:10px;color:#ef4444;font-size:0.85rem;margin-top:10px;';
+                        errDiv.textContent = '❌ ' + err.message;
+                        document.getElementById('boutiqueLyraContainer').parentNode.appendChild(errDiv);
+                        setTimeout(() => errDiv.remove(), 5000);
+                    }
+                } else if (method === 'mobile') {
+                    // --- MOBILE MONEY ---
+                    const total = formatPrice(totalRaw);
+                    alert('📱 Mobile Money\n\nTotal : ' + total + '\n\nVous allez recevoir une notification sur votre téléphone pour confirmer le paiement via Orange Money, MTN, Moov ou Wave.');
+                } else {
+                    // --- WALLET CRYPTO ---
+                    const total = formatPrice(totalRaw);
+                    alert('💰 Wallet Crypto\n\nTotal : ' + total + '\n\nLe montant sera débité de votre wallet USDC/EURC PaieCash.\n\nCommande confirmée ! Livraison sous 7-14 jours.');
+                    cartItems = [];
+                    updateBoutiqueCart();
+                }
             };
 
             function updateBoutiqueCart() {
