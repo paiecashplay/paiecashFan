@@ -288,6 +288,22 @@
             color: white;
         }
         
+        /* BOUTIQUE BUTTON */
+        .boutique-btn {
+            background: linear-gradient(135deg, #00C853, #69F0AE);
+            border-color: #00C853;
+            animation: glowGreen 2s infinite;
+        }
+        
+        @keyframes glowGreen {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 200, 83, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 200, 83, 0.6); }
+        }
+        
+        .boutique-btn i {
+            color: #1a1a2e !important;
+        }
+        
         /* BALANCE CARDS */
         .balance-section {
             padding: 20px;
@@ -1581,6 +1597,9 @@
 
     <!-- LEFT ACTION BAR - Gamification en haut -->
     <div class="left-actions">
+        <div class="action-btn boutique-btn" onclick="openBoutique()" title="Boutique">
+            <i class="fas fa-shopping-bag"></i>
+        </div>
         <div class="action-btn gamification-btn" onclick="openGamification()" title="Gamification">
             <i class="fas fa-trophy"></i>
             <div class="gamification-badge">🔥</div>
@@ -3571,6 +3590,11 @@ function shareResult() {
             document.getElementById('shopModal').classList.add('active');
         }
         
+        function openBoutique() {
+            // Ouvrir la boutique officielle du club courant
+            openAfriqueMerchandisingService();
+        }
+        
         function openBilletsService() {
             document.getElementById('billetsModal').classList.add('active');
         }
@@ -3591,12 +3615,15 @@ function shareResult() {
         
         // MERCHANDISING OM AFRIQUE avec PaieCash (Wallet + Carte Bancaire + Mobile Money)
         function openAfriqueMerchandisingService() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clubName = urlParams.get('club') || document.getElementById('headerClubName')?.textContent || 'Club';
+            const clubLogo = urlParams.get('logo') || '⚽';
             const modal = document.createElement('div');
             modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
             modal.innerHTML = `
                 <div style="background:white;border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">👕 Merchandising OM</h3>
+                        <h3 style="margin:0;color:#1e293b;font-size:1.3rem;">🛍️ Boutique ${clubLogo} ${clubName}</h3>
                         <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
                     </div>
                     
