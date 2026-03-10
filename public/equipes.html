@@ -596,10 +596,16 @@
                         };
                         grid.appendChild(createCard(equipe));
                         
-                        // Compter les équipes
-                        if (category.title.includes('Nationales')) countNationales++;
-                        else if (category.title.includes('Masculines')) countMasculins++;
-                        else if (category.title.includes('Féminines')) countFeminins++;
+                        // Compter les équipes (basé sur team.type ET le titre de catégorie)
+                        const teamType = (team.type || '').toLowerCase();
+                        const catTitle = (category.title || '').toLowerCase();
+                        if (teamType === 'nationale' || catTitle.includes('nationale')) {
+                            countNationales++;
+                        } else if (teamType === 'féminin' || teamType === 'feminin' || teamType === 'feminine' || catTitle.includes('féminin') || catTitle.includes('feminin')) {
+                            countFeminins++;
+                        } else if (teamType === 'masculin' || teamType === 'masculine' || catTitle.includes('masculin') || catTitle.includes('club')) {
+                            countMasculins++;
+                        }
                     });
                     
                     section.appendChild(grid);

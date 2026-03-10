@@ -736,6 +736,15 @@ const equipesDatabase = {
                     { name: "Union Douala", fullName: "Union Sportive de Douala", logo: "/logos/union-douala.png", founded: 1958, stadium: "Stade de la Réunion", titles: 6, description: "Club historique de Douala", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Union+Douala&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=Elite+One" },
                     { name: "Eding Sport", fullName: "Eding Sport FC", logo: "/logos/eding-sport.png", founded: 2002, stadium: "Stade Municipal de Sa'a", titles: 3, description: "Club de Sa'a (Centre)", sport: "Football", category: "Professionnel", type: "masculin", appUrl: "app-universal-simple.html?club=Eding+Sport&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=Elite+One" }
                 ]
+            },
+            {
+                title: "👩‍⚽ Clubs Féminins Cameroun",
+                teams: [
+                    { name: "AS Awa FC", fullName: "Association Sportive Awa Football Club", logo: "/logos/as-awa-fc.png", founded: 2013, stadium: "Yaoundé", titles: 0, description: "Club féminin de Yaoundé, fondé en 2013", sport: "Football", category: "Féminin", type: "féminin", appUrl: "app-universal-simple.html?club=AS+Awa+FC&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=D1+F%C3%A9minine+Cameroun" },
+                    { name: "FC Ebolowa", fullName: "FC Ebolowa", logo: "/logos/fc-ebolowa.png", founded: 2000, stadium: "Ebolowa", titles: 0, description: "Club féminin d'Ebolowa (Sud)", sport: "Football", category: "Féminin", type: "féminin", appUrl: "app-universal-simple.html?club=FC+Ebolowa&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=D1+F%C3%A9minine+Cameroun" },
+                    { name: "Lekié Football Filles", fullName: "Lekié Football Filles", logo: "/logos/lekie-football-filles.png", founded: 2005, stadium: "Obala", titles: 0, description: "Club féminin de la Lekié (Centre)", sport: "Football", category: "Féminin", type: "féminin", appUrl: "app-universal-simple.html?club=Leki%C3%A9+Football+Filles&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=D1+F%C3%A9minine+Cameroun" },
+                    { name: "Louves Minproff", fullName: "Louves Minproff FC", logo: "/logos/louves-minproff.png", founded: 2010, stadium: "Yaoundé", titles: 0, description: "Club féminin du Ministère de la Promotion de la Femme", sport: "Football", category: "Féminin", type: "féminin", appUrl: "app-universal-simple.html?club=Louves+Minproff&logo=%F0%9F%87%A8%F0%9F%87%B2&sport=Football&league=D1+F%C3%A9minine+Cameroun" }
+                ]
             }
         ]
     },
