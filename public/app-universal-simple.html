@@ -3919,7 +3919,7 @@ function shareResult() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 amount: totalRaw,
-                                currency: (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur()) ? CurrencyConverter.getLocalCurrency() : 'EUR',
+                                currency: (typeof CurrencyConverter !== 'undefined' && !CurrencyConverter.isEur() && CurrencyConverter.currencyInfo) ? CurrencyConverter.currencyInfo.currency : 'EUR',
                                 order_id: orderId,
                                 customer_email: '',
                                 customer_name: 'Fan PaieCash',
