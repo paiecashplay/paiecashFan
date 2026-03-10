@@ -3885,6 +3885,8 @@ function shareResult() {
 
             // Clé publique Lyra chargée depuis l'API
             let lyraPublicKeyBoutique = null;
+            // Flag : le formulaire Lyra a-t-il déjà été rendu une fois ?
+            let lyraFormRendered = false;
             // Charger la clé publique Lyra au démarrage de la boutique
             (async function loadLyraKey() {
                 try {
@@ -3936,25 +3938,18 @@ function shareResult() {
                         btn.style.display = 'none';
                         // Initialiser le formulaire Lyra
                         if (typeof KR !== 'undefined') {
-                            // 1. Supprimer les formulaires Lyra côté SDK
-                            try { await KR.removeForms(); } catch(e) {}
-                            await new Promise(r => setTimeout(r, 200));
-                            // 2. Recréer entièrement le nœud .kr-embedded (force un état DOM propre)
-                            const lyraParent = document.getElementById('boutiqueLyraContainer');
-                            const oldEmbed = lyraParent.querySelector('.kr-embedded');
-                            if (oldEmbed) oldEmbed.remove();
-                            const newEmbed = document.createElement('div');
-                            newEmbed.className = 'kr-embedded';
-                            newEmbed.setAttribute('kr-form-token', data.formToken);
-                            lyraParent.insertBefore(newEmbed, lyraParent.firstChild);
-                            // 3. Configurer le SDK avec le nouveau token
+                            // Configurer le token (toujours)
                             await KR.setFormConfig({
                                 formToken: data.formToken,
                                 'kr-public-key': lyraPublicKeyBoutique || data.publicKey,
                                 'kr-language': 'fr-FR'
                             });
-                            // 4. Rendre dans le nouveau nœud
-                            await KR.renderElements('#boutiqueLyraContainer .kr-embedded');
+                            if (!lyraFormRendered) {
+                                // Premier rendu : appeler renderElements une seule fois
+                                await KR.renderElements('#boutiqueLyraContainer .kr-embedded');
+                                lyraFormRendered = true;
+                            }
+                            // Si déjà rendu : setFormConfig suffit pour mettre à jour le token
                             KR.onSubmit(function(paymentData) {
                                 lyraContainer.style.display = 'none';
                                 const successMsg = document.createElement('div');
