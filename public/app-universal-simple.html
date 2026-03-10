@@ -3938,18 +3938,15 @@ function shareResult() {
                         btn.style.display = 'none';
                         // Initialiser le formulaire Lyra
                         if (typeof KR !== 'undefined') {
-                            // Configurer le token (toujours)
+                            // Mettre à jour l'attribut kr-form-token sur le div
+                            const krDiv = document.querySelector('#boutiqueLyraContainer .kr-embedded');
+                            if (krDiv) krDiv.setAttribute('kr-form-token', data.formToken);
+                            // setFormConfig met à jour le token — Lyra auto-rend via l'attribut
                             await KR.setFormConfig({
                                 formToken: data.formToken,
                                 'kr-public-key': lyraPublicKeyBoutique || data.publicKey,
                                 'kr-language': 'fr-FR'
                             });
-                            if (!lyraFormRendered) {
-                                // Premier rendu : appeler renderElements une seule fois
-                                await KR.renderElements('#boutiqueLyraContainer .kr-embedded');
-                                lyraFormRendered = true;
-                            }
-                            // Si déjà rendu : setFormConfig suffit pour mettre à jour le token
                             KR.onSubmit(function(paymentData) {
                                 lyraContainer.style.display = 'none';
                                 const successMsg = document.createElement('div');
