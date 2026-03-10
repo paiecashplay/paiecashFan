@@ -3942,11 +3942,14 @@ function shareResult() {
                             const krDiv = document.querySelector('#boutiqueLyraContainer .kr-embedded');
                             if (krDiv) krDiv.setAttribute('kr-form-token', data.formToken);
                             // setFormConfig met à jour le token — Lyra auto-rend via l'attribut
+                            // kr-post-url-success = URL actuelle pour éviter la redirection vers /none
                             await KR.setFormConfig({
                                 formToken: data.formToken,
                                 'kr-public-key': lyraPublicKeyBoutique || data.publicKey,
-                                'kr-language': 'fr-FR'
+                                'kr-language': 'fr-FR',
+                                'kr-post-url-success': window.location.href
                             });
+                            // KR.onSubmit intercepte le paiement avant la redirection
                             KR.onSubmit(function(paymentData) {
                                 lyraContainer.style.display = 'none';
                                 const successMsg = document.createElement('div');
@@ -3955,7 +3958,7 @@ function shareResult() {
                                 lyraContainer.parentNode.insertBefore(successMsg, lyraContainer.nextSibling);
                                 cartItems = [];
                                 updateBoutiqueCart();
-                                return true;
+                                return false; // false = ne pas rediriger, rester sur la page
                             });
                         } else {
                             throw new Error('SDK Lyra non chargé');
