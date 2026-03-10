@@ -3873,15 +3873,8 @@ function shareResult() {
             window.boutiqueOrder = function(name) {
                 if (cartItems.length === 0) return;
                 const total = formatPrice(getCartTotal());
-                alert(`✅ Commande confirmée !
-
-${cartItems.map(i => `• ${i.name} x${i.qty}`).join('
-')}
-
-Total : ${total}
-
-Votre commande ${name} sera livrée sous 7-14 jours.
-Merci d'avoir choisi PaieCash !`);
+                const items = cartItems.map(i => '• ' + i.name + ' x' + i.qty).join('\n');
+                alert('✅ Commande confirmée !\n\n' + items + '\n\nTotal : ' + total + '\n\nVotre commande ' + name + ' sera livrée sous 7-14 jours.\nMerci d\'avoir choisi PaieCash !');
                 cartItems = [];
                 updateBoutiqueCart();
             };
