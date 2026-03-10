@@ -3936,7 +3936,13 @@ function shareResult() {
                         btn.style.display = 'none';
                         // Initialiser le formulaire Lyra
                         if (typeof KR !== 'undefined') {
+                            // Supprimer tout formulaire existant et attendre
                             try { await KR.removeForms(); } catch(e) {}
+                            // Petit délai pour laisser le DOM se nettoyer
+                            await new Promise(r => setTimeout(r, 150));
+                            // Vider le conteneur manuellement
+                            const lyraInner = document.querySelector('#boutiqueLyraContainer .kr-embedded');
+                            if (lyraInner) lyraInner.innerHTML = '';
                             await KR.setFormConfig({
                                 formToken: data.formToken,
                                 'kr-public-key': lyraPublicKeyBoutique || data.publicKey,
