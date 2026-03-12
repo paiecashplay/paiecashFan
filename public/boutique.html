@@ -554,6 +554,13 @@
                 }
                 
                 currentOrder = orderData.order
+                
+                // Validation stricte
+                if (!currentOrder || !currentOrder.id) {
+                    console.error('❌ Commande invalide:', orderData)
+                    throw new Error('Commande créée mais ID manquant')
+                }
+                
                 console.log('✅ Order ID:', currentOrder.id)
                 
                 // 2. Créer le paiement Lyra
@@ -561,28 +568,41 @@
                 const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
                 const amountCents = Math.round(total * 100)
                 
+                console.log('💵 Montant:', total, '€ =', amountCents, 'centimes')
+                console.log('🆔 Order ID pour Lyra:', currentOrder.id)
+                
+                console.log('💵 Montant:', total, '€ =', amountCents, 'centimes')
+                console.log('🆔 Order ID pour Lyra:', currentOrder.id)
+                
+                // Préparer le payload
+                const lyraPayload = {
+                    amount: amountCents,
+                    currency: 'EUR',
+                    orderId: currentOrder.id,
+                    customer: {
+                        email: email,
+                        reference: USER_ID
+                    },
+                    metadata: {
+                        club_id: CLUB_ID,
+                        invoice_number: currentOrder.invoice_number || ''
+                    }
+                }
+                
+                console.log('📤 Payload Lyra:', JSON.stringify(lyraPayload, null, 2))
+                
                 const paymentResponse = await fetch(`${API_BASE_URL}/api/lyra/create-payment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: amountCents,
-                        currency: 'EUR',
-                        orderId: currentOrder.id,
-                        customer: {
-                            email: email,
-                            reference: USER_ID
-                        },
-                        metadata: {
-                            club_id: CLUB_ID,
-                            invoice_number: currentOrder.invoice_number
-                        }
-                    })
+                    body: JSON.stringify(lyraPayload)
                 })
                 
                 const paymentData = await paymentResponse.json()
                 console.log('💳 Réponse paiement:', paymentData)
                 
                 if (!paymentData.success) {
+                    console.error('❌ Erreur API Lyra:', paymentData)
+                    console.error('❌ Message:', paymentData.error)
                     throw new Error(paymentData.error || 'Erreur création paiement')
                 }
                 
