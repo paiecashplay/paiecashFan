@@ -755,7 +755,7 @@
             loadProducts()
 
             // Corriger le bouton Retour pour renvoyer vers l'app avec les bons paramètres
-            (function() {
+            ;(function() {
                 const _bParams = new URLSearchParams(window.location.search);
                 const _bClub = _bParams.get('club') || '';
                 const _bLeague = _bParams.get('league') || '';
