@@ -1,0 +1,471 @@
+/* ═══════════════════════════════════════════════════════════════
+   ClubChatbot - Premium Floating Chat Widget
+   All selectors prefixed .ccb- to avoid collisions
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Launcher ── */
+.ccb-launcher {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.ccb-launcher:hover {
+  transform: scale(1.08);
+}
+
+.ccb-launcher:active {
+  transform: scale(0.96);
+}
+
+/* Pulse ring */
+.ccb-launcher-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid;
+  animation: ccb-pulse-ring 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Notification dot */
+.ccb-notif-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Panel ── */
+.ccb-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 28px;
+  z-index: 9999;
+  width: 380px;
+  height: 540px;
+  background: #0d0d12;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.ccb-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 72px;
+  padding: 0 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Shimmer pseudo-element */
+.ccb-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  animation: ccb-shimmer 3s ease infinite;
+  pointer-events: none;
+}
+
+/* Accent line at bottom of header */
+.ccb-header-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 2;
+}
+
+/* Club crest */
+.ccb-header-crest {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.ccb-header-crest-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.ccb-header-crest-fallback {
+  font-size: 16px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Header info */
+.ccb-header-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.ccb-header-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ccb-header-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1;
+}
+
+/* Header action buttons */
+.ccb-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.ccb-header-btn {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.ccb-header-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Messages ── */
+.ccb-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ccb-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ccb-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ccb-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.ccb-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Message row */
+.ccb-msg {
+  display: flex;
+  gap: 8px;
+  animation: ccb-msg-in 0.3s ease-out both;
+}
+
+.ccb-msg--bot {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.ccb-msg--user {
+  justify-content: flex-end;
+}
+
+/* Bot avatar */
+.ccb-bot-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Bubbles */
+.ccb-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.ccb-bubble--bot {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px 16px 16px 16px;
+}
+
+.ccb-bubble--user {
+  border-radius: 16px 4px 16px 16px;
+  font-weight: 500;
+}
+
+/* Timestamp */
+.ccb-timestamp {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.ccb-timestamp--bot {
+  text-align: left;
+  padding-left: 2px;
+}
+
+.ccb-timestamp--user {
+  text-align: right;
+  padding-right: 2px;
+}
+
+/* ── Typing Indicator ── */
+.ccb-bubble--typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 18px;
+  min-width: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px 16px 16px 16px;
+}
+
+.ccb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: ccb-bounce 1.2s ease infinite;
+}
+
+.ccb-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ccb-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── Suggested Questions ── */
+.ccb-suggestions {
+  padding: 0 14px 12px;
+  flex-shrink: 0;
+}
+
+.ccb-suggestions-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.ccb-suggestions-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ccb-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+}
+
+.ccb-pill:hover {
+  border-color: currentColor !important;
+  filter: brightness(1.2);
+}
+
+/* ── Input Area ── */
+.ccb-input-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 60px;
+  padding: 0 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.ccb-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #fff;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ccb-input:focus {
+  border-color: var(--ccb-focus-border, rgba(255, 255, 255, 0.2));
+  box-shadow: 0 0 0 3px var(--ccb-focus-shadow, rgba(255, 255, 255, 0.05));
+}
+
+.ccb-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.ccb-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.ccb-send-btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: scale(1.05);
+}
+
+.ccb-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Keyframes ── */
+@keyframes ccb-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes ccb-bounce {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes ccb-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ccb-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .ccb-panel {
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 90px;
+    height: 480px;
+  }
+
+  .ccb-launcher {
+    bottom: 20px;
+    right: 12px;
+  }
+}

@@ -1,0 +1,1362 @@
+/* ═══════════════════════════════════════════════════════════════
+   PCC Marketplace - Sports/Gaming Design System
+   Dream11/Fanatics inspired vibrant theme
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+@import './clubs.css';
+@import './clubs-detail.css';
+@import './clubs-components.css';
+
+:root {
+  --color-bg: #070c11;
+  --color-surface: #0e1a17;
+  --color-card: #152620;
+  --color-primary: #059669;
+  --color-accent: #34d399;
+  --color-gold: #fcd34d;
+  --color-text-primary: #f0fdf4;
+  --color-text-muted: #6ee7b7;
+  --color-border: #1f3d32;
+
+  --color-gold-silver: #fef08a;
+  --color-gold-bronze: #d97706;
+
+  --bg-dark: var(--color-bg);
+  --bg-surface: var(--color-surface);
+  --bg-card: var(--color-card);
+  --bg-hover: var(--color-surface);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-input: var(--color-card);
+
+  --border: var(--color-border);
+  --border-active: var(--color-primary);
+
+  --text: var(--color-text-primary);
+  --text-dim: var(--color-text-muted);
+  --text-muted: var(--color-text-muted);
+
+  --primary: var(--color-primary);
+  --primary-dim: rgba(5, 150, 105, 0.15);
+  --secondary: var(--color-accent);
+  --accent: var(--color-accent);
+  --accent-dim: rgba(52, 211, 153, 0.12);
+  --gold: var(--color-gold);
+  --gold-dim: rgba(252, 211, 77, 0.12);
+  --blue: #3b82f6;
+  --orange: #ff9800;
+  --cyan: #00bcd4;
+  --red: #f44336;
+
+  --gradient-hero: linear-gradient(135deg, var(--color-bg), var(--color-surface), var(--color-card));
+  --gradient-card: linear-gradient(145deg, var(--color-card), var(--color-surface));
+  --gradient-gold: linear-gradient(135deg, var(--color-gold), var(--color-gold-silver));
+  --gradient-live: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+
+  --shadow: 0 4px 24px rgba(8, 16, 14, 0.6);
+  --shadow-glow: 0 0 24px rgba(52, 211, 153, 0.15);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ── Google Translate text-expansion protection ── */
+font[style], font[color], font[face] {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Flex children: prevent refusing to shrink below content width */
+[style*="display: flex"] > *,
+[style*="display:flex"] > *,
+.flex-child-safe {
+  min-width: 0;
+}
+
+/* Ensure all images are responsive by default */
+img, video, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* ─── Top Navbar ───────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  height: 64px;
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.navbar-logo .logo-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--gradient-hero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 40px;
+  list-style: none;
+}
+
+.navbar-nav a {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.navbar-nav a:hover {
+  color: var(--text);
+  background: var(--bg-glass);
+}
+
+.navbar-nav a.active {
+  color: var(--primary);
+  background: transparent;
+  outline: 1px solid var(--color-primary);
+}
+
+.navbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ─── Hero Section ─────────────────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 32px 60px;
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-dark) 100%);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 60, 120, 0.08), transparent 70%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -50px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108, 92, 231, 0.06), transparent 70%);
+}
+
+.hero-content {
+  position: relative;
+  max-width: 800px;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* ─── Section ──────────────────────────────────────────────── */
+.section {
+  padding: 48px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 24px;
+}
+
+/* ─── Cards ────────────────────────────────────────────────── */
+.card {
+  background: var(--color-card);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* ─── Club Card ────────────────────────────────────────────── */
+.club-card {
+  background: var(--color-card);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.club-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+.club-banner {
+  height: 100px;
+  background: var(--gradient-hero);
+  position: relative;
+}
+
+.club-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-dark);
+  border: 3px solid var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  position: absolute;
+  bottom: -28px;
+  left: 20px;
+}
+
+.club-info {
+  padding: 36px 20px 20px;
+}
+
+.club-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.club-meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ─── Product Card ─────────────────────────────────────────── */
+.product-card {
+  background: var(--color-card);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.product-img {
+  height: 180px;
+  background: var(--gradient-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.product-info {
+  padding: 16px;
+}
+
+.product-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.product-club {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.product-price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+/* ─── Contest/Betting Cards ────────────────────────────────── */
+.contest-card {
+  background: var(--color-card);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.contest-card:hover {
+  border-color: var(--gold);
+}
+
+.contest-card .live-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--gradient-live);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.contest-type {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.contest-type.fantasy {
+  background: var(--primary-dim);
+  color: var(--primary);
+}
+
+.contest-type.prediction {
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+
+.contest-type.tournament {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.prize-pool {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ─── Grid Layouts ─────────────────────────────────────────── */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* ─── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.btn-primary:hover {
+  background: var(--color-accent);
+  color: var(--color-surface);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+
+.btn-accent:hover {
+  box-shadow: 0 4px 16px rgba(0, 230, 118, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--bg-glass);
+}
+
+.btn-gold {
+  background: var(--gradient-gold);
+  color: #000;
+  font-weight: 700;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ─── Badges ───────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-live {
+  background: var(--gradient-live);
+  color: #fff;
+}
+
+.badge-upcoming {
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+
+.badge-completed {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.badge-open {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--blue);
+}
+
+/* ─── Leaderboard ──────────────────────────────────────────── */
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.2s;
+}
+
+.leaderboard-item:hover {
+  background: var(--bg-glass);
+}
+
+.leaderboard-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.rank-1 {
+  background: var(--gradient-gold);
+  color: #000;
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+  color: #000;
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #cd7f32, #b87333);
+  color: #000;
+}
+
+.rank-default {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+/* ─── Form ─────────────────────────────────────────────────── */
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-accent);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+/* ─── Empty State ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-dim);
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+/* ─── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+
+  .grid-4,
+  .grid-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .section {
+    padding: 32px 16px;
+  }
+
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .navbar-nav {
+    display: none;
+  }
+}
+
+/* ─── Animations ───────────────────────────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+/* ─── Mobile Hamburger ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex !important;
+  }
+
+  .navbar-actions .btn:not(:last-child) {
+    display: none;
+  }
+
+  .navbar-nav {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger-btn {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   MOBILE POLISH - Gaming pages
+══════════════════════════════════════════ */
+
+/* overflow-x handled in body reset above */
+/* Prevent horizontal overflow - use clip to not break sticky */
+body {
+  overflow-x: clip;
+}
+
+/* Section padding tighter on mobile */
+@media (max-width: 480px) {
+  .section {
+    padding: 16px 12px !important;
+  }
+
+  .section-title {
+    font-size: 1.4rem !important;
+  }
+}
+
+/* Game top bar wraps on small screens */
+@media (max-width: 480px) {
+  .game-top-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .game-top-bar .center-title {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Aviator multiplier font scales down */
+@media (max-width: 360px) {
+  .aviator-multiplier {
+    font-size: 2.8rem !important;
+  }
+}
+
+/* Lobby stats always 3 columns even on small mobile */
+@media (max-width: 360px) {
+  .lobby-stats {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .lobby-stats .stat-value {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Leaderboard table - hide country col on mobile */
+/* ─── Betting Dashboard (4RABET Style) ─────────────────────── */
+.betting-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.bet-sidebar {
+  position: sticky;
+  top: 88px;
+}
+
+.bet-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.bet-sidebar-item:hover {
+  background: var(--bg-glass);
+  color: var(--text);
+}
+
+.bet-sidebar-item.active {
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-left: 3px solid var(--primary);
+}
+
+.odds-matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* PAIECASH EMERALD THEME */
+:root {
+  --bg-darker: #020617;
+  --bg-card: #0f172a;
+  --bg-sidebar: #020617;
+  --accent-emerald: #10b981;
+  --emerald: #10b981;
+  --accent-gold: #fbbf24;
+}
+
+.btn-emerald {
+  background: var(--emerald);
+  color: #000;
+  border: none;
+}
+
+.btn-emerald:hover {
+  background: #059669;
+}
+
+.text-emerald {
+  color: var(--emerald);
+}
+
+.betting-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  gap: 20px;
+  background: var(--bg-darker);
+  min-height: calc(100vh - 100px);
+}
+
+.bet-sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid #30363d;
+  padding-top: 20px;
+}
+
+.bet-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.bet-sidebar-item:hover,
+.bet-sidebar-item.active {
+  background: #1e293b;
+  color: #fff;
+  border-left: 3px solid var(--emerald);
+}
+
+/* Match Detail View */
+.match-detail-header {
+  background: var(--bg-lighter);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.market-group {
+  margin-bottom: 32px;
+}
+
+.market-group-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.market-card-title {
+  font-weight: 700;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.market-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.market-option-btn {
+  background: var(--bg-lighter);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.market-option-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+}
+
+.market-option-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+}
+
+.option-label {
+  font-size: 0.75rem;
+  color: inherit;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.option-odds {
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-bottom: 16px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: var(--primary);
+}
+
+.odds-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+
+.odds-value {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.odds-btn.active .odds-value,
+.odds-btn.active .odds-label {
+  color: #fff;
+}
+
+.highlights-header {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.highlight-btn {
+  background: #21262d;
+  border: none;
+  color: #8b949e;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.highlight-btn.active {
+  background: var(--emerald);
+  color: #000;
+}
+
+.odds-matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #1e293b;
+}
+
+.odds-btn {
+  background: #0f172a;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.odds-btn:hover {
+  background: #1e293b;
+}
+
+.odds-btn.active {
+  background: var(--emerald) !important;
+  color: #000 !important;
+}
+
+/* Betslip Enhancements */
+.betslip-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.betslip-header {
+  background: #21262d;
+  padding: 16px;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.betslip-tabs {
+  display: flex;
+  background: #0d1117;
+  padding: 4px;
+  border-radius: 4px;
+  margin: 12px;
+}
+
+.betslip-tab {
+  flex: 1;
+  text-align: center;
+  padding: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 3px;
+  color: #8b949e;
+}
+
+.betslip-tab.active {
+  background: #21262d;
+  color: #fff;
+}
+
+.stake-preset {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stake-preset-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #fff;
+  padding: 8px 4px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.stake-preset-btn.active {
+  background: var(--emerald);
+  border-color: var(--emerald);
+  color: #000;
+}
+
+.potential-win-box {
+  background: #0d1117;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 16px;
+}
+
+@media (max-width: 1200px) {
+  .betting-layout {
+    grid-template-columns: 200px 1fr;
+  }
+
+  .bet-right-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .betting-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bet-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-row {
+    grid-template-columns: 36px 1fr 70px 70px !important;
+  }
+
+  .leaderboard-country {
+    display: none !important;
+  }
+
+  .podium-wrap {
+    gap: 6px !important;
+  }
+
+  .podium-name {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* My Games table col adjustments */
+@media (max-width: 640px) {
+  .mygames-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Roulette bet grid: 3 cols always, tighter on mobile */
+@media (max-width: 400px) {
+  .roulette-bet-grid {
+    gap: 5px !important;
+  }
+
+  .roulette-bet-btn {
+    padding: 8px 4px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Slot reels: min-width protection */
+@media (max-width: 360px) {
+  .reel-wrap {
+    width: 58px !important;
+  }
+
+  .reel-cell {
+    height: 50px !important;
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Featured games grid: always 2 cols minimum on mobile */
+@media (max-width: 320px) {
+  .featured-games-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Profile dropdown: full width on mobile */
+@media (max-width: 480px) {
+  .profile-dropdown {
+    right: -12px !important;
+    min-width: calc(100vw - 24px) !important;
+  }
+}
+
+/* Toast: full width on mobile */
+@media (max-width: 480px) {
+  .toast-container {
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+  }
+}
+
+/* Navbar: tighter on very small screens */
+@media (max-width: 360px) {
+  .navbar {
+    padding: 0 12px !important;
+  }
+
+  .navbar-logo {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* Smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Touch targets: all buttons min 44px tall */
+@media (max-width: 768px) {
+
+  button,
+  .btn,
+  a.btn {
+    min-height: 44px;
+  }
+}
+
+/* ── Mobile responsiveness for game pages ── */
+@media (max-width: 768px) {
+
+  /* Contests grid → single column */
+  .contests-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* History table → hide on mobile, show summary only */
+  .history-table-row {
+    grid-template-columns: 36px 1fr 80px 80px !important;
+  }
+
+  .history-col-payout,
+  .history-col-time {
+    display: none;
+  }
+
+  /* Dashboard wallet card → stack vertically */
+  .wallet-summary-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* Game bet controls → full width */
+  .game-bet-input,
+  .game-bet-button {
+    width: 100% !important;
+  }
+
+  /* Navbar wallet badge → compact */
+  .wallet-badge-label {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .contests-stats-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ── Withdrawal page ── */
+@media (max-width: 600px) {
+  .withdraw-methods {
+    flex-direction: column;
+  }
+
+  .withdraw-presets {
+    flex-wrap: wrap;
+  }
+
+  .withdraw-confirm-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* ── Transaction feed ── */
+@media (max-width: 500px) {
+  .txn-feed-row {
+    flex-wrap: wrap;
+  }
+
+  .txn-feed-amount {
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
+  }
+
+  .txn-feed-filters {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Leaderboard tabs ── */
+@media (max-width: 600px) {
+  .leaderboard-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    overflow-x: unset !important;
+  }
+}

@@ -1,0 +1,729 @@
+/* ─── SquadSpotlight Component ─── */
+.squad-spotlight {
+  padding: 100px 32px;
+  background: var(--squad-dark, var(--club-dark));
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.squad-spotlight__header {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.squad-spotlight__label {
+  display: inline-block;
+  font-family: var(--font-club-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--squad-secondary);
+  margin-bottom: 16px;
+}
+
+.squad-spotlight__title {
+  font-family: var(--font-club-hero);
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.squad-spotlight__subtitle {
+  font-family: var(--font-club-sub);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Grid layout - 4 columns on desktop */
+.squad-spotlight__grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1100px) {
+  .squad-spotlight__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .squad-spotlight__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .squad-spotlight__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual player card */
+.squad-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 28px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.squad-spotlight--visible .squad-card {
+  animation: clubFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.squad-card:hover {
+  border-color: var(--squad-glow);
+  transform: translateY(-8px) !important;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Number watermark */
+.squad-card__number-watermark {
+  position: absolute;
+  top: -15px;
+  right: 5px;
+  font-family: var(--font-club-hero);
+  font-size: 9rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.03);
+  z-index: 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Player photo */
+.squad-card__photo-wrap {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  margin-bottom: 20px;
+  z-index: 1;
+}
+
+.squad-card__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Cutout images - show full body, no circle crop */
+.squad-card__photo--cutout {
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
+}
+
+.squad-card__photo-wrap--cutout {
+  width: 140px;
+  height: 160px;
+  margin-bottom: 12px;
+}
+
+.squad-card__photo-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  z-index: 0;
+  background: radial-gradient(circle, var(--squad-glow, rgba(255, 255, 255, 0.1)), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.squad-card:hover .squad-card__photo-glow {
+  opacity: 1;
+}
+
+/* Emoji fallback */
+.squad-card__emoji-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Player info */
+.squad-card__info {
+  z-index: 1;
+  margin-bottom: 16px;
+}
+
+.squad-card__jersey {
+  display: inline-block;
+  font-family: var(--font-club-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--squad-primary);
+  margin-bottom: 6px;
+  opacity: 0.7;
+}
+
+.squad-card__name {
+  font-family: var(--font-club-hero);
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.squad-card__position {
+  font-family: var(--font-club-sub);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Stats bar */
+.squad-card__stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 1;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  justify-content: center;
+}
+
+.squad-card__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.squad-card__stat-num {
+  font-family: var(--font-club-hero);
+  font-size: 1.4rem;
+  color: var(--squad-secondary);
+  line-height: 1;
+}
+
+.squad-card__stat-label {
+  font-family: var(--font-club-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.squad-card__stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Accent bottom line */
+.squad-card__accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--squad-glow, rgba(255, 255, 255, 0.2)), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.squad-card:hover .squad-card__accent {
+  opacity: 1;
+}
+
+/* ─── MerchandiseGrid & ProductCard ─── */
+.merch-grid {
+  padding: 100px 32px;
+  background: var(--club-dark);
+  position: relative;
+  z-index: 2;
+}
+
+.merch-grid__header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.merch-grid__label {
+  font-family: var(--font-club-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--merch-secondary);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.merch-grid__title {
+  font-family: var(--font-club-hero);
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.merch-grid__count {
+  font-family: var(--font-club-mono);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.merch-grid__filters {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.merch-grid__filter-btn {
+  padding: 10px 24px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--club-text);
+  font-family: var(--font-club-sub);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.merch-grid__filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.merch-grid__filter-btn--active {
+  background: var(--club-text);
+  color: var(--club-dark);
+  font-weight: 700;
+}
+
+.merch-grid__products {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+.merch-grid__product-wrap {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.merch-grid--visible .merch-grid__product-wrap {
+  animation: clubFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.merch-grid__empty {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.product-card-v2 {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  backdrop-filter: blur(10px);
+}
+
+.product-card-v2:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 40px var(--prod-glow);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.product-card-v2__img-wrap {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.product-card-v2__img-bg {
+  border-radius: 16px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  transition: all 0.4s ease;
+}
+
+.product-card-v2:hover .product-card-v2__img-bg {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.12) 0%, transparent 80%);
+}
+
+.product-card-v2__img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card-v2:hover .product-card-v2__img {
+  transform: scale(1.08) translateY(-5px);
+}
+
+.product-card-v2__img-emoji {
+  font-size: 6rem;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+}
+
+.product-card-v2:hover .product-card-v2__img-emoji {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.product-card-v2__category {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  font-family: var(--font-club-sub);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--club-text);
+}
+
+.product-card-v2__body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px;
+}
+
+.product-card-v2__name {
+  font-family: var(--font-club-sub);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  line-height: 1.4;
+  color: var(--club-text);
+  opacity: 0.9;
+}
+
+.product-card-v2__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.product-card-v2__price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.product-card-v2__price-amount {
+  font-family: var(--font-club-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--club-text);
+  line-height: 1;
+}
+
+.product-card-v2__price-currency {
+  font-family: var(--font-club-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--prod-secondary);
+}
+
+.product-card-v2__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--club-text);
+  font-family: var(--font-club-sub);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.product-card-v2:hover .product-card-v2__btn {
+  background: var(--club-text);
+  color: var(--club-dark);
+  font-weight: 700;
+  border-color: var(--club-text);
+}
+
+.product-card-v2__btn--added {
+  background: var(--c-green) !important;
+  color: #000 !important;
+  border-color: var(--c-green) !important;
+}
+
+/* ─── Footer - Premium ─── */
+.club-store__footer {
+  padding: 80px 32px;
+  background: var(--club-dark);
+  z-index: 2;
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.club-store__footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--club-glow, rgba(255, 255, 255, 0.2)), transparent);
+}
+
+.club-store__footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.club-store__footer-crest {
+  width: 60px;
+  height: 60px;
+  filter: grayscale(1) opacity(0.5);
+  transition: all 0.5s ease;
+}
+
+.club-store__footer-crest:hover {
+  filter: grayscale(0) opacity(1);
+  transform: scale(1.1);
+}
+
+.club-store__footer-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.club-store__footer-crest span {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.club-store__footer-text {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.35);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ─── ClubStats Ribbon ─── */
+.club-stats-ribbon {
+  padding: 0;
+  position: relative;
+  z-index: 3;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.club-stats-ribbon__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.club-stats-ribbon__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 20px;
+  position: relative;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.club-stats-ribbon__item::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 0;
+  width: 1px;
+  height: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.club-stats-ribbon__item:last-child::after {
+  display: none;
+}
+
+.club-stats-ribbon--visible .club-stats-ribbon__item {
+  animation: clubFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.club-stats-ribbon__value {
+  font-family: var(--font-club-hero);
+  font-size: 2.8rem;
+  line-height: 1;
+  color: var(--stats-secondary, #D4AF37);
+}
+
+.club-stats-ribbon__label {
+  font-family: var(--font-club-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .club-stats-ribbon__inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .club-stats-ribbon__item {
+    padding: 28px 16px;
+  }
+
+  .club-stats-ribbon__item:nth-child(2)::after {
+    display: none;
+  }
+
+  .club-stats-ribbon__value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .club-stats-ribbon__value {
+    font-size: 1.6rem;
+  }
+
+  .club-stats-ribbon__item {
+    padding: 20px 12px;
+  }
+}
+
+/* Product Card Quantity Style */
+.product-card-v2__qty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+}
+
+/* ─── Additional Mobile Responsive ─── */
+@media (max-width: 480px) {
+  .squad-spotlight { padding: 60px 16px; }
+  .squad-spotlight__title { font-size: 2.5rem; }
+  .squad-spotlight__subtitle { font-size: 0.85rem; }
+  .squad-card { padding: 20px 16px 16px; border-radius: 16px; }
+  .squad-card__photo-wrap { width: 80px; height: 80px; margin-bottom: 14px; }
+  .squad-card__name { font-size: 1.2rem; }
+  .squad-card__stats { gap: 10px; padding: 8px 12px; }
+  .squad-card__stat-num { font-size: 1.1rem; }
+  .merch-grid { padding: 60px 16px; }
+  .merch-grid__title { font-size: 2.5rem; }
+  .merch-grid__header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .merch-grid__products { grid-template-columns: 1fr !important; gap: 20px; }
+  .merch-grid__filter-btn { padding: 8px 16px; font-size: 0.9rem; }
+  .product-card-v2 { padding: 12px; border-radius: 18px; }
+  .product-card-v2__name { font-size: 1rem; }
+  .product-card-v2__price-amount { font-size: 1.2rem; }
+  .product-card-v2__btn { padding: 8px 14px; font-size: 0.8rem; }
+  .club-store__footer { padding: 48px 16px; }
+  .club-store__footer-text { font-size: 0.85rem; }
+}
+.product-card-v2__qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--club-text);
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.product-card-v2__qty-btn:hover {
+  background: var(--club-text);
+  color: var(--club-dark);
+}
+
+.product-card-v2__qty-val {
+  font-family: var(--font-club-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--club-text);
+  min-width: 16px;
+  text-align: center;
+}

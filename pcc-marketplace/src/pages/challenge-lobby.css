@@ -1,0 +1,166 @@
+.lobby-container {
+  min-height: calc(100vh - 64px);
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Rajdhani', 'Inter', sans-serif;
+  padding: 20px;
+}
+
+.lobby-card {
+  background: #111;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.lobby-header h2 {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin: 0 0 10px 0;
+  letter-spacing: 1px;
+}
+
+.lobby-game-name {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.lobby-game-name span {
+  color: #00ff88;
+}
+
+.lobby-players {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 40px 0;
+  padding: 0 20px;
+}
+
+.lobby-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.lobby-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #0a0a0a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 3px solid #222;
+}
+
+.lobby-player-name {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.lobby-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.lobby-status.ready {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.lobby-status.waiting {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.lobby-status.ready .status-dot {
+  box-shadow: 0 0 10px #00ff88;
+  animation: pulse-ready 1.5s infinite;
+}
+
+.lobby-status.waiting .status-dot {
+  animation: pulse-waiting 1.5s infinite;
+}
+
+.lobby-vs {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.2);
+  font-style: italic;
+}
+
+.lobby-countdown-box {
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  color: #00ff88;
+  font-weight: 800;
+  animation: scale-up 0.3s ease-out;
+}
+
+.countdown-number {
+  font-size: 3rem;
+  line-height: 1;
+  margin-top: 10px;
+}
+
+.lobby-cancel-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lobby-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+@keyframes pulse-ready {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-waiting {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

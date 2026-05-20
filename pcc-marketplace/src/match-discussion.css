@@ -1,0 +1,405 @@
+/* ═══════════════════════════════════════════════════════════════
+   match-discussion.css - Live Match Discussion page styles
+   Dark theme: #0a0a0a / #111 / #1a1a1a, accent: #00ff88
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Navbar clearance wrapper removed as App.jsx handles it ── */
+
+/* ── Page layout ─────────────────────────────────────────────── */
+.md-page {
+  display: flex;
+  margin-top: 32px;
+  /* App.jsx gives 64px, + 32px = 96px total (clears the navbar exactly) */
+  height: calc(100vh - 96px);
+  background: #0a0a0a;
+  color: #f0f0f0;
+  font-family: 'Rajdhani', 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────── */
+.md-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  background: #0f0f0f;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.md-sidebar-header {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.md-sidebar-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.md-sidebar-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.08);
+  padding: 3px 8px;
+  border-radius: 99px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.md-room-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.md-room-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.md-room-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.md-room-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.15);
+  border-radius: 2px;
+}
+
+.md-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 10px 6px 4px;
+}
+
+.md-no-rooms {
+  padding: 24px 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+}
+
+/* ── Main chat area ───────────────────────────────────────────── */
+.md-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.md-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  text-align: center;
+}
+
+.md-empty-icon {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.md-empty-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.md-empty-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* ── Chat window ──────────────────────────────────────────────── */
+.md-chatwindow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.md-chatwindow-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #111;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.md-chatwindow-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.md-chatwindow-team {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.md-score {
+  font-size: 22px;
+  font-weight: 900;
+  color: #00ff88;
+  font-family: 'Rajdhani', monospace;
+  letter-spacing: 3px;
+  line-height: 1;
+}
+
+.md-chatwindow-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.md-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.md-online-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 700;
+}
+
+/* ── Live dot ──────────────────────────────────────────────────── */
+.md-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: md-pulse 1.5s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes md-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Messages area ─────────────────────────────────────────────── */
+.md-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* No scroll-behavior: smooth here - we set scrollTop directly in JS */
+}
+
+/* ── Reaction message bubble (Bug 3 fix) ───────────────────────── */
+.md-message-reaction {
+  align-self: center;
+  /* centre within the flex column, not the viewport */
+  text-align: center;
+  font-size: 2rem;
+  padding: 4px 12px;
+  background: transparent;
+  border: none;
+  line-height: 1.2;
+}
+
+.md-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.md-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.md-messages::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.12);
+  border-radius: 2px;
+}
+
+.md-loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.md-no-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding: 40px;
+}
+
+/* ── Quick reactions bar ───────────────────────────────────────── */
+.md-reactions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 20px 0;
+  flex-shrink: 0;
+}
+
+.md-reaction-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.md-reaction-btn:hover {
+  background: rgba(0, 255, 136, 0.08);
+  border-color: rgba(0, 255, 136, 0.2);
+  transform: scale(1.15);
+}
+
+/* ── Input bar ─────────────────────────────────────────────────── */
+.md-input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0f0f0f;
+  flex-shrink: 0;
+}
+
+.md-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.md-input:focus {
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.md-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.md-send-btn {
+  padding: 10px 20px;
+  background: rgba(0, 255, 136, 0.12);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 12px;
+  color: #00ff88;
+  font-weight: 800;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.md-send-btn:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.4);
+}
+
+.md-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .md-page {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 96px);
+  }
+
+  .md-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+  }
+
+  .md-room-list {
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .md-room-list>* {
+    flex-shrink: 0;
+    width: 220px;
+  }
+
+  .md-main {
+    height: calc(100vh - 304px);
+  }
+
+  .md-messages {
+    padding: 12px 14px;
+  }
+
+  .md-input-bar {
+    padding: 10px 14px 12px;
+  }
+}
