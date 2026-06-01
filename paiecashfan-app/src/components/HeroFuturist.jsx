@@ -52,14 +52,15 @@ const FEATURE_CARDS = [
   }
 ];
 
-// Trust row : clubs partenaires (les couleurs hover dérivent de leur palette officielle)
+// Trust row : logos officiels des clubs partenaires (commence par PSG)
+// Crests via crests.football-data.org (gratuit, sans clé).
 const TRUSTED_CLUBS = [
-  { name: 'OM',          color: 'rgba(0,153,216,0.3)',  border: 'rgba(0,153,216,0.6)' },
-  { name: 'PSG',         color: 'rgba(0,65,112,0.3)',   border: 'rgba(0,65,112,0.6)' },
-  { name: 'RAJA',        color: 'rgba(0,114,61,0.3)',   border: 'rgba(0,114,61,0.6)' },
-  { name: 'BARCA',       color: 'rgba(165,0,68,0.3)',   border: 'rgba(165,0,68,0.6)' },
-  { name: 'BAYERN',      color: 'rgba(220,5,45,0.3)',   border: 'rgba(220,5,45,0.6)' },
-  { name: 'LIVERPOOL',   color: 'rgba(200,16,46,0.3)',  border: 'rgba(200,16,46,0.6)' }
+  { name: 'Paris Saint-Germain', crest: 'https://crests.football-data.org/524.png', border: 'rgba(0,65,112,0.7)'   },
+  { name: 'FC Barcelona',        crest: 'https://crests.football-data.org/81.png',  border: 'rgba(165,0,68,0.7)'   },
+  { name: 'Real Madrid',         crest: 'https://crests.football-data.org/86.png',  border: 'rgba(254,190,16,0.7)' },
+  { name: 'Manchester United',   crest: 'https://crests.football-data.org/66.png',  border: 'rgba(218,41,28,0.7)'  },
+  { name: 'Bayern Munich',       crest: 'https://crests.football-data.org/5.png',   border: 'rgba(220,5,45,0.7)'   },
+  { name: 'Liverpool FC',        crest: 'https://crests.football-data.org/64.png',  border: 'rgba(200,16,46,0.7)'  }
 ];
 
 export function HeroFuturist() {
@@ -150,9 +151,10 @@ export function HeroFuturist() {
                   <div
                     key={c.name}
                     className="ph-crest"
-                    style={{ '--hover-bg': c.color, '--hover-border': c.border }}
+                    title={c.name}
+                    style={{ '--hover-border': c.border }}
                   >
-                    {c.name}
+                    <img src={c.crest} alt={c.name} loading="lazy" />
                   </div>
                 ))}
               </div>
@@ -326,27 +328,28 @@ const HERO_CSS = `
     color: rgba(255,255,255,0.45);
     font-weight: 700;
   }
-  .ph-trusted__row { display: flex; gap: -2px; align-items: center; }
+  .ph-trusted__row { display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap; }
   .ph-crest {
     display: inline-grid;
     place-items: center;
-    width: 38px; height: 38px;
+    width: 52px; height: 52px;
     border-radius: 100%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.12);
-    margin-left: -8px;
-    font-size: 8px;
-    font-weight: 900;
-    font-family: 'Barlow Condensed', sans-serif;
-    color: #fff;
-    letter-spacing: 0.05em;
-    transition: all 0.3s;
+    padding: 7px;
+    transition: transform 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.3s;
   }
-  .ph-crest:first-child { margin-left: 0; }
+  .ph-crest img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  }
   .ph-crest:hover {
-    background: var(--hover-bg, rgba(34,211,94,0.2));
-    border-color: var(--hover-border, rgba(34,211,94,0.6));
-    transform: translateY(-2px);
+    background: rgba(255,255,255,0.07);
+    border-color: var(--hover-border, rgba(16,185,129,0.6));
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6);
   }
 
   /* RIGHT (cards flottantes) */
