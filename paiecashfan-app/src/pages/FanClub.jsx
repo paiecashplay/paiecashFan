@@ -5,7 +5,7 @@ export function FanClub() {
   return (
     <section className="relative min-h-[60vh] py-24">
       <Container className="text-center">
-        <Badge variant="indigo">À venir — Phase B</Badge>
+        <Badge variant="emerald">À venir — Phase B</Badge>
         <h1 className="mt-6 font-display text-display-xl font-bold tracking-tight">
           <span className="text-gradient-hero">Fan club</span>
         </h1>

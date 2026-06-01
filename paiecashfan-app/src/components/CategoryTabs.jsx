@@ -26,7 +26,7 @@ export function CategoryTabs({ active, onChange }) {
                     {isActive && (
                       <motion.span
                         layoutId="category-pill"
-                        className="absolute inset-0 rounded-full bg-gradient-hero shadow-glow-indigo"
+                        className="absolute inset-0 rounded-full bg-gradient-hero shadow-glow-emerald"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}

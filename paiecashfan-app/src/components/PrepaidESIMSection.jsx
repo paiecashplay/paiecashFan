@@ -9,7 +9,7 @@ const cards = [
     title: 'Cartes Prépayées PaieCash',
     tagline: 'Jusqu’à 10 % cashback · Sans frais · Instantané',
     cta: 'Commander',
-    accent: 'indigo',
+    accent: 'emerald',
     features: [
       { icon: Zap,     text: 'Activation immédiate' },
       { icon: Shield,  text: 'Sans découvert ni frais cachés' }
@@ -30,11 +30,11 @@ const cards = [
 ];
 
 const accents = {
-  indigo: {
-    iconBg:   'bg-indigo-500/15 text-indigo-300 ring-indigo-500/30',
-    glow:     'group-hover:shadow-glow-indigo',
-    border:   'hover:border-indigo-500/40',
-    btn:      'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500'
+  emerald: {
+    iconBg:   'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30',
+    glow:     'group-hover:shadow-glow-emerald',
+    border:   'hover:border-emerald-500/40',
+    btn:      'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500'
   },
   cyan: {
     iconBg:   'bg-cyan-500/15 text-cyan-300 ring-cyan-500/30',
@@ -96,7 +96,7 @@ export function PrepaidESIMSection() {
                 </div>
 
                 {/* Halos décoratifs */}
-                <div className={`pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full blur-3xl opacity-20 ${c.accent === 'indigo' ? 'bg-indigo-500' : 'bg-cyan-500'}`} />
+                <div className={`pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full blur-3xl opacity-20 ${c.accent === 'emerald' ? 'bg-emerald-500' : 'bg-cyan-500'}`} />
               </motion.div>
             );
           })}

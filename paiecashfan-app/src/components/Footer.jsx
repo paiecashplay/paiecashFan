@@ -22,11 +22,11 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="h-9 w-9 rounded-xl bg-gradient-hero shadow-glow-indigo grid place-items-center text-[11px] font-black text-white font-display">
+              <span className="h-9 w-9 rounded-xl bg-gradient-hero shadow-glow-emerald grid place-items-center text-[11px] font-black text-white font-display">
                 P
               </span>
               <span className="font-display text-xl font-bold text-bone-50">
-                PaieCash<span className="text-cyan-400">Fan</span>
+                PaieCash<span className="text-emerald-400">Fan</span>
               </span>
             </div>
             <p className="mt-5 max-w-sm text-sm text-bone-400 leading-relaxed">
@@ -51,7 +51,7 @@ export function Footer() {
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-sm text-bone-200 hover:text-cyan-400 transition-colors"
+                      className="text-sm text-bone-200 hover:text-emerald-400 transition-colors"
                     >
                       {link}
                     </a>
@@ -79,7 +79,7 @@ function Social({ label }) {
     <a
       href="#"
       aria-label={label}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-bone-300 hover:border-cyan-500/40 hover:text-cyan-400 transition-colors"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-bone-300 hover:border-emerald-500/40 hover:text-emerald-400 transition-colors"
     >
       {label}
     </a>

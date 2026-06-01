@@ -4,7 +4,7 @@ export function GlassCard({ className, variant = 'default', ...props }) {
   const variants = {
     default: 'glass',
     strong: 'glass-strong',
-    indigo: 'glass-indigo'
+    emerald: 'glass-emerald'
   };
   return (
     <div

@@ -39,11 +39,11 @@ export function Navbar() {
       <Container className="flex h-16 md:h-20 items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-          <span className="relative h-9 w-9 rounded-xl bg-gradient-hero shadow-glow-indigo transition-transform group-hover:scale-110">
+          <span className="relative h-9 w-9 rounded-xl bg-gradient-hero shadow-glow-emerald transition-transform group-hover:scale-110">
             <span className="absolute inset-1 rounded-lg bg-ink-900/60 backdrop-blur grid place-items-center text-[11px] font-black text-bone-50 font-display">P</span>
           </span>
           <span className="font-display text-lg md:text-xl font-bold tracking-tight text-bone-50">
-            PaieCash<span className="text-cyan-400">Fan</span>
+            PaieCash<span className="text-emerald-400">Fan</span>
           </span>
         </Link>
 
@@ -82,15 +82,15 @@ export function Navbar() {
           </IconButton>
           <IconButton aria-label="Notifications">
             <Bell size={16} />
-            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-glow-cyan" />
+            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-glow-emerald" />
           </IconButton>
           <IconButton aria-label="Panier" className="hidden md:inline-flex">
             <ShoppingBag size={16} />
           </IconButton>
 
           {/* Connect button desktop */}
-          <button className="hidden md:inline-flex items-center gap-2 h-10 pl-1 pr-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md hover:border-indigo-500/40 transition-colors group">
-            <span className="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 ring-2 ring-ink-800 grid place-items-center text-[10px] font-black text-white">
+          <button className="hidden md:inline-flex items-center gap-2 h-10 pl-1 pr-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md hover:border-emerald-500/40 transition-colors group">
+            <span className="h-7 w-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-400 ring-2 ring-ink-800 grid place-items-center text-[10px] font-black text-white">
               <User size={12} />
             </span>
             <span className="text-xs font-bold text-bone-50">Se connecter</span>
@@ -129,7 +129,7 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className={({ isActive }) => cn(
                     'py-3 px-2 text-sm uppercase tracking-[0.14em] font-semibold border-b border-white/5 last:border-0',
-                    isActive ? 'text-cyan-400' : 'text-bone-200 hover:text-bone-50'
+                    isActive ? 'text-emerald-400' : 'text-bone-200 hover:text-bone-50'
                   )}
                 >
                   {item.label}
@@ -152,7 +152,7 @@ function IconButton({ children, className, ...rest }) {
     <button
       {...rest}
       className={cn(
-        'relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-bone-200 hover:text-cyan-400 hover:border-cyan-500/40 transition-colors',
+        'relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-bone-200 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors',
         className
       )}
     >

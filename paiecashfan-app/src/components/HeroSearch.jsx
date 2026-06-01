@@ -69,7 +69,7 @@ export function HeroSearch() {
       <div className={cn(
         'glass-strong rounded-full flex items-center pl-6 pr-2 h-16',
         'transition-shadow duration-300',
-        open && query ? 'shadow-glow-indigo' : 'shadow-glow-indigo/30'
+        open && query ? 'shadow-glow-emerald' : 'shadow-glow-emerald/30'
       )}>
         <Search size={18} className="text-bone-400 shrink-0" />
         <input
@@ -146,7 +146,7 @@ function ResultIcon({ item }) {
 
 function TypeBadge({ type }) {
   const map = {
-    club:       { label: 'Club',       cls: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' },
+    club:       { label: 'Club',       cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     league:     { label: 'Ligue',      cls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' },
     federation: { label: 'Fédération', cls: 'bg-gold-500/15 text-gold-400 border-gold-500/30' }
   };

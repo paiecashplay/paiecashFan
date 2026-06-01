@@ -9,9 +9,9 @@ const base =
 
 const variants = {
   primary:
-    'bg-gradient-hero text-white shadow-glow-indigo hover:shadow-glow-cyan focus-visible:ring-cyan-400',
+    'bg-gradient-hero text-ink-900 shadow-glow-emerald hover:shadow-glow-emerald-lg focus-visible:ring-emerald-400',
   outline:
-    'bg-white/5 backdrop-blur text-bone-100 border border-white/15 hover:border-indigo-500/50 hover:bg-white/10 focus-visible:ring-indigo-400',
+    'bg-white/5 backdrop-blur text-bone-100 border border-white/15 hover:border-emerald-500/50 hover:bg-white/10 focus-visible:ring-emerald-400',
   ghost:
     'bg-transparent text-bone-200 hover:text-bone-50 hover:bg-white/5 focus-visible:ring-bone-400',
   gold:
