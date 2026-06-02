@@ -71,3 +71,39 @@ export const federations = [
     flag: '🌏'
   }
 ];
+
+// Map par id pour merger avec les données live de /api/federations.
+// L'API Worker Hono renvoie un shape EN minimal (region en anglais, flag
+// en code 2 lettres). On enrichit côté frontend avec couleurs + emoji + FR.
+export const federationStyleById = Object.fromEntries(
+  federations.map((f) => [f.id, {
+    primaryColor: f.primaryColor,
+    accent: f.accent,
+    flag: f.flag,         // emoji local (override le code court de l'API)
+    region: f.region,     // FR local (override l'EN de l'API)
+    shortName: f.shortName // FR plus court que le fullName de l'API
+  }])
+);
+
+// Normalize : convertit la shape API Hono → shape FederationCard
+// Hono :   { id, name, fullName, flag, region, clubsCount }
+// Card :   { id, code, shortName, region, clubs, primaryColor, accent, flag }
+export function normalizeFederation(api) {
+  const local = federationStyleById[api.id] || {
+    primaryColor: '#10b981',
+    accent: '#FFFFFF',
+    flag: '🌐',
+    region: api.region,
+    shortName: api.fullName
+  };
+  return {
+    id: api.id,
+    code: api.name,
+    shortName: local.shortName || api.fullName,
+    region: local.region || api.region,
+    clubs: api.clubsCount,
+    flag: local.flag,
+    primaryColor: local.primaryColor,
+    accent: local.accent
+  };
+}
