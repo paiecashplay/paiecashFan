@@ -6,17 +6,49 @@ import { ArrowUpRight, User, Calendar, Award } from 'lucide-react';
 // Ex: '🇿🇦' → 'ZA', '🇩🇿' → 'DZ'. Sur Windows, le navigateur affiche
 // déjà les emoji en texte ASCII (manque la font flag) — donc on a besoin
 // de ce code "propre" pour le badge gauche.
+// Ne supporte PAS les composite tag sequences (Angleterre/Écosse/Pays de Galles
+// utilisent ce format : 🏴󠁧󠁢󠁥󠁮󠁧󠁿). Pour ces cas on passe par le map ci-dessous.
 function flagToCountryCode(flag) {
   if (!flag) return '';
   const chars = [...flag];
   if (chars.length !== 2) return '';
   try {
-    return chars
+    const out = chars
       .map((c) => String.fromCharCode(c.codePointAt(0) - 0x1F1E6 + 0x41))
       .join('');
+    // Sanity check : le résultat doit être 2 lettres A-Z
+    return /^[A-Z]{2}$/.test(out) ? out : '';
   } catch {
     return '';
   }
+}
+
+// Codes spéciaux FlagCDN pour les nations qui n'ont pas de code ISO 3166-1
+// alpha-2 standard mais qui ont une bannière footballistique propre.
+// Indexés par le code 3-letter sport présent dans la data.
+// Note : pour l'Angleterre on utilise l'Union Jack (gb) au lieu de la croix
+// de Saint Georges (gb-eng) — choix produit pour la reconnaissance visuelle.
+const SPECIAL_FLAG_CDN_CODES = {
+  ENG: 'gb',      // Angleterre — Union Jack (RU entier, choix produit)
+  SCO: 'gb-sct',  // Écosse — Saltire (croix de Saint André)
+  WAL: 'gb-wls',  // Pays de Galles — dragon rouge
+  NIR: 'gb-nir'   // Irlande du Nord — Ulster Banner
+};
+
+// Code à utiliser pour FlagCDN (lowercase, format 'za' ou 'gb-eng').
+function getFlagCdnCode(member) {
+  const special = SPECIAL_FLAG_CDN_CODES[member.code];
+  if (special) return special;
+  return (flagToCountryCode(member.flag) || '').toLowerCase();
+}
+
+// Code à afficher en fallback texte (si l'image FlagCDN ne charge pas).
+function getDisplayCode(member) {
+  return (
+    flagToCountryCode(member.flag) ||
+    member.code?.slice(0, 3).toUpperCase() ||
+    '??'
+  );
 }
 
 // Card pour un membre national d'une fédération (ex: Algérie dans CAF).
@@ -29,7 +61,8 @@ function flagToCountryCode(flag) {
 //   • CTA "Voir le détail" en bas
 export function FederationMemberCard({ member, index = 0 }) {
   const primaryColor = member.colors?.[0] || '#10b981';
-  const isoCode = flagToCountryCode(member.flag) || member.code?.slice(0, 2).toUpperCase() || '??';
+  const flagCdnCode = getFlagCdnCode(member);
+  const displayCode = getDisplayCode(member);
 
   return (
     <motion.a
@@ -54,7 +87,8 @@ export function FederationMemberCard({ member, index = 0 }) {
         {/* Header : drapeau + nom + code 3-letter */}
         <div className="flex items-start gap-3 mb-4 pr-12">
           <FlagBadge
-            isoCode={isoCode}
+            flagCdnCode={flagCdnCode}
+            displayCode={displayCode}
             primaryColor={primaryColor}
             countryName={member.nameFR || member.name}
           />
@@ -195,25 +229,27 @@ function RegionPillCorner({ region }) {
 
 // ============================================================
 // FlagBadge — drapeau PNG du pays via FlagCDN (gratuit, sans clé).
-// URL : https://flagcdn.com/w80/{iso2_lowercase}.png
-// Fallback : code ISO 2-letter en texte si l'image ne charge pas.
+// URL : https://flagcdn.com/w80/{flagCdnCode}.png
+// Supporte les codes spéciaux (gb-eng, gb-sct, gb-wls, gb-nir) pour
+// les nations britanniques qui n'ont pas de code ISO 3166-1 standard.
+// Fallback : displayCode en texte si l'image ne charge pas ou si on
+// n'a pas de flagCdnCode valide.
 // ============================================================
-function FlagBadge({ isoCode, primaryColor, countryName }) {
+function FlagBadge({ flagCdnCode, displayCode, primaryColor, countryName }) {
   const [imageError, setImageError] = useState(false);
-  const lower = isoCode?.toLowerCase();
-  const showImage = isoCode && !imageError;
+  const showImage = flagCdnCode && !imageError;
 
   return (
     <span
       className="shrink-0 relative h-11 w-11 rounded-xl overflow-hidden bg-white/5 border-2 grid place-items-center"
       style={{ borderColor: `${primaryColor}55` }}
-      title={countryName ? `${countryName}${isoCode ? ` (${isoCode})` : ''}` : isoCode || ''}
+      title={countryName ? `${countryName}${displayCode ? ` (${displayCode})` : ''}` : displayCode || ''}
     >
       {showImage ? (
         <img
-          src={`https://flagcdn.com/w80/${lower}.png`}
-          srcSet={`https://flagcdn.com/w160/${lower}.png 2x`}
-          alt={`Drapeau ${countryName || isoCode}`}
+          src={`https://flagcdn.com/w80/${flagCdnCode}.png`}
+          srcSet={`https://flagcdn.com/w160/${flagCdnCode}.png 2x`}
+          alt={`Drapeau ${countryName || displayCode}`}
           width={44}
           height={44}
           loading="lazy"
@@ -222,10 +258,10 @@ function FlagBadge({ isoCode, primaryColor, countryName }) {
         />
       ) : (
         <span
-          className="font-display font-black text-sm tracking-tight"
+          className="font-display font-black text-xs tracking-tight"
           style={{ color: primaryColor }}
         >
-          {isoCode || '??'}
+          {displayCode || '??'}
         </span>
       )}
     </span>
