@@ -150,6 +150,7 @@ const regionMeta = {
   'Caucase':               { abbr: 'CA', cls: 'text-rose-500 bg-rose-500/10 border-rose-500/30' },
   'Pays Baltes':           { abbr: 'PB', cls: 'text-cyan-300 bg-cyan-500/15 border-cyan-500/30' },
   'Asie Centrale':         { abbr: 'AC', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  'Moyen-Orient':          { abbr: 'MO', cls: 'text-violet-500 bg-violet-500/15 border-violet-500/30' },
   // CONCACAF
   'CFU':                   { abbr: 'CFU', cls: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30' },
   'NAFU':                  { abbr: 'NAF', cls: 'text-rose-300 bg-rose-500/15 border-rose-500/30' },
