@@ -29,6 +29,12 @@ const datasets = {
   uefa: {
     members: uefaMembers,
     founded: '1954',
+    heroVideo: '/videos/heroUEFA.mp4',
+    heroLayout: 'sequenced',
+    heroTitle: 'UEFA',
+    heroTagline: 'L\'ÉLITE DU FOOTBALL EUROPÉEN',
+    heroSubtitle: '55 fédérations • 8 régions • Depuis 1954',
+    heroCaption: 'Là où naissent les légendes.',
     heroGradient: 'from-blue-500 via-indigo-500 to-violet-500'
   },
   conmebol: {
@@ -172,19 +178,37 @@ function FederationView({ federation, dataset }) {
 }
 
 // ── HERO avec vidéo background ou fallback gradient ──────────────────
+// Supporte deux layouts :
+//  • 'simple'   (défaut) : 1 titre + 1 sous-titre, fade-in unique
+//  • 'sequenced'         : 4 lignes (titre, tagline, subtitle, caption)
+//    qui apparaissent séquentiellement à 3s/6s/9s/12s
+//
+// Overrides dispo dans le registry :
+//  • heroTitle    → remplace federation.name
+//  • heroTagline  → ligne secondaire en gros (mode sequenced)
+//  • heroSubtitle → remplace le calcul auto "X fédérations • N régions • Depuis YYYY"
+//  • heroCaption  → ligne emotional finale (mode sequenced)
+//  • heroVideo    → URL MP4 background
+//  • heroGradient → fallback gradient Tailwind
 function FederationHero({ federation, dataset, regions }) {
   const totalFederations = dataset.members.length;
   const hasRegions = regions.length > 0;
 
-  // Subtitle : "X fédérations • N régions • Depuis YYYY" (omettre regions si 0)
-  const subtitle = [
+  const title = dataset.heroTitle || federation.name;
+  const subtitle = dataset.heroSubtitle || [
     `${totalFederations} fédérations`,
     hasRegions ? `${regions.length} régions` : null,
     `Depuis ${dataset.founded}`
   ].filter(Boolean).join(' • ');
+  const tagline = dataset.heroTagline;
+  const caption = dataset.heroCaption;
+  const isSequenced = dataset.heroLayout === 'sequenced';
 
   return (
-    <section className="relative overflow-hidden border-b border-white/5">
+    <section className={cn(
+      'relative overflow-hidden border-b border-white/5',
+      isSequenced && 'min-h-[80vh] flex flex-col'
+    )}>
       {/* Background : vidéo si disponible, sinon gradient */}
       {dataset.heroVideo ? (
         <video
@@ -194,7 +218,7 @@ function FederationHero({ federation, dataset, regions }) {
           loop
           playsInline
           preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
           aria-hidden
         />
       ) : (
@@ -203,12 +227,17 @@ function FederationHero({ federation, dataset, regions }) {
         />
       )}
 
-      {/* Overlay sombre pour lisibilité du texte */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900/60 via-ink-900/40 to-ink-900" />
-      {/* Vignette horizontale supplémentaire pour focaliser le centre */}
+      {/* Overlays — un peu plus légers en mode sequenced pour voir la vidéo */}
+      <div className={cn(
+        'pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900/50 via-ink-900/30 to-ink-900',
+        !isSequenced && 'from-ink-900/60 via-ink-900/40'
+      )} />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink-900/40 via-transparent to-ink-900/40" />
 
-      <Container className="relative pt-8 pb-16 md:pt-10 md:pb-24">
+      <Container className={cn(
+        'relative pt-8 pb-16 md:pt-10 md:pb-24',
+        isSequenced && 'flex-1 flex flex-col'
+      )}>
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
@@ -217,27 +246,105 @@ function FederationHero({ federation, dataset, regions }) {
           Retour
         </Link>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-16 md:mt-24 text-center"
-        >
-          <h1
-            className="font-display text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-bone-50"
-            style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}
-          >
-            {federation.name}
-          </h1>
-          <p
-            className="mt-4 md:mt-5 text-base md:text-lg text-bone-200 font-semibold"
-            style={{ textShadow: '0 2px 16px rgba(0,0,0,0.8)' }}
-          >
-            {subtitle}
-          </p>
-        </motion.div>
+        {isSequenced ? (
+          <SequencedHero
+            title={title}
+            tagline={tagline}
+            subtitle={subtitle}
+            caption={caption}
+          />
+        ) : (
+          <SimpleHero title={title} subtitle={subtitle} />
+        )}
       </Container>
     </section>
+  );
+}
+
+function SimpleHero({ title, subtitle }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-16 md:mt-24 text-center"
+    >
+      <h1
+        className="font-display text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-bone-50"
+        style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}
+      >
+        {title}
+      </h1>
+      <p
+        className="mt-4 md:mt-5 text-base md:text-lg text-bone-200 font-semibold"
+        style={{ textShadow: '0 2px 16px rgba(0,0,0,0.8)' }}
+      >
+        {subtitle}
+      </p>
+    </motion.div>
+  );
+}
+
+// Animation séquentielle (UEFA) :
+//   0-3s  : vidéo seule
+//   3-6s  : titre apparaît
+//   6-9s  : tagline apparaît
+//   9-12s : subtitle apparaît
+//   12s+  : caption apparaît
+const FADE_IN = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 }
+};
+const SEQ_EASE = [0.22, 1, 0.36, 1];
+
+function SequencedHero({ title, tagline, subtitle, caption }) {
+  const shadow = { textShadow: '0 4px 40px rgba(0,0,0,0.9)' };
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center text-center py-20 md:py-32 gap-5 md:gap-7">
+      {/* Titre principal — apparaît à 3s */}
+      <motion.h1
+        {...FADE_IN}
+        transition={{ delay: 3, duration: 1.1, ease: SEQ_EASE }}
+        className="font-display text-6xl md:text-8xl lg:text-9xl font-black uppercase tracking-tight text-bone-50"
+        style={shadow}
+      >
+        {title}
+      </motion.h1>
+
+      {/* Tagline — apparaît à 6s */}
+      {tagline && (
+        <motion.div
+          {...FADE_IN}
+          transition={{ delay: 6, duration: 1.1, ease: SEQ_EASE }}
+          className="font-display text-xl md:text-3xl lg:text-4xl font-bold uppercase tracking-wide text-bone-50"
+          style={shadow}
+        >
+          {tagline}
+        </motion.div>
+      )}
+
+      {/* Subtitle stats — apparaît à 9s */}
+      <motion.p
+        {...FADE_IN}
+        transition={{ delay: 9, duration: 1.1, ease: SEQ_EASE }}
+        className="text-sm md:text-base text-bone-200 font-mono tracking-wider"
+        style={shadow}
+      >
+        {subtitle}
+      </motion.p>
+
+      {/* Caption emotional — apparaît à 12s */}
+      {caption && (
+        <motion.p
+          {...FADE_IN}
+          transition={{ delay: 12, duration: 1.2, ease: SEQ_EASE }}
+          className="mt-4 text-lg md:text-2xl text-bone-100 font-light italic"
+          style={shadow}
+        >
+          {caption}
+        </motion.p>
+      )}
+    </div>
   );
 }
 
