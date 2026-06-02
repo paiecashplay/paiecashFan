@@ -130,21 +130,62 @@ function MetaRow({ icon: Icon, label, value }) {
 // ============================================================
 // Région : abbrev + couleur + tooltip
 // ============================================================
+// Map explicite pour les régions connues (CAF + UEFA + CONCACAF + AFC).
+// Si la région n'est pas dans cette table, on fallback sur les 2 premières
+// lettres pour l'abbrev + couleur générique emerald (cf. computeRegionStyle).
 const regionMeta = {
-  'Afrique du Nord':     { abbr: 'AN', textColor: 'text-rose-300',    bg: 'bg-rose-500/15',    border: 'border-rose-500/30' },
-  'Afrique de l\'Ouest': { abbr: 'AO', textColor: 'text-gold-400',    bg: 'bg-gold-500/15',    border: 'border-gold-500/30' },
-  'Afrique Centrale':    { abbr: 'AC', textColor: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/30' },
-  'Afrique de l\'Est':   { abbr: 'AE', textColor: 'text-cyan-400',    bg: 'bg-cyan-500/15',    border: 'border-cyan-500/30' },
-  'Afrique Australe':    { abbr: 'AA', textColor: 'text-pink-400',    bg: 'bg-pink-400/15',    border: 'border-pink-400/30' }
+  // CAF
+  'Afrique du Nord':       { abbr: 'AN', cls: 'text-rose-300 bg-rose-500/15 border-rose-500/30' },
+  'Afrique de l\'Ouest':   { abbr: 'AO', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  'Afrique Centrale':      { abbr: 'AC', cls: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30' },
+  'Afrique de l\'Est':     { abbr: 'AE', cls: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/30' },
+  'Afrique Australe':      { abbr: 'AA', cls: 'text-pink-400 bg-pink-400/15 border-pink-400/30' },
+  // UEFA
+  'Europe de l\'Ouest':    { abbr: 'EO', cls: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/30' },
+  'Europe de l\'Est':      { abbr: 'EE', cls: 'text-rose-300 bg-rose-500/15 border-rose-500/30' },
+  'Europe du Nord':        { abbr: 'EN', cls: 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30' },
+  'Europe du Sud':         { abbr: 'ES', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  'Europe Centrale':       { abbr: 'EC', cls: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30' },
+  'Balkans':               { abbr: 'BK', cls: 'text-pink-400 bg-pink-400/15 border-pink-400/30' },
+  'Caucase':               { abbr: 'CA', cls: 'text-rose-500 bg-rose-500/10 border-rose-500/30' },
+  'Pays Baltes':           { abbr: 'PB', cls: 'text-cyan-300 bg-cyan-500/15 border-cyan-500/30' },
+  'Asie Centrale':         { abbr: 'AC', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  // CONCACAF
+  'CFU':                   { abbr: 'CFU', cls: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30' },
+  'NAFU':                  { abbr: 'NAF', cls: 'text-rose-300 bg-rose-500/15 border-rose-500/30' },
+  'UNCAF':                 { abbr: 'UNC', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  // AFC
+  'WAFF':                  { abbr: 'WAF', cls: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/30' },
+  'CAFA':                  { abbr: 'CAF', cls: 'text-gold-400 bg-gold-500/15 border-gold-500/30' },
+  'SAFF':                  { abbr: 'SAF', cls: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30' },
+  'AFF':                   { abbr: 'AFF', cls: 'text-pink-400 bg-pink-400/15 border-pink-400/30' },
+  'EAFF':                  { abbr: 'EAF', cls: 'text-rose-300 bg-rose-500/15 border-rose-500/30' }
 };
 
+function computeRegionStyle(region) {
+  const known = regionMeta[region];
+  if (known) return known;
+  // Fallback : abbrev = initiales (jusqu'à 3 lettres), couleur emerald générique
+  const initials = region
+    .split(/[\s']+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 3)
+    .join('')
+    .toUpperCase();
+  return {
+    abbr: initials || '?',
+    cls: 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30'
+  };
+}
+
 function RegionPillCorner({ region }) {
-  const m = regionMeta[region];
-  if (!m) return null;
+  if (!region) return null;
+  const m = computeRegionStyle(region);
   return (
     <span
       title={region}
-      className={`absolute top-3 right-3 z-10 inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-full border ${m.bg} ${m.border} ${m.textColor} text-[10px] font-black uppercase tracking-[0.14em] cursor-help backdrop-blur-sm`}
+      className={`absolute top-3 right-3 z-10 inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-full border ${m.cls} text-[10px] font-black uppercase tracking-[0.14em] cursor-help backdrop-blur-sm`}
     >
       {m.abbr}
     </span>
