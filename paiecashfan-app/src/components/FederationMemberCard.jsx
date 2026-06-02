@@ -1,11 +1,34 @@
 import { motion } from 'framer-motion';
 import { ArrowUpRight, User, Calendar, Award } from 'lucide-react';
 
+// Convertit un drapeau emoji (Regional Indicator Symbol pairs) en code ISO 2-letter.
+// Ex: '🇿🇦' → 'ZA', '🇩🇿' → 'DZ'. Sur Windows, le navigateur affiche
+// déjà les emoji en texte ASCII (manque la font flag) — donc on a besoin
+// de ce code "propre" pour le badge gauche.
+function flagToCountryCode(flag) {
+  if (!flag) return '';
+  const chars = [...flag];
+  if (chars.length !== 2) return '';
+  try {
+    return chars
+      .map((c) => String.fromCharCode(c.codePointAt(0) - 0x1F1E6 + 0x41))
+      .join('');
+  } catch {
+    return '';
+  }
+}
+
 // Card pour un membre national d'une fédération (ex: Algérie dans CAF).
-// Reprend la structure de l'ancienne caf.html mais avec le design futuriste.
+// Layout :
+//   • Badge gauche : ISO 2-letter (ZA, DZ, MA…) avec couleur du drapeau
+//   • Nom du pays : full width, peut wrap sur 2 lignes
+//   • Code 3-letter en mono (RSA, ALG, MAR…)
+//   • Badge région : abbrev 2-letter dans le coin top-right avec tooltip
+//   • Métadonnées Président / Fondation / FIFA
+//   • CTA "Voir le détail" en bas
 export function FederationMemberCard({ member, index = 0 }) {
   const primaryColor = member.colors?.[0] || '#10b981';
-  const accentColor  = member.colors?.[1] || primaryColor;
+  const isoCode = flagToCountryCode(member.flag) || member.code?.slice(0, 2).toUpperCase() || '??';
 
   return (
     <motion.a
@@ -17,38 +40,39 @@ export function FederationMemberCard({ member, index = 0 }) {
       whileHover={{ y: -3 }}
       className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 overflow-hidden transition-colors hover:border-white/20 hover:bg-white/[0.06]"
     >
-      {/* Glow accent au survol, couleur du drapeau */}
+      {/* Glow accent au survol (couleur du drapeau) */}
       <div
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{ background: `radial-gradient(circle at 50% 0%, ${primaryColor}22, transparent 70%)` }}
       />
 
+      {/* Badge région — abrégé, coin top-right, avec tooltip natif */}
+      <RegionPillCorner region={member.region} />
+
       <div className="relative">
-        {/* Header : code 2 lettres + nom + flag emoji + badge région */}
-        <div className="flex items-start justify-between gap-2 mb-4">
-          <div className="flex items-start gap-3 min-w-0">
-            <span
-              className="shrink-0 grid place-items-center h-10 w-10 rounded-xl font-display font-black text-sm bg-white/5 border border-white/10"
-              style={{ color: primaryColor }}
+        {/* Header : code ISO + nom + code 3-letter */}
+        <div className="flex items-start gap-3 mb-4 pr-12">
+          <span
+            className="shrink-0 grid place-items-center h-11 w-11 rounded-xl font-display font-black text-sm tracking-tight bg-white/5 border border-white/10"
+            style={{ color: primaryColor, borderColor: `${primaryColor}40` }}
+            title={`Code pays : ${isoCode}`}
+          >
+            {isoCode}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3
+              className="font-display font-bold text-base text-bone-50 leading-tight line-clamp-2"
+              title={member.nameFR || member.name}
             >
-              {member.code?.slice(0, 2).toUpperCase() || '??'}
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xl" aria-hidden>{member.flag}</span>
-                <h3 className="font-display font-bold text-base text-bone-50 truncate">
-                  {member.nameFR || member.name}
-                </h3>
-              </div>
-              <div className="mt-0.5 text-[10px] font-mono text-bone-400 tracking-wider">
-                {member.code}
-              </div>
+              {member.nameFR || member.name}
+            </h3>
+            <div className="mt-1 text-[10px] font-mono text-bone-400 tracking-[0.18em] uppercase">
+              {member.code}
             </div>
           </div>
-          <RegionBadge region={member.region} />
         </div>
 
-        {/* Logo de la fédération nationale */}
+        {/* Logo fédération nationale */}
         {member.logo && (
           <div className="flex justify-center mb-4 h-16">
             <img
@@ -61,7 +85,7 @@ export function FederationMemberCard({ member, index = 0 }) {
           </div>
         )}
 
-        {/* Méta : président, fondation, FIFA */}
+        {/* Métadonnées */}
         <ul className="space-y-1.5 text-xs">
           {member.president && (
             <MetaRow icon={User} label="Président" value={member.president} />
@@ -74,14 +98,14 @@ export function FederationMemberCard({ member, index = 0 }) {
           )}
         </ul>
 
-        {/* CTA discret en bas */}
+        {/* CTA */}
         <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
           <span className="text-[10px] uppercase tracking-[0.18em] text-bone-400 font-semibold">
             Voir le détail
           </span>
           <ArrowUpRight
             size={14}
-            className="text-bone-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+            className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
             style={{ color: primaryColor }}
           />
         </div>
@@ -104,20 +128,26 @@ function MetaRow({ icon: Icon, label, value }) {
   );
 }
 
-// Couleur de la pill par région CAF
-const regionStyles = {
-  'Afrique du Nord':    'bg-rose-500/15 text-rose-500 border-rose-500/30',
-  'Afrique de l\'Ouest':'bg-gold-500/15 text-gold-400 border-gold-500/30',
-  'Afrique Centrale':   'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  'Afrique de l\'Est':  'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-  'Afrique Australe':   'bg-pink-400/15 text-pink-400 border-pink-400/30'
+// ============================================================
+// Région : abbrev + couleur + tooltip
+// ============================================================
+const regionMeta = {
+  'Afrique du Nord':     { abbr: 'AN', textColor: 'text-rose-300',    bg: 'bg-rose-500/15',    border: 'border-rose-500/30' },
+  'Afrique de l\'Ouest': { abbr: 'AO', textColor: 'text-gold-400',    bg: 'bg-gold-500/15',    border: 'border-gold-500/30' },
+  'Afrique Centrale':    { abbr: 'AC', textColor: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/30' },
+  'Afrique de l\'Est':   { abbr: 'AE', textColor: 'text-cyan-400',    bg: 'bg-cyan-500/15',    border: 'border-cyan-500/30' },
+  'Afrique Australe':    { abbr: 'AA', textColor: 'text-pink-400',    bg: 'bg-pink-400/15',    border: 'border-pink-400/30' }
 };
 
-function RegionBadge({ region }) {
-  const cls = regionStyles[region] || 'bg-white/5 text-bone-300 border-white/10';
+function RegionPillCorner({ region }) {
+  const m = regionMeta[region];
+  if (!m) return null;
   return (
-    <span className={`shrink-0 text-[9px] font-bold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full border ${cls}`}>
-      {region}
+    <span
+      title={region}
+      className={`absolute top-3 right-3 z-10 inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-full border ${m.bg} ${m.border} ${m.textColor} text-[10px] font-black uppercase tracking-[0.14em] cursor-help backdrop-blur-sm`}
+    >
+      {m.abbr}
     </span>
   );
 }
