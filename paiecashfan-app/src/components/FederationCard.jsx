@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
+
+const MotionLink = motion(Link);
 
 export function FederationCard({ federation, index = 0 }) {
   return (
-    <motion.a
-      href={`#fed-${federation.id}`}
+    <MotionLink
+      to={`/federations/${federation.id}`}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -51,6 +54,6 @@ export function FederationCard({ federation, index = 0 }) {
 
         <ArrowUpRight size={16} className="text-bone-400 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-    </motion.a>
+    </MotionLink>
   );
 }
