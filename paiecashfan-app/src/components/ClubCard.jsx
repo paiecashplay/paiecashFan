@@ -1,11 +1,15 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { slugify } from '@/lib/slugify';
+
+const MotionLink = motion(Link);
 
 export function ClubCard({ club, index = 0 }) {
   return (
-    <motion.a
-      href={`#club-${club.id}`}
+    <MotionLink
+      to={`/clubs/${slugify(club.name)}`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
@@ -67,6 +71,6 @@ export function ClubCard({ club, index = 0 }) {
       >
         <ArrowUpRight size={14} />
       </div>
-    </motion.a>
+    </MotionLink>
   );
 }

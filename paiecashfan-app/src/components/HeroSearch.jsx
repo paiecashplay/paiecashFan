@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from './ui/Button';
 import { cn } from '@/lib/cn';
 import { ligue1, championsEurope } from '@/data/leagues';
 import { federations } from '@/data/federations';
+import { slugify } from '@/lib/slugify';
 
 // Index plat de tous les items cherchables (clubs + ligues + fédérations)
 function buildSearchIndex() {
@@ -46,6 +48,19 @@ export function HeroSearch() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleSelect = (it) => {
+    setOpen(false);
+    if (it.type === 'club') {
+      navigate(`/clubs/${slugify(it.label)}`);
+    } else if (it.type === 'federation') {
+      const fedId = it.id.replace('fed-', '');
+      navigate(`/federations/${fedId}`);
+    } else {
+      setQuery(it.label);
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -106,7 +121,7 @@ export function HeroSearch() {
                   <li key={it.id}>
                     <button
                       className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-white/5 transition-colors text-left"
-                      onClick={() => { setQuery(it.label); setOpen(false); }}
+                      onClick={() => handleSelect(it)}
                     >
                       <ResultIcon item={it} />
                       <div className="flex-1 min-w-0">

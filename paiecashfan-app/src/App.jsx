@@ -6,6 +6,7 @@ import { Boutique } from './pages/Boutique';
 import { Tombola } from './pages/Tombola';
 import { FanClub } from './pages/FanClub';
 import { FederationDetail } from './pages/FederationDetail';
+import { ClubDetail } from './pages/ClubDetail';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/tombola" element={<Tombola />} />
           <Route path="/fan-club" element={<FanClub />} />
           <Route path="/federations/:fedId" element={<FederationDetail />} />
+          <Route path="/clubs/:slug" element={<ClubDetail />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

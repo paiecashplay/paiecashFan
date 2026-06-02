@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight, User, Calendar, Award } from 'lucide-react';
+import { slugify } from '@/lib/slugify';
+
+const MotionLink = motion(Link);
 
 // Convertit un drapeau emoji (Regional Indicator Symbol pairs) en code ISO 2-letter.
 // Ex: '🇿🇦' → 'ZA', '🇩🇿' → 'DZ'. Sur Windows, le navigateur affiche
@@ -65,8 +69,8 @@ export function FederationMemberCard({ member, index = 0 }) {
   const displayCode = getDisplayCode(member);
 
   return (
-    <motion.a
-      href={`#${member.code}`}
+    <MotionLink
+      to={`/clubs/${slugify(member.nameFR || member.name)}`}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
@@ -143,7 +147,7 @@ export function FederationMemberCard({ member, index = 0 }) {
           />
         </div>
       </div>
-    </motion.a>
+    </MotionLink>
   );
 }
 
