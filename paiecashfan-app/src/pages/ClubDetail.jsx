@@ -694,6 +694,8 @@ function SquadSpotlight({ squad, primaryColor }) {
 }
 
 function PlayerCard({ player, index, primaryColor }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -701,15 +703,36 @@ function PlayerCard({ player, index, primaryColor }) {
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: (index % 12) * 0.04 }}
       whileHover={{ y: -3 }}
-      className="relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-4 overflow-hidden group"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative rounded-2xl border bg-white/[0.03] backdrop-blur-md p-4 pb-5 overflow-hidden transition-all duration-300"
+      style={{
+        borderColor: hovered ? primaryColor : 'rgba(255,255,255,0.1)',
+        boxShadow: hovered
+          ? `0 0 40px -8px ${primaryColor}88, 0 0 0 1px ${primaryColor}55 inset`
+          : undefined,
+        background: hovered
+          ? `linear-gradient(180deg, ${primaryColor}10, rgba(255,255,255,0.03))`
+          : undefined
+      }}
     >
-      {/* Gros numéro en background */}
+      {/* Halo radial coloré derrière la photo (apparaît au hover) */}
       <div
-        className="pointer-events-none absolute -right-4 -top-2 font-display font-black select-none"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+        style={{
+          opacity: hovered ? 1 : 0,
+          background: `radial-gradient(circle at 50% 35%, ${primaryColor}55, transparent 65%)`
+        }}
+        aria-hidden
+      />
+
+      {/* Gros numéro en background — plus visible au hover */}
+      <div
+        className="pointer-events-none absolute -right-4 -top-2 font-display font-black select-none transition-colors duration-300"
         style={{
           fontSize: '6rem',
           lineHeight: 1,
-          color: `${primaryColor}1F`
+          color: hovered ? `${primaryColor}55` : `${primaryColor}1F`
         }}
         aria-hidden
       >
@@ -719,7 +742,13 @@ function PlayerCard({ player, index, primaryColor }) {
       <div className="relative">
         <PlayerPhoto player={player} size="sm" primaryColor={primaryColor} />
         <div className="mt-3 text-center">
-          <div className="font-display text-xs md:text-sm font-bold text-bone-50 leading-tight line-clamp-2">
+          <div
+            className="text-[10px] font-mono font-bold mb-1 tabular-nums transition-colors"
+            style={{ color: hovered ? primaryColor : `${primaryColor}AA` }}
+          >
+            #{player.number}
+          </div>
+          <div className="font-display text-sm font-black uppercase text-bone-50 leading-tight line-clamp-2 tracking-tight">
             {player.name}
           </div>
           <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-bone-400 font-bold">
