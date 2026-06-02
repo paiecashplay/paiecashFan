@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -42,9 +42,22 @@ export function ClubDetail() {
       </Container>
 
       {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ */}
-      <Container className="relative pt-6 pb-32 md:pb-24">
+      <Container className="relative pt-6 pb-12">
         <TransactionsLiveSection items={mockTransactions} club={club} />
       </Container>
+
+      {/* ═══ STAR PLAYER (si profil club avec starPlayer dispo) ═════ */}
+      {club.starPlayer && (
+        <StarPlayerSection player={club.starPlayer} primaryColor={club.primaryColor} />
+      )}
+
+      {/* ═══ SQUAD SPOTLIGHT (si profil club avec squad dispo) ══════ */}
+      {club.squad && club.squad.length > 0 && (
+        <SquadSpotlight squad={club.squad} primaryColor={club.primaryColor} />
+      )}
+
+      {/* Espace bas pour la barre side actions mobile */}
+      <div className="pb-32 md:pb-12" />
     </div>
   );
 }
@@ -52,14 +65,14 @@ export function ClubDetail() {
 // ── HERO ─────────────────────────────────────────────────────────────
 function ClubHero({ club }) {
   const stats = useMemo(() => fallbackHeroStats(club), [club]);
+  // Image custom du club si dispo (ex: psg-stadium.jpg),
+  // sinon fallback sur l'image stade générique.
+  const stadiumImage = club.stadiumImage || '/images/futuristic_stadium_hero.png';
 
   return (
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
-      {/* Background stade flouté avec teinte couleur du club */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/futuristic_stadium_hero.png')" }}
-      />
+      {/* Background stade — image custom du club ou fallback générique */}
+      <ClubStadiumBg src={stadiumImage} fallback="/images/futuristic_stadium_hero.png" />
       <div
         className="absolute inset-0"
         style={{
@@ -107,25 +120,51 @@ function ClubHero({ club }) {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.6 }}
-              className="mt-3 text-xs md:text-sm italic text-bone-300 uppercase tracking-[0.18em]"
-              style={{ textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}
+              className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]"
+              style={{
+                color: club.mottoColor || '#a8c0b3',
+                textShadow: '0 2px 16px rgba(0,0,0,0.7)'
+              }}
             >
               « {club.motto || club.federation} »
             </motion.p>
           )}
 
-          {/* Méta chips inline */}
+          {/* Méta chips inline — Fondation / Stade / Coach / Président pour clubs,
+              Fondation / Ligue / Président pour sélections nationales */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="mt-6 inline-flex items-center gap-px overflow-hidden rounded-full border border-white/10 bg-ink-900/60 backdrop-blur-md"
+            className="mt-6 inline-flex items-center gap-px overflow-hidden rounded-full border border-white/10 bg-ink-900/60 backdrop-blur-md flex-wrap"
           >
             <MetaChip label="Fondation" value={club.founded || '—'} />
             <Divider />
-            <MetaChip label={club.type === 'national' ? 'Ligue' : 'Stade'} value={club.stadium || club.league} />
-            <Divider />
-            <MetaChip label={club.type === 'national' ? 'Président' : 'Coach'} value={club.president || club.manager || '—'} />
+            <MetaChip
+              label={club.type === 'national' ? 'Ligue' : 'Stade'}
+              value={club.stadium || club.league}
+            />
+            {club.coach && (
+              <>
+                <Divider />
+                <MetaChip label="Coach" value={club.coach} />
+              </>
+            )}
+            {club.president && (
+              <>
+                <Divider />
+                <MetaChip label="Président" value={club.president} />
+              </>
+            )}
+            {!club.coach && !club.president && (club.manager || club.type === 'national') && (
+              <>
+                <Divider />
+                <MetaChip
+                  label={club.type === 'national' ? 'Président' : 'Coach'}
+                  value={club.president || club.manager || '—'}
+                />
+              </>
+            )}
           </motion.div>
         </motion.div>
 
@@ -402,6 +441,208 @@ function SideActions({ primaryColor }) {
         })}
       </motion.div>
     </div>
+  );
+}
+
+// ── STADIUM BACKGROUND ───────────────────────────────────────────────
+// Affiche l'image du stade en background avec un fallback automatique
+// si l'image custom du club n'existe pas (404).
+function ClubStadiumBg({ src, fallback }) {
+  const [errored, setErrored] = useState(false);
+  const finalSrc = errored ? fallback : src;
+  return (
+    <>
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url('${finalSrc}')` }}
+      />
+      {/* Probe pour détecter le 404 et basculer vers le fallback */}
+      {!errored && src !== fallback && (
+        <img
+          src={src}
+          alt=""
+          aria-hidden
+          className="hidden"
+          onError={() => setErrored(true)}
+        />
+      )}
+    </>
+  );
+}
+
+// ── STAR PLAYER ──────────────────────────────────────────────────────
+// Section "STAR PLAYER" style marketplace : photo du joueur (gauche),
+// gros numéro en background, infos + stats (droite).
+function StarPlayerSection({ player, primaryColor }) {
+  return (
+    <section className="relative overflow-hidden py-20 md:py-28 border-y border-white/5">
+      {/* Gros numéro en background, ultra opaque */}
+      <div
+        className="pointer-events-none absolute right-4 md:right-12 top-1/2 -translate-y-1/2 font-display font-black select-none"
+        style={{
+          fontSize: 'clamp(180px, 32vw, 380px)',
+          color: `${primaryColor}11`,
+          lineHeight: 1,
+          textShadow: `0 0 80px ${primaryColor}22`
+        }}
+        aria-hidden
+      >
+        {player.number}
+      </div>
+
+      <Container className="relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="grid gap-10 md:gap-16 items-center md:grid-cols-[1fr_1.1fr]"
+        >
+          {/* Photo */}
+          <div className="relative flex justify-center md:justify-end">
+            <div
+              className="relative h-64 w-64 md:h-96 md:w-96 rounded-3xl overflow-hidden"
+              style={{
+                background: `radial-gradient(circle at 50% 30%, ${primaryColor}33, transparent 70%)`,
+                boxShadow: `0 0 80px -20px ${primaryColor}66`
+              }}
+            >
+              {player.image ? (
+                <img
+                  src={player.image}
+                  alt={player.name}
+                  className="h-full w-full object-cover object-top"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                <div className="h-full w-full grid place-items-center text-7xl font-display font-black" style={{ color: primaryColor }}>
+                  #{player.number}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Infos */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
+              Star Player
+            </div>
+            <div className="mt-3 text-bone-400 font-mono">#{player.number}</div>
+            <h2 className="mt-2 font-display text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-bone-50 leading-[0.95]">
+              {player.name}
+            </h2>
+            <div className="mt-2 text-sm uppercase tracking-[0.22em] text-bone-300 font-semibold">
+              {player.position}
+            </div>
+
+            {/* Stats */}
+            {player.stats && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                <StatBox label="Buts" value={player.stats.goals ?? '—'} />
+                <StatBox label="Passes décisives" value={player.stats.assists ?? '—'} />
+                <StatBox
+                  label="G + A"
+                  value={(player.stats.goals ?? 0) + (player.stats.assists ?? 0)}
+                  accentColor={primaryColor}
+                />
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </Container>
+    </section>
+  );
+}
+
+function StatBox({ label, value, accentColor }) {
+  return (
+    <div
+      className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md px-5 py-4 min-w-[110px] text-center"
+      style={accentColor ? { borderColor: `${accentColor}40`, background: `${accentColor}0D` } : undefined}
+    >
+      <div className="font-display text-3xl font-black text-bone-50 tabular-nums" style={accentColor ? { color: accentColor } : undefined}>
+        {value}
+      </div>
+      <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ── SQUAD SPOTLIGHT ──────────────────────────────────────────────────
+// Grille des joueurs de l'équipe première (capture 2 du marketplace).
+function SquadSpotlight({ squad, primaryColor }) {
+  return (
+    <section className="py-16 md:py-20">
+      <Container>
+        <header className="text-center mb-10">
+          <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
+            Featured Players
+          </div>
+          <h2 className="mt-3 font-display text-3xl md:text-5xl font-black uppercase tracking-tight text-bone-50">
+            Squad Spotlight
+          </h2>
+          <p className="mt-2 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+            {squad.length} joueurs · Saison 2025/26
+          </p>
+        </header>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+          {squad.map((p, i) => (
+            <PlayerCard key={p.number} player={p} index={i} primaryColor={primaryColor} />
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function PlayerCard({ player, index, primaryColor }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: (index % 12) * 0.04 }}
+      whileHover={{ y: -3 }}
+      className="relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-4 overflow-hidden group"
+    >
+      {/* Gros numéro en background */}
+      <div
+        className="pointer-events-none absolute -right-4 -top-2 font-display font-black select-none"
+        style={{
+          fontSize: '6rem',
+          lineHeight: 1,
+          color: `${primaryColor}1F`
+        }}
+        aria-hidden
+      >
+        {player.number}
+      </div>
+
+      <div className="relative">
+        <div
+          className="h-16 w-16 md:h-20 md:w-20 mx-auto rounded-full grid place-items-center text-xl font-display font-black ring-2 transition-transform group-hover:scale-110"
+          style={{
+            background: `${primaryColor}26`,
+            color: primaryColor,
+            borderColor: `${primaryColor}40`,
+            boxShadow: `0 0 30px -8px ${primaryColor}66`
+          }}
+        >
+          {player.number}
+        </div>
+        <div className="mt-3 text-center">
+          <div className="font-display text-xs md:text-sm font-bold text-bone-50 leading-tight line-clamp-2">
+            {player.name}
+          </div>
+          <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+            {player.position}
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

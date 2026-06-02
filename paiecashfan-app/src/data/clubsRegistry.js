@@ -13,6 +13,7 @@ import { uefaMembers }     from './uefa-members';
 import { conmebolMembers } from './conmebol-members';
 import { concacafMembers } from './concacaf-members';
 import { afcMembers }      from './afc-members';
+import { getClubProfile }  from './clubProfiles';
 import { slugify }         from '@/lib/slugify';
 
 // Normalise un club de Ligue/Sport vers la shape commune.
@@ -95,7 +96,12 @@ function buildRegistry() {
 const registry = buildRegistry();
 
 export function findClubBySlug(slug) {
-  return registry.get(slug) || null;
+  const base = registry.get(slug);
+  if (!base) return null;
+  // Merge avec le profil détaillé si disponible (motto, founded, stadium,
+  // coach, president, starPlayer, squad, image stade...)
+  const profile = getClubProfile(slug);
+  return profile ? { ...base, ...profile } : base;
 }
 
 export function allClubs() {
