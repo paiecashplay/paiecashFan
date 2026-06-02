@@ -683,7 +683,7 @@ function SquadSpotlight({ squad, primaryColor }) {
           </p>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
           {squad.map((p, i) => (
             <PlayerCard key={p.number} player={p} index={i} primaryColor={primaryColor} />
           ))}
@@ -761,54 +761,93 @@ function PlayerCard({ player, index, primaryColor }) {
 }
 
 // ── PHOTO JOUEUR ─────────────────────────────────────────────────────
-// Cherche d'abord player.image (URL absolue ou path /images/players/...),
-// sinon dérive automatiquement /images/players/{slug}.jpg. Si le fichier
-// renvoie 404, fallback sur un placeholder stylisé : cercle gradient avec
-// le numéro géant dans la couleur du club.
+// Container carré (plus de cercle) pour homogénéiser quel que soit le
+// fond de la photo source (transparent ou blanc).
+// Mode 'lg' (Star Player) : grand carré arrondi 3xl avec hover propre
+// (bordure + glow rouge + zoom légèrement la photo).
+// Mode 'sm' (PlayerCard) : carré arrondi xl qui prend toute la largeur
+// de la card. L'effet hover est porté par la card parente.
 function PlayerPhoto({ player, size = 'sm', primaryColor }) {
   const [errored, setErrored] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const derivedImage = player.image || `/images/players/${slugify(player.name)}.jpg`;
   const showPhoto = derivedImage && !errored;
 
-  const sizeClasses = size === 'lg'
-    ? 'h-64 w-64 md:h-96 md:w-96 rounded-3xl'
-    : 'h-16 w-16 md:h-20 md:w-20 mx-auto rounded-full ring-2';
+  if (size === 'lg') {
+    return (
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="group relative h-72 w-72 md:h-96 md:w-96 rounded-3xl overflow-hidden border-2 transition-all duration-300"
+        style={{
+          borderColor: hovered ? primaryColor : 'rgba(255,255,255,0.06)',
+          background: `radial-gradient(circle at 50% 35%, ${primaryColor}${hovered ? '55' : '22'}, transparent 70%)`,
+          boxShadow: hovered
+            ? `0 0 100px -15px ${primaryColor}99, 0 0 0 1px ${primaryColor}55 inset`
+            : `0 0 40px -20px ${primaryColor}44`
+        }}
+      >
+        {showPhoto ? (
+          <img
+            src={derivedImage}
+            alt={player.name}
+            loading="lazy"
+            onError={() => setErrored(true)}
+            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500"
+            style={{ transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
+          />
+        ) : (
+          <PlayerNumberPlaceholder
+            number={player.number}
+            name={player.name}
+            size="lg"
+            primaryColor={primaryColor}
+          />
+        )}
+        {/* Fade vers le bas pour fondre les fonds clairs des photos
+            dans la card sombre */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 transition-opacity duration-500"
+          style={{
+            background: 'linear-gradient(to top, #04080d 0%, transparent 100%)',
+            opacity: hovered ? 0.85 : 1
+          }}
+        />
+      </div>
+    );
+  }
 
+  // PlayerCard squad — carré arrondi qui prend toute la largeur de la card
   return (
-    <div
-      className={`relative ${sizeClasses} overflow-hidden grid place-items-center transition-transform`}
-      style={{
-        background: size === 'lg'
-          ? `radial-gradient(circle at 50% 30%, ${primaryColor}33, transparent 70%)`
-          : `radial-gradient(circle, ${primaryColor}33, ${primaryColor}11)`,
-        boxShadow: `0 0 ${size === 'lg' ? 80 : 30}px -${size === 'lg' ? 20 : 8}px ${primaryColor}66`,
-        borderColor: `${primaryColor}40`
-      }}
-    >
-      {showPhoto && (
+    <div className="relative aspect-square w-full rounded-xl overflow-hidden">
+      {showPhoto ? (
         <img
           src={derivedImage}
           alt={player.name}
           loading="lazy"
           onError={() => setErrored(true)}
-          className="absolute inset-0 h-full w-full object-cover object-top"
+          className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
         />
-      )}
-      {!showPhoto && (
+      ) : (
         <PlayerNumberPlaceholder
           number={player.number}
           name={player.name}
-          size={size}
+          size="sm"
           primaryColor={primaryColor}
         />
       )}
+      {/* Fade bas subtle — fond les éventuels fonds blancs des photos
+          dans la couleur de la card */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
+        style={{ background: 'linear-gradient(to top, #04080d 0%, transparent 100%)' }}
+      />
     </div>
   );
 }
 
 function PlayerNumberPlaceholder({ number, name, size, primaryColor }) {
   if (size === 'lg') {
-    // Mode large (Star Player) — silhouette stylée avec initiales et numéro géant
     const initials = name?.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
@@ -831,14 +870,19 @@ function PlayerNumberPlaceholder({ number, name, size, primaryColor }) {
       </div>
     );
   }
-  // Mode small (PlayerCard) — numéro central avec gradient
+  // sm — fond gradient + numéro central
   return (
-    <span
-      className="font-display text-xl font-black tabular-nums"
-      style={{ color: primaryColor }}
+    <div
+      className="h-full w-full grid place-items-center"
+      style={{ background: `radial-gradient(circle, ${primaryColor}33, ${primaryColor}11)` }}
     >
-      {number}
-    </span>
+      <span
+        className="font-display text-4xl font-black tabular-nums"
+        style={{ color: primaryColor }}
+      >
+        {number}
+      </span>
+    </div>
   );
 }
 
