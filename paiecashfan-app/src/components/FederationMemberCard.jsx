@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, User, Calendar, Award } from 'lucide-react';
 
@@ -50,15 +51,13 @@ export function FederationMemberCard({ member, index = 0 }) {
       <RegionPillCorner region={member.region} />
 
       <div className="relative">
-        {/* Header : code ISO + nom + code 3-letter */}
+        {/* Header : drapeau + nom + code 3-letter */}
         <div className="flex items-start gap-3 mb-4 pr-12">
-          <span
-            className="shrink-0 grid place-items-center h-11 w-11 rounded-xl font-display font-black text-sm tracking-tight bg-white/5 border border-white/10"
-            style={{ color: primaryColor, borderColor: `${primaryColor}40` }}
-            title={`Code pays : ${isoCode}`}
-          >
-            {isoCode}
-          </span>
+          <FlagBadge
+            isoCode={isoCode}
+            primaryColor={primaryColor}
+            countryName={member.nameFR || member.name}
+          />
           <div className="min-w-0 flex-1">
             <h3
               className="font-display font-bold text-base text-bone-50 leading-tight line-clamp-2"
@@ -148,6 +147,45 @@ function RegionPillCorner({ region }) {
       className={`absolute top-3 right-3 z-10 inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-full border ${m.bg} ${m.border} ${m.textColor} text-[10px] font-black uppercase tracking-[0.14em] cursor-help backdrop-blur-sm`}
     >
       {m.abbr}
+    </span>
+  );
+}
+
+// ============================================================
+// FlagBadge — drapeau PNG du pays via FlagCDN (gratuit, sans clé).
+// URL : https://flagcdn.com/w80/{iso2_lowercase}.png
+// Fallback : code ISO 2-letter en texte si l'image ne charge pas.
+// ============================================================
+function FlagBadge({ isoCode, primaryColor, countryName }) {
+  const [imageError, setImageError] = useState(false);
+  const lower = isoCode?.toLowerCase();
+  const showImage = isoCode && !imageError;
+
+  return (
+    <span
+      className="shrink-0 relative h-11 w-11 rounded-xl overflow-hidden bg-white/5 border-2 grid place-items-center"
+      style={{ borderColor: `${primaryColor}55` }}
+      title={countryName ? `${countryName}${isoCode ? ` (${isoCode})` : ''}` : isoCode || ''}
+    >
+      {showImage ? (
+        <img
+          src={`https://flagcdn.com/w80/${lower}.png`}
+          srcSet={`https://flagcdn.com/w160/${lower}.png 2x`}
+          alt={`Drapeau ${countryName || isoCode}`}
+          width={44}
+          height={44}
+          loading="lazy"
+          onError={() => setImageError(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <span
+          className="font-display font-black text-sm tracking-tight"
+          style={{ color: primaryColor }}
+        >
+          {isoCode || '??'}
+        </span>
+      )}
     </span>
   );
 }
