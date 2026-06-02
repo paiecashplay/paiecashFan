@@ -3,11 +3,12 @@ import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
-  ShoppingBag, Trophy, Dices, Heart, Share2
+  ShoppingBag, Trophy, Dices, Heart, Share2, Award
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { findClubBySlug } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
+import { slugify } from '@/lib/slugify';
 
 const fmtAmount = (n, currency = 'EUR') =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
@@ -46,6 +47,11 @@ export function ClubDetail() {
         <TransactionsLiveSection items={mockTransactions} club={club} />
       </Container>
 
+      {/* ═══ TROPHY CABINET (si profil club avec trophies.breakdown) ═ */}
+      {club.trophies?.breakdown && (
+        <TrophyCabinet trophies={club.trophies} primaryColor={club.primaryColor} />
+      )}
+
       {/* ═══ STAR PLAYER (si profil club avec starPlayer dispo) ═════ */}
       {club.starPlayer && (
         <StarPlayerSection player={club.starPlayer} primaryColor={club.primaryColor} />
@@ -64,7 +70,13 @@ export function ClubDetail() {
 
 // ── HERO ─────────────────────────────────────────────────────────────
 function ClubHero({ club }) {
-  const stats = useMemo(() => fallbackHeroStats(club), [club]);
+  const stats = useMemo(() => {
+    const s = fallbackHeroStats(club);
+    // Override le compteur de trophées avec la vraie data du profil si dispo
+    if (club.trophies?.total != null) s.trophies = club.trophies.total;
+    if (club.squad?.length) s.squad = club.squad.length;
+    return s;
+  }, [club]);
   // Image custom du club si dispo (ex: psg-stadium.jpg),
   // sinon fallback sur l'image stade générique.
   const stadiumImage = club.stadiumImage || '/images/futuristic_stadium_hero.png';
@@ -470,6 +482,104 @@ function ClubStadiumBg({ src, fallback }) {
   );
 }
 
+// ── TROPHY CABINET ───────────────────────────────────────────────────
+// Affiche le palmarès complet du club : compteur total + liste des
+// trophées avec count + années, regroupés par scope (european / world /
+// domestic). Visuel inspiré de la capture utilisateur (table style).
+function TrophyCabinet({ trophies, primaryColor }) {
+  const scopeMeta = {
+    european: { label: 'Europe',           colorClass: 'text-cyan-400'    },
+    world:    { label: 'Monde',            colorClass: 'text-gold-400'    },
+    domestic: { label: 'France',           colorClass: 'text-emerald-400' }
+  };
+
+  // Regroupe par scope, en préservant l'ordre.
+  const groups = useMemo(() => {
+    const out = { european: [], world: [], domestic: [] };
+    for (const t of trophies.breakdown) {
+      (out[t.scope] || out.domestic).push(t);
+    }
+    return out;
+  }, [trophies.breakdown]);
+
+  return (
+    <section className="py-16 md:py-20 border-y border-white/5">
+      <Container>
+        <header className="text-center mb-10">
+          <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
+            Le palmarès
+          </div>
+          <h2 className="mt-3 font-display text-3xl md:text-5xl font-black uppercase tracking-tight text-bone-50">
+            Trophy Cabinet
+          </h2>
+          <div className="mt-4 inline-flex items-center gap-3 px-5 py-2.5 rounded-full border bg-white/[0.03] backdrop-blur-md"
+            style={{ borderColor: `${primaryColor}55` }}>
+            <Trophy size={16} style={{ color: primaryColor }} />
+            <span className="font-display text-2xl md:text-3xl font-black tabular-nums" style={{ color: primaryColor }}>
+              {trophies.total}
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-bone-300 font-bold">
+              trophées au total
+            </span>
+          </div>
+        </header>
+
+        <div className="space-y-8">
+          {Object.entries(groups).map(([scope, items]) => {
+            if (!items.length) return null;
+            const meta = scopeMeta[scope];
+            return (
+              <div key={scope}>
+                <div className={`mb-3 text-[10px] font-bold uppercase tracking-[0.32em] ${meta.colorClass}`}>
+                  {meta.label}
+                </div>
+                <div className="grid gap-2.5">
+                  {items.map((t) => (
+                    <TrophyRow key={t.label} trophy={t} primaryColor={primaryColor} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function TrophyRow({ trophy, primaryColor }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35 }}
+      className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md px-5 py-4"
+    >
+      <span
+        className="shrink-0 grid h-10 w-10 place-items-center rounded-xl"
+        style={{ background: `${primaryColor}1A`, color: primaryColor, border: `1px solid ${primaryColor}40` }}
+      >
+        <Award size={18} />
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-bone-50 truncate">{trophy.label}</div>
+        {trophy.years && (
+          <div className="text-[10px] uppercase tracking-[0.18em] text-bone-400 font-mono mt-0.5 line-clamp-1">
+            {trophy.years}
+          </div>
+        )}
+      </div>
+      <div
+        className="font-display text-3xl md:text-4xl font-black tabular-nums shrink-0"
+        style={{ color: primaryColor }}
+      >
+        {trophy.count}
+      </div>
+    </motion.div>
+  );
+}
+
 // ── STAR PLAYER ──────────────────────────────────────────────────────
 // Section "STAR PLAYER" style marketplace : photo du joueur (gauche),
 // gros numéro en background, infos + stats (droite).
@@ -500,26 +610,11 @@ function StarPlayerSection({ player, primaryColor }) {
         >
           {/* Photo */}
           <div className="relative flex justify-center md:justify-end">
-            <div
-              className="relative h-64 w-64 md:h-96 md:w-96 rounded-3xl overflow-hidden"
-              style={{
-                background: `radial-gradient(circle at 50% 30%, ${primaryColor}33, transparent 70%)`,
-                boxShadow: `0 0 80px -20px ${primaryColor}66`
-              }}
-            >
-              {player.image ? (
-                <img
-                  src={player.image}
-                  alt={player.name}
-                  className="h-full w-full object-cover object-top"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              ) : (
-                <div className="h-full w-full grid place-items-center text-7xl font-display font-black" style={{ color: primaryColor }}>
-                  #{player.number}
-                </div>
-              )}
-            </div>
+            <PlayerPhoto
+              player={player}
+              size="lg"
+              primaryColor={primaryColor}
+            />
           </div>
 
           {/* Infos */}
@@ -622,17 +717,7 @@ function PlayerCard({ player, index, primaryColor }) {
       </div>
 
       <div className="relative">
-        <div
-          className="h-16 w-16 md:h-20 md:w-20 mx-auto rounded-full grid place-items-center text-xl font-display font-black ring-2 transition-transform group-hover:scale-110"
-          style={{
-            background: `${primaryColor}26`,
-            color: primaryColor,
-            borderColor: `${primaryColor}40`,
-            boxShadow: `0 0 30px -8px ${primaryColor}66`
-          }}
-        >
-          {player.number}
-        </div>
+        <PlayerPhoto player={player} size="sm" primaryColor={primaryColor} />
         <div className="mt-3 text-center">
           <div className="font-display text-xs md:text-sm font-bold text-bone-50 leading-tight line-clamp-2">
             {player.name}
@@ -643,6 +728,88 @@ function PlayerCard({ player, index, primaryColor }) {
         </div>
       </div>
     </motion.div>
+  );
+}
+
+// ── PHOTO JOUEUR ─────────────────────────────────────────────────────
+// Cherche d'abord player.image (URL absolue ou path /images/players/...),
+// sinon dérive automatiquement /images/players/{slug}.jpg. Si le fichier
+// renvoie 404, fallback sur un placeholder stylisé : cercle gradient avec
+// le numéro géant dans la couleur du club.
+function PlayerPhoto({ player, size = 'sm', primaryColor }) {
+  const [errored, setErrored] = useState(false);
+  const derivedImage = player.image || `/images/players/${slugify(player.name)}.jpg`;
+  const showPhoto = derivedImage && !errored;
+
+  const sizeClasses = size === 'lg'
+    ? 'h-64 w-64 md:h-96 md:w-96 rounded-3xl'
+    : 'h-16 w-16 md:h-20 md:w-20 mx-auto rounded-full ring-2';
+
+  return (
+    <div
+      className={`relative ${sizeClasses} overflow-hidden grid place-items-center transition-transform`}
+      style={{
+        background: size === 'lg'
+          ? `radial-gradient(circle at 50% 30%, ${primaryColor}33, transparent 70%)`
+          : `radial-gradient(circle, ${primaryColor}33, ${primaryColor}11)`,
+        boxShadow: `0 0 ${size === 'lg' ? 80 : 30}px -${size === 'lg' ? 20 : 8}px ${primaryColor}66`,
+        borderColor: `${primaryColor}40`
+      }}
+    >
+      {showPhoto && (
+        <img
+          src={derivedImage}
+          alt={player.name}
+          loading="lazy"
+          onError={() => setErrored(true)}
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+      )}
+      {!showPhoto && (
+        <PlayerNumberPlaceholder
+          number={player.number}
+          name={player.name}
+          size={size}
+          primaryColor={primaryColor}
+        />
+      )}
+    </div>
+  );
+}
+
+function PlayerNumberPlaceholder({ number, name, size, primaryColor }) {
+  if (size === 'lg') {
+    // Mode large (Star Player) — silhouette stylée avec initiales et numéro géant
+    const initials = name?.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <div
+          className="text-[10px] uppercase tracking-[0.32em] font-bold mb-2"
+          style={{ color: primaryColor }}
+        >
+          {initials}
+        </div>
+        <div
+          className="font-display font-black tabular-nums leading-[0.85]"
+          style={{
+            color: primaryColor,
+            fontSize: '14rem',
+            textShadow: `0 0 60px ${primaryColor}66`
+          }}
+        >
+          {number}
+        </div>
+      </div>
+    );
+  }
+  // Mode small (PlayerCard) — numéro central avec gradient
+  return (
+    <span
+      className="font-display text-xl font-black tabular-nums"
+      style={{ color: primaryColor }}
+    >
+      {number}
+    </span>
   );
 }
 

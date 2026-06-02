@@ -22,13 +22,32 @@ export const clubProfiles = {
     stadiumImage: '/images/clubs/psg-stadium.jpg', // poser le fichier ici
     coach: 'Luis Enrique',
     president: 'Nasser Al-Khelaïfi',
+    // Palmarès complet du PSG (58 trophées au total).
+    // Pour étendre à d'autres clubs : reprendre la même structure.
+    trophies: {
+      total: 58,
+      breakdown: [
+        { label: 'Ligue des champions',            count: 2,  years: '2025, 2026',              scope: 'european' },
+        { label: 'Coupe intercontinentale',        count: 1,  years: '2025',                    scope: 'world' },
+        { label: 'Supercoupe d\'Europe',           count: 1,  years: '2025',                    scope: 'european' },
+        { label: 'Coupe des vainqueurs de coupe',  count: 1,  years: '1996',                    scope: 'european' },
+        { label: 'Championnat de France',          count: 14, years: '1986, 1994, 2013-2016, 2018-2020, 2022-2026', scope: 'domestic' },
+        { label: 'Coupe de France',                count: 16, years: '1982, 1983, 1993, 1995, 1998, 2004, 2006, 2010, 2015-2018, 2020, 2021, 2024, 2025', scope: 'domestic' },
+        { label: 'Coupe de la Ligue',              count: 9,  years: '1995, 1998, 2008, 2014-2018, 2020', scope: 'domestic' },
+        { label: 'Trophée des champions',          count: 14, years: '1995, 1998, 2013-2020, 2022-2025', scope: 'domestic' }
+      ]
+    },
     starPlayer: {
       number: 10,
       name: 'Ousmane Dembélé',
       position: 'Attaquant',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Ousmane_Demb%C3%A9l%C3%A9_2018.jpg/400px-Ousmane_Demb%C3%A9l%C3%A9_2018.jpg',
+      // L'image va d'abord chercher /images/players/ousmane-dembele.jpg (à poser),
+      // sinon fallback automatique sur un placeholder stylisé.
+      image: '/images/players/ousmane-dembele.jpg',
       stats: { goals: 33, assists: 14 }
     },
+    // Pour chaque joueur, image optionnelle dans /images/players/{slug}.jpg
+    // Tu peux laisser vide pour utiliser le placeholder stylisé (numéro géant).
     squad: [
       { number: 1,  name: 'Gianluigi Donnarumma', position: 'Gardien',     country: 'IT' },
       { number: 5,  name: 'Marquinhos',           position: 'Défenseur',   country: 'BR' },
