@@ -40,17 +40,20 @@ const datasets = {
   conmebol: {
     members: conmebolMembers,
     founded: '1916',
-    heroGradient: 'from-cyan-500 via-emerald-400 to-gold-400'
+    // Or → Turquoise · Passion
+    heroGradient: 'from-gold-400 via-emerald-400 to-cyan-400'
   },
   concacaf: {
     members: concacafMembers,
     founded: '1961',
-    heroGradient: 'from-rose-500 via-orange-400 to-emerald-400'
+    // Cyan → Orange · Diversité et énergie
+    heroGradient: 'from-cyan-400 via-cyan-500 to-orange-500'
   },
   afc: {
     members: afcMembers,
     founded: '1954',
-    heroGradient: 'from-rose-500 via-amber-400 to-emerald-400'
+    // Rouge → Or · Puissance et croissance
+    heroGradient: 'from-red-600 via-orange-500 to-gold-500'
   }
   // OFC : pas encore de fichier — affichera le placeholder "Bientôt"
 };

@@ -33,8 +33,9 @@ export const federations = [
     shortName: 'Confederación Sudamericana',
     region: 'Amérique du Sud',
     clubs: 10,
-    primaryColor: '#FFCB05',
-    accent: '#0033A0',
+    // Or + Turquoise · Passion
+    primaryColor: '#FBBF24',
+    accent: '#22D3EE',
     flag: '🌎'
   },
   {
@@ -44,8 +45,9 @@ export const federations = [
     shortName: 'CONCACAF',
     region: 'Amérique du Nord',
     clubs: 35,
-    primaryColor: '#E5252C',
-    accent: '#FFFFFF',
+    // Cyan + Orange · Diversité et énergie
+    primaryColor: '#22D3EE',
+    accent: '#F97316',
     flag: '🌎'
   },
   {
@@ -55,8 +57,9 @@ export const federations = [
     shortName: 'AFC',
     region: 'Asie',
     clubs: 47,
-    primaryColor: '#0B2C5F',
-    accent: '#E60023',
+    // Rouge + Or · Puissance et croissance
+    primaryColor: '#DC2626',
+    accent: '#FBBF24',
     flag: '🌏'
   },
   {
