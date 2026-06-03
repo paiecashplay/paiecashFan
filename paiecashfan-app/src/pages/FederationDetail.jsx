@@ -52,7 +52,13 @@ const datasets = {
   concacaf: {
     members: concacafMembers,
     founded: '1961',
-    // Cyan → Orange · Diversité et énergie
+    heroVideo: '/videos/hero-CONCACAF.mp4',
+    heroLayout: 'sequenced',
+    heroTitle: 'CONCACAF',
+    heroTagline: 'LE FUTUR DU FOOTBALL CONTINENTAL',
+    heroSubtitle: '41 fédérations • Depuis 1961',
+    heroCaption: 'Innovation, diversité et ambition.',
+    // Cyan → Orange · Diversité et énergie (fallback gradient)
     heroGradient: 'from-cyan-400 via-cyan-500 to-orange-500'
   },
   afc: {
