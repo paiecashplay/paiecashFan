@@ -40,7 +40,13 @@ const datasets = {
   conmebol: {
     members: conmebolMembers,
     founded: '1916',
-    // Or → Turquoise · Passion
+    heroVideo: '/videos/hero-CONMEBOL.mp4',
+    heroLayout: 'sequenced',
+    heroTitle: 'CONMEBOL',
+    heroTagline: 'LE FOOTBALL COMME RELIGION',
+    heroSubtitle: '10 fédérations • Depuis 1916',
+    heroCaption: 'Là où naissent les légendes éternelles.',
+    // Or → Turquoise · Passion (fallback gradient si la vidéo ne charge pas)
     heroGradient: 'from-gold-400 via-emerald-400 to-cyan-400'
   },
   concacaf: {
