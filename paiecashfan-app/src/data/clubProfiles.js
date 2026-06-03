@@ -105,6 +105,33 @@ export const clubProfiles = {
       image: '/images/players/OM/aubameyang.jpg',
       stats: { goals: 15, assists: 4 }   // à ajuster avec les stats officielles
     },
+    // Boutique OM — override des produits par défaut avec les vrais maillots
+    // Photos à poser dans public/images/products/olympique-de-marseille/
+    merchandise: [
+      {
+        id: 'home-jersey',
+        category: 'jersey',
+        name: 'Maillot Domicile 2025-26',
+        description: 'Maillot officiel à domicile, design Puma × OM, sponsor CMA CGM, taille XS au XXXL.',
+        price: 100,
+        image: '/images/products/olympique-de-marseille/home-jersey.png',
+        images: [
+          '/images/products/olympique-de-marseille/home-jersey.png',
+          '/images/products/olympique-de-marseille/home-jersey-2.png'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+      // Autres produits gardés en placeholder — à remplacer quand tu auras
+      // les vrais maillots / accessoires officiels OM 2025-26.
+      { id: 'away-jersey', category: 'jersey',      name: 'Maillot Extérieur 2025-26', price: 100,    image: '/images/products/olympique-de-marseille/away-jersey.png', sizes: ['XS','S','M','L','XL','XXL','XXXL'], emoji: '👕' },
+      { id: 'hoodie',      category: 'hoodie',      name: 'Sweat à capuche OM',         price: 64.99,  image: '/images/products/olympique-de-marseille/hoodie.png',      sizes: ['S','M','L','XL','XXL'], emoji: '🥋' },
+      { id: 'tshirt',      category: 'tshirt',      name: 'T-Shirt OM Droit au but',    price: 34.99,  image: '/images/products/olympique-de-marseille/tshirt.png',      sizes: ['XS','S','M','L','XL','XXL','XXXL'], emoji: '👕' },
+      { id: 'scarf',       category: 'accessory',   name: 'Écharpe Officielle OM',      price: 19.99,  image: '/images/products/olympique-de-marseille/scarf.png',       emoji: '🧣' },
+      { id: 'cap',         category: 'accessory',   name: 'Casquette OM',               price: 24.99,  image: '/images/products/olympique-de-marseille/cap.png',         emoji: '🧢' },
+      { id: 'ball',        category: 'collectible', name: 'Ballon Collector OM',        price: 49.99,  image: '/images/products/olympique-de-marseille/ball.png',        emoji: '⚽' },
+      { id: 'stadium',     category: 'collectible', name: 'Vélodrome Miniature',        price: 74.99,  image: '/images/products/olympique-de-marseille/stadium.png',     emoji: '🏟' }
+    ],
     // Squad officiel OM 2025-26 (depuis captures fournies par l'utilisateur).
     // Photos posées dans public/images/players/OM/
     // À compléter : les 6 attaquants ont des numéros estimés — la capture des

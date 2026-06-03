@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
-  ShoppingBag, Trophy, Dices, Heart, Share2, Award, Plus, Check
+  ShoppingBag, Trophy, Dices, Heart, Share2, Award,
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { findClubBySlug } from '@/data/clubsRegistry';
@@ -850,10 +851,11 @@ function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
 }
 
 // ── MERCHANDISE (boutique du club) ───────────────────────────────────
-// Section style marketplace as-nancy-lorraine :
-// - Header 'OFFICIAL STORE / MERCHANDISE' + compteur panier à droite
-// - Tabs catégories (Tous / Maillot / Sweat / T-Shirt / Accessoire / Collection)
-// - Grille de cards produits avec badge catégorie, image, nom, prix PCC, ADD TO CART
+// Section style marketplace as-nancy-lorraine avec une modale de
+// sélection (taille + quantité) à l'ajout au panier.
+//
+// Format du cart : [{ productId, size, qty, unitPrice }]
+// Total dynamique = sum(qty × unitPrice).
 function MerchandiseSection({ club }) {
   const products = useMemo(
     () => club.merchandise || defaultMerchandise(club),
@@ -861,22 +863,37 @@ function MerchandiseSection({ club }) {
   );
   const [activeCat, setActiveCat] = useState('all');
   const [cart, setCart] = useState([]);
+  const [openProduct, setOpenProduct] = useState(null);
 
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
     [products, activeCat]
   );
 
-  const handleAdd = (product) => {
-    setCart((prev) => [...prev, product.id]);
+  // Ajoute (ou fusionne si même produit/taille déjà au panier) un item.
+  const handleAddItem = (item) => {
+    setCart((prev) => {
+      const idx = prev.findIndex(
+        (x) => x.productId === item.productId && x.size === item.size
+      );
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], qty: next[idx].qty + item.qty };
+        return next;
+      }
+      return [...prev, item];
+    });
+    setOpenProduct(null);
   };
 
+  // Total cart : somme des qty × unitPrice
   const totalPrice = useMemo(
-    () => cart.reduce((sum, id) => {
-      const p = products.find((x) => x.id === id);
-      return sum + (p?.price || 0);
-    }, 0),
-    [cart, products]
+    () => cart.reduce((sum, it) => sum + it.qty * it.unitPrice, 0),
+    [cart]
+  );
+  const totalItems = useMemo(
+    () => cart.reduce((sum, it) => sum + it.qty, 0),
+    [cart]
   );
 
   return (
@@ -899,7 +916,7 @@ function MerchandiseSection({ club }) {
             </p>
           </div>
 
-          {/* Compteur panier (visuel — pas de checkout réel pour V1) */}
+          {/* Compteur panier */}
           <div className="flex items-center gap-3">
             <div className="text-right">
               <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
@@ -909,7 +926,7 @@ function MerchandiseSection({ club }) {
                 className="font-display text-xl font-black tabular-nums"
                 style={{ color: club.primaryColor }}
               >
-                {cart.length} {cart.length > 1 ? 'articles' : 'article'}
+                {totalItems} {totalItems > 1 ? 'articles' : 'article'}
               </div>
             </div>
             <div
@@ -921,12 +938,12 @@ function MerchandiseSection({ club }) {
               }}
             >
               <ShoppingBag size={18} />
-              {cart.length > 0 && (
+              {totalItems > 0 && (
                 <span
                   className="absolute -top-1.5 -right-1.5 grid h-5 w-5 place-items-center rounded-full text-[10px] font-mono font-bold text-ink-900"
                   style={{ background: club.primaryColor }}
                 >
-                  {cart.length}
+                  {totalItems}
                 </span>
               )}
             </div>
@@ -983,48 +1000,183 @@ function MerchandiseSection({ club }) {
                 product={p}
                 index={i}
                 primaryColor={club.primaryColor}
-                inCart={cart.includes(p.id)}
-                onAdd={() => handleAdd(p)}
+                inCart={cart.some((x) => x.productId === p.id)}
+                onOpen={() => setOpenProduct(p)}
               />
             ))}
           </div>
         )}
 
-        {/* Footer sticky avec total */}
+        {/* Détail du panier */}
         {cart.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mt-10 flex items-center justify-between gap-4 rounded-2xl border bg-white/[0.04] backdrop-blur-md px-5 py-4"
-            style={{ borderColor: `${club.primaryColor}55` }}
-          >
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
-                Total panier
-              </div>
-              <div
-                className="font-display text-2xl font-black tabular-nums"
-                style={{ color: club.primaryColor }}
-              >
-                {formatPCC(totalPrice)} PCC
-              </div>
-            </div>
-            <button
-              className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105"
-              style={{ background: club.primaryColor }}
-            >
-              <ShoppingBag size={14} />
-              Passer commande
-            </button>
-          </motion.div>
+          <CartFooter
+            cart={cart}
+            products={products}
+            totalPrice={totalPrice}
+            totalItems={totalItems}
+            primaryColor={club.primaryColor}
+            onRemove={(idx) => setCart((prev) => prev.filter((_, i) => i !== idx))}
+            onQtyChange={(idx, qty) => setCart((prev) =>
+              prev.map((it, i) => (i === idx ? { ...it, qty } : it))
+            )}
+          />
         )}
       </Container>
+
+      {/* Modale de sélection du produit (taille + quantité) */}
+      <AnimatePresence>
+        {openProduct && (
+          <ProductDetailModal
+            product={openProduct}
+            primaryColor={club.primaryColor}
+            onClose={() => setOpenProduct(null)}
+            onAdd={handleAddItem}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
 
-function ProductCard({ product, index, primaryColor, inCart, onAdd }) {
+// ── CART FOOTER ──────────────────────────────────────────────────────
+// Affichage détaillé du panier : items avec qty/taille/prix unitaire +
+// total + bouton checkout. Apparaît sous la grille produits dès qu'un
+// article est ajouté.
+function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRemove, onQtyChange }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mt-10 rounded-2xl border bg-white/[0.04] backdrop-blur-md overflow-hidden"
+      style={{ borderColor: `${primaryColor}55` }}
+    >
+      {/* Header */}
+      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-bone-200 font-bold inline-flex items-center gap-2">
+          <ShoppingBag size={14} style={{ color: primaryColor }} />
+          Votre panier · {totalItems} {totalItems > 1 ? 'articles' : 'article'}
+        </div>
+      </div>
+
+      {/* Items */}
+      <ul className="divide-y divide-white/5">
+        {cart.map((item, idx) => {
+          const product = products.find((p) => p.id === item.productId);
+          if (!product) return null;
+          const lineTotal = item.qty * item.unitPrice;
+          return (
+            <li key={`${item.productId}-${item.size}-${idx}`} className="px-5 py-4 flex items-center gap-4">
+              {/* Mini photo */}
+              <span
+                className="shrink-0 grid h-12 w-12 place-items-center rounded-lg overflow-hidden"
+                style={{ background: `${primaryColor}15`, border: `1px solid ${primaryColor}40` }}
+              >
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span className="text-2xl">{product.emoji}</span>
+                )}
+              </span>
+
+              {/* Nom + taille */}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-bone-50 truncate">{product.name}</div>
+                <div className="mt-0.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-bone-400 font-bold">
+                  {item.size && (
+                    <span className="px-1.5 py-0.5 rounded bg-white/5 text-bone-200 font-mono">
+                      {item.size}
+                    </span>
+                  )}
+                  <span className="font-mono">
+                    {formatPCC(item.unitPrice)} PCC × {item.qty}
+                  </span>
+                </div>
+              </div>
+
+              {/* Quantité (- / +) */}
+              <div className="hidden sm:inline-flex items-center gap-1 rounded-full border border-white/10 bg-ink-900/50 p-1">
+                <QtyButton
+                  onClick={() => onQtyChange(idx, Math.max(1, item.qty - 1))}
+                  ariaLabel="Diminuer la quantité"
+                >
+                  <Minus size={12} strokeWidth={3} />
+                </QtyButton>
+                <span className="min-w-[1.5rem] text-center text-xs font-mono font-bold text-bone-50 tabular-nums">
+                  {item.qty}
+                </span>
+                <QtyButton
+                  onClick={() => onQtyChange(idx, item.qty + 1)}
+                  ariaLabel="Augmenter la quantité"
+                >
+                  <Plus size={12} strokeWidth={3} />
+                </QtyButton>
+              </div>
+
+              {/* Total ligne + supprimer */}
+              <div className="text-right shrink-0">
+                <div
+                  className="font-display text-base font-black tabular-nums"
+                  style={{ color: primaryColor }}
+                >
+                  {formatPCC(lineTotal)}
+                </div>
+                <button
+                  onClick={() => onRemove(idx)}
+                  className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-bone-400 hover:text-rose-400 font-bold transition-colors"
+                >
+                  Retirer
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Footer : total + CTA */}
+      <div className="px-5 py-4 border-t border-white/5 flex items-center justify-between gap-4 bg-white/[0.02]">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+            Total à payer
+          </div>
+          <div
+            className="font-display text-2xl md:text-3xl font-black tabular-nums"
+            style={{ color: primaryColor }}
+          >
+            {formatPCC(totalPrice)} PCC
+          </div>
+        </div>
+        <button
+          className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105"
+          style={{ background: primaryColor }}
+        >
+          <ShoppingBag size={14} />
+          Passer commande
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function QtyButton({ children, onClick, ariaLabel }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className="grid h-6 w-6 place-items-center rounded-full bg-white/5 text-bone-200 hover:bg-white/10 transition-colors"
+    >
+      {children}
+    </button>
+  );
+}
+
+function ProductCard({ product, index, primaryColor, inCart, onOpen }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -1036,7 +1188,8 @@ function ProductCard({ product, index, primaryColor, inCart, onAdd }) {
       whileHover={{ y: -3 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative rounded-2xl border bg-white/[0.03] backdrop-blur-md overflow-hidden transition-all duration-300"
+      onClick={onOpen}
+      className="group relative rounded-2xl border bg-white/[0.03] backdrop-blur-md overflow-hidden transition-all duration-300 cursor-pointer"
       style={{
         borderColor: hovered ? primaryColor : 'rgba(255,255,255,0.1)',
         boxShadow: hovered ? `0 0 40px -8px ${primaryColor}66` : undefined
@@ -1046,6 +1199,14 @@ function ProductCard({ product, index, primaryColor, inCart, onAdd }) {
       <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-ink-900/80 backdrop-blur-sm text-[9px] uppercase tracking-[0.22em] font-bold text-bone-200">
         {labelOf(product.category)}
       </div>
+
+      {/* Tag "Déjà dans le panier" si applicable */}
+      {inCart && (
+        <div className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[9px] uppercase tracking-[0.22em] font-bold">
+          <Check size={10} strokeWidth={3} />
+          Au panier
+        </div>
+      )}
 
       {/* Image (ou fallback emoji) */}
       <ProductImage
@@ -1067,30 +1228,246 @@ function ProductCard({ product, index, primaryColor, inCart, onAdd }) {
           </div>
         </div>
         <button
-          onClick={onAdd}
-          disabled={inCart}
-          className={cn(
-            'shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-full',
-            'text-[10px] uppercase tracking-[0.18em] font-bold transition-all duration-200',
-            inCart
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-default'
-              : 'text-ink-900 hover:scale-105 active:scale-95'
-          )}
-          style={inCart ? undefined : { background: primaryColor }}
+          onClick={(e) => { e.stopPropagation(); onOpen(); }}
+          className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[10px] uppercase tracking-[0.18em] font-bold text-ink-900 transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{ background: primaryColor }}
         >
-          {inCart ? (
-            <>
-              <Check size={12} strokeWidth={3} />
-              Ajouté
-            </>
-          ) : (
-            <>
-              <Plus size={12} strokeWidth={3} />
-              Add to cart
-            </>
-          )}
+          <Plus size={12} strokeWidth={3} />
+          Choisir
         </button>
       </div>
+    </motion.div>
+  );
+}
+
+// ── PRODUCT DETAIL MODAL ─────────────────────────────────────────────
+// Popup au clic 'Choisir' / sur la card : carousel d'images, sélecteur
+// de taille (si product.sizes existe), sélecteur de quantité, total
+// dynamique, bouton 'Ajouter au panier'.
+function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
+  const images = product.images && product.images.length > 0
+    ? product.images
+    : [product.image].filter(Boolean);
+
+  const [imgIdx, setImgIdx] = useState(0);
+  const [size, setSize] = useState(product.sizes?.[2] ?? product.sizes?.[0] ?? null);
+  const [qty, setQty] = useState(1);
+
+  // Fermeture au Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft' && images.length > 1) {
+        setImgIdx((i) => (i - 1 + images.length) % images.length);
+      }
+      if (e.key === 'ArrowRight' && images.length > 1) {
+        setImgIdx((i) => (i + 1) % images.length);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose, images.length]);
+
+  const lineTotal = qty * product.price;
+  const requiresSize = product.sizes && product.sizes.length > 0;
+  const canAdd = !requiresSize || !!size;
+
+  const handleConfirm = () => {
+    if (!canAdd) return;
+    onAdd({
+      productId: product.id,
+      size: requiresSize ? size : null,
+      qty,
+      unitPrice: product.price
+    });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[100] grid place-items-center p-4 md:p-6 bg-ink-950/85 backdrop-blur-sm overflow-y-auto"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, y: 16, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.96, y: 16, opacity: 0 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-3xl rounded-3xl border bg-ink-900/95 backdrop-blur-xl overflow-hidden my-8"
+        style={{ borderColor: `${primaryColor}55` }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Bouton close */}
+        <button
+          onClick={onClose}
+          aria-label="Fermer"
+          className="absolute top-4 right-4 z-20 grid h-9 w-9 place-items-center rounded-full bg-ink-900/80 border border-white/10 text-bone-300 hover:text-bone-50 hover:border-white/30 transition-colors backdrop-blur"
+        >
+          <X size={16} />
+        </button>
+
+        <div className="grid md:grid-cols-[1.1fr_1fr] gap-0">
+          {/* Carousel images */}
+          <div className="relative bg-white/[0.02] aspect-square md:aspect-auto md:min-h-[460px]">
+            <ProductImage
+              product={{ ...product, image: images[imgIdx] }}
+              primaryColor={primaryColor}
+              hovered
+            />
+
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={() => setImgIdx((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-ink-900/70 border border-white/15 text-bone-200 hover:text-bone-50 hover:border-white/30 transition-colors backdrop-blur"
+                  aria-label="Image précédente"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setImgIdx((i) => (i + 1) % images.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-ink-900/70 border border-white/15 text-bone-200 hover:text-bone-50 hover:border-white/30 transition-colors backdrop-blur"
+                  aria-label="Image suivante"
+                >
+                  <ChevronRight size={16} />
+                </button>
+                {/* Dots */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setImgIdx(i)}
+                      aria-label={`Image ${i + 1}`}
+                      className="h-1.5 rounded-full transition-all"
+                      style={{
+                        width: i === imgIdx ? '20px' : '6px',
+                        background: i === imgIdx ? primaryColor : 'rgba(255,255,255,0.3)'
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Sélection */}
+          <div className="p-6 md:p-8 flex flex-col">
+            <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
+              {labelOf(product.category)}
+            </div>
+            <h3 className="mt-2 font-display text-2xl md:text-3xl font-black uppercase tracking-tight text-bone-50 leading-tight">
+              {product.name}
+            </h3>
+            <div className="mt-3 inline-flex items-baseline gap-1.5">
+              <span
+                className="font-display text-3xl md:text-4xl font-black tabular-nums"
+                style={{ color: primaryColor }}
+              >
+                {formatPCC(product.price)}
+              </span>
+              <span className="text-xs font-mono uppercase tracking-[0.18em] text-bone-400 font-bold">
+                PCC
+              </span>
+            </div>
+
+            {product.description && (
+              <p className="mt-4 text-sm text-bone-300 leading-relaxed">
+                {product.description}
+              </p>
+            )}
+
+            {/* Tailles */}
+            {requiresSize && (
+              <div className="mt-6">
+                <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold mb-3">
+                  Choisis ta taille
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((s) => {
+                    const isActive = size === s;
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => setSize(s)}
+                        className={cn(
+                          'min-w-[3rem] h-10 px-3 rounded-xl text-[11px] uppercase tracking-[0.18em] font-bold transition-all',
+                          isActive
+                            ? 'text-ink-900 shadow-lg'
+                            : 'bg-white/[0.04] border border-white/10 text-bone-200 hover:border-white/20 hover:bg-white/[0.07]'
+                        )}
+                        style={isActive ? { background: primaryColor } : undefined}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Quantité */}
+            <div className="mt-6">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold mb-3">
+                Quantité
+              </div>
+              <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-ink-900/50 p-1">
+                <QtyButton onClick={() => setQty(Math.max(1, qty - 1))} ariaLabel="Diminuer">
+                  <Minus size={14} strokeWidth={3} />
+                </QtyButton>
+                <span className="min-w-[2.5rem] text-center text-base font-display font-black text-bone-50 tabular-nums">
+                  {qty}
+                </span>
+                <QtyButton onClick={() => setQty(qty + 1)} ariaLabel="Augmenter">
+                  <Plus size={14} strokeWidth={3} />
+                </QtyButton>
+              </div>
+            </div>
+
+            {/* Total + CTA */}
+            <div className="mt-auto pt-8">
+              <div className="flex items-baseline justify-between mb-4">
+                <span className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+                  Total
+                </span>
+                <span
+                  className="font-display text-2xl md:text-3xl font-black tabular-nums"
+                  style={{ color: primaryColor }}
+                >
+                  {formatPCC(lineTotal)} PCC
+                </span>
+              </div>
+              <button
+                onClick={handleConfirm}
+                disabled={!canAdd}
+                className={cn(
+                  'w-full inline-flex items-center justify-center gap-2 h-12 rounded-full',
+                  'text-xs uppercase tracking-[0.18em] font-bold transition-all',
+                  canAdd
+                    ? 'text-ink-900 hover:scale-[1.02] active:scale-[0.98] shadow-lg'
+                    : 'bg-white/5 text-bone-500 cursor-not-allowed'
+                )}
+                style={canAdd ? { background: primaryColor } : undefined}
+              >
+                {!canAdd && requiresSize && !size ? (
+                  'Choisis une taille'
+                ) : (
+                  <>
+                    <ShoppingBag size={14} />
+                    Ajouter au panier
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
