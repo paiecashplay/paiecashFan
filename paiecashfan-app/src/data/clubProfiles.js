@@ -41,36 +41,36 @@ export const clubProfiles = {
       number: 10,
       name: 'Ousmane Dembélé',
       position: 'Attaquant',
-      image: '/images/players/ousmane-dembele.jpg',
+      image: '/images/players/PSG/ousmane-dembele.jpg',
       stats: { goals: 33, assists: 14 }
     },
     // Liste officielle 2026 (24 joueurs). Photos posées dans /public/images/players/
     // avec noms hétérogènes — référencés explicitement via le champ image.
     squad: [
-      { number: 2,  name: 'Achraf Hakimi',          position: 'Défenseur',         country: 'MA', image: '/images/players/hakimi.jpg' },
-      { number: 5,  name: 'Marquinhos',             position: 'Défenseur',         country: 'BR', image: '/images/players/marquinhos.jpg' },
-      { number: 6,  name: 'Illia Zabarnyi',         position: 'Défenseur',         country: 'UA', image: '/images/players/Zabarnyi.jpg' },
-      { number: 7,  name: 'Khvicha Kvaratskhelia',  position: 'Attaquant',         country: 'GE', image: '/images/players/Kvaratskhelia.jpg' },
-      { number: 8,  name: 'Fabián Ruiz',            position: 'Milieu de terrain', country: 'ES', image: '/images/players/ruiz.jpg' },
-      { number: 9,  name: 'Gonçalo Ramos',          position: 'Attaquant',         country: 'PT', image: '/images/players/ramos.jpg' },
-      { number: 10, name: 'Ousmane Dembélé',        position: 'Attaquant',         country: 'FR', image: '/images/players/ousmane-dembele.jpg' },
-      { number: 14, name: 'Désiré Doué',            position: 'Attaquant',         country: 'FR', image: '/images/players/doué.jpg' },
-      { number: 17, name: 'Vitinha',                position: 'Milieu de terrain', country: 'PT', image: '/images/players/vitinha.jpg' },
-      { number: 19, name: 'Kang-In Lee',            position: 'Milieu de terrain', country: 'KR', image: '/images/players/lee.jpg' },
-      { number: 21, name: 'Lucas Hernández',        position: 'Défenseur',         country: 'FR', image: '/images/players/hernandez.jpg' },
-      { number: 25, name: 'Nuno Mendes',            position: 'Défenseur',         country: 'PT', image: '/images/players/mendes.jpg' },
-      { number: 27, name: 'Dro Fernández',          position: 'Milieu de terrain', country: 'ES', image: '/images/players/Dro Fernández.jpg' },
-      { number: 29, name: 'Bradley Barcola',        position: 'Attaquant',         country: 'FR', image: '/images/players/barcola.jpg' },
-      { number: 30, name: 'Lucas Chevalier',        position: 'Gardien de but',    country: 'FR', image: '/images/players/chevalier.jpg' },
-      { number: 33, name: 'Warren Zaïre-Emery',     position: 'Milieu de terrain', country: 'FR', image: '/images/players/Zaïre-Emery.jpg' },
-      { number: 35, name: 'Lucas Beraldo',          position: 'Défenseur',         country: 'BR', image: '/images/players/beraldo.jpg' },
-      { number: 39, name: 'Matvey Safonov',         position: 'Gardien de but',    country: 'RU', image: '/images/players/safonov.jpg' },
-      { number: 41, name: 'Senny Mayulu',           position: 'Milieu de terrain', country: 'FR', image: '/images/players/mayulu.jpg' },
-      { number: 44, name: 'Quentin Ndjantou',       position: 'Attaquant',         country: 'FR', image: '/images/players/Ndjantou.jpg' },
-      { number: 49, name: 'Ibrahim Mbaye',          position: 'Attaquant',         country: 'FR', image: '/images/players/mbaye.jpg' },
-      { number: 51, name: 'Willian Pacho',          position: 'Défenseur',         country: 'EC', image: '/images/players/pacho.jpg' },
-      { number: 87, name: 'João Neves',             position: 'Milieu de terrain', country: 'PT', image: '/images/players/neves.jpg' },
-      { number: 89, name: 'Renato Marin',           position: 'Gardien de but',    country: 'BR', image: '/images/players/marin.jpg' }
+      { number: 2,  name: 'Achraf Hakimi',          position: 'Défenseur',         country: 'MA', image: '/images/players/PSG/hakimi.jpg' },
+      { number: 5,  name: 'Marquinhos',             position: 'Défenseur',         country: 'BR', image: '/images/players/PSG/marquinhos.jpg' },
+      { number: 6,  name: 'Illia Zabarnyi',         position: 'Défenseur',         country: 'UA', image: '/images/players/PSG/Zabarnyi.jpg' },
+      { number: 7,  name: 'Khvicha Kvaratskhelia',  position: 'Attaquant',         country: 'GE', image: '/images/players/PSG/Kvaratskhelia.jpg' },
+      { number: 8,  name: 'Fabián Ruiz',            position: 'Milieu de terrain', country: 'ES', image: '/images/players/PSG/ruiz.jpg' },
+      { number: 9,  name: 'Gonçalo Ramos',          position: 'Attaquant',         country: 'PT', image: '/images/players/PSG/ramos.jpg' },
+      { number: 10, name: 'Ousmane Dembélé',        position: 'Attaquant',         country: 'FR', image: '/images/players/PSG/ousmane-dembele.jpg' },
+      { number: 14, name: 'Désiré Doué',            position: 'Attaquant',         country: 'FR', image: '/images/players/PSG/doué.jpg' },
+      { number: 17, name: 'Vitinha',                position: 'Milieu de terrain', country: 'PT', image: '/images/players/PSG/vitinha.jpg' },
+      { number: 19, name: 'Kang-In Lee',            position: 'Milieu de terrain', country: 'KR', image: '/images/players/PSG/lee.jpg' },
+      { number: 21, name: 'Lucas Hernández',        position: 'Défenseur',         country: 'FR', image: '/images/players/PSG/hernandez.jpg' },
+      { number: 25, name: 'Nuno Mendes',            position: 'Défenseur',         country: 'PT', image: '/images/players/PSG/mendes.jpg' },
+      { number: 27, name: 'Dro Fernández',          position: 'Milieu de terrain', country: 'ES', image: '/images/players/PSG/Dro Fernández.jpg' },
+      { number: 29, name: 'Bradley Barcola',        position: 'Attaquant',         country: 'FR', image: '/images/players/PSG/barcola.jpg' },
+      { number: 30, name: 'Lucas Chevalier',        position: 'Gardien de but',    country: 'FR', image: '/images/players/PSG/chevalier.jpg' },
+      { number: 33, name: 'Warren Zaïre-Emery',     position: 'Milieu de terrain', country: 'FR', image: '/images/players/PSG/Zaïre-Emery.jpg' },
+      { number: 35, name: 'Lucas Beraldo',          position: 'Défenseur',         country: 'BR', image: '/images/players/PSG/beraldo.jpg' },
+      { number: 39, name: 'Matvey Safonov',         position: 'Gardien de but',    country: 'RU', image: '/images/players/PSG/safonov.jpg' },
+      { number: 41, name: 'Senny Mayulu',           position: 'Milieu de terrain', country: 'FR', image: '/images/players/PSG/mayulu.jpg' },
+      { number: 44, name: 'Quentin Ndjantou',       position: 'Attaquant',         country: 'FR', image: '/images/players/PSG/Ndjantou.jpg' },
+      { number: 49, name: 'Ibrahim Mbaye',          position: 'Attaquant',         country: 'FR', image: '/images/players/PSG/mbaye.jpg' },
+      { number: 51, name: 'Willian Pacho',          position: 'Défenseur',         country: 'EC', image: '/images/players/PSG/pacho.jpg' },
+      { number: 87, name: 'João Neves',             position: 'Milieu de terrain', country: 'PT', image: '/images/players/PSG/neves.jpg' },
+      { number: 89, name: 'Renato Marin',           position: 'Gardien de but',    country: 'BR', image: '/images/players/PSG/marin.jpg' }
     ]
   },
 
@@ -99,7 +99,7 @@ export const clubProfiles = {
       ]
     },
     starPlayer: {
-      number: 9,
+      number: 17,
       name: 'Pierre-Emerick Aubameyang',
       position: 'Attaquant',
       image: '/images/players/OM/aubameyang.jpg',
@@ -136,13 +136,13 @@ export const clubProfiles = {
       { number: 45, name: 'Yanis Sellami',            position: 'Milieu de terrain', country: 'FR', image: '/images/players/OM/sellami.jpg' },
 
       // ── ATTAQUANTS ─────────────────────────────────────────────
-      // Numéros estimés (capture attaquants pas encore reçue)
-      { number: 7,  name: 'Mason Greenwood',          position: 'Attaquant',         country: 'GB', image: '/images/players/OM/greenwood.jpg' },
-      { number: 9,  name: 'Pierre-Emerick Aubameyang',position: 'Attaquant',         country: 'GA', image: '/images/players/OM/aubameyang.jpg' },
-      { number: 10, name: 'Amine Gouiri',             position: 'Attaquant',         country: 'DZ', image: '/images/players/OM/gouiri.jpg' },
-      { number: 11, name: 'Igor Paixão',              position: 'Attaquant',         country: 'BR', image: '/images/players/OM/paixao.jpg' },
-      { number: 17, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/OM/traore.jpg' },
-      { number: 24, name: 'Ethan Nwaneri',            position: 'Attaquant',         country: 'GB', image: '/images/players/OM/nwaneri.jpg' }
+      { number: 9,  name: 'Amine Gouiri',             position: 'Attaquant',         country: 'DZ', image: '/images/players/OM/gouiri.jpg' },
+      { number: 10, name: 'Mason Greenwood',          position: 'Attaquant',         country: 'GB', image: '/images/players/OM/greenwood.jpg' },
+      { number: 11, name: 'Ethan Nwaneri',            position: 'Attaquant',         country: 'GB', image: '/images/players/OM/nwaneri.jpg' },
+      { number: 14, name: 'Igor Paixão',              position: 'Attaquant',         country: 'BR', image: '/images/players/OM/paixao.jpg' },
+      { number: 17, name: 'Pierre-Emerick Aubameyang',position: 'Attaquant',         country: 'GA', image: '/images/players/OM/aubameyang.jpg' },
+      { number: 20, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/OM/traore.jpg' },
+      { number: 76, name: 'Tadjidine Mmadi',          position: 'Attaquant',         country: 'KM', image: '/images/players/OM/mmadi.jpg' }
     ]
   }
 
