@@ -102,47 +102,47 @@ export const clubProfiles = {
       number: 9,
       name: 'Pierre-Emerick Aubameyang',
       position: 'Attaquant',
-      image: '/images/players/om/aubameyang.jpg',
+      image: '/images/players/OM/aubameyang.jpg',
       stats: { goals: 15, assists: 4 }   // à ajuster avec les stats officielles
     },
     // Squad officiel OM 2025-26 (depuis captures fournies par l'utilisateur).
-    // Photos posées dans public/images/players/om/
+    // Photos posées dans public/images/players/OM/
     // À compléter : les 6 attaquants ont des numéros estimés — la capture des
     // attaquants n'a pas encore été reçue (à ajuster si numéros différents).
     squad: [
       // ── GARDIENS ───────────────────────────────────────────────
-      { number: 1,  name: 'Gerónimo Rulli',           position: 'Gardien de but',    country: 'AR', image: '/images/players/om/rulli.jpg' },
-      { number: 12, name: 'Jeffrey De Lange',         position: 'Gardien de but',    country: 'NL', image: '/images/players/om/deLange.jpg' },
-      { number: 40, name: 'Jelle Van Neck',           position: 'Gardien de but',    country: 'BE', image: '/images/players/om/vanNeck.jpg' },
-      { number: 92, name: 'Théo Vermot',              position: 'Gardien de but',    country: 'FR', image: '/images/players/om/vermot.jpg' },
+      { number: 1,  name: 'Gerónimo Rulli',           position: 'Gardien de but',    country: 'AR', image: '/images/players/OM/rulli.jpg' },
+      { number: 12, name: 'Jeffrey De Lange',         position: 'Gardien de but',    country: 'NL', image: '/images/players/OM/deLange.jpg' },
+      { number: 40, name: 'Jelle Van Neck',           position: 'Gardien de but',    country: 'BE', image: '/images/players/OM/vanNeck.jpg' },
+      { number: 92, name: 'Théo Vermot',              position: 'Gardien de but',    country: 'FR', image: '/images/players/OM/vermot.jpg' },
 
       // ── DÉFENSEURS ─────────────────────────────────────────────
-      { number: 4,  name: 'CJ Egan-Riley',            position: 'Défenseur',         country: 'GB', image: '/images/players/om/egan-riley.jpg' },
-      { number: 5,  name: 'Leonardo Balerdi',         position: 'Défenseur',         country: 'AR', image: '/images/players/om/balerdi.jpg' },
-      { number: 21, name: 'Nayef Aguerd',             position: 'Défenseur',         country: 'MA', image: '/images/players/om/aguerd.jpg' },
-      { number: 22, name: 'Timothy Weah',             position: 'Défenseur',         country: 'US', image: '/images/players/om/weah.jpg' },
-      { number: 28, name: 'Benjamin Pavard',          position: 'Défenseur',         country: 'FR', image: '/images/players/om/pavard.jpg' },
-      { number: 32, name: 'Facundo Medina',           position: 'Défenseur',         country: 'AR', image: '/images/players/om/medina.jpg' },
-      { number: 33, name: 'Emerson Palmieri',         position: 'Défenseur',         country: 'IT', image: '/images/players/om/palmieri.jpg' },
+      { number: 4,  name: 'CJ Egan-Riley',            position: 'Défenseur',         country: 'GB', image: '/images/players/OM/egan-riley.jpg' },
+      { number: 5,  name: 'Leonardo Balerdi',         position: 'Défenseur',         country: 'AR', image: '/images/players/OM/balerdi.jpg' },
+      { number: 21, name: 'Nayef Aguerd',             position: 'Défenseur',         country: 'MA', image: '/images/players/OM/aguerd.jpg' },
+      { number: 22, name: 'Timothy Weah',             position: 'Défenseur',         country: 'US', image: '/images/players/OM/weah.jpg' },
+      { number: 28, name: 'Benjamin Pavard',          position: 'Défenseur',         country: 'FR', image: '/images/players/OM/pavard.jpg' },
+      { number: 32, name: 'Facundo Medina',           position: 'Défenseur',         country: 'AR', image: '/images/players/OM/medina.jpg' },
+      { number: 33, name: 'Emerson Palmieri',         position: 'Défenseur',         country: 'IT', image: '/images/players/OM/palmieri.jpg' },
 
       // ── MILIEUX ────────────────────────────────────────────────
-      { number: 6,  name: 'Tochukwu Nnadi',           position: 'Milieu de terrain', country: 'NG', image: '/images/players/om/tochukwu.jpg' },
-      { number: 8,  name: 'Himad Abdelli',            position: 'Milieu de terrain', country: 'DZ', image: '/images/players/om/abdelli.jpg' },
-      { number: 18, name: 'Arthur Vermeeren',         position: 'Milieu de terrain', country: 'BE', image: '/images/players/om/vermeeren.jpg' },
-      { number: 19, name: 'Geoffrey Kondogbia',       position: 'Milieu de terrain', country: 'CF', image: '/images/players/om/kondogbia.jpg' },
-      { number: 23, name: 'Pierre-Emile Højbjerg',    position: 'Milieu de terrain', country: 'DK', image: '/images/players/om/hojbjerg.jpg' },
-      { number: 26, name: 'Bilal Nadir',              position: 'Milieu de terrain', country: 'MA', image: '/images/players/om/nadir.jpg' },
-      { number: 27, name: 'Quinten Timber',           position: 'Milieu de terrain', country: 'NL', image: '/images/players/om/timber.jpg' },
-      { number: 45, name: 'Yanis Sellami',            position: 'Milieu de terrain', country: 'FR', image: '/images/players/om/sellami.jpg' },
+      { number: 6,  name: 'Tochukwu Nnadi',           position: 'Milieu de terrain', country: 'NG', image: '/images/players/OM/tochukwu.jpg' },
+      { number: 8,  name: 'Himad Abdelli',            position: 'Milieu de terrain', country: 'DZ', image: '/images/players/OM/abdelli.jpg' },
+      { number: 18, name: 'Arthur Vermeeren',         position: 'Milieu de terrain', country: 'BE', image: '/images/players/OM/vermeeren.jpg' },
+      { number: 19, name: 'Geoffrey Kondogbia',       position: 'Milieu de terrain', country: 'CF', image: '/images/players/OM/kondogbia.jpg' },
+      { number: 23, name: 'Pierre-Emile Højbjerg',    position: 'Milieu de terrain', country: 'DK', image: '/images/players/OM/hojbjerg.jpg' },
+      { number: 26, name: 'Bilal Nadir',              position: 'Milieu de terrain', country: 'MA', image: '/images/players/OM/nadir.jpg' },
+      { number: 27, name: 'Quinten Timber',           position: 'Milieu de terrain', country: 'NL', image: '/images/players/OM/timber.jpg' },
+      { number: 45, name: 'Yanis Sellami',            position: 'Milieu de terrain', country: 'FR', image: '/images/players/OM/sellami.jpg' },
 
       // ── ATTAQUANTS ─────────────────────────────────────────────
       // Numéros estimés (capture attaquants pas encore reçue)
-      { number: 7,  name: 'Mason Greenwood',          position: 'Attaquant',         country: 'GB', image: '/images/players/om/greenwood.jpg' },
-      { number: 9,  name: 'Pierre-Emerick Aubameyang',position: 'Attaquant',         country: 'GA', image: '/images/players/om/aubameyang.jpg' },
-      { number: 10, name: 'Amine Gouiri',             position: 'Attaquant',         country: 'DZ', image: '/images/players/om/gouiri.jpg' },
-      { number: 11, name: 'Igor Paixão',              position: 'Attaquant',         country: 'BR', image: '/images/players/om/paixao.jpg' },
-      { number: 17, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/om/traore.jpg' },
-      { number: 24, name: 'Ethan Nwaneri',            position: 'Attaquant',         country: 'GB', image: '/images/players/om/nwaneri.jpg' }
+      { number: 7,  name: 'Mason Greenwood',          position: 'Attaquant',         country: 'GB', image: '/images/players/OM/greenwood.jpg' },
+      { number: 9,  name: 'Pierre-Emerick Aubameyang',position: 'Attaquant',         country: 'GA', image: '/images/players/OM/aubameyang.jpg' },
+      { number: 10, name: 'Amine Gouiri',             position: 'Attaquant',         country: 'DZ', image: '/images/players/OM/gouiri.jpg' },
+      { number: 11, name: 'Igor Paixão',              position: 'Attaquant',         country: 'BR', image: '/images/players/OM/paixao.jpg' },
+      { number: 17, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/OM/traore.jpg' },
+      { number: 24, name: 'Ethan Nwaneri',            position: 'Attaquant',         country: 'GB', image: '/images/players/OM/nwaneri.jpg' }
     ]
   }
 
