@@ -3,12 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
-  ShoppingBag, Trophy, Dices, Heart, Share2, Award
+  ShoppingBag, Trophy, Dices, Heart, Share2, Award, Plus, Check
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { findClubBySlug } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
+import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { slugify } from '@/lib/slugify';
+import { cn } from '@/lib/cn';
 
 const fmtAmount = (n, currency = 'EUR') =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
@@ -61,6 +63,9 @@ export function ClubDetail() {
       {club.squad && club.squad.length > 0 && (
         <SquadSpotlight squad={club.squad} primaryColor={club.primaryColor} />
       )}
+
+      {/* ═══ MERCHANDISE (boutique du club) ═════════════════════════ */}
+      <MerchandiseSection club={club} />
 
       {/* Espace bas pour la barre side actions mobile */}
       <div className="pb-32 md:pb-12" />
@@ -842,6 +847,300 @@ function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
       </div>
     </motion.div>
   );
+}
+
+// ── MERCHANDISE (boutique du club) ───────────────────────────────────
+// Section style marketplace as-nancy-lorraine :
+// - Header 'OFFICIAL STORE / MERCHANDISE' + compteur panier à droite
+// - Tabs catégories (Tous / Maillot / Sweat / T-Shirt / Accessoire / Collection)
+// - Grille de cards produits avec badge catégorie, image, nom, prix PCC, ADD TO CART
+function MerchandiseSection({ club }) {
+  const products = useMemo(
+    () => club.merchandise || defaultMerchandise(club),
+    [club]
+  );
+  const [activeCat, setActiveCat] = useState('all');
+  const [cart, setCart] = useState([]);
+
+  const filtered = useMemo(
+    () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
+    [products, activeCat]
+  );
+
+  const handleAdd = (product) => {
+    setCart((prev) => [...prev, product.id]);
+  };
+
+  const totalPrice = useMemo(
+    () => cart.reduce((sum, id) => {
+      const p = products.find((x) => x.id === id);
+      return sum + (p?.price || 0);
+    }, 0),
+    [cart, products]
+  );
+
+  return (
+    <section className="py-16 md:py-20 border-t border-white/5">
+      <Container>
+        {/* Header */}
+        <header className="mb-10 flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <div
+              className="text-[10px] font-bold uppercase tracking-[0.32em]"
+              style={{ color: club.primaryColor }}
+            >
+              Official Store
+            </div>
+            <h2 className="mt-3 font-display text-3xl md:text-5xl font-black uppercase tracking-tight text-bone-50">
+              Boutique
+            </h2>
+            <p className="mt-2 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+              {products.length} produits · Paiement PCC
+            </p>
+          </div>
+
+          {/* Compteur panier (visuel — pas de checkout réel pour V1) */}
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+                Panier
+              </div>
+              <div
+                className="font-display text-xl font-black tabular-nums"
+                style={{ color: club.primaryColor }}
+              >
+                {cart.length} {cart.length > 1 ? 'articles' : 'article'}
+              </div>
+            </div>
+            <div
+              className="relative grid h-12 w-12 place-items-center rounded-xl border"
+              style={{
+                background: `${club.primaryColor}15`,
+                borderColor: `${club.primaryColor}40`,
+                color: club.primaryColor
+              }}
+            >
+              <ShoppingBag size={18} />
+              {cart.length > 0 && (
+                <span
+                  className="absolute -top-1.5 -right-1.5 grid h-5 w-5 place-items-center rounded-full text-[10px] font-mono font-bold text-ink-900"
+                  style={{ background: club.primaryColor }}
+                >
+                  {cart.length}
+                </span>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Tabs catégories */}
+        <div className="mb-8 overflow-x-auto -mx-2 px-2 scrollbar-none mask-fade-x">
+          <div className="flex gap-2 min-w-max">
+            {PRODUCT_CATEGORIES.map((cat) => {
+              const count = cat.id === 'all'
+                ? products.length
+                : products.filter((p) => p.category === cat.id).length;
+              const isActive = activeCat === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCat(cat.id)}
+                  className={cn(
+                    'shrink-0 inline-flex items-center gap-2 h-10 px-4 rounded-full',
+                    'text-[11px] uppercase tracking-[0.18em] font-bold transition-all duration-200',
+                    isActive
+                      ? 'text-ink-900 shadow-lg'
+                      : 'bg-white/[0.04] border border-white/10 text-bone-300 hover:text-bone-50 hover:bg-white/[0.07]'
+                  )}
+                  style={isActive ? { background: club.primaryColor } : undefined}
+                >
+                  <span className="text-sm leading-none">{cat.emoji}</span>
+                  <span>{cat.label}</span>
+                  <span
+                    className={cn(
+                      'text-[10px] font-mono px-1.5 py-0.5 rounded-full',
+                      isActive ? 'bg-ink-900/20' : 'bg-white/5'
+                    )}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Grille produits */}
+        {filtered.length === 0 ? (
+          <div className="text-center py-16 text-bone-400 text-sm">
+            Aucun produit dans cette catégorie.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            {filtered.map((p, i) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                index={i}
+                primaryColor={club.primaryColor}
+                inCart={cart.includes(p.id)}
+                onAdd={() => handleAdd(p)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Footer sticky avec total */}
+        {cart.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mt-10 flex items-center justify-between gap-4 rounded-2xl border bg-white/[0.04] backdrop-blur-md px-5 py-4"
+            style={{ borderColor: `${club.primaryColor}55` }}
+          >
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+                Total panier
+              </div>
+              <div
+                className="font-display text-2xl font-black tabular-nums"
+                style={{ color: club.primaryColor }}
+              >
+                {formatPCC(totalPrice)} PCC
+              </div>
+            </div>
+            <button
+              className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105"
+              style={{ background: club.primaryColor }}
+            >
+              <ShoppingBag size={14} />
+              Passer commande
+            </button>
+          </motion.div>
+        )}
+      </Container>
+    </section>
+  );
+}
+
+function ProductCard({ product, index, primaryColor, inCart, onAdd }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.45, delay: (index % 6) * 0.05 }}
+      whileHover={{ y: -3 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative rounded-2xl border bg-white/[0.03] backdrop-blur-md overflow-hidden transition-all duration-300"
+      style={{
+        borderColor: hovered ? primaryColor : 'rgba(255,255,255,0.1)',
+        boxShadow: hovered ? `0 0 40px -8px ${primaryColor}66` : undefined
+      }}
+    >
+      {/* Badge catégorie en haut à gauche */}
+      <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-ink-900/80 backdrop-blur-sm text-[9px] uppercase tracking-[0.22em] font-bold text-bone-200">
+        {labelOf(product.category)}
+      </div>
+
+      {/* Image (ou fallback emoji) */}
+      <ProductImage
+        product={product}
+        primaryColor={primaryColor}
+        hovered={hovered}
+      />
+
+      {/* Bas de la card : nom + prix + ADD */}
+      <div className="p-4 md:p-5 flex items-center justify-between gap-3 border-t border-white/5">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-bold text-bone-50 truncate">{product.name}</div>
+          <div
+            className="mt-0.5 text-[11px] font-mono tabular-nums"
+            style={{ color: primaryColor }}
+          >
+            <span className="font-bold">{formatPCC(product.price)}</span>
+            <span className="ml-1 opacity-70">PCC</span>
+          </div>
+        </div>
+        <button
+          onClick={onAdd}
+          disabled={inCart}
+          className={cn(
+            'shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-full',
+            'text-[10px] uppercase tracking-[0.18em] font-bold transition-all duration-200',
+            inCart
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-default'
+              : 'text-ink-900 hover:scale-105 active:scale-95'
+          )}
+          style={inCart ? undefined : { background: primaryColor }}
+        >
+          {inCart ? (
+            <>
+              <Check size={12} strokeWidth={3} />
+              Ajouté
+            </>
+          ) : (
+            <>
+              <Plus size={12} strokeWidth={3} />
+              Add to cart
+            </>
+          )}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function ProductImage({ product, primaryColor, hovered }) {
+  const [errored, setErrored] = useState(false);
+  return (
+    <div
+      className="relative aspect-square w-full grid place-items-center overflow-hidden"
+      style={{
+        background: hovered
+          ? `radial-gradient(circle at 50% 50%, ${primaryColor}22, transparent 70%), rgba(255,255,255,0.02)`
+          : 'rgba(255,255,255,0.02)'
+      }}
+    >
+      {product.image && !errored ? (
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          onError={() => setErrored(true)}
+          className="h-full w-full object-contain transition-transform duration-500"
+          style={{ transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
+        />
+      ) : (
+        // Fallback : gros emoji centré avec halo gradient
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute inset-0 rounded-full blur-3xl"
+            style={{ background: `${primaryColor}44` }}
+            aria-hidden
+          />
+          <span
+            className="relative text-7xl md:text-8xl select-none transition-transform duration-500"
+            style={{
+              transform: hovered ? 'scale(1.08) rotate(-3deg)' : 'scale(1) rotate(0)',
+              filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))'
+            }}
+            aria-hidden
+          >
+            {product.emoji}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function labelOf(catId) {
+  return PRODUCT_CATEGORIES.find((c) => c.id === catId)?.label || catId;
 }
 
 // ── PHOTO JOUEUR ─────────────────────────────────────────────────────
