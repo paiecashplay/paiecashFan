@@ -72,12 +72,63 @@ export const clubProfiles = {
       { number: 87, name: 'João Neves',             position: 'Milieu de terrain', country: 'PT', image: '/images/players/neves.jpg' },
       { number: 89, name: 'Renato Marin',           position: 'Gardien de but',    country: 'BR', image: '/images/players/marin.jpg' }
     ]
+  },
+
+  // ────────────────────────────────────────────────────────────
+  // Olympique de Marseille — Ligue 1
+  // ────────────────────────────────────────────────────────────
+  'olympique-de-marseille': {
+    motto: 'Droit au but',
+    mottoColor: '#FFFFFF',            // texte blanc (devise traditionnelle blanche sur bleu)
+    founded: 1899,
+    stadium: 'Orange Vélodrome',
+    stadiumImage: '/images/clubs/velodrome-om.jpg',
+    coach: 'Roberto De Zerbi',        // À ajuster si changement
+    president: 'Pablo Longoria',
+    // Palmarès historique le plus étoffé du football français.
+    // 27 trophées au total (10 + 10 + 3 + 3 + 1).
+    // Ne compte pas le titre amateur de 1929 (qui porterait à 28).
+    trophies: {
+      total: 27,
+      breakdown: [
+        { label: 'Ligue des champions',     count: 1,  years: '1993',                            scope: 'european' },
+        { label: 'Championnat de France',   count: 10, years: '1937, 1948, 1971, 1972, 1989-1992, 2010', scope: 'domestic' },
+        { label: 'Coupe de France',         count: 10, years: '1924, 1926, 1927, 1935, 1938, 1943, 1969, 1972, 1976, 1989', scope: 'domestic' },
+        { label: 'Coupe de la Ligue',       count: 3,  years: '2010, 2011, 2012',                scope: 'domestic' },
+        { label: 'Trophée des Champions',   count: 3,  years: '1971, 2010, 2011',                scope: 'domestic' }
+      ]
+    },
+    starPlayer: {
+      number: 10,
+      name: 'Mason Greenwood',
+      position: 'Attaquant',
+      image: '/images/players/greenwood.jpg',
+      stats: { goals: 21, assists: 5 }
+    },
+    // Squad approximatif saison 2025-26 — à valider avec la liste officielle om.fr
+    // Photos : poser dans public/images/players/ avec les noms ci-dessous.
+    squad: [
+      { number: 1,  name: 'Geronimo Rulli',         position: 'Gardien de but',    country: 'AR', image: '/images/players/rulli.jpg' },
+      { number: 3,  name: 'Quentin Merlin',         position: 'Défenseur',         country: 'FR', image: '/images/players/merlin.jpg' },
+      { number: 5,  name: 'Ismaël Koné',            position: 'Milieu de terrain', country: 'CA', image: '/images/players/kone.jpg' },
+      { number: 7,  name: 'Pierre-Emerick Aubameyang', position: 'Attaquant',      country: 'GA', image: '/images/players/aubameyang.jpg' },
+      { number: 8,  name: 'Valentin Rongier',       position: 'Milieu de terrain', country: 'FR', image: '/images/players/rongier.jpg' },
+      { number: 10, name: 'Mason Greenwood',        position: 'Attaquant',         country: 'GB', image: '/images/players/greenwood.jpg' },
+      { number: 11, name: 'Luis Henrique',          position: 'Attaquant',         country: 'BR', image: '/images/players/luis-henrique.jpg' },
+      { number: 15, name: 'Leonardo Balerdi',       position: 'Défenseur',         country: 'AR', image: '/images/players/balerdi.jpg' },
+      { number: 16, name: 'Pau López',              position: 'Gardien de but',    country: 'ES', image: '/images/players/pau-lopez.jpg' },
+      { number: 17, name: 'Faris Moumbagna',        position: 'Attaquant',         country: 'CM', image: '/images/players/moumbagna.jpg' },
+      { number: 18, name: 'Bilal Nadir',            position: 'Milieu de terrain', country: 'MA', image: '/images/players/nadir.jpg' },
+      { number: 24, name: 'Derek Cornelius',        position: 'Défenseur',         country: 'CA', image: '/images/players/cornelius.jpg' },
+      { number: 25, name: 'Adrien Rabiot',          position: 'Milieu de terrain', country: 'FR', image: '/images/players/rabiot.jpg' },
+      { number: 27, name: 'Jonathan Rowe',          position: 'Attaquant',         country: 'GB', image: '/images/players/rowe.jpg' },
+      { number: 28, name: 'Geoffrey Kondogbia',     position: 'Milieu de terrain', country: 'CF', image: '/images/players/kondogbia.jpg' },
+      { number: 38, name: 'Amir Murillo',           position: 'Défenseur',         country: 'PA', image: '/images/players/murillo.jpg' }
+    ]
   }
 
-  // À étendre pour les autres clubs : Olympique de Marseille, Lyon, Monaco,
-  // FC Barcelona, Real Madrid, Bayern Munich, Liverpool, etc.
-  // Pattern : ajouter une entrée { slug → profil } et la page club
-  // se mettra automatiquement à jour.
+  // À étendre : Olympique Lyonnais, AS Monaco, FC Barcelona, Real Madrid,
+  // Bayern Munich, Liverpool, etc. Même pattern.
 };
 
 // Helper : récupère le profil d'un club (peut être null).
