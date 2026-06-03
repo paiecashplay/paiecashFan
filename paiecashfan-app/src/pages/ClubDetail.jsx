@@ -427,12 +427,34 @@ function TransactionsLiveSection({ items, club }) {
 
 // ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
 function SideActions({ primaryColor }) {
+  // Scroll smooth vers une section. La classe scroll-mt-20 sur la section
+  // cible compense la hauteur de la Navbar pour ne pas masquer le header.
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: document.title,
+      text: 'Découvre cette page sur PaieCashFan',
+      url: window.location.href
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard?.writeText(window.location.href);
+      }
+    } catch { /* user cancelled or unsupported */ }
+  };
+
   const actions = [
-    { key: 'shop',  icon: ShoppingBag, label: 'Boutique',     bg: 'from-emerald-400 to-emerald-600' },
-    { key: 'play',  icon: Trophy,      label: 'Gamification', bg: 'from-amber-400 to-amber-600' },
-    { key: 'games', icon: Dices,       label: 'Jeux',         bg: 'from-orange-400 to-rose-500' },
+    { key: 'shop',  icon: ShoppingBag, label: 'Boutique',     bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') },
+    { key: 'play',  icon: Trophy,      label: 'Palmarès',     bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices,       label: 'Effectif',     bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
     { key: 'like',  icon: Heart,       label: 'J\'aime',      bg: 'from-rose-400 to-rose-600' },
-    { key: 'share', icon: Share2,      label: 'Partager',     bg: 'from-cyan-400 to-cyan-600' },
+    { key: 'share', icon: Share2,      label: 'Partager',     bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
     { key: 'find',  icon: Search,      label: 'Rechercher',   bg: 'from-bone-300 to-bone-500' }
   ];
 
@@ -451,6 +473,7 @@ function SideActions({ primaryColor }) {
               key={a.key}
               aria-label={a.label}
               title={a.label}
+              onClick={a.onClick}
               className={`relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${a.bg} text-ink-900 hover:scale-110 active:scale-95 transition-transform shadow-lg`}
             >
               <Icon size={16} strokeWidth={2.4} />
@@ -509,7 +532,7 @@ function TrophyCabinet({ trophies, primaryColor }) {
   }, [trophies.breakdown]);
 
   return (
-    <section className="py-16 md:py-20 border-y border-white/5">
+    <section id="trophies" className="py-16 md:py-20 border-y border-white/5 scroll-mt-20">
       <Container>
         <header className="text-center mb-10">
           <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
@@ -591,7 +614,7 @@ function TrophyRow({ trophy, primaryColor }) {
 // gros numéro en background, infos + stats (droite).
 function StarPlayerSection({ player, primaryColor }) {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 border-y border-white/5">
+    <section id="star-player" className="relative overflow-hidden py-20 md:py-28 border-y border-white/5 scroll-mt-20">
       {/* Gros numéro en background, ultra opaque */}
       <div
         className="pointer-events-none absolute right-4 md:right-12 top-1/2 -translate-y-1/2 font-display font-black select-none"
@@ -697,7 +720,7 @@ function SquadSpotlight({ squad, primaryColor }) {
   }, [squad]);
 
   return (
-    <section className="py-16 md:py-20">
+    <section id="squad" className="py-16 md:py-20 scroll-mt-20">
       <Container>
         <header className="text-center mb-12">
           <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
@@ -897,7 +920,7 @@ function MerchandiseSection({ club }) {
   );
 
   return (
-    <section className="py-16 md:py-20 border-t border-white/5">
+    <section id="merchandise" className="py-16 md:py-20 border-t border-white/5 scroll-mt-20">
       <Container>
         {/* Header */}
         <header className="mb-10 flex items-end justify-between gap-4 flex-wrap">
