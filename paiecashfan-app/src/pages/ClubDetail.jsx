@@ -666,12 +666,34 @@ function StatBox({ label, value, accentColor }) {
 }
 
 // ── SQUAD SPOTLIGHT ──────────────────────────────────────────────────
-// Grille des joueurs de l'équipe première (capture 2 du marketplace).
+// Grille des joueurs de l'équipe première organisée par poste (inspirée
+// du site officiel om.fr/fr/equipe/hommes) : Gardiens / Défenseurs /
+// Milieux / Attaquants. Évite de répéter le poste dans chaque card.
+const POSITION_GROUPS = [
+  { key: 'Gardien de but',    label: 'Gardiens de but' },
+  { key: 'Défenseur',         label: 'Défenseurs' },
+  { key: 'Milieu de terrain', label: 'Milieux de terrain' },
+  { key: 'Attaquant',         label: 'Attaquants' }
+];
+
 function SquadSpotlight({ squad, primaryColor }) {
+  const groups = useMemo(() => {
+    const map = new Map();
+    // Initialise les 4 groupes dans l'ordre canonique
+    POSITION_GROUPS.forEach((g) => map.set(g.key, []));
+    // Distribue les joueurs (ceux avec position inconnue tombent dans 'Autre')
+    squad.forEach((p) => {
+      const key = POSITION_GROUPS.some((g) => g.key === p.position) ? p.position : 'Autre';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(p);
+    });
+    return map;
+  }, [squad]);
+
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <header className="text-center mb-10">
+        <header className="text-center mb-12">
           <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: primaryColor }}>
             Featured Players
           </div>
@@ -683,17 +705,77 @@ function SquadSpotlight({ squad, primaryColor }) {
           </p>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-          {squad.map((p, i) => (
-            <PlayerCard key={p.number} player={p} index={i} primaryColor={primaryColor} />
-          ))}
+        <div className="space-y-12 md:space-y-16">
+          {/* Sections dans l'ordre canonique GK / DEF / MID / ATT */}
+          {POSITION_GROUPS.map(({ key, label }) => {
+            const players = groups.get(key) || [];
+            if (players.length === 0) return null;
+            return (
+              <PositionSection
+                key={key}
+                label={label}
+                players={players}
+                primaryColor={primaryColor}
+              />
+            );
+          })}
+
+          {/* Joueurs avec un poste non-standard, regroupés en 'Autre' */}
+          {groups.has('Autre') && groups.get('Autre').length > 0 && (
+            <PositionSection
+              key="Autre"
+              label="Autres"
+              players={groups.get('Autre')}
+              primaryColor={primaryColor}
+            />
+          )}
         </div>
       </Container>
     </section>
   );
 }
 
-function PlayerCard({ player, index, primaryColor }) {
+function PositionSection({ label, players, primaryColor }) {
+  return (
+    <div>
+      {/* Header de section avec ligne dégradée à droite */}
+      <div className="mb-5 md:mb-6 flex items-center gap-4">
+        <h3 className="font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50">
+          {label}
+        </h3>
+        <span
+          className="text-[11px] font-mono font-bold tabular-nums px-2 py-0.5 rounded-full"
+          style={{
+            background: `${primaryColor}1F`,
+            color: primaryColor,
+            border: `1px solid ${primaryColor}40`
+          }}
+        >
+          {players.length}
+        </span>
+        <div
+          className="flex-1 h-px"
+          style={{ background: `linear-gradient(to right, ${primaryColor}55, transparent)` }}
+        />
+      </div>
+
+      {/* Grille des joueurs (sans la position en bas, donc cards plus aérées) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+        {players.map((p, i) => (
+          <PlayerCard
+            key={p.number}
+            player={p}
+            index={i}
+            primaryColor={primaryColor}
+            hidePosition
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -751,9 +833,11 @@ function PlayerCard({ player, index, primaryColor }) {
           <div className="font-display text-sm font-black uppercase text-bone-50 leading-tight line-clamp-2 tracking-tight">
             {player.name}
           </div>
-          <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-bone-400 font-bold">
-            {player.position}
-          </div>
+          {!hidePosition && (
+            <div className="mt-1 text-[9px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+              {player.position}
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
