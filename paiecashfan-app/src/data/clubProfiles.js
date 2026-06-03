@@ -219,9 +219,42 @@ export const clubProfiles = {
       },
 
       // ── COLLECTION ────────────────────────────────────────────
-      // Pas encore de photos — fallback emoji actif
-      { id: 'ball',    category: 'collectible', name: 'Ballon Collector OM',  price: 49.99, image: '/images/products/olympique-de-marseille/ball.png',    emoji: '⚽' },
-      { id: 'stadium', category: 'collectible', name: 'Vélodrome Miniature',  price: 74.99, image: '/images/products/olympique-de-marseille/stadium.png', emoji: '🏟' }
+      {
+        id: 'ball',
+        category: 'collectible',
+        name: 'Ballon Officiel OM',
+        description: 'Ballon officiel aux couleurs de l\'Olympique de Marseille. Sous licence officielle.',
+        price: 25,
+        image: '/images/products/olympique-de-marseille/Ballon OM.png',
+        images: [
+          '/images/products/olympique-de-marseille/Ballon OM.png',
+          '/images/products/olympique-de-marseille/Ballon OM2.png'
+        ],
+        emoji: '⚽'
+      },
+      {
+        id: 'linge-lit-prado',
+        category: 'collectible',
+        name: 'Linge De Lit OM PRADO 240 × 220',
+        description: `Linge de lit Olympique de Marseille inspiration du Prado, coloris bleu et blanc.
+Housse de couette réversible, pour changer selon vos envies.
+Produit sous licence officielle.
+
+En savoir plus :
+- Housse de couette réversible bleu et blanc 240 × 220
+- 2 taies d'oreiller bleu 63 × 63
+
+Composition : 100 % coton
+Coloris : Bleu et blanc`,
+        price: 69.90,
+        image: '/images/products/olympique-de-marseille/lingeLit.png',
+        images: [
+          '/images/products/olympique-de-marseille/lingeLit.png',
+          '/images/products/olympique-de-marseille/lingeLit2.png',
+          '/images/products/olympique-de-marseille/lingeLit3.png'
+        ],
+        emoji: '🛏️'
+      }
     ],
     // Squad officiel OM 2025-26 (depuis captures fournies par l'utilisateur).
     // Photos posées dans public/images/players/OM/

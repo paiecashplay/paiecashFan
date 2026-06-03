@@ -1378,7 +1378,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
             </div>
 
             {product.description && (
-              <p className="mt-4 text-sm text-bone-300 leading-relaxed">
+              <p className="mt-4 text-sm text-bone-300 leading-relaxed whitespace-pre-line">
                 {product.description}
               </p>
             )}
