@@ -64,10 +64,15 @@ const datasets = {
   afc: {
     members: afcMembers,
     founded: '1954',
-    // Rouge → Or · Puissance et croissance
+    heroVideo: '/videos/heroAfc.mp4',
+    heroLayout: 'sequenced',
+    heroTitle: 'AFC',
+    heroTagline: 'L\'AVENIR DU FOOTBALL MONDIAL',
+    heroSubtitle: '47 fédérations • 5 régions • Depuis 1954',
+    heroCaption: 'Innovation, ambition et croissance.',
+    // Rouge → Or · Puissance et croissance (fallback gradient)
     heroGradient: 'from-red-600 via-orange-500 to-gold-500'
   }
-  // OFC : pas encore de fichier — affichera le placeholder "Bientôt"
 };
 
 export function FederationDetail() {

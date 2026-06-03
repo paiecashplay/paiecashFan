@@ -30,7 +30,7 @@ export function Home() {
                 Trouvez votre club
               </h2>
               <p className="mt-1 text-sm text-bone-400 font-body">
-                Plus de 500 clubs partenaires, 6 fédérations, des milliers d'équipes
+                Plus de 500 clubs partenaires, 5 fédérations, des milliers d'équipes
               </p>
             </div>
             <HeroSearch />

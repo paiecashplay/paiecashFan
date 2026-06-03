@@ -63,7 +63,7 @@ function FederationsGridLive() {
           <span className="text-3xl">🌐</span>
           <div>
             <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-bone-50">
-              6 fédérations FIFA
+              5 fédérations FIFA
             </h2>
             <div className="text-[10px] uppercase tracking-[0.18em] text-bone-400 font-semibold mt-0.5">
               212 sélections nationales · Couverture mondiale

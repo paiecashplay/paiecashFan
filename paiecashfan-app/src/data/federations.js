@@ -61,18 +61,9 @@ export const federations = [
     primaryColor: '#DC2626',
     accent: '#FBBF24',
     flag: '🌏'
-  },
-  {
-    id: 'ofc',
-    code: 'OFC',
-    name: 'Oceania Football Confederation',
-    shortName: 'OFC',
-    region: 'Océanie',
-    clubs: 11,
-    primaryColor: '#0072CE',
-    accent: '#FFFFFF',
-    flag: '🌏'
   }
+  // OFC retirée — pas de dataset disponible. À réintégrer si on récupère
+  // les 11 fédérations membres + une vidéo Hero.
 ];
 
 // Map par id pour merger avec les données live de /api/federations.
