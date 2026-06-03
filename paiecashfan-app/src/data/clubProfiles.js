@@ -105,14 +105,15 @@ export const clubProfiles = {
       image: '/images/players/OM/aubameyang.jpg',
       stats: { goals: 15, assists: 4 }   // à ajuster avec les stats officielles
     },
-    // Boutique OM — override des produits par défaut avec les vrais maillots
-    // Photos à poser dans public/images/products/olympique-de-marseille/
+    // Boutique OM — paths réels des photos posées dans
+    // public/images/products/olympique-de-marseille/
     merchandise: [
+      // ── MAILLOTS ──────────────────────────────────────────────
       {
         id: 'home-jersey',
         category: 'jersey',
         name: 'Maillot Domicile 2025-26',
-        description: 'Maillot officiel à domicile, design Puma × OM, sponsor CMA CGM, taille XS au XXXL.',
+        description: 'Maillot officiel à domicile, design Puma × OM, sponsor CMA CGM, blanc à liserés bleu et or.',
         price: 100,
         image: '/images/products/olympique-de-marseille/home-jersey.png',
         images: [
@@ -122,15 +123,105 @@ export const clubProfiles = {
         sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         emoji: '👕'
       },
-      // Autres produits gardés en placeholder — à remplacer quand tu auras
-      // les vrais maillots / accessoires officiels OM 2025-26.
-      { id: 'away-jersey', category: 'jersey',      name: 'Maillot Extérieur 2025-26', price: 100,    image: '/images/products/olympique-de-marseille/away-jersey.png', sizes: ['XS','S','M','L','XL','XXL','XXXL'], emoji: '👕' },
-      { id: 'hoodie',      category: 'hoodie',      name: 'Sweat à capuche OM',         price: 64.99,  image: '/images/products/olympique-de-marseille/hoodie.png',      sizes: ['S','M','L','XL','XXL'], emoji: '🥋' },
-      { id: 'tshirt',      category: 'tshirt',      name: 'T-Shirt OM Droit au but',    price: 34.99,  image: '/images/products/olympique-de-marseille/tshirt.png',      sizes: ['XS','S','M','L','XL','XXL','XXXL'], emoji: '👕' },
-      { id: 'scarf',       category: 'accessory',   name: 'Écharpe Officielle OM',      price: 19.99,  image: '/images/products/olympique-de-marseille/scarf.png',       emoji: '🧣' },
-      { id: 'cap',         category: 'accessory',   name: 'Casquette OM',               price: 24.99,  image: '/images/products/olympique-de-marseille/cap.png',         emoji: '🧢' },
-      { id: 'ball',        category: 'collectible', name: 'Ballon Collector OM',        price: 49.99,  image: '/images/products/olympique-de-marseille/ball.png',        emoji: '⚽' },
-      { id: 'stadium',     category: 'collectible', name: 'Vélodrome Miniature',        price: 74.99,  image: '/images/products/olympique-de-marseille/stadium.png',     emoji: '🏟' }
+      {
+        id: 'away-jersey',
+        category: 'jersey',
+        name: 'Maillot Extérieur 2025-26',
+        description: 'Maillot officiel à l\'extérieur, design Puma × OM, sponsor CMA CGM.',
+        price: 100,
+        image: '/images/products/olympique-de-marseille/out-jersey-recto.png',
+        images: [
+          '/images/products/olympique-de-marseille/out-jersey-recto.png',
+          '/images/products/olympique-de-marseille/out-jersey-verso.png'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+      {
+        id: 'training-jersey',
+        category: 'jersey',
+        name: 'Maillot d\'Entraînement OM',
+        description: 'Maillot d\'entraînement officiel Puma × OM, idéal pour l\'effort.',
+        price: 50,
+        image: '/images/products/olympique-de-marseille/training-recto.png',
+        images: [
+          '/images/products/olympique-de-marseille/training-recto.png',
+          '/images/products/olympique-de-marseille/training1-recto.png',
+          '/images/products/olympique-de-marseille/training verso.png'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+
+      // ── SWEAT ─────────────────────────────────────────────────
+      {
+        id: 'hoodie',
+        category: 'hoodie',
+        name: 'Sweat à capuche OM',
+        description: 'Sweat à capuche officiel OM, coupe ample, parfait pour la tribune.',
+        price: 85,
+        image: '/images/products/olympique-de-marseille/sweet-recto.png',
+        images: [
+          '/images/products/olympique-de-marseille/sweet-recto.png',
+          '/images/products/olympique-de-marseille/sweet-verso.png',
+          '/images/products/olympique-de-marseille/sweet-porte.png'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '🥋'
+      },
+
+      // ── T-SHIRT ───────────────────────────────────────────────
+      {
+        id: 'tshirt',
+        category: 'tshirt',
+        name: 'T-Shirt OM Travel',
+        description: 'T-shirt officiel OM Travel, coton premium, esprit Droit au but.',
+        price: 45,
+        image: '/images/products/olympique-de-marseille/Tshirt-travel.png',
+        images: [
+          '/images/products/olympique-de-marseille/Tshirt-travel.png',
+          '/images/products/olympique-de-marseille/Tshirt-travel-verso.png',
+          '/images/products/olympique-de-marseille/Tshirt-travel2.png'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+
+      // ── ACCESSOIRES ───────────────────────────────────────────
+      {
+        id: 'scarf',
+        category: 'accessory',
+        name: 'Écharpe Allez l\'OM',
+        description: 'Écharpe tricotée officielle aux couleurs marseillaises, design Allez l\'OM.',
+        price: 15,
+        image: '/images/products/olympique-de-marseille/echarp-allez.png',
+        images: [
+          '/images/products/olympique-de-marseille/echarp-allez.png',
+          '/images/products/olympique-de-marseille/echarp-allez2.png',
+          '/images/products/olympique-de-marseille/echarp-allez3.png'
+        ],
+        emoji: '🧣'
+      },
+      {
+        id: 'cap',
+        category: 'accessory',
+        name: 'Casquette OM',
+        description: 'Casquette officielle aux couleurs de l\'OM, taille unique ajustable.',
+        price: 30,
+        image: '/images/products/olympique-de-marseille/casquette-recto.png',
+        images: [
+          '/images/products/olympique-de-marseille/casquette-recto.png',
+          '/images/products/olympique-de-marseille/casquette-verso.png',
+          '/images/products/olympique-de-marseille/casquette-verso2.png',
+          '/images/products/olympique-de-marseille/casquette2recto.png'
+        ],
+        emoji: '🧢'
+      },
+
+      // ── COLLECTION ────────────────────────────────────────────
+      // Pas encore de photos — fallback emoji actif
+      { id: 'ball',    category: 'collectible', name: 'Ballon Collector OM',  price: 49.99, image: '/images/products/olympique-de-marseille/ball.png',    emoji: '⚽' },
+      { id: 'stadium', category: 'collectible', name: 'Vélodrome Miniature',  price: 74.99, image: '/images/products/olympique-de-marseille/stadium.png', emoji: '🏟' }
     ],
     // Squad officiel OM 2025-26 (depuis captures fournies par l'utilisateur).
     // Photos posées dans public/images/players/OM/
