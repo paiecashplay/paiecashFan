@@ -372,7 +372,7 @@ export const CLUB_THEMES = {
     category: 'French Football Clubs',
     tagline: 'L\'Ambition du Berry',
     crestEmoji: '🏰',
-    crestUrl: '/images/clubs/BOURGES-FC.jpg',
+    crestUrl: '/images/clubs/BOURGES-FC.png',
     primaryColor: '#E30613',
     secondaryColor: '#FFD700',
     accentColor: '#FFFFFF',
@@ -621,21 +621,37 @@ export function getFeaturedClub() {
   return Object.values(CLUB_THEMES).find(c => c.featured) || Object.values(CLUB_THEMES)[0];
 }
 
-// Mock products tied to a club
+// Products tied to a specific club.
+// Only Olympique de Marseille has real merchandise data at this time.
+// All other clubs display generic placeholder products.
 export function getClubProducts(clubId) {
   const theme = getClubTheme(clubId);
   if (!theme) return [];
 
-  const baseProducts = [
-    { id: `${clubId}-1`, name: `Authentic OM Home Jersey 25/26`, category: 'Jersey', price: 127.50, currency: 'PCC', image: '/images/products/Home_jersey.webp', emoji: '👕' },
-    { id: `${clubId}-2`, name: `OM Away Jersey 25/26`, category: 'Jersey', price: 156.00, currency: 'PCC', image: '/images/products/AWAY_JERSEY.webp', emoji: '👕' },
-    { id: `${clubId}-3`, name: `OM Navy Blue Travel Jacket`, category: 'Jacket', price: 63.00, currency: 'PCC', image: '/images/products/JACKET.webp', emoji: '🧥' },
-    { id: `${clubId}-4`, name: `Go OM scarf`, category: 'Accessory', price: 12.50, currency: 'PCC', image: '/images/products/scarf.webp', emoji: '🧣' },
-    { id: `${clubId}-5`, name: `Casquette OM King Bleu/Blanche`, category: 'Accessory', price: 25.00, currency: 'PCC', image: '/images/products/cap.webp', emoji: '🧢' },
-    { id: `${clubId}-6`, name: `OM Bracelet, Black Leather, Small Model`, category: 'Accessory', price: 49.50, currency: 'PCC', image: '/images/products/bracelet.webp', emoji: '🎁' },
-  ];
+  // ── Olympique de Marseille – real merchandise catalog ──────────────────────
+  if (clubId === 'olympique-de-marseille') {
+    return [
+      { id: 'om-1', name: 'Authentic OM Home Jersey 25/26', category: 'Jersey', price: 127.50, currency: 'PCC', image: '/images/products/Home_jersey.webp', emoji: '👕' },
+      { id: 'om-2', name: 'OM Away Jersey 25/26', category: 'Jersey', price: 156.00, currency: 'PCC', image: '/images/products/AWAY_JERSEY.webp', emoji: '👕' },
+      { id: 'om-3', name: 'OM Navy Blue Travel Jacket', category: 'Jacket', price: 63.00, currency: 'PCC', image: '/images/products/JACKET.webp', emoji: '🧥' },
+      { id: 'om-4', name: 'Go OM Scarf', category: 'Accessory', price: 12.50, currency: 'PCC', image: '/images/products/scarf.webp', emoji: '🧣' },
+      { id: 'om-5', name: 'Casquette OM King Bleu/Blanche', category: 'Accessory', price: 25.00, currency: 'PCC', image: '/images/products/cap.webp', emoji: '🧢' },
+      { id: 'om-6', name: 'OM Bracelet, Black Leather, Small Model', category: 'Accessory', price: 49.50, currency: 'PCC', image: '/images/products/bracelet.webp', emoji: '🎁' },
+    ];
+  }
 
-  return baseProducts;
+  // ── All other clubs – generic placeholder products ──────────────────────────
+  // Real club-specific merchandise will be added here as it becomes available.
+  return [
+    { id: `${clubId}-1`, name: 'Home Jersey', category: 'Jersey', price: 89.99, currency: 'PCC', image: '/images/products/jersey-home.png', emoji: '👕' },
+    { id: `${clubId}-2`, name: 'Away Jersey', category: 'Jersey', price: 89.99, currency: 'PCC', image: '/images/products/jersey-away.png', emoji: '👕' },
+    { id: `${clubId}-3`, name: 'Club Hoodie', category: 'Hoodie', price: 64.99, currency: 'PCC', image: '/images/products/hoodie.png', emoji: '🧥' },
+    { id: `${clubId}-4`, name: 'Club T-Shirt', category: 'T-Shirt', price: 34.99, currency: 'PCC', image: '/images/products/tshirt.png', emoji: '👕' },
+    { id: `${clubId}-5`, name: 'Club Scarf', category: 'Accessory', price: 19.99, currency: 'PCC', image: '/images/products/scarf.png', emoji: '🧣' },
+    { id: `${clubId}-6`, name: 'Club Cap', category: 'Accessory', price: 24.99, currency: 'PCC', image: '/images/products/cap.png', emoji: '🧢' },
+    { id: `${clubId}-7`, name: 'Collectible Ball', category: 'Collectible', price: 49.99, currency: 'PCC', image: '/images/products/collectible-ball.png', emoji: '⚽' },
+    { id: `${clubId}-8`, name: 'Stadium Miniature', category: 'Collectible', price: 74.99, currency: 'PCC', image: '/images/products/stadium-miniature.png', emoji: '🏟️' },
+  ];
 }
 
 export const STADIUM_BG = '/images/stadium-bg.png';
