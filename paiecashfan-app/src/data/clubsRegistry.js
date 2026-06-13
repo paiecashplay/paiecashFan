@@ -18,6 +18,8 @@ import { getClubProfile }  from './clubProfiles';
 import { slugify }         from '@/lib/slugify';
 
 // Normalise un club de Ligue/Sport vers la shape commune.
+// Certaines ligues (NBC Premier League TZ) fournissent stadium/founded
+// directement sur le club ; on les propage pour la grille des fédérations.
 function fromLeagueClub(club, league) {
   return {
     slug:         slugify(club.name),
@@ -33,8 +35,8 @@ function fromLeagueClub(club, league) {
     logo:         club.logo,
     primaryColor: club.primaryColor,
     accentColor:  club.primaryColor,
-    founded:      null,
-    stadium:      null,
+    founded:      club.founded ?? null,
+    stadium:      club.stadium ?? null,
     manager:      null,
     motto:        null
   };
@@ -111,4 +113,31 @@ export function findClubBySlug(slug) {
 
 export function allClubs() {
   return Array.from(registry.values());
+}
+
+// ============================================================
+// Mapping fédération nationale → ses clubs membres.
+// Permet à /clubs/:slug d'afficher la grille des clubs au lieu
+// de la boutique quand l'entité est une fédération avec un
+// championnat rattaché (ex: /clubs/tanzanie → 8 clubs NBC).
+// ============================================================
+const FEDERATION_CLUBS = {
+  // Tanzanie → NBC Premier League
+  tanzanie: nbcPremier.clubs.map((c) => ({
+    slug:         slugify(c.name),
+    name:         c.name,
+    code:         (c.id || '').toUpperCase(),
+    city:         c.city,
+    stadium:      c.stadium,
+    founded:      c.founded,
+    logo:         c.logo,
+    primaryColor: c.primaryColor,
+    league:       nbcPremier.name,
+    countryCode:  'TZ',
+    country:      'Tanzania'
+  }))
+};
+
+export function getFederationClubs(slug) {
+  return FEDERATION_CLUBS[slug] || null;
 }

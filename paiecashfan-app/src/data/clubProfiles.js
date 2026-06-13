@@ -298,6 +298,29 @@ Coloris : Bleu et blanc`,
   },
 
   // ────────────────────────────────────────────────────────────
+  // Sélection nationale Tanzanie (Taifa Stars) — page Fédération.
+  // Pas de boutique : on remplace par la grille des clubs NBC.
+  // Le flag `isFederationHub: true` indique au ClubDetail de basculer
+  // le rendu (grille de clubs au lieu de Boutique).
+  // ────────────────────────────────────────────────────────────
+  'tanzanie': {
+    motto: 'Taifa Stars',
+    mottoColor: '#FCD116',
+    founded: 1930,
+    stadium: 'Benjamin Mkapa Stadium',
+    stadiumImage: '/images/tanzania-stadium.png',
+    coach: 'Hemed Morocco',
+    president: 'Wallace Karia',
+    isFederationHub: true,
+    starPlayer: {
+      number: 10,
+      name: 'Mbwana Samatta',
+      position: 'Attaquant',
+      stats: { goals: 25, assists: 7 }
+    }
+  },
+
+  // ────────────────────────────────────────────────────────────
   // Clubs de la NBC Premier League (Tanzanie)
   // Boutique standard 4 produits (maillot/sweat/t-shirt/casquette)
   // Photos posées dans /images/products/{Nom-Dossier}/ avec leur casse exacte.
@@ -373,6 +396,7 @@ function tanzaniaClubsProfiles() {
         mottoColor: c.primaryColor,
         founded: c.founded,
         stadium: c.stadium,
+        stadiumImage: '/images/tanzania-stadium.png',
         merchandise: [
           {
             id: 'jersey',

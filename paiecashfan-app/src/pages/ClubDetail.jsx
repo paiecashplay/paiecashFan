@@ -7,9 +7,10 @@ import {
   Plus, Minus, Check, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { findClubBySlug } from '@/data/clubsRegistry';
+import { findClubBySlug, getFederationClubs } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
+import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
 
@@ -27,10 +28,16 @@ export function ClubDetail() {
 
   if (!club) return <NotFound slug={slug} />;
 
+  // Page Fédération nationale (ex: /clubs/tanzanie) : on remplace la
+  // boutique par la grille des clubs membres si le profil expose
+  // isFederationHub ET qu'on a une liste de clubs rattachés.
+  const federationClubs = club.isFederationHub ? getFederationClubs(slug) : null;
+  const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
+
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
-      <SideActions primaryColor={club.primaryColor} />
+      <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
       {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
       <ClubHero club={club} />
@@ -65,8 +72,18 @@ export function ClubDetail() {
         <SquadSpotlight squad={club.squad} primaryColor={club.primaryColor} />
       )}
 
-      {/* ═══ MERCHANDISE (boutique du club) ═════════════════════════ */}
-      <MerchandiseSection club={club} />
+      {/* ═══ Page Fédération : grille des clubs (au lieu de Boutique) ═ */}
+      {isFederationHub ? (
+        <FederationClubsGrid
+          clubs={federationClubs}
+          federationName={club.name}
+          federationColor={club.primaryColor}
+          leagueName="🌐 Équipes Masculines - Ligi Kuu Bara"
+          cardBackground={club.stadiumImage}
+        />
+      ) : (
+        <MerchandiseSection club={club} />
+      )}
 
       {/* Espace bas pour la barre side actions mobile */}
       <div className="pb-32 md:pb-12" />
@@ -426,7 +443,9 @@ function TransactionsLiveSection({ items, club }) {
 }
 
 // ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
-function SideActions({ primaryColor }) {
+// Sur une page fédération (Tanzanie etc.), le bouton "Boutique" est
+// remplacé par "Clubs" qui scrolle vers la grille des clubs membres.
+function SideActions({ primaryColor, isFederationHub = false }) {
   // Scroll smooth vers une section. La classe scroll-mt-20 sur la section
   // cible compense la hauteur de la Navbar pour ne pas masquer le header.
   const scrollTo = (id) => {
@@ -449,8 +468,12 @@ function SideActions({ primaryColor }) {
     } catch { /* user cancelled or unsupported */ }
   };
 
+  const shopAction = isFederationHub
+    ? { key: 'clubs', icon: ShoppingBag, label: 'Clubs',    bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') }
+    : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') };
+
   const actions = [
-    { key: 'shop',  icon: ShoppingBag, label: 'Boutique',     bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') },
+    shopAction,
     { key: 'play',  icon: Trophy,      label: 'Palmarès',     bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices,       label: 'Effectif',     bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
     { key: 'like',  icon: Heart,       label: 'J\'aime',      bg: 'from-rose-400 to-rose-600' },
