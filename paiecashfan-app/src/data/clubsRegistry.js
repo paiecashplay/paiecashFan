@@ -141,3 +141,17 @@ const FEDERATION_CLUBS = {
 export function getFederationClubs(slug) {
   return FEDERATION_CLUBS[slug] || null;
 }
+
+// Mapping inverse : slug d'un club membre → slug de sa fédération
+// parente. Permet au bouton "Retour" d'une page club de revenir à
+// sa fédération au lieu de la HomePage. Auto-généré depuis
+// FEDERATION_CLUBS pour rester en sync.
+const CLUB_TO_FEDERATION = Object.fromEntries(
+  Object.entries(FEDERATION_CLUBS).flatMap(([fedSlug, clubs]) =>
+    clubs.map((c) => [c.slug, fedSlug])
+  )
+);
+
+export function getClubFederation(slug) {
+  return CLUB_TO_FEDERATION[slug] || null;
+}

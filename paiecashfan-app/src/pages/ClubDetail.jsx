@@ -7,7 +7,7 @@ import {
   Plus, Minus, Check, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { findClubBySlug, getFederationClubs } from '@/data/clubsRegistry';
+import { findClubBySlug, getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -34,13 +34,19 @@ export function ClubDetail() {
   const federationClubs = club.isFederationHub ? getFederationClubs(slug) : null;
   const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
 
+  // Bouton "Retour" dynamique : si on est sur un club rattaché à une
+  // fédération (ex: Simba SC → tanzanie), retour vers la page de la
+  // fédération. Sinon retour HomePage.
+  const federationParentSlug = isFederationHub ? null : getClubFederation(slug);
+  const backTo = federationParentSlug ? `/clubs/${federationParentSlug}` : '/';
+
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
       <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
       {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
-      <ClubHero club={club} />
+      <ClubHero club={club} backTo={backTo} />
 
       {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
       <Container className="relative pt-12 md:pt-16 pb-6">
@@ -79,7 +85,7 @@ export function ClubDetail() {
           federationName={club.name}
           federationColor={club.primaryColor}
           leagueName="🌐 Équipes Masculines - Ligi Kuu Bara"
-          cardBackground={club.stadiumImage}
+          cardBackground={club.cardBackground || club.stadiumImage}
         />
       ) : (
         <MerchandiseSection club={club} />
@@ -92,7 +98,7 @@ export function ClubDetail() {
 }
 
 // ── HERO ─────────────────────────────────────────────────────────────
-function ClubHero({ club }) {
+function ClubHero({ club, backTo = '/' }) {
   const stats = useMemo(() => {
     const s = fallbackHeroStats(club);
     // Override le compteur de trophées avec la vraie data du profil si dispo
@@ -122,7 +128,7 @@ function ClubHero({ club }) {
 
       <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
         <Link
-          to="/"
+          to={backTo}
           className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
         >
           <ArrowLeft size={14} />

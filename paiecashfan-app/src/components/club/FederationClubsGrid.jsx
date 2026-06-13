@@ -109,16 +109,35 @@ function FederationClubCard({ club, index, cardBackground }) {
         to={`/clubs/${club.slug}`}
         className="block relative h-[360px] md:h-[400px]"
       >
-        {/* Background : photo du stade — pleinement visible */}
+        {/* Background : photo du stade en <img> (plus fiable que
+            background-image qui peut être masqué selon le
+            navigateur / format). Fallback solide si l'image
+            échoue à charger. */}
+        {cardBackground ? (
+          <img
+            src={cardBackground}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
+            style={{ transform: hovered ? 'scale(1.08)' : 'scale(1.02)' }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : (
+          <div
+            className="absolute inset-0 transition-transform duration-500"
+            style={{
+              background: `linear-gradient(135deg, ${club.primaryColor}40, ${club.primaryColor}20)`,
+              transform: hovered ? 'scale(1.08)' : 'scale(1.02)'
+            }}
+          />
+        )}
+
+        {/* Couche solide en-dessous pour fallback en cas d'image
+            qui n'a pas chargé (sinon on verrait le DOM derrière) */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-500"
-          style={{
-            backgroundImage: cardBackground ? `url('${cardBackground}')` : undefined,
-            background: !cardBackground
-              ? `linear-gradient(135deg, ${club.primaryColor}40, ${club.primaryColor}20)`
-              : undefined,
-            transform: hovered ? 'scale(1.08)' : 'scale(1.02)'
-          }}
+          className="absolute inset-0 -z-10"
+          style={{ background: `linear-gradient(135deg, ${club.primaryColor}30, #0a0f17)` }}
         />
 
         {/* Overlay dégradé : sombre uniquement en haut (chips) et en bas

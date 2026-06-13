@@ -310,6 +310,10 @@ Coloris : Bleu et blanc`,
     founded: 1930,
     stadium: 'Benjamin Mkapa Stadium',
     stadiumImage: '/images/tanzania-stadium.webp',
+    // Image plus légère/standard (JPEG) pour la grille des cards —
+    // garantit l'affichage sur tous les navigateurs + chargement
+    // rapide quand on en affiche 8 sur la même vue.
+    cardBackground: '/images/clubs/tanzania-stadium-card.jpg',
     coach: 'Hemed Morocco',
     president: 'Wallace Karia',
     isFederationHub: true,
