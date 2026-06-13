@@ -316,6 +316,7 @@ Coloris : Bleu et blanc`,
       number: 10,
       name: 'Mbwana Samatta',
       position: 'Attaquant',
+      image: '/images/players/ZFF/Mbwana%20Samatta.jpeg',
       stats: { goals: 25, assists: 7 }
     }
   },
@@ -377,14 +378,38 @@ Coloris : Bleu et blanc`,
 // ============================================================
 function tanzaniaClubsProfiles() {
   const clubs = [
-    { slug: 'azam-fc',           folder: 'Azam-FC',           founded: 2003, stadium: 'Chamazi Complex',     primaryColor: '#1B3A6E', motto: 'Force et Honneur' },
-    { slug: 'coastal-union',     folder: 'Coastal-Union',     founded: 1953, stadium: 'Mkwakwani Stadium',   primaryColor: '#B22222', motto: 'L\'Union de la Côte' },
-    { slug: 'geita-gold-fc',     folder: 'Geita-Gold-FC',     founded: 2013, stadium: 'Geita Stadium',       primaryColor: '#DAA520', motto: 'Or de Geita' },
-    { slug: 'jkt-tanzania',      folder: 'JKT-Tanzania',      founded: 1970, stadium: 'Uhuru Stadium',       primaryColor: '#4F7942', motto: 'Pour la Patrie' },
-    { slug: 'kagera-sugar',      folder: 'Kagera-Sugar',      founded: 2002, stadium: 'Kaitaba Stadium',     primaryColor: '#C49A0E', motto: 'La Douceur de Kagera' },
-    { slug: 'namungo-fc',        folder: 'Namungo-FC',        founded: 2007, stadium: 'Majaliwa Stadium',    primaryColor: '#1E40AF', motto: 'L\'Esprit de Ruangwa' },
-    { slug: 'simba-sc',          folder: 'Simba-SC',          founded: 1936, stadium: 'Benjamin Mkapa',      primaryColor: '#C8102E', motto: 'Les Lions de Tanzanie' },
-    { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour' }
+    { slug: 'azam-fc',           folder: 'Azam-FC',           founded: 2003, stadium: 'Chamazi Complex',     primaryColor: '#1B3A6E', motto: 'Force et Honneur',
+      starPlayer: { number: 10, name: 'Prince Dube',          position: 'Attaquant',         stats: { goals: 14, assists: 6 } },
+      trophies: { total: 4, breakdown: [
+        { label: 'NBC Premier League',   count: 1, years: '2014',           scope: 'domestic' },
+        { label: 'Coupe de Tanzanie',    count: 2, years: '2013, 2018',     scope: 'domestic' },
+        { label: 'Community Shield TZ',  count: 1, years: '2014',           scope: 'domestic' }
+      ]} },
+    { slug: 'coastal-union',     folder: 'Coastal-Union',     founded: 1953, stadium: 'Mkwakwani Stadium',   primaryColor: '#B22222', motto: 'L\'Union de la Côte',
+      starPlayer: { number: 9,  name: 'Hassan Dilunga',       position: 'Attaquant',         stats: { goals: 9,  assists: 4 } } },
+    { slug: 'geita-gold-fc',     folder: 'Geita-Gold-FC',     founded: 2013, stadium: 'Geita Stadium',       primaryColor: '#DAA520', motto: 'Or de Geita',
+      starPlayer: { number: 11, name: 'Said Ndemla',          position: 'Milieu de terrain', stats: { goals: 6,  assists: 5 } } },
+    { slug: 'jkt-tanzania',      folder: 'JKT-Tanzania',      founded: 1970, stadium: 'Uhuru Stadium',       primaryColor: '#4F7942', motto: 'Pour la Patrie',
+      starPlayer: { number: 7,  name: 'Bakari Mwamnyeto',     position: 'Milieu de terrain', stats: { goals: 8,  assists: 7 } } },
+    { slug: 'kagera-sugar',      folder: 'Kagera-Sugar',      founded: 2002, stadium: 'Kaitaba Stadium',     primaryColor: '#C49A0E', motto: 'La Douceur de Kagera',
+      starPlayer: { number: 8,  name: 'Farid Mussa',          position: 'Milieu de terrain', stats: { goals: 5,  assists: 6 } } },
+    { slug: 'namungo-fc',        folder: 'Namungo-FC',        founded: 2007, stadium: 'Majaliwa Stadium',    primaryColor: '#1E40AF', motto: 'L\'Esprit de Ruangwa',
+      starPlayer: { number: 9,  name: 'Pius Buswita',         position: 'Attaquant',         stats: { goals: 11, assists: 3 } },
+      trophies: { total: 1, breakdown: [
+        { label: 'Coupe de Tanzanie',    count: 1, years: '2020',           scope: 'domestic' }
+      ]} },
+    { slug: 'simba-sc',          folder: 'Simba-SC',          founded: 1936, stadium: 'Benjamin Mkapa',      primaryColor: '#C8102E', motto: 'Les Lions de Tanzanie',
+      starPlayer: { number: 10, name: 'Clatous Chama',        position: 'Attaquant',         stats: { goals: 19, assists: 8 } },
+      trophies: { total: 29, breakdown: [
+        { label: 'NBC Premier League',   count: 23, years: '1965, 1971, 1972, 1973, 1976, 1977, 1979, 1980, 1981, 1992, 1993, 1994, 1995, 2000, 2002, 2009, 2010, 2012, 2018, 2020, 2021, 2022, 2023', scope: 'domestic' },
+        { label: 'Coupe de Tanzanie',    count: 6, years: '1974, 1975, 1976, 2000, 2010, 2024', scope: 'domestic' }
+      ]} },
+    { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour',
+      starPlayer: { number: 9,  name: 'Fiston Mayele',        position: 'Attaquant',         stats: { goals: 21, assists: 5 } },
+      trophies: { total: 35, breakdown: [
+        { label: 'NBC Premier League',   count: 30, years: '1968, 1969, 1970, 1974, 1978, 1981, 1982, 1984, 1985, 1986, 1987, 1992, 1996, 1997, 1998, 2005, 2006, 2008, 2011, 2013, 2015, 2016, 2017, 2019, 2024, 2025…', scope: 'domestic' },
+        { label: 'Coupe de Tanzanie',    count: 5, years: '1975, 1999, 2003, 2018, 2023', scope: 'domestic' }
+      ]} }
   ];
 
   const entries = clubs.map((c) => {
@@ -397,6 +422,11 @@ function tanzaniaClubsProfiles() {
         founded: c.founded,
         stadium: c.stadium,
         stadiumImage: '/images/tanzania-stadium.png',
+        // starPlayer / trophies / squad sont optionnels — ne s'affichent
+        // que si présents dans le profil club.
+        ...(c.starPlayer ? { starPlayer: c.starPlayer } : {}),
+        ...(c.trophies   ? { trophies:   c.trophies   } : {}),
+        ...(c.squad      ? { squad:      c.squad      } : {}),
         merchandise: [
           {
             id: 'jersey',

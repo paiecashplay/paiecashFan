@@ -19,9 +19,9 @@ export const nbcPremier = {
     { id: 'azam-fc',           name: 'Azam FC',           city: 'Dar es Salaam', stadium: 'Chamazi Stadium',        founded: 2004, logo: '/images/logos/clubs-tanzanie/azam-fc.png',           primaryColor: '#1B3A6E' },
     { id: 'coastal-union',     name: 'Coastal Union',     city: 'Tanga',         stadium: 'Mkwakwani Stadium',      founded: 1974, logo: '/images/logos/clubs-tanzanie/coastal-union.png',     primaryColor: '#B22222' },
     { id: 'jkt-tanzania',      name: 'JKT Tanzania',      city: 'Dar es Salaam', stadium: 'Uhuru Stadium',          founded: 1964, logo: '/images/logos/clubs-tanzanie/jkt-tanzania.png',      primaryColor: '#4F7942' },
-    { id: 'namungo-fc',        name: 'Namungo FC',        city: 'Mtwara',        stadium: 'Majaliwa Stadium',       founded: 2000, logo: null,                                                  primaryColor: '#1E40AF' },
-    { id: 'geita-gold-fc',     name: 'Geita Gold FC',     city: 'Geita',         stadium: 'Kambarage Stadium',      founded: 2015, logo: null,                                                  primaryColor: '#DAA520' },
-    { id: 'kagera-sugar',      name: 'Kagera Sugar',      city: 'Kagera',        stadium: 'Kaitaba Stadium',        founded: 1977, logo: null,                                                  primaryColor: '#C49A0E' }
+    { id: 'namungo-fc',        name: 'Namungo FC',        city: 'Mtwara',        stadium: 'Majaliwa Stadium',       founded: 2000, logo: '/images/logos/clubs-tanzanie/namungo-fc.png',        primaryColor: '#1E40AF' },
+    { id: 'geita-gold-fc',     name: 'Geita Gold FC',     city: 'Geita',         stadium: 'Kambarage Stadium',      founded: 2015, logo: '/images/logos/clubs-tanzanie/geita-gold-fc.png',     primaryColor: '#DAA520' },
+    { id: 'kagera-sugar',      name: 'Kagera Sugar',      city: 'Kagera',        stadium: 'Kaitaba Stadium',        founded: 1977, logo: '/images/logos/clubs-tanzanie/kagera-sugar.png',      primaryColor: '#C49A0E' }
   ]
 };
 
