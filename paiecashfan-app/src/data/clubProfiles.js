@@ -304,11 +304,12 @@ Coloris : Bleu et blanc`,
   // le rendu (grille de clubs au lieu de Boutique).
   // ────────────────────────────────────────────────────────────
   'tanzanie': {
+    logo: '/images/logos/clubs-tanzanie/tanzania-federation-logo.png',
     motto: 'Taifa Stars',
     mottoColor: '#FCD116',
     founded: 1930,
     stadium: 'Benjamin Mkapa Stadium',
-    stadiumImage: '/images/tanzania-stadium.png',
+    stadiumImage: '/images/tanzania-stadium.webp',
     coach: 'Hemed Morocco',
     president: 'Wallace Karia',
     isFederationHub: true,
@@ -316,7 +317,7 @@ Coloris : Bleu et blanc`,
       number: 10,
       name: 'Mbwana Samatta',
       position: 'Attaquant',
-      image: '/images/players/ZFF/Mbwana%20Samatta.jpeg',
+      image: '/images/players/ZFF/Mbwana-Samatta.avif',
       stats: { goals: 25, assists: 7 }
     }
   },
@@ -405,7 +406,7 @@ function tanzaniaClubsProfiles() {
         { label: 'Coupe de Tanzanie',    count: 6, years: '1974, 1975, 1976, 2000, 2010, 2024', scope: 'domestic' }
       ]} },
     { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour',
-      starPlayer: { number: 9,  name: 'Fiston Mayele',        position: 'Attaquant',         stats: { goals: 21, assists: 5 } },
+      starPlayer: { number: 9,  name: 'Fiston Mayele',        position: 'Attaquant',         image: '/images/players/ZFF/Fiston-Mayele.webp', stats: { goals: 21, assists: 5 } },
       trophies: { total: 35, breakdown: [
         { label: 'NBC Premier League',   count: 30, years: '1968, 1969, 1970, 1974, 1978, 1981, 1982, 1984, 1985, 1986, 1987, 1992, 1996, 1997, 1998, 2005, 2006, 2008, 2011, 2013, 2015, 2016, 2017, 2019, 2024, 2025…', scope: 'domestic' },
         { label: 'Coupe de Tanzanie',    count: 5, years: '1975, 1999, 2003, 2018, 2023', scope: 'domestic' }
@@ -421,7 +422,7 @@ function tanzaniaClubsProfiles() {
         mottoColor: c.primaryColor,
         founded: c.founded,
         stadium: c.stadium,
-        stadiumImage: '/images/tanzania-stadium.png',
+        stadiumImage: '/images/tanzania-stadium.webp',
         // starPlayer / trophies / squad sont optionnels — ne s'affichent
         // que si présents dans le profil club.
         ...(c.starPlayer ? { starPlayer: c.starPlayer } : {}),
