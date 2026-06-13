@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, Volleyball
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { findClubBySlug, getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -474,8 +474,10 @@ function SideActions({ primaryColor, isFederationHub = false }) {
     } catch { /* user cancelled or unsupported */ }
   };
 
+  // Page fédération : icône ballon de foot (Volleyball) au lieu du
+  // panier — visuel plus parlant pour signaler une liste de clubs.
   const shopAction = isFederationHub
-    ? { key: 'clubs', icon: ShoppingBag, label: 'Clubs',    bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') }
+    ? { key: 'clubs', icon: Volleyball,  label: 'Clubs',    bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') }
     : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') };
 
   const actions = [
