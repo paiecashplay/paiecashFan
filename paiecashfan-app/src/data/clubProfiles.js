@@ -295,11 +295,131 @@ Coloris : Bleu et blanc`,
       { number: 20, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/OM/traore.jpg' },
       { number: 76, name: 'Tadjidine Mmadi',          position: 'Attaquant',         country: 'KM', image: '/images/players/OM/mmadi.jpg' }
     ]
-  }
+  },
 
-  // À étendre : Olympique Lyonnais, AS Monaco, FC Barcelona, Real Madrid,
-  // Bayern Munich, Liverpool, etc. Même pattern.
+  // ────────────────────────────────────────────────────────────
+  // Clubs de la NBC Premier League (Tanzanie)
+  // Boutique standard 4 produits (maillot/sweat/t-shirt/casquette)
+  // Photos posées dans /images/products/{Nom-Dossier}/ avec leur casse exacte.
+  // ────────────────────────────────────────────────────────────
+  ...tanzaniaClubsProfiles(),
+
+  // ────────────────────────────────────────────────────────────
+  // Fédération de Zanzibar de Football (sélection nationale spéciale)
+  // ────────────────────────────────────────────────────────────
+  'federation-de-zanzibar-de-football': {
+    motto: 'Pamoja kwa Zanzibar',
+    mottoColor: '#FFD700',
+    founded: 1926,
+    stadium: 'Amaan Stadium',
+    coach: '—',
+    president: 'Salum Madadi',
+    // Effectif minimal : 3 joueurs avec leurs photos dans players/ZFF/
+    squad: [
+      { number: 1, name: 'Mudathir Yahya',     position: 'Gardien de but', country: 'TZ', image: '/images/players/ZFF/Mudathir-Yahya.webp' },
+      { number: 8, name: 'Feisal Salum',       position: 'Milieu de terrain', country: 'TZ', image: '/images/players/ZFF/Feisal-Salum.jpeg' },
+      { number: 9, name: 'Abdulaziz Makame',   position: 'Attaquant',      country: 'TZ', image: '/images/players/ZFF/Abdulaziz-Makame.jpeg' }
+    ],
+    starPlayer: {
+      number: 9,
+      name: 'Abdulaziz Makame',
+      position: 'Attaquant',
+      image: '/images/players/ZFF/Abdulaziz-Makame.jpeg',
+      stats: { goals: 8, assists: 3 }
+    },
+    // Boutique : seulement 1 t-shirt à ce stade
+    merchandise: [
+      {
+        id: 'tshirt',
+        category: 'tshirt',
+        name: 'T-Shirt Fédération Zanzibar',
+        description: 'T-shirt officiel aux couleurs de la Fédération de Zanzibar de Football.',
+        price: 30,
+        image: '/images/products/federation-de-zanzibar-de-football/Tshirt-recto.jpg',
+        images: [
+          '/images/products/federation-de-zanzibar-de-football/Tshirt-recto.jpg',
+          '/images/products/federation-de-zanzibar-de-football/Tshirt-verso.jpg'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '👕'
+      }
+    ]
+  }
 };
+
+// ============================================================
+// Helper : génère les profils des 8 clubs tanzaniens.
+// Chacun a la même structure boutique (4 produits) avec paths
+// référencés en majuscules pour matcher l'arbre git case-sensitive.
+// ============================================================
+function tanzaniaClubsProfiles() {
+  const clubs = [
+    { slug: 'azam-fc',           folder: 'Azam-FC',           founded: 2003, stadium: 'Chamazi Complex',     primaryColor: '#1B3A6E', motto: 'Force et Honneur' },
+    { slug: 'coastal-union',     folder: 'Coastal-Union',     founded: 1953, stadium: 'Mkwakwani Stadium',   primaryColor: '#B22222', motto: 'L\'Union de la Côte' },
+    { slug: 'geita-gold-fc',     folder: 'Geita-Gold-FC',     founded: 2013, stadium: 'Geita Stadium',       primaryColor: '#DAA520', motto: 'Or de Geita' },
+    { slug: 'jkt-tanzania',      folder: 'JKT-Tanzania',      founded: 1970, stadium: 'Uhuru Stadium',       primaryColor: '#4F7942', motto: 'Pour la Patrie' },
+    { slug: 'kagera-sugar',      folder: 'Kagera-Sugar',      founded: 2002, stadium: 'Kaitaba Stadium',     primaryColor: '#C49A0E', motto: 'La Douceur de Kagera' },
+    { slug: 'namungo-fc',        folder: 'Namungo-FC',        founded: 2007, stadium: 'Majaliwa Stadium',    primaryColor: '#1E40AF', motto: 'L\'Esprit de Ruangwa' },
+    { slug: 'simba-sc',          folder: 'Simba-SC',          founded: 1936, stadium: 'Benjamin Mkapa',      primaryColor: '#C8102E', motto: 'Les Lions de Tanzanie' },
+    { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour' }
+  ];
+
+  const entries = clubs.map((c) => {
+    const base = `/images/products/${c.folder}`;
+    return [
+      c.slug,
+      {
+        motto: c.motto,
+        mottoColor: c.primaryColor,
+        founded: c.founded,
+        stadium: c.stadium,
+        merchandise: [
+          {
+            id: 'jersey',
+            category: 'jersey',
+            name: 'Maillot Officiel',
+            price: 75,
+            image: `${base}/jersey-recto.png`,
+            images: [`${base}/jersey-recto.png`, `${base}/jersey-verso.png`],
+            sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+            emoji: '👕'
+          },
+          {
+            id: 'hoodie',
+            category: 'hoodie',
+            name: 'Sweat à capuche',
+            price: 55,
+            image: `${base}/sweet-porte-recto.png`,
+            images: [`${base}/sweet-porte-recto.png`, `${base}/sweet-porte-verso.png`],
+            sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+            emoji: '🥋'
+          },
+          {
+            id: 'tshirt',
+            category: 'tshirt',
+            name: 'T-Shirt Officiel',
+            price: 30,
+            image: `${base}/Tshirt-recto.png`,
+            images: [`${base}/Tshirt-recto.png`, `${base}/Tshirt-verso.png`],
+            sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+            emoji: '👕'
+          },
+          {
+            id: 'cap',
+            category: 'accessory',
+            name: 'Casquette Officielle',
+            price: 20,
+            image: `${base}/casquette-recto.png`,
+            images: [`${base}/casquette-recto.png`, `${base}/casquette-verso.png`],
+            emoji: '🧢'
+          }
+        ]
+      }
+    ];
+  });
+
+  return Object.fromEntries(entries);
+}
 
 // Helper : récupère le profil d'un club (peut être null).
 export function getClubProfile(slug) {

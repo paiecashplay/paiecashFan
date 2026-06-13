@@ -13,6 +13,7 @@ import { uefaMembers }     from './uefa-members';
 import { conmebolMembers } from './conmebol-members';
 import { concacafMembers } from './concacaf-members';
 import { afcMembers }      from './afc-members';
+import { nbcPremier, zanzibarFederation } from './tanzania-clubs';
 import { getClubProfile }  from './clubProfiles';
 import { slugify }         from '@/lib/slugify';
 
@@ -77,12 +78,16 @@ function buildRegistry() {
   championsEurope.forEach((l) => l.clubs.forEach((c) => all.push(fromLeagueClub(c, l))));
   // Autres sports
   otherSports.forEach((l) => l.clubs.forEach((c) => all.push(fromLeagueClub(c, l))));
+  // NBC Premier League (Tanzanie)
+  nbcPremier.clubs.forEach((c) => all.push(fromLeagueClub(c, nbcPremier)));
   // Sélections nationales par confédération
   cafMembers.forEach((m)      => all.push(fromFederationMember(m, 'caf')));
   uefaMembers.forEach((m)     => all.push(fromFederationMember(m, 'uefa')));
   conmebolMembers.forEach((m) => all.push(fromFederationMember(m, 'conmebol')));
   concacafMembers.forEach((m) => all.push(fromFederationMember(m, 'concacaf')));
   afcMembers.forEach((m)      => all.push(fromFederationMember(m, 'afc')));
+  // Fédération de Zanzibar (sélection nationale spéciale, membre associé CAF)
+  all.push(fromFederationMember(zanzibarFederation, 'caf'));
 
   const bySlug = new Map();
   for (const club of all) {
