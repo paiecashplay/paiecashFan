@@ -13,10 +13,13 @@ import { uefaMembers }     from './uefa-members';
 import { conmebolMembers } from './conmebol-members';
 import { concacafMembers } from './concacaf-members';
 import { afcMembers }      from './afc-members';
+import { nbcPremier, zanzibarFederation } from './tanzania-clubs';
 import { getClubProfile }  from './clubProfiles';
 import { slugify }         from '@/lib/slugify';
 
 // Normalise un club de Ligue/Sport vers la shape commune.
+// Certaines ligues (NBC Premier League TZ) fournissent stadium/founded
+// directement sur le club ; on les propage pour la grille des fédérations.
 function fromLeagueClub(club, league) {
   return {
     slug:         slugify(club.name),
@@ -32,8 +35,8 @@ function fromLeagueClub(club, league) {
     logo:         club.logo,
     primaryColor: club.primaryColor,
     accentColor:  club.primaryColor,
-    founded:      null,
-    stadium:      null,
+    founded:      club.founded ?? null,
+    stadium:      club.stadium ?? null,
     manager:      null,
     motto:        null
   };
@@ -77,12 +80,16 @@ function buildRegistry() {
   championsEurope.forEach((l) => l.clubs.forEach((c) => all.push(fromLeagueClub(c, l))));
   // Autres sports
   otherSports.forEach((l) => l.clubs.forEach((c) => all.push(fromLeagueClub(c, l))));
+  // NBC Premier League (Tanzanie)
+  nbcPremier.clubs.forEach((c) => all.push(fromLeagueClub(c, nbcPremier)));
   // Sélections nationales par confédération
   cafMembers.forEach((m)      => all.push(fromFederationMember(m, 'caf')));
   uefaMembers.forEach((m)     => all.push(fromFederationMember(m, 'uefa')));
   conmebolMembers.forEach((m) => all.push(fromFederationMember(m, 'conmebol')));
   concacafMembers.forEach((m) => all.push(fromFederationMember(m, 'concacaf')));
   afcMembers.forEach((m)      => all.push(fromFederationMember(m, 'afc')));
+  // Fédération de Zanzibar (sélection nationale spéciale, membre associé CAF)
+  all.push(fromFederationMember(zanzibarFederation, 'caf'));
 
   const bySlug = new Map();
   for (const club of all) {
@@ -106,4 +113,45 @@ export function findClubBySlug(slug) {
 
 export function allClubs() {
   return Array.from(registry.values());
+}
+
+// ============================================================
+// Mapping fédération nationale → ses clubs membres.
+// Permet à /clubs/:slug d'afficher la grille des clubs au lieu
+// de la boutique quand l'entité est une fédération avec un
+// championnat rattaché (ex: /clubs/tanzanie → 8 clubs NBC).
+// ============================================================
+const FEDERATION_CLUBS = {
+  // Tanzanie → NBC Premier League
+  tanzanie: nbcPremier.clubs.map((c) => ({
+    slug:         slugify(c.name),
+    name:         c.name,
+    code:         (c.id || '').toUpperCase(),
+    city:         c.city,
+    stadium:      c.stadium,
+    founded:      c.founded,
+    logo:         c.logo,
+    primaryColor: c.primaryColor,
+    league:       nbcPremier.name,
+    countryCode:  'TZ',
+    country:      'Tanzania'
+  }))
+};
+
+export function getFederationClubs(slug) {
+  return FEDERATION_CLUBS[slug] || null;
+}
+
+// Mapping inverse : slug d'un club membre → slug de sa fédération
+// parente. Permet au bouton "Retour" d'une page club de revenir à
+// sa fédération au lieu de la HomePage. Auto-généré depuis
+// FEDERATION_CLUBS pour rester en sync.
+const CLUB_TO_FEDERATION = Object.fromEntries(
+  Object.entries(FEDERATION_CLUBS).flatMap(([fedSlug, clubs]) =>
+    clubs.map((c) => [c.slug, fedSlug])
+  )
+);
+
+export function getClubFederation(slug) {
+  return CLUB_TO_FEDERATION[slug] || null;
 }

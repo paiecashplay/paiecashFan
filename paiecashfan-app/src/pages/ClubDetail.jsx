@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, Volleyball
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { findClubBySlug } from '@/data/clubsRegistry';
+import { findClubBySlug, getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
+import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
 
@@ -27,13 +28,25 @@ export function ClubDetail() {
 
   if (!club) return <NotFound slug={slug} />;
 
+  // Page Fédération nationale (ex: /clubs/tanzanie) : on remplace la
+  // boutique par la grille des clubs membres si le profil expose
+  // isFederationHub ET qu'on a une liste de clubs rattachés.
+  const federationClubs = club.isFederationHub ? getFederationClubs(slug) : null;
+  const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
+
+  // Bouton "Retour" dynamique : si on est sur un club rattaché à une
+  // fédération (ex: Simba SC → tanzanie), retour vers la page de la
+  // fédération. Sinon retour HomePage.
+  const federationParentSlug = isFederationHub ? null : getClubFederation(slug);
+  const backTo = federationParentSlug ? `/clubs/${federationParentSlug}` : '/';
+
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
-      <SideActions primaryColor={club.primaryColor} />
+      <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
       {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
-      <ClubHero club={club} />
+      <ClubHero club={club} backTo={backTo} />
 
       {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
       <Container className="relative pt-12 md:pt-16 pb-6">
@@ -65,8 +78,18 @@ export function ClubDetail() {
         <SquadSpotlight squad={club.squad} primaryColor={club.primaryColor} />
       )}
 
-      {/* ═══ MERCHANDISE (boutique du club) ═════════════════════════ */}
-      <MerchandiseSection club={club} />
+      {/* ═══ Page Fédération : grille des clubs (au lieu de Boutique) ═ */}
+      {isFederationHub ? (
+        <FederationClubsGrid
+          clubs={federationClubs}
+          federationName={club.name}
+          federationColor={club.primaryColor}
+          leagueName="🌐 Équipes Masculines - Ligi Kuu Bara"
+          cardBackground={club.cardBackground || club.stadiumImage}
+        />
+      ) : (
+        <MerchandiseSection club={club} />
+      )}
 
       {/* Espace bas pour la barre side actions mobile */}
       <div className="pb-32 md:pb-12" />
@@ -75,7 +98,7 @@ export function ClubDetail() {
 }
 
 // ── HERO ─────────────────────────────────────────────────────────────
-function ClubHero({ club }) {
+function ClubHero({ club, backTo = '/' }) {
   const stats = useMemo(() => {
     const s = fallbackHeroStats(club);
     // Override le compteur de trophées avec la vraie data du profil si dispo
@@ -105,7 +128,7 @@ function ClubHero({ club }) {
 
       <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
         <Link
-          to="/"
+          to={backTo}
           className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
         >
           <ArrowLeft size={14} />
@@ -426,7 +449,9 @@ function TransactionsLiveSection({ items, club }) {
 }
 
 // ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
-function SideActions({ primaryColor }) {
+// Sur une page fédération (Tanzanie etc.), le bouton "Boutique" est
+// remplacé par "Clubs" qui scrolle vers la grille des clubs membres.
+function SideActions({ primaryColor, isFederationHub = false }) {
   // Scroll smooth vers une section. La classe scroll-mt-20 sur la section
   // cible compense la hauteur de la Navbar pour ne pas masquer le header.
   const scrollTo = (id) => {
@@ -449,8 +474,14 @@ function SideActions({ primaryColor }) {
     } catch { /* user cancelled or unsupported */ }
   };
 
+  // Page fédération : icône ballon de foot (Volleyball) au lieu du
+  // panier — visuel plus parlant pour signaler une liste de clubs.
+  const shopAction = isFederationHub
+    ? { key: 'clubs', icon: Volleyball,  label: 'Clubs',    bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') }
+    : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') };
+
   const actions = [
-    { key: 'shop',  icon: ShoppingBag, label: 'Boutique',     bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') },
+    shopAction,
     { key: 'play',  icon: Trophy,      label: 'Palmarès',     bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices,       label: 'Effectif',     bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
     { key: 'like',  icon: Heart,       label: 'J\'aime',      bg: 'from-rose-400 to-rose-600' },
