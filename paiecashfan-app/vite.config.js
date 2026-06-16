@@ -18,8 +18,8 @@ export default defineConfig({
   server: {
     port: 5175,
     proxy: {
-      // En dev on tape l'API Hono qui tourne sur 5173 via vite dev
-      '/api': { target: 'http://localhost:5173', changeOrigin: true }
+      // En dev : backend Express sur :3001
+      '/api': { target: 'http://localhost:3001', changeOrigin: true }
     }
   },
   build: {

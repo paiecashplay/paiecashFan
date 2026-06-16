@@ -117,12 +117,15 @@ const v2MintTransfer = require('./routes/v2/mint/transfer');
 const v2MintWithdraw = require('./routes/v2/mint/withdraw');
 const v2MintTreasury = require('./routes/v2/mint/treasury');
 const v2MarketClubs = require('./routes/v2/marketplace/clubs');
+const v2MarketFederations = require('./routes/v2/marketplace/federations');
 const v2MarketProducts = require('./routes/v2/marketplace/products');
 const v2MarketOrders = require('./routes/v2/marketplace/orders');
 const v2GamingContests = require('./routes/v2/gaming/contests');
 const v2GamingSessions = require('./routes/v2/gaming/sessions');
 const v2BettingPools = require('./routes/v2/betting/pools');
-const v2AdminGov = require('./routes/v2/admin/governance');
+const v2AdminGov      = require('./routes/v2/admin/governance');
+const v2AdminCrudClubs = require('./routes/v2/admin/clubs-crud');
+const v2AdminUsers    = require('./routes/v2/admin/users');
 
 // Platform 1: Mint Engine + Wallet Super App
 app.use('/api/v2/mint/auth', v2MintAuth);
@@ -134,6 +137,7 @@ app.use('/api/v2/mint/treasury', v2MintTreasury);
 
 // Platform 2: Marketplace + Gaming + Betting
 app.use('/api/v2/marketplace/clubs', v2MarketClubs);
+app.use('/api/v2/marketplace/federations', v2MarketFederations);
 app.use('/api/v2/marketplace/products', v2MarketProducts);
 app.use('/api/v2/marketplace/orders', v2MarketOrders);
 app.use('/api/v2/gaming/contests', v2GamingContests);
@@ -142,6 +146,8 @@ app.use('/api/v2/betting/pools', v2BettingPools);
 
 // Platform 3: Super Admin Governance
 app.use('/api/v2/admin', v2AdminGov);
+app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);
+app.use('/api/v2/admin/users', v2AdminUsers);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'running', network: process.env.BLOCKCHAIN }, error: '' });

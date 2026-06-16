@@ -9,6 +9,10 @@ export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+console.log('SUPABASE_URL?', import.meta.env.VITE_SUPABASE_URL);
+console.log('ANON?', import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+
 function getToken() {
   const raw = localStorage.getItem('pcc_user');
   if (!raw) return null;
