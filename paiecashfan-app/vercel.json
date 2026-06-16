@@ -1,5 +1,4 @@
 {
-  "//": "Le front appelle le backend Railway via VITE_API_BASE (défini dans les env vars Vercel). Ici on ne garde que le fallback SPA pour le routing client.",
   "rewrites": [
     {
       "source": "/(.*)",
