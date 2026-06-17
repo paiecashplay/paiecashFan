@@ -1431,7 +1431,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
 
         <div className="grid md:grid-cols-[1.1fr_1fr] gap-0">
           {/* Carousel images */}
-          <div className="relative bg-white/[0.02] aspect-square md:aspect-auto md:min-h-[460px]">
+          <div className="relative bg-white/[0.02] aspect-square md:aspect-auto md:min-h-[460px] grid place-items-center">
             <ProductImage
               product={{ ...product, image: images[imgIdx] }}
               primaryColor={primaryColor}
