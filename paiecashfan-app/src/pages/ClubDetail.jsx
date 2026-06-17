@@ -959,16 +959,21 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const products = useMemo(() => {
     // Priorité : produits Supabase si disponibles, sinon données statiques
     if (apiProducts.length > 0) {
-      return apiProducts.map((p) => ({
-        id:       p.id,
-        name:     p.name,
-        category: p.category_slug || 'merchandise',
-        price:    p.eur_price || 0,
-        pccPrice: p.pcc_price || 0,
-        image:    Array.isArray(p.images) ? p.images[0] : (p.images?.main || ''),
-        sizes:    p.sizes || [],
-        description: p.description || ''
-      }));
+      return apiProducts.map((p) => {
+        const imgs = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+        const cover = imgs[0] || p.image_url || '';
+        return {
+          id:       p.id,
+          name:     p.name,
+          category: p.category_slug || 'autre',
+          price:    p.eur_price || 0,
+          pccPrice: p.pcc_price || 0,
+          image:    cover,                                       // vignette de la card
+          images:   imgs.length ? imgs : (cover ? [cover] : []), // slider de la modale
+          sizes:    p.sizes || [],
+          description: p.description || ''
+        };
+      });
     }
     return club.merchandise || defaultMerchandise(club);
   }, [club, apiProducts]);
