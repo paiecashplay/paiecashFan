@@ -1416,7 +1416,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.96, y: 16, opacity: 0 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-3xl rounded-3xl border bg-ink-900/95 backdrop-blur-xl overflow-hidden my-8"
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border bg-ink-900/95 backdrop-blur-xl"
         style={{ borderColor: `${primaryColor}55` }}
         onClick={(e) => e.stopPropagation()}
       >
