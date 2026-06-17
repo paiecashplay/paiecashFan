@@ -25,7 +25,7 @@ const fmtRel = (n) =>
 
 export function ClubDetail() {
   const { slug } = useParams();
-  const { club, players, starPlayer, trophies, products } = useClubDetail(slug);
+  const { club, players, starPlayer, trophies, products, loading } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
 
@@ -79,7 +79,7 @@ export function ClubDetail() {
       <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
       {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
-      <ClubHero club={club} backTo={backTo} />
+      <ClubHero club={club} backTo={backTo} loading={loading} />
 
       {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
       <Container className="relative pt-12 md:pt-16 pb-6">
@@ -134,7 +134,7 @@ export function ClubDetail() {
 }
 
 // ── HERO ─────────────────────────────────────────────────────────────
-function ClubHero({ club, backTo = '/' }) {
+function ClubHero({ club, backTo = '/', loading = false }) {
   const stats = useMemo(() => {
     const s = fallbackHeroStats(club);
     // Override le compteur de trophées avec la vraie data du profil si dispo
@@ -142,9 +142,11 @@ function ClubHero({ club, backTo = '/' }) {
     if (club.squad?.length) s.squad = club.squad.length;
     return s;
   }, [club]);
-  // Image custom du club si dispo (ex: psg-stadium.jpg),
-  // sinon fallback sur l'image stade générique.
-  const stadiumImage = club.stadiumImage || '/images/futuristic_stadium_hero.png';
+  // Image du stade : custom du club si dispo. Tant que l'API charge et qu'on
+  // n'a pas encore d'image (ex: club uniquement en BDD comme l'OL), on n'affiche
+  // PAS le stade générique → on évite le flash « défaut puis saut ». Le fallback
+  // générique n'est utilisé qu'une fois le chargement terminé sans image custom.
+  const stadiumImage = club.stadiumImage || (loading ? null : '/images/futuristic_stadium_hero.png');
 
   return (
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
@@ -562,25 +564,42 @@ function SideActions({ primaryColor, isFederationHub = false }) {
 }
 
 // ── STADIUM BACKGROUND ───────────────────────────────────────────────
-// Affiche l'image du stade en background avec un fallback automatique
-// si l'image custom du club n'existe pas (404).
+// Affiche l'image du stade en background avec fondu enchaîné au chargement
+// et fallback automatique si l'image custom du club n'existe pas (404).
+// Tant que `src` est null (API en cours), seul un fond sombre est affiché —
+// pas de stade générique → aucun flash « défaut puis saut ».
 function ClubStadiumBg({ src, fallback }) {
   const [errored, setErrored] = useState(false);
+  const [loaded, setLoaded]   = useState(false);
   const finalSrc = errored ? fallback : src;
+
+  // Réinitialise le fondu à chaque changement de source
+  useEffect(() => { setLoaded(false); setErrored(false); }, [src]);
+
   return (
     <>
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${finalSrc}')` }}
-      />
-      {/* Probe pour détecter le 404 et basculer vers le fallback */}
-      {!errored && src !== fallback && (
+      {/* Base sombre toujours présente : évite tout flash blanc / image par défaut */}
+      <div className="absolute inset-0 bg-ink-950" />
+
+      {finalSrc && (
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-out"
+          style={{ backgroundImage: `url('${finalSrc}')`, opacity: loaded ? 1 : 0 }}
+        />
+      )}
+
+      {/* Préchargement : on ne révèle l'image qu'une fois chargée (onLoad) */}
+      {finalSrc && (
         <img
-          src={src}
+          src={finalSrc}
           alt=""
           aria-hidden
           className="hidden"
-          onError={() => setErrored(true)}
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            if (!errored && finalSrc !== fallback) setErrored(true);
+            else setLoaded(true);
+          }}
         />
       )}
     </>
