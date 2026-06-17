@@ -6,7 +6,13 @@
 // La variable VITE_API_BASE peut surcharger pour pointer ailleurs.
 // ============================================================
 
-const API_BASE = import.meta.env.VITE_API_BASE || '';
+// Normalise VITE_API_BASE : ajoute https:// si le schéma est oublié (sinon
+// fetch traite l'URL comme relative et tape le front au lieu du backend),
+// et retire un éventuel / final.
+const RAW_BASE = import.meta.env.VITE_API_BASE || '';
+const API_BASE = RAW_BASE
+  ? (/^https?:\/\//.test(RAW_BASE) ? RAW_BASE : `https://${RAW_BASE}`).replace(/\/+$/, '')
+  : '';
 
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;

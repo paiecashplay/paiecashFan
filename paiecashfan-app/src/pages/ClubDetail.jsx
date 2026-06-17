@@ -7,10 +7,11 @@ import {
   Plus, Minus, Check, X, ChevronLeft, ChevronRight, Volleyball
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { findClubBySlug, getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
+import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { useClubDetail } from '@/hooks/useClubDetail';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
 
@@ -24,7 +25,7 @@ const fmtRel = (n) =>
 
 export function ClubDetail() {
   const { slug } = useParams();
-  const club = findClubBySlug(slug);
+  const { club, players, starPlayer, trophies, products } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
 
@@ -39,6 +40,38 @@ export function ClubDetail() {
   // fédération. Sinon retour HomePage.
   const federationParentSlug = isFederationHub ? null : getClubFederation(slug);
   const backTo = federationParentSlug ? `/clubs/${federationParentSlug}` : '/';
+
+  // Normalise les trophées : accepte la shape API (tableau plat avec champ
+  // scope/label/count/years_text) ET la shape statique (trophies.breakdown).
+  const trophyList = trophies.length > 0
+    ? trophies
+    : (club.trophies?.breakdown || []);
+  const trophyTotal = trophies.length > 0
+    ? trophies.reduce((s, t) => s + (t.count || 1), 0)
+    : (club.trophies?.total || 0);
+
+  // Normalise les joueurs : accepte la shape API (full_name, jersey_number…)
+  // ET la shape statique (name, number…).
+  const squadList = players.length > 0
+    ? players.map((p) => ({
+        number:   p.shirt_number ?? p.jersey_number ?? p.number,
+        name:     p.full_name     ?? p.name,
+        position: p.position,
+        country:  p.nationality_code ?? p.country,
+        image:    p.image_url     ?? p.image,
+        stats:    p.stats
+      }))
+    : (club.squad || []);
+
+  const starData = starPlayer
+    ? {
+        number:   starPlayer.shirt_number ?? starPlayer.jersey_number ?? starPlayer.number,
+        name:     starPlayer.full_name      ?? starPlayer.name,
+        position: starPlayer.position,
+        image:    starPlayer.image_url      ?? starPlayer.image,
+        stats:    starPlayer.stats
+      }
+    : club.starPlayer;
 
   return (
     <div className="relative">
@@ -63,19 +96,22 @@ export function ClubDetail() {
         <TransactionsLiveSection items={mockTransactions} club={club} />
       </Container>
 
-      {/* ═══ TROPHY CABINET (si profil club avec trophies.breakdown) ═ */}
-      {club.trophies?.breakdown && (
-        <TrophyCabinet trophies={club.trophies} primaryColor={club.primaryColor} />
+      {/* ═══ TROPHY CABINET ═══════════════════════════════════════════ */}
+      {trophyList.length > 0 && (
+        <TrophyCabinet
+          trophies={{ total: trophyTotal, breakdown: trophyList }}
+          primaryColor={club.primaryColor}
+        />
       )}
 
-      {/* ═══ STAR PLAYER (si profil club avec starPlayer dispo) ═════ */}
-      {club.starPlayer && (
-        <StarPlayerSection player={club.starPlayer} primaryColor={club.primaryColor} />
+      {/* ═══ STAR PLAYER ══════════════════════════════════════════════ */}
+      {starData && (
+        <StarPlayerSection player={starData} primaryColor={club.primaryColor} />
       )}
 
-      {/* ═══ SQUAD SPOTLIGHT (si profil club avec squad dispo) ══════ */}
-      {club.squad && club.squad.length > 0 && (
-        <SquadSpotlight squad={club.squad} primaryColor={club.primaryColor} />
+      {/* ═══ SQUAD SPOTLIGHT ══════════════════════════════════════════ */}
+      {squadList.length > 0 && (
+        <SquadSpotlight squad={squadList} primaryColor={club.primaryColor} />
       )}
 
       {/* ═══ Page Fédération : grille des clubs (au lieu de Boutique) ═ */}
@@ -88,7 +124,7 @@ export function ClubDetail() {
           cardBackground={club.cardBackground || club.stadiumImage}
         />
       ) : (
-        <MerchandiseSection club={club} />
+        <MerchandiseSection club={club} apiProducts={products} />
       )}
 
       {/* Espace bas pour la barre side actions mobile */}
@@ -114,17 +150,26 @@ function ClubHero({ club, backTo = '/' }) {
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
       {/* Background stade — image custom du club ou fallback générique */}
       <ClubStadiumBg src={stadiumImage} fallback="/images/futuristic_stadium_hero.png" />
+      {/* Voile couleur club — mix-blend-color teinte uniformément toute l'image
+          quelle que soit la teinte (vif comme l'OM ou marine foncé comme l'OL),
+          tout en préservant les détails clairs/sombres du stade. */}
+      <div
+        className="absolute inset-0 mix-blend-color"
+        style={{ background: club.primaryColor, opacity: 0.55 }}
+      />
+      {/* Renfort de teinte en haut + assombrissement progressif en bas pour
+          garantir la lisibilité du texte du hero. */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(180deg,
-            ${club.primaryColor}20 0%,
-            ${club.primaryColor}40 30%,
+            ${club.primaryColor}33 0%,
+            ${club.primaryColor}1A 30%,
             rgba(4,8,13,0.6) 65%,
             rgba(4,8,13,1) 100%)`
         }}
       />
-      <div className="absolute inset-0 bg-ink-900/40" />
+      <div className="absolute inset-0 bg-ink-900/30" />
 
       <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
         <Link
@@ -910,11 +955,23 @@ function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
 //
 // Format du cart : [{ productId, size, qty, unitPrice }]
 // Total dynamique = sum(qty × unitPrice).
-function MerchandiseSection({ club }) {
-  const products = useMemo(
-    () => club.merchandise || defaultMerchandise(club),
-    [club]
-  );
+function MerchandiseSection({ club, apiProducts = [] }) {
+  const products = useMemo(() => {
+    // Priorité : produits Supabase si disponibles, sinon données statiques
+    if (apiProducts.length > 0) {
+      return apiProducts.map((p) => ({
+        id:       p.id,
+        name:     p.name,
+        category: p.category_slug || 'merchandise',
+        price:    p.eur_price || 0,
+        pccPrice: p.pcc_price || 0,
+        image:    Array.isArray(p.images) ? p.images[0] : (p.images?.main || ''),
+        sizes:    p.sizes || [],
+        description: p.description || ''
+      }));
+    }
+    return club.merchandise || defaultMerchandise(club);
+  }, [club, apiProducts]);
   const [activeCat, setActiveCat] = useState('all');
   const [cart, setCart] = useState([]);
   const [openProduct, setOpenProduct] = useState(null);
