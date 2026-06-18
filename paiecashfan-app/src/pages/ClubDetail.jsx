@@ -12,6 +12,7 @@ import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount 
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { useClubDetail } from '@/hooks/useClubDetail';
+import { useCart } from '@/hooks/useCart';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
 
@@ -25,7 +26,7 @@ const fmtRel = (n) =>
 
 export function ClubDetail() {
   const { slug } = useParams();
-  const { club, players, starPlayer, trophies, products } = useClubDetail(slug);
+  const { club, players, starPlayer, trophies, products, loading } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
 
@@ -79,7 +80,7 @@ export function ClubDetail() {
       <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
       {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
-      <ClubHero club={club} backTo={backTo} />
+      <ClubHero club={club} backTo={backTo} loading={loading} />
 
       {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
       <Container className="relative pt-12 md:pt-16 pb-6">
@@ -134,7 +135,7 @@ export function ClubDetail() {
 }
 
 // ── HERO ─────────────────────────────────────────────────────────────
-function ClubHero({ club, backTo = '/' }) {
+function ClubHero({ club, backTo = '/', loading = false }) {
   const stats = useMemo(() => {
     const s = fallbackHeroStats(club);
     // Override le compteur de trophées avec la vraie data du profil si dispo
@@ -142,9 +143,11 @@ function ClubHero({ club, backTo = '/' }) {
     if (club.squad?.length) s.squad = club.squad.length;
     return s;
   }, [club]);
-  // Image custom du club si dispo (ex: psg-stadium.jpg),
-  // sinon fallback sur l'image stade générique.
-  const stadiumImage = club.stadiumImage || '/images/futuristic_stadium_hero.png';
+  // Image du stade : custom du club si dispo. Tant que l'API charge et qu'on
+  // n'a pas encore d'image (ex: club uniquement en BDD comme l'OL), on n'affiche
+  // PAS le stade générique → on évite le flash « défaut puis saut ». Le fallback
+  // générique n'est utilisé qu'une fois le chargement terminé sans image custom.
+  const stadiumImage = club.stadiumImage || (loading ? null : '/images/futuristic_stadium_hero.png');
 
   return (
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
@@ -562,25 +565,42 @@ function SideActions({ primaryColor, isFederationHub = false }) {
 }
 
 // ── STADIUM BACKGROUND ───────────────────────────────────────────────
-// Affiche l'image du stade en background avec un fallback automatique
-// si l'image custom du club n'existe pas (404).
+// Affiche l'image du stade en background avec fondu enchaîné au chargement
+// et fallback automatique si l'image custom du club n'existe pas (404).
+// Tant que `src` est null (API en cours), seul un fond sombre est affiché —
+// pas de stade générique → aucun flash « défaut puis saut ».
 function ClubStadiumBg({ src, fallback }) {
   const [errored, setErrored] = useState(false);
+  const [loaded, setLoaded]   = useState(false);
   const finalSrc = errored ? fallback : src;
+
+  // Réinitialise le fondu à chaque changement de source
+  useEffect(() => { setLoaded(false); setErrored(false); }, [src]);
+
   return (
     <>
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${finalSrc}')` }}
-      />
-      {/* Probe pour détecter le 404 et basculer vers le fallback */}
-      {!errored && src !== fallback && (
+      {/* Base sombre toujours présente : évite tout flash blanc / image par défaut */}
+      <div className="absolute inset-0 bg-ink-950" />
+
+      {finalSrc && (
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-out"
+          style={{ backgroundImage: `url('${finalSrc}')`, opacity: loaded ? 1 : 0 }}
+        />
+      )}
+
+      {/* Préchargement : on ne révèle l'image qu'une fois chargée (onLoad) */}
+      {finalSrc && (
         <img
-          src={src}
+          src={finalSrc}
           alt=""
           aria-hidden
           className="hidden"
-          onError={() => setErrored(true)}
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            if (!errored && finalSrc !== fallback) setErrored(true);
+            else setLoaded(true);
+          }}
         />
       )}
     </>
@@ -953,28 +973,35 @@ function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
 // Section style marketplace as-nancy-lorraine avec une modale de
 // sélection (taille + quantité) à l'ajout au panier.
 //
-// Format du cart : [{ productId, size, qty, unitPrice }]
-// Total dynamique = sum(qty × unitPrice).
+// Panier persisté via useCart : items au format order_items
+//   { id, product_id, size, quantity, unit_price_pcc, total_pcc }
 function MerchandiseSection({ club, apiProducts = [] }) {
   const products = useMemo(() => {
     // Priorité : produits Supabase si disponibles, sinon données statiques
     if (apiProducts.length > 0) {
-      return apiProducts.map((p) => ({
-        id:       p.id,
-        name:     p.name,
-        category: p.category_slug || 'merchandise',
-        price:    p.eur_price || 0,
-        pccPrice: p.pcc_price || 0,
-        image:    Array.isArray(p.images) ? p.images[0] : (p.images?.main || ''),
-        sizes:    p.sizes || [],
-        description: p.description || ''
-      }));
+      return apiProducts.map((p) => {
+        const imgs = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+        const cover = imgs[0] || p.image_url || '';
+        return {
+          id:       p.id,
+          name:     p.name,
+          category: p.category_slug || 'autre',
+          price:    p.eur_price || 0,
+          pccPrice: p.pcc_price || 0,
+          image:    cover,                                       // vignette de la card
+          images:   imgs.length ? imgs : (cover ? [cover] : []), // slider de la modale
+          sizes:    p.sizes || [],
+          description: p.description || ''
+        };
+      });
     }
     return club.merchandise || defaultMerchandise(club);
   }, [club, apiProducts]);
   const [activeCat, setActiveCat] = useState('all');
-  const [cart, setCart] = useState([]);
   const [openProduct, setOpenProduct] = useState(null);
+
+  // Panier persisté (Supabase) si connecté + club en base, sinon local.
+  const { items: cart, addItem, updateQty, removeItem, totalItems, totalPrice, persisted } = useCart(club.id);
 
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
@@ -982,30 +1009,10 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   );
 
   // Ajoute (ou fusionne si même produit/taille déjà au panier) un item.
-  const handleAddItem = (item) => {
-    setCart((prev) => {
-      const idx = prev.findIndex(
-        (x) => x.productId === item.productId && x.size === item.size
-      );
-      if (idx >= 0) {
-        const next = [...prev];
-        next[idx] = { ...next[idx], qty: next[idx].qty + item.qty };
-        return next;
-      }
-      return [...prev, item];
-    });
+  const handleAddItem = async (item) => {
+    await addItem(item); // { productId, size, qty, unitPrice }
     setOpenProduct(null);
   };
-
-  // Total cart : somme des qty × unitPrice
-  const totalPrice = useMemo(
-    () => cart.reduce((sum, it) => sum + it.qty * it.unitPrice, 0),
-    [cart]
-  );
-  const totalItems = useMemo(
-    () => cart.reduce((sum, it) => sum + it.qty, 0),
-    [cart]
-  );
 
   return (
     <section id="merchandise" className="py-16 md:py-20 border-t border-white/5 scroll-mt-20">
@@ -1111,7 +1118,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
                 product={p}
                 index={i}
                 primaryColor={club.primaryColor}
-                inCart={cart.some((x) => x.productId === p.id)}
+                inCart={cart.some((x) => x.product_id === p.id)}
                 onOpen={() => setOpenProduct(p)}
               />
             ))}
@@ -1126,10 +1133,9 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             totalPrice={totalPrice}
             totalItems={totalItems}
             primaryColor={club.primaryColor}
-            onRemove={(idx) => setCart((prev) => prev.filter((_, i) => i !== idx))}
-            onQtyChange={(idx, qty) => setCart((prev) =>
-              prev.map((it, i) => (i === idx ? { ...it, qty } : it))
-            )}
+            persisted={persisted}
+            onRemove={(itemId) => removeItem(itemId)}
+            onQtyChange={(itemId, qty) => updateQty(itemId, qty)}
           />
         )}
       </Container>
@@ -1153,7 +1159,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
 // Affichage détaillé du panier : items avec qty/taille/prix unitaire +
 // total + bouton checkout. Apparaît sous la grille produits dès qu'un
 // article est ajouté.
-function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRemove, onQtyChange }) {
+function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, persisted, onRemove, onQtyChange }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -1163,21 +1169,30 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRe
       style={{ borderColor: `${primaryColor}55` }}
     >
       {/* Header */}
-      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between gap-3 flex-wrap">
         <div className="text-[10px] uppercase tracking-[0.22em] text-bone-200 font-bold inline-flex items-center gap-2">
           <ShoppingBag size={14} style={{ color: primaryColor }} />
           Votre panier · {totalItems} {totalItems > 1 ? 'articles' : 'article'}
         </div>
+        {persisted ? (
+          <span className="text-[9px] uppercase tracking-[0.18em] text-emerald-400/80 font-bold inline-flex items-center gap-1">
+            <Check size={10} /> Sauvegardé
+          </span>
+        ) : (
+          <Link to="/login" className="text-[9px] uppercase tracking-[0.18em] text-amber-400/80 hover:text-amber-300 font-bold">
+            Connecte-toi pour sauvegarder ton panier
+          </Link>
+        )}
       </div>
 
       {/* Items */}
       <ul className="divide-y divide-white/5">
-        {cart.map((item, idx) => {
-          const product = products.find((p) => p.id === item.productId);
+        {cart.map((item) => {
+          const product = products.find((p) => p.id === item.product_id);
           if (!product) return null;
-          const lineTotal = item.qty * item.unitPrice;
+          const lineTotal = Number(item.total_pcc ?? item.quantity * item.unit_price_pcc);
           return (
-            <li key={`${item.productId}-${item.size}-${idx}`} className="px-5 py-4 flex items-center gap-4">
+            <li key={item.id} className="px-5 py-4 flex items-center gap-4">
               {/* Mini photo */}
               <span
                 className="shrink-0 grid h-12 w-12 place-items-center rounded-lg overflow-hidden"
@@ -1206,7 +1221,7 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRe
                     </span>
                   )}
                   <span className="font-mono">
-                    {formatPCC(item.unitPrice)} PCC × {item.qty}
+                    {formatPCC(item.unit_price_pcc)} PCC × {item.quantity}
                   </span>
                 </div>
               </div>
@@ -1214,16 +1229,16 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRe
               {/* Quantité (- / +) */}
               <div className="hidden sm:inline-flex items-center gap-1 rounded-full border border-white/10 bg-ink-900/50 p-1">
                 <QtyButton
-                  onClick={() => onQtyChange(idx, Math.max(1, item.qty - 1))}
+                  onClick={() => onQtyChange(item.id, Math.max(1, item.quantity - 1))}
                   ariaLabel="Diminuer la quantité"
                 >
                   <Minus size={12} strokeWidth={3} />
                 </QtyButton>
                 <span className="min-w-[1.5rem] text-center text-xs font-mono font-bold text-bone-50 tabular-nums">
-                  {item.qty}
+                  {item.quantity}
                 </span>
                 <QtyButton
-                  onClick={() => onQtyChange(idx, item.qty + 1)}
+                  onClick={() => onQtyChange(item.id, item.quantity + 1)}
                   ariaLabel="Augmenter la quantité"
                 >
                   <Plus size={12} strokeWidth={3} />
@@ -1239,7 +1254,7 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, onRe
                   {formatPCC(lineTotal)}
                 </div>
                 <button
-                  onClick={() => onRemove(idx)}
+                  onClick={() => onRemove(item.id)}
                   className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-bone-400 hover:text-rose-400 font-bold transition-colors"
                 >
                   Retirer
@@ -1411,7 +1426,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.96, y: 16, opacity: 0 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-3xl rounded-3xl border bg-ink-900/95 backdrop-blur-xl overflow-hidden my-8"
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border bg-ink-900/95 backdrop-blur-xl"
         style={{ borderColor: `${primaryColor}55` }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1426,7 +1441,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
 
         <div className="grid md:grid-cols-[1.1fr_1fr] gap-0">
           {/* Carousel images */}
-          <div className="relative bg-white/[0.02] aspect-square md:aspect-auto md:min-h-[460px]">
+          <div className="relative bg-white/[0.02] aspect-square md:aspect-auto md:min-h-[460px] grid place-items-center">
             <ProductImage
               product={{ ...product, image: images[imgIdx] }}
               primaryColor={primaryColor}

@@ -22,7 +22,16 @@ const TABS = [
 const POSITIONS  = ['Gardien de but','Défenseur','Milieu de terrain','Attaquant'];
 const SCOPES     = ['domestic','european','world'];
 const SCOPE_FR   = { domestic: 'National', european: 'Europe', world: 'Monde' };
-const CATEGORIES = ['jersey','hoodie','tshirt','accessory','shoes','home','other'];
+// Slugs FR alignés sur product_categories en base
+const CATEGORIES = [
+  { slug: 'maillot',    label: 'Maillot' },
+  { slug: 'sweat',      label: 'Sweat' },
+  { slug: 't-shirt',    label: 'T-Shirt' },
+  { slug: 'accessoire', label: 'Accessoire' },
+  { slug: 'chaussures', label: 'Chaussures' },
+  { slug: 'maison',     label: 'Maison' },
+  { slug: 'autre',      label: 'Autre' },
+];
 
 // Formats d'image acceptés (affiché sous les inputs + attribut accept)
 const IMG_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml';
@@ -687,7 +696,7 @@ function ProductsTab({ tenantId, showToast }) {
     load();
   }
 
-  const blank = { name: '', description: '', eur_price: '', pcc_price: '', category_slug: 'jersey', display_order: products.length, status: 'active', images_list: [''], sizes_raw: 'S,M,L,XL' };
+  const blank = { name: '', description: '', eur_price: '', pcc_price: '', category_slug: 'maillot', display_order: products.length, status: 'active', images_list: [''], sizes_raw: 'S,M,L,XL' };
 
   return (
     <div className="space-y-4">
@@ -760,16 +769,32 @@ function ProductsTab({ tenantId, showToast }) {
 
 function ProductForm({ initial, onSave, onCancel }) {
   const { uploadImage, uploading } = useImageUpload();
-  const imgRef = useRef();
-  const [form, setForm] = useState({ ...initial, images_list: initial.images_list || [''] });
+  const [form, setForm] = useState({ ...initial, images_list: (initial.images_list?.length ? initial.images_list : ['']) });
   const [saving, setSaving] = useState(false);
   function set(k) { return (e) => setForm((f) => ({ ...f, [k]: e.target.value })); }
 
-  async function handleImgUpload(e) {
-    const file = e.target.files?.[0];
+  // Upload vers un slot précis (remplace l'image de ce slot)
+  async function handleUpload(file, idx) {
     if (!file) return;
     const url = await uploadImage(file, 'produits');
-    if (url) setForm((f) => ({ ...f, images_list: [url, ...f.images_list.slice(1)] }));
+    if (!url) return;
+    setForm((f) => {
+      const l = [...f.images_list];
+      l[idx] = url;
+      return { ...f, images_list: l };
+    });
+  }
+  function setImageUrl(idx, val) {
+    setForm((f) => { const l = [...f.images_list]; l[idx] = val; return { ...f, images_list: l }; });
+  }
+  function addImageSlot() {
+    setForm((f) => ({ ...f, images_list: [...f.images_list, ''] }));
+  }
+  function removeImage(idx) {
+    setForm((f) => {
+      const l = f.images_list.filter((_, i) => i !== idx);
+      return { ...f, images_list: l.length ? l : [''] };
+    });
   }
 
   async function submit() {
@@ -789,7 +814,7 @@ function ProductForm({ initial, onSave, onCancel }) {
         </Field>
         <Field label="Catégorie">
           <select value={form.category_slug} onChange={set('category_slug')} className={input()}>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            {CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.label}</option>)}
           </select>
         </Field>
         <Field label="Ordre d'affichage">
@@ -809,17 +834,51 @@ function ProductForm({ initial, onSave, onCancel }) {
         </Field>
       </div>
 
-      {/* Image principale */}
-      <div className="flex items-center gap-4">
-        {form.images_list[0] && <img src={form.images_list[0]} alt="" className="h-14 w-14 rounded-xl object-cover bg-white/5 border border-white/10" />}
-        <div className="flex-1 space-y-1">
-          <input value={form.images_list[0] || ''} onChange={(e) => setForm((f) => { const l = [...f.images_list]; l[0] = e.target.value; return { ...f, images_list: l }; })} placeholder="URL image principale" className={input()} />
-          <input type="file" accept={IMG_ACCEPT} ref={imgRef} onChange={handleImgUpload} className="hidden" />
-          <button type="button" onClick={() => imgRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
-            <Upload size={12} /> {uploading ? 'Upload…' : 'Uploader une image'}
+      {/* Photos du produit (plusieurs vues : face, dos, porté…) */}
+      <div className="space-y-2">
+        <label className="block text-[11px] font-semibold text-bone-400 uppercase tracking-wider">
+          Photos du produit
+          <span className="ml-2 normal-case tracking-normal text-bone-600">la 1ʳᵉ est l'image principale · ajoutez face/dos/porté pour le slider</span>
+        </label>
+
+        {form.images_list.map((url, idx) => (
+          <div key={idx} className="flex items-center gap-2">
+            <div className="h-12 w-12 shrink-0 rounded-lg border border-white/10 bg-white/5 overflow-hidden grid place-items-center">
+              {url
+                ? <img src={url} alt="" className="h-full w-full object-cover" />
+                : <span className="text-[9px] font-bold text-bone-600">{idx === 0 ? 'PRINC' : idx + 1}</span>}
+            </div>
+            <input
+              value={url}
+              onChange={(e) => setImageUrl(idx, e.target.value)}
+              placeholder={idx === 0 ? 'URL image principale' : `URL image ${idx + 1}`}
+              className={cn(input(), 'flex-1')}
+            />
+            <label className="shrink-0 h-10 w-10 rounded-xl border border-white/10 bg-white/5 text-bone-300 hover:text-emerald-400 transition-colors grid place-items-center cursor-pointer" title="Uploader cette image">
+              <Upload size={13} />
+              <input type="file" accept={IMG_ACCEPT} className="hidden" onChange={(e) => handleUpload(e.target.files?.[0], idx)} />
+            </label>
+            {form.images_list.length > 1 && (
+              <button type="button" onClick={() => removeImage(idx)} title="Retirer"
+                className="shrink-0 h-10 w-10 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center">
+                <Trash2 size={13} />
+              </button>
+            )}
+          </div>
+        ))}
+
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={addImageSlot}
+            className="flex items-center gap-1.5 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
+            <Plus size={13} /> Ajouter une photo
           </button>
-          <p className="text-[10px] text-bone-600">{IMG_HINT}</p>
+          {uploading && (
+            <span className="inline-flex items-center gap-1 text-[11px] text-bone-500">
+              <Loader2 size={11} className="animate-spin" /> Upload…
+            </span>
+          )}
         </div>
+        <p className="text-[10px] text-bone-600">{IMG_HINT}</p>
       </div>
 
       <div className="flex items-center gap-3">

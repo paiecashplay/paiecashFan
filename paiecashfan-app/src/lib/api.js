@@ -14,6 +14,12 @@ const API_BASE = RAW_BASE
   ? (/^https?:\/\//.test(RAW_BASE) ? RAW_BASE : `https://${RAW_BASE}`).replace(/\/+$/, '')
   : '';
 
+// Construit l'URL absolue vers le backend. À utiliser pour les requêtes qui
+// ne passent PAS par apiFetch (ex: upload multipart/form-data).
+export function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
   const res = await fetch(url, {
