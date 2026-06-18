@@ -318,11 +318,11 @@ Coloris : Bleu et blanc`,
     president: 'Wallace Karia',
     isFederationHub: true,
     starPlayer: {
-      number: 10,
-      name: 'Mbwana Samatta',
-      position: 'Attaquant',
-      image: '/images/players/ZFF/mbwana-samatta.jpg',
-      stats: { goals: 25, assists: 7 }
+      number: 6,
+      name: 'Feisal Salum ',
+      position: 'Milieu de terrain',
+      image: '/images/players/AZ/Feisal-Salum.png',
+      stats: { goals: 14, assists: 8 }
     }
   },
 
@@ -384,12 +384,30 @@ Coloris : Bleu et blanc`,
 function tanzaniaClubsProfiles() {
   const clubs = [
     { slug: 'azam-fc',           folder: 'Azam-FC',           founded: 2003, stadium: 'Chamazi Complex',     primaryColor: '#1B3A6E', motto: 'Force et Honneur',
-      starPlayer: { number: 10, name: 'Prince Dube',          position: 'Attaquant',         image: '/images/players/ZFF/Prince-Dube.jpg',      stats: { goals: 14, assists: 6 } },
+      starPlayer: { number: 6, name: 'Feisal Salum',          position: 'Milieu de terrain',         image: '/images/players/AZ/Feisal-Salum.png',      stats: { goals: 14, assists: 8 } },
       trophies: { total: 4, breakdown: [
         { label: 'NBC Premier League',   count: 1, years: '2014',           scope: 'domestic' },
         { label: 'Coupe de Tanzanie',    count: 2, years: '2013, 2018',     scope: 'domestic' },
         { label: 'Community Shield TZ',  count: 1, years: '2014',           scope: 'domestic' }
-      ]} },
+      ]},
+      squad: [
+        { number: 2,  name: 'James Akaminko',         position: 'Milieu de terrain',    country: 'GN', image: '/images/players/AZ/James-Akaminko.jpg' },
+        { number: 6,  name: 'Feisal Salum',           position: 'Milieu de terrain',    country: 'TZ', image: '/images/players/AZ/Feisal-Salum.png' },
+        { number: 7,  name: 'Zidane Ally Sereri',     position: 'Milieu de terrain',    country: 'TZ', image: '/images/players/AZ/Zidane-Ally.jpg' },
+        { number: 8,  name: 'Sadio Kanouté',          position: 'Milieu de terrain',    country: 'ML', image: '/images/players/AZ/Sadio-Kanoute.png' },
+        { number: 35,  name: 'Himid Mao Mkami',       position: 'Milieu de terrain',    country: 'TZ', image: '/images/players/AZ/Himid-Mao.png' },
+        { number: 9,  name: 'Abdul Hamisi Suleiman',  position: 'Attaquant',          country: 'TZ', image: '/images/players/AZ/Abdul-Hamisi.png' },
+        { number: 13,  name: 'Pape Doudou Diallo',    position: 'Attaquant',            country: 'SN', image: '/images/players/AZ/Doudou-Diallo.png' },
+        { number: 23,  name: 'Iddy Nado',             position: 'Attaquant',            country: 'TZ', image: '/images/players/AZ/Iddy-Nado.png' },
+        { number: 30,  name: 'Jephté Kitambala',      position: 'Attaquant',         country: 'RD', image: '/images/players/AZ/Jephte-Kitambala.png'},
+        { number: 3,  name: 'Yoro Diaby',             position: 'Défenseur',            country: 'ML', image: '/images/players/AZ/Yoro-Diaby.png' },
+        { number: 5,  name: 'Lusajo Mwaikenda',       position: 'Défenseur',            country: 'TZ', image: '/images/players/AZ/Lusajo-Mwaikenda.png' },
+        { number: 24,  name: 'Yeison Fuentes',         position: 'Défenseur',            country: 'CB', image: '/images/players/AZ/Yeison-Fuentes.png' },
+        { number: 25,  name: 'Nuru Twalib',            position: 'Défenseur',            country: 'TZ', image: '/images/players/AZ/Nuru-Twalib.png' },
+        { number: 28,  name: 'Zuberi Foba',           position: 'Gardien de but',            country: 'TZ', image: '/images/players/AZ/Zuberi-Foba.png' },
+        { number: 32,  name: 'Aishi Manula',           position: 'Gardien de but',            country: 'TZ', image: '/images/players/AZ/Aishi-Manula.png' },
+      ]
+    },
     { slug: 'coastal-union',     folder: 'Coastal-Union',     founded: 1953, stadium: 'Mkwakwani Stadium',   primaryColor: '#B22222', motto: 'L\'Union de la Côte',
       starPlayer: { number: 9,  name: 'Hassan Dilunga',       position: 'Attaquant',         image: '/images/players/ZFF/Hassan-Dilunga.jpg',   stats: { goals: 9,  assists: 4 } } },
     { slug: 'geita-gold-fc',     folder: 'Geita-Gold-FC',     founded: 2013, stadium: 'Geita Stadium',       primaryColor: '#DAA520', motto: 'Or de Geita',
@@ -404,17 +422,62 @@ function tanzaniaClubsProfiles() {
         { label: 'Coupe de Tanzanie',    count: 1, years: '2020',           scope: 'domestic' }
       ]} },
     { slug: 'simba-sc',          folder: 'Simba-SC',          founded: 1936, stadium: 'Benjamin Mkapa',      primaryColor: '#C8102E', motto: 'Les Lions de Tanzanie',
-      starPlayer: { number: 10, name: 'Clatous Chama',        position: 'Attaquant',         image: '/images/players/ZFF/clatous-chama.jpeg',   stats: { goals: 19, assists: 8 } },
+      starPlayer: { number: 24, name: 'Clatous Chama',        position: 'Milieu de terrain',         image: '/images/players/SB/Clatous-Chama.png',   stats: { goals: 8, assists: 6 } },
       trophies: { total: 29, breakdown: [
         { label: 'NBC Premier League',   count: 23, years: '1965, 1971, 1972, 1973, 1976, 1977, 1979, 1980, 1981, 1992, 1993, 1994, 1995, 2000, 2002, 2009, 2010, 2012, 2018, 2020, 2021, 2022, 2023', scope: 'domestic' },
         { label: 'Coupe de Tanzanie',    count: 6, years: '1974, 1975, 1976, 2000, 2010, 2024', scope: 'domestic' }
-      ]} },
+      ]},
+      squad: [
+        { number: 2,  name: 'Chamou Karaboué',             position: 'Défenseur',           country: 'CI', image: '/images/players/SB/Chamou-Karaboue.png' },
+        { number: 12,  name: 'Shomari Kapombe',            position: 'Défenseur',           country: 'TZ', image: '/images/players/SB/Shomari-Kapombe.png' },
+        { number: 23,  name: 'Rushine De Reuck',           position: 'Défenseur',           country: 'AS', image: '/images/players/SB/Rushine-De-Reuck.png' },
+        { number: 15,  name: 'David Kameta',               position: 'Défenseur',           country: 'TZ', image: '/images/players/SB/David-Kameta.png' },
+        { number: 31,  name: 'Wilson Nangu',               position: 'Défenseur',           country: 'TZ', image: '/images/players/SB/Wilson-Nangu.png' },
+        { number: 18,  name: 'Morice Abraham',             position: 'Milieu de terrain',   country: 'TZ', image: '/images/players/SB/Morice-Abraham.png' },
+        { number: 19,  name: 'Mzamiru Yassin',             position: 'Milieu de terrain',   country: 'TZ', image: '/images/players/SB/Mzamiru-Yassin.png' },
+        { number: 21,  name: 'Yusuph Kagoma',              position: 'Milieu de terrain',   country: 'TZ', image: '/images/players/SB/Yusuph-Kagoma.png' },
+        { number: 24,  name: 'Clatous Chama',              position: 'Milieu de terrain',   country: 'ZB', image: '/images/players/SB/Clatous-Chama.png' },
+        { number: 37,  name: 'Hussein Semfuko',            position: 'Milieu de terrain',   country: 'TZ', image: '/images/players/SB/Hussein-Semfuko.png' },
+        { number: 3,  name: 'Jonathan Sowah',              position: 'Attaquant',           country: 'GN', image: '/images/players/SB/Jonathan-Sowah.png' },
+        { number: 11,  name: 'Steven Mukwala',             position: 'Attaquant',                country: 'OG', image: '/images/players/SB/Steven-Mukwala.png' },
+        { number: 29,  name: 'Libasse Gueye',             position: 'Attaquant',                country: 'SN', image: '/images/players/SB/Libasse-Gueye.png' },       
+        { number: 40,  name: 'Selemani Mwalimu',       position: 'Attaquant',           country: 'TZ', image: '/images/players/SB/Selemani-Mwalimu.png' },
+        { number: 22,  name: 'Yakoub Suleiman Ali',       position: 'Gardien de but',           country: 'TZ', image: '/images/players/SB/Yakoub-Suleiman.png' },
+
+
+
+        
+      ] 
+    },
     { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour',
-      starPlayer: { number: 9,  name: 'Fiston Mayele',        position: 'Attaquant',         image: '/images/players/ZFF/Fiston-Mayele.webp', stats: { goals: 21, assists: 5 } },
+      starPlayer: { number: 20,  name: 'Allan Okello',        position: 'Milieu de terrain',         image: '/images/players/YA/Allan-Okello.png', stats: { goals: 11, assists: 7 } },
       trophies: { total: 35, breakdown: [
         { label: 'NBC Premier League',   count: 30, years: '1968, 1969, 1970, 1974, 1978, 1981, 1982, 1984, 1985, 1986, 1987, 1992, 1996, 1997, 1998, 2005, 2006, 2008, 2011, 2013, 2015, 2016, 2017, 2019, 2024, 2025…', scope: 'domestic' },
         { label: 'Coupe de Tanzanie',    count: 5, years: '1975, 1999, 2003, 2018, 2023', scope: 'domestic' }
-      ]} }
+      ]},
+      squad: [
+        { number: 1,  name: 'Khomeiny Abubakar',          position: 'Gardien de but',         country: 'TZ', image: '/images/players/YA/Khomeiny-Abubakar.png' },
+        { number: 16,  name: 'Abdutwalib Mshery',         position: 'Gardien de but',         country: 'TZ', image: '/images/players/YA/Abdutwalib-Mshery.png' },
+        { number: 28,  name: 'Hussein Masaranga',         position: 'Gardien de but',         country: 'TZ', image: '/images/players/YA/Hussein-Masaranga.png' },
+        { number: 39,  name: 'Djigui Diarra',             position: 'Gardien de but',         country: 'ML', image: '/images/players/YA/Djigui-Diarra.png' },
+        { number: 3,  name: 'Bakari Mwamnyeto',           position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Bakari-Mwamnyeto.png' },
+        { number: 4,  name: 'Ibrahim Hamad',              position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Ibrahim-Hamad.png' },
+        { number: 5,  name: 'Dickson Job',                position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Dickson-Job.png' },
+        { number: 15,  name: 'Mohamed Hussein',           position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Mohamed-Hussein.png' },
+        { number: 23,  name: 'Issaka Boka',               position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Issaka-Boka.png' },
+        { number: 33,  name: 'Israel Mwenda',             position: 'Défenseur',              country: 'TZ', image: '/images/players/YA/Israel-Mwenda.png' },
+        { number: 2,  name: 'Aziz Andabwile',             position: 'Milieu de terrain',      country: 'TZ', image: '/images/players/YA/Aziz-Andabwile.png' },
+        { number: 7,  name: 'Maxi Nzengeli',              position: 'Milieu de terrain',      country: 'TZ', image: '/images/players/YA/Maxi-Nzengeli.png' },
+        { number: 8,  name: 'Lassine Kouma',              position: 'Milieu de terrain',      country: 'TZ', image: '/images/players/YA/Lassine-Kouma.png' },
+        { number: 10,  name: 'Pacôme Zouzoua',            position: 'Milieu de terrain',      country: 'CI', image: '/images/players/YA/Pacome-Zouzoua.png' },
+        { number: 20,  name: 'Allan Okello',              position: 'Milieu de terrain',      country: 'TZ', image: '/images/players/YA/Allan-Okello.png' },
+        { number: 18,  name: 'Salum Abubakar',            position: 'Milieu de terrain',      country: 'TZ', image: '/images/players/YA/Salum-Abubakar.png' },
+        { number: 6,  name: 'Balla Conté',                position: 'Attaquant',              country: 'GN', image: '/images/players/YA/Balla-Conte.png' },
+        { number: 13,  name: 'Buba Jammeh',               position: 'Attaquant',              country: 'GB', image: '/images/players/YA/Buba-Jammeh.png' },
+        { number: 17,  name: 'Farid Mussa',               position: 'Attaquant',              country: 'TZ', image: '/images/players/YA/Farid-Mussa.png' },
+        { number: 29,  name: 'Prince Dube',               position: 'Attaquant',              country: 'ZW', image: '/images/players/YA/Prince-Dube.png' },
+        { number: 30,  name: 'Clement Mzize',             position: 'Attaquant',              country: 'TZ', image: '/images/players/YA/Clement-Mzize.png' },
+      ]}
   ];
 
   const entries = clubs.map((c) => {
