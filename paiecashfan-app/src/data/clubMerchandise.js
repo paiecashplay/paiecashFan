@@ -15,7 +15,7 @@ import { slugify } from '@/lib/slugify';
 export const PRODUCT_CATEGORIES = [
   { id: 'all',         label: 'Tous',          emoji: '✨' },
   { id: 'jersey',      label: 'Maillot',       emoji: '👕' },
-  { id: 'hoodie',      label: 'Sweat',         emoji: '🥋' },
+  { id: 'hoodie',      label: 'Survêtement',   emoji: '🥋' },
   { id: 'tshirt',      label: 'T-Shirt',       emoji: '👕' },
   { id: 'accessory',   label: 'Accessoire',    emoji: '🧣' },
   { id: 'collectible', label: 'Collection',    emoji: '🏆' }
@@ -29,7 +29,7 @@ export function defaultMerchandise(club) {
   return [
     { id: 'home-jersey',  category: 'jersey',      name: 'Maillot Domicile',  price: 89.99, image: `${base}/home-jersey.png`,  emoji: '👕' },
     { id: 'away-jersey',  category: 'jersey',      name: 'Maillot Extérieur', price: 89.99, image: `${base}/away-jersey.png`,  emoji: '👕' },
-    { id: 'hoodie',       category: 'hoodie',      name: 'Sweat à capuche',   price: 64.99, image: `${base}/hoodie.png`,       emoji: '🥋' },
+    { id: 'hoodie',       category: 'hoodie',      name: 'Survêtement à capuche',   price: 64.99, image: `${base}/hoodie.png`,       emoji: '🥋' },
     { id: 'tshirt',       category: 'tshirt',      name: 'T-Shirt Club',      price: 34.99, image: `${base}/tshirt.png`,       emoji: '👕' },
     { id: 'scarf',        category: 'accessory',   name: 'Écharpe Officielle',price: 19.99, image: `${base}/scarf.png`,        emoji: '🧣' },
     { id: 'cap',          category: 'accessory',   name: 'Casquette Club',    price: 24.99, image: `${base}/cap.png`,          emoji: '🧢' },
