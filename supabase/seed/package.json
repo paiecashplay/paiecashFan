@@ -1,0 +1,16 @@
+{
+  "name": "paiecashfan-seed",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Idempotent data seeder for PaieCashFan Supabase project",
+  "type": "module",
+  "scripts": {
+    "seed": "node seed.js",
+    "seed:dry": "node seed.js --dry-run",
+    "seed:reset": "node seed.js --reset"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "dotenv": "^17.4.2"
+  }
+}
