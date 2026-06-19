@@ -71,7 +71,129 @@ export const clubProfiles = {
       { number: 51, name: 'Willian Pacho',          position: 'Défenseur',         country: 'EC', image: '/images/players/PSG/pacho.jpg' },
       { number: 87, name: 'João Neves',             position: 'Milieu de terrain', country: 'PT', image: '/images/players/PSG/neves.jpg' },
       { number: 89, name: 'Renato Marin',           position: 'Gardien de but',    country: 'BR', image: '/images/players/PSG/marin.jpg' }
+    ],
+    merchandise: [
+      // ── Maillots ─────────────────────────────────────────────────
+      {
+        id: 'home-jersey',
+        category: 'maillot',
+        name: 'Maillot Domicile 2025-26',
+        description: 'Maillot Domicile Match PSG Nike Dri-FIT ADV.',
+        price: 130,
+        image: '/images/products/paris-saint-germain/home-jersey-recto.jpg',
+        images: [
+          '/images/products/paris-saint-germain/home-jersey-recto.jpg',
+          '/images/products/paris-saint-germain/home-jersey-verso.jpg'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+      {
+        id: 'away-jersey',
+        category: 'maillot',
+        name: 'Maillot Extérieur 2025-26',
+        description: 'Maillot Extérieur Stadium PSG Nike.',
+        price: 100,
+        image: '/images/products/paris-saint-germain/out-jersey-recto.png',
+        images: [
+          '/images/products/paris-saint-germain/out-jersey-recto.png',
+          '/images/products/paris-saint-germain/out-jersey-verso.png'
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+
+      // ── Sweats ─────────────────────────────────────────────────
+      {
+        id: 'hoodie',
+        category: 'sweat',
+        name: 'Sweat à capuche PSG',
+        description: 'Sweat capuche PSG Nike Kvaratskhelia 7 - Bleu.',
+        price: 75,
+        image: '/images/products/paris-saint-germain/hoodie-recto.jpg',
+        images: [
+          '/images/products/paris-saint-germain/hoodie-recto.jpg',
+          '/images/products/paris-saint-germain/hoodie-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '🥋'
+      },
+
+      // ── T-SHIRT ───────────────────────────────────────────────
+      {
+        id: 'tshirt',
+        category: 't-shirt',
+        name: 'T-Shirt OM',
+        description: 'T-Shirt PSG Nike Kvaratskhelia 7 - Bleu.',
+        price: 42,
+        image: '/images/products/paris-saint-germain/Tshirt-recto.jpg',
+        images: [
+          '/images/products/paris-saint-germain/Tshirt-recto.jpg',
+          '/images/products/paris-saint-germain/Tshirt-verso.jpg',
+        ],
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '👕'
+      },
+
+      // ── Survetement ───────────────────────────────────────────────
+      {
+        id: 'survetement',
+        category: 'survetement',
+        name: 'Survêtement PSG',
+        description: 'Survêtement PSG - Bleu.',
+        price: 83,
+        image: '/images/products/paris-saint-germain/tracksuit-recto.jpg',
+        images: [
+          '/images/products/paris-saint-germain/tracksuit-recto.jpg',
+          '/images/products/paris-saint-germain/tracksuit-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '🥋'
+      },
+
+      // ── ACCESSOIRES ───────────────────────────────────────────
+      {
+        id: 'scarf',
+        category: 'accessoire',
+        name: 'Écharpe PSG ',
+        description: 'Écharpe PSG Core Wordmark - Bleu',
+        price: 13,
+        image: '/images/products/paris-saint-germain/echarp.jpg',
+        images: [
+          '/images/products/paris-saint-germain/echarp.jpg',
+        ],
+        emoji: '🧣'
+      },
+      {
+        id: 'cap',
+        category: 'accessoire',
+        name: 'Casquette PSG',
+        description: 'Casquette PSG Étoile Eiffel 2 réglable - Bleu',
+        price: 25,
+        image: '/images/products/paris-saint-germain/casquette-recto.jpg',
+        images: [
+          '/images/products/paris-saint-germain/casquette-recto.jpg',
+          '/images/products/paris-saint-germain/casquette-verso.jpg'
+        ],
+        emoji: '🧢'
+      },
+
+      // ── COLLECTION ────────────────────────────────────────────
+      {
+        id: 'ball',
+        category: 'autre',
+        name: 'Ballon PSG ecusson',
+        description: 'Ballon de football Paris Saint-Germain avec écusson ',
+        price: 17,
+        image: '/images/products/paris-saint-germain/ballon.jpg',
+        images: [
+          '/images/products/paris-saint-germain/ballon.jpg'
+        ],
+        emoji: '⚽'
+      },
+
     ]
+   
   },
 
   // ────────────────────────────────────────────────────────────
@@ -111,7 +233,7 @@ export const clubProfiles = {
       // ── MAILLOTS ──────────────────────────────────────────────
       {
         id: 'home-jersey',
-        category: 'jersey',
+        category: 'maillot',
         name: 'Maillot Domicile 2025-26',
         description: 'Maillot officiel à domicile, design Puma × OM, sponsor CMA CGM, blanc à liserés bleu et or.',
         price: 100,
@@ -125,7 +247,7 @@ export const clubProfiles = {
       },
       {
         id: 'away-jersey',
-        category: 'jersey',
+        category: 'maillot',
         name: 'Maillot Extérieur 2025-26',
         description: 'Maillot officiel à l\'extérieur, design Puma × OM, sponsor CMA CGM.',
         price: 100,
@@ -139,7 +261,7 @@ export const clubProfiles = {
       },
       {
         id: 'training-jersey',
-        category: 'jersey',
+        category: 'maillot',
         name: 'Maillot d\'Entraînement OM',
         description: 'Maillot d\'entraînement officiel Puma × OM, idéal pour l\'effort.',
         price: 50,
@@ -156,7 +278,7 @@ export const clubProfiles = {
       // ── SWEAT ─────────────────────────────────────────────────
       {
         id: 'hoodie',
-        category: 'hoodie',
+        category: 'sweat',
         name: 'Sweat à capuche OM',
         description: 'Sweat à capuche officiel OM, coupe ample, parfait pour la tribune.',
         price: 85,
@@ -173,7 +295,7 @@ export const clubProfiles = {
       // ── T-SHIRT ───────────────────────────────────────────────
       {
         id: 'tshirt',
-        category: 'tshirt',
+        category: 't-shirt',
         name: 'T-Shirt OM Travel',
         description: 'T-shirt officiel OM Travel, coton premium, esprit Droit au but.',
         price: 45,
@@ -190,7 +312,7 @@ export const clubProfiles = {
       // ── ACCESSOIRES ───────────────────────────────────────────
       {
         id: 'scarf',
-        category: 'accessory',
+        category: 'accessoire',
         name: 'Écharpe Allez l\'OM',
         description: 'Écharpe tricotée officielle aux couleurs marseillaises, design Allez l\'OM.',
         price: 15,
@@ -204,7 +326,7 @@ export const clubProfiles = {
       },
       {
         id: 'cap',
-        category: 'accessory',
+        category: 'accessoire',
         name: 'Casquette OM',
         description: 'Casquette officielle aux couleurs de l\'OM, taille unique ajustable.',
         price: 30,
@@ -221,7 +343,7 @@ export const clubProfiles = {
       // ── COLLECTION ────────────────────────────────────────────
       {
         id: 'ball',
-        category: 'collectible',
+        category: 'autre',
         name: 'Ballon Officiel OM',
         description: 'Ballon officiel aux couleurs de l\'Olympique de Marseille. Sous licence officielle.',
         price: 25,
@@ -234,7 +356,7 @@ export const clubProfiles = {
       },
       {
         id: 'linge-lit-prado',
-        category: 'collectible',
+        category: 'maison',
         name: 'Linge De Lit OM PRADO 240 × 220',
         description: `Linge de lit Olympique de Marseille inspiration du Prado, coloris bleu et blanc.
 Housse de couette réversible, pour changer selon vos envies.
@@ -294,6 +416,49 @@ Coloris : Bleu et blanc`,
       { number: 17, name: 'Pierre-Emerick Aubameyang',position: 'Attaquant',         country: 'GA', image: '/images/players/OM/aubameyang.jpg' },
       { number: 20, name: 'Hamed Traoré',             position: 'Attaquant',         country: 'CI', image: '/images/players/OM/traore.jpg' },
       { number: 76, name: 'Tadjidine Mmadi',          position: 'Attaquant',         country: 'KM', image: '/images/players/OM/mmadi.jpg' }
+    ]
+  },
+
+  // ────────────────────────────────────────────────────────────
+  // Paris FC — Ligue 1
+  // ────────────────────────────────────────────────────────────
+  'paris-fc': {
+    motto: 'Une ambition capitale',
+    mottoColor: '#0033A0',            // rouge PSG
+    founded: 1969,
+    stadium: 'Jean-Bouin',
+    stadiumImage: '/images/clubs/parisFC-stadium.jpg', // poser le fichier ici
+    coach: 'Pierre Ferracci',
+    president: 'Antoine Kombouaré',
+    // Palmarès complet du PSG (58 trophées au total).
+    // Pour étendre à d'autres clubs : reprendre la même structure.
+    trophies: {
+      total: 0,
+      breakdown: [
+        { label: 'Division 2 (Groupe Centre)',       count: 1, years: '1971', scope: 'national' },
+        { label: 'Division 4',                       count: 1, years: '1989', scope: 'national' },
+        { label: 'Division d\'Honneur (Paris-Île-de-France)', count: 1, years: '1988', scope: 'regional' },
+        { label: 'Championnat de France Amateur',    count: 1, years: '2006', scope: 'national' }
+      ]
+    },
+    starPlayer: {
+      number: 10,
+      name: 'Ilan Kebbal',
+      position: 'Milieu de terrain',
+      image: '/images/players/PFC/ilan-kebbal.png',
+      stats: {
+        goals: 12,
+        assists: 26
+      }
+    },
+    // Liste officielle 2026 (24 joueurs). Photos posées dans /public/images/players/
+    // avec noms hétérogènes — référencés explicitement via le champ image.
+    squad: [
+      { number: 1,  name: 'Rémy Riou',            position: 'Gardien de but',     country: 'FR', image: '/images/players/PFC/remy-riou.png' },
+      { number: 16,  name: 'Obed Nkambadio',      position: 'Gardien de but',  country: 'FR', image: '/images/players/PFC/obed-nkambadio.png' },
+      { number: 35,  name: 'Kevin Trapp',         position: 'Gardien de but',     country: 'AG', image: '/images/players/PFC/kevin-trapp.png' },
+      { number: 2,  name: 'Tuomas Ollila',        position: 'Défenseur',          country: 'FL', image: '/images/players/PFC/tuomas-ollilia.png' },
+      
     ]
   },
 
@@ -442,11 +607,7 @@ function tanzaniaClubsProfiles() {
         { number: 11,  name: 'Steven Mukwala',             position: 'Attaquant',                country: 'OG', image: '/images/players/SB/Steven-Mukwala.png' },
         { number: 29,  name: 'Libasse Gueye',             position: 'Attaquant',                country: 'SN', image: '/images/players/SB/Libasse-Gueye.png' },       
         { number: 40,  name: 'Selemani Mwalimu',       position: 'Attaquant',           country: 'TZ', image: '/images/players/SB/Selemani-Mwalimu.png' },
-        { number: 22,  name: 'Yakoub Suleiman Ali',       position: 'Gardien de but',           country: 'TZ', image: '/images/players/SB/Yakoub-Suleiman.png' },
-
-
-
-        
+        { number: 22,  name: 'Yakoub Suleiman Ali',       position: 'Gardien de but',           country: 'TZ', image: '/images/players/SB/Yakoub-Suleiman.png' },   
       ] 
     },
     { slug: 'young-africans-sc', folder: 'Young-Africans-SC', founded: 1935, stadium: 'Benjamin Mkapa',      primaryColor: '#007A33', motto: 'Yanga, mon amour',
@@ -498,7 +659,7 @@ function tanzaniaClubsProfiles() {
         merchandise: [
           {
             id: 'jersey',
-            category: 'jersey',
+            category: 'maillot',
             name: 'Maillot Officiel',
             price: 75,
             image: `${base}/jersey-recto.png`,
@@ -508,7 +669,7 @@ function tanzaniaClubsProfiles() {
           },
           {
             id: 'hoodie',
-            category: 'hoodie',
+            category: 'survetement',
             name: 'Sweat à capuche',
             price: 55,
             image: `${base}/sweet-porte-recto.png`,
@@ -518,7 +679,7 @@ function tanzaniaClubsProfiles() {
           },
           {
             id: 'tshirt',
-            category: 'tshirt',
+            category: 't-shirt',
             name: 'T-Shirt Officiel',
             price: 30,
             image: `${base}/Tshirt-recto.png`,
@@ -528,7 +689,7 @@ function tanzaniaClubsProfiles() {
           },
           {
             id: 'cap',
-            category: 'accessory',
+            category: 'accessoire',
             name: 'Casquette Officielle',
             price: 20,
             image: `${base}/casquette-recto.png`,

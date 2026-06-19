@@ -38,7 +38,8 @@ export const ligue1 = {
     { id: 'nantes', name: 'FC Nantes',              city: 'Nantes',        logo: crest(543),  primaryColor: '#FFD700' },
     { id: 'mtpel', name: 'Montpellier HSC',         city: 'Montpellier',   logo: crest(518),  primaryColor: '#FF6900' },
     { id: 'reims',  name: 'Stade de Reims',         city: 'Reims',         logo: crest(547),  primaryColor: '#E1000F' },
-    { id: 'toul',   name: 'Toulouse FC',            city: 'Toulouse',      logo: crest(511),  primaryColor: '#4B0082' }
+    { id: 'toul',   name: 'Toulouse FC',            city: 'Toulouse',      logo: crest(511),  primaryColor: '#4B0082' },
+    { id: 'parisfc',   name: 'Paris FC',            city: 'Paris',         logo: null,  primaryColor: '#0033A0' } //Trouver le logo du Paris FC sur football-data.org
   ]
 };
 
