@@ -447,18 +447,163 @@ Coloris : Bleu et blanc`,
       position: 'Milieu de terrain',
       image: '/images/players/PFC/ilan-kebbal.png',
       stats: {
-        goals: 12,
-        assists: 26
+        goals: 9,
+        assists: 4
       }
     },
     // Liste officielle 2026 (24 joueurs). Photos posées dans /public/images/players/
     // avec noms hétérogènes — référencés explicitement via le champ image.
     squad: [
       { number: 1,  name: 'Rémy Riou',            position: 'Gardien de but',     country: 'FR', image: '/images/players/PFC/remy-riou.png' },
-      { number: 16,  name: 'Obed Nkambadio',      position: 'Gardien de but',  country: 'FR', image: '/images/players/PFC/obed-nkambadio.png' },
+      { number: 16,  name: 'Obed Nkambadio',      position: 'Gardien de but',     country: 'FR', image: '/images/players/PFC/obed-nkambadio.png' },
       { number: 35,  name: 'Kevin Trapp',         position: 'Gardien de but',     country: 'AG', image: '/images/players/PFC/kevin-trapp.png' },
       { number: 2,  name: 'Tuomas Ollila',        position: 'Défenseur',          country: 'FL', image: '/images/players/PFC/tuomas-ollilia.png' },
+      { number: 28,  name: 'Thibault De Smet',    position: 'Défenseur',          country: 'BE', image: '/images/players/PFC/thibault-de-smet.png' },
+      { number: 6,  name: 'Otávio Ataíde da Silva',        position: 'Défenseur',          country: 'BR', image: '/images/players/PFC/otavio-ataide-da-silva.png' },
+      { number: 19,  name: 'Nhoa Sangui',       position: 'Défenseur',  country: 'FR', image: '/images/players/PFC/nhoa-sangui.png' },
+      { number: 5,  name: 'Moustapha Mbow',     position: 'Défenseur',          country: 'SE', image: '/images/players/PFC/moustapha-mbow.png' },
+      { number: 15,  name: 'Timothée Kolodziejczak',   position: 'Défenseur',          country: 'FR', image: '/images/players/PFC/timothee-kolodziejczak.png' },
+      { number: 22,  name: 'Sofiane Alakouch',   position: 'Défenseur',          country: 'MA', image: '/images/players/PFC/sofiane-alakouch.png' },
+      { number: 31,  name: 'Samir Chergui',       position: 'Défenseur',  country: 'AL', image: '/images/players/PFC/samir-chergui.png' },
+      { number: 14,  name: 'Hamari Traoré',       position: 'Défenseur',  country: 'MA', image: '/images/players/PFC/hamari-traore.png' },
+      { number: 42,  name: 'Diego Coppola',     position: 'Défenseur',   country: 'IT', image: '/images/players/PFC/diego-coppola.png' },
+      { number: 4,  name: 'Vincent Marchetti',        position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/vincent-marchetti.png' },
+      { number: 17,  name: 'Adama Camara',        position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/adama-camara.png' },
+      { number: 13,  name: 'Mathieu Cafaro',     position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/mathieu-cafaro.png' },
+      { number: 33,  name: 'Pierre Lees-Melou',     position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/pierre-lees-melou.png' },
+      { number: 21,  name: 'Maxime Lopez',     position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/maxime-lopez.png' },    
+      { number: 10,  name: 'Ilan Kebbal',         position: 'Milieu de terrain',  country: 'FR', image: '/images/players/PFC/ilan-kebbal.png' },
+      { number: 18,  name: 'Marshall Munetsi',    position: 'Milieu de terrain',          country: 'ZM', image: '/images/players/PFC/marshall-munetsi.png' },
+      { number: 23,  name: 'Rudy Matondo',       position: 'Milieu de terrain',          country: 'FR', image: '/images/players/PFC/rudy-matondo.png' },
+      { number: 11,  name: 'Jean-Philippe Krasso',     position: 'Attaquant',          country: 'CI', image: '/images/players/PFC/jean-philippe-krasso.png' },
+      { number: 7,   name: 'Alimami Gory',   position: 'Attaquant',          country: 'FR', image: '/images/players/PFC/alimami-gory.png' },
+      { number: 20,   name: 'Julien Lopez',     position: 'Attaquant',          country: 'AL', image: '/images/players/PFC/julien-lopez.png' },
+      { number: 26,   name: 'Lamine Gueye',     position: 'Attaquant',          country: 'SE', image: '/images/players/PFC/lamine-gueye.png' },
+      { number: 29,   name: 'Pierre-Yves Hamel',     position: 'Attaquant',          country: 'FR', image: '/images/players/PFC/pierre-yves-hamel.png' },
+      { number: 9,   name: 'Willem Geubbels',     position: 'Attaquant',          country: 'FR', image: '/images/players/PFC/willem-geubbels.png' },
+      { number: 93,   name: 'Jonathan Ikoné',     position: 'Attaquant',          country: 'FR', image: '/images/players/PFC/jonathan-ikone.png' },
+      { number: 27,   name: 'Moses Simon',     position: 'Attaquant',          country: 'NI', image: '/images/players/PFC/moses-simon.png' },
+      { number: 24,   name: 'Luca Koleosho',     position: 'Attaquant',          country: 'IT', image: '/images/players/PFC/luca-koleosho.png' },
+      { number: 36,   name: 'Ciro Immobile',     position: 'Attaquant',          country: 'FR', image: '/images/players/PFC/ciro-immobile.png' }
+    ],
+    merchandise: [
+      // ── Maillots ──────────────────────────────────────────────
+      {
+        id: 'home-jersey',
+        category: 'maillot',
+        name: 'Maillot Domicile PFC 2025/2026',
+        description: 'Le maillot officiel Paris FC domicile par adidas pour la saison 2025/2026.',
+        price: 57,
+        image: '/images/products/PFC/home-jersey-recto.jpg',
+        images: [
+          '/images/products/PFC/home-jersey-recto.jpg',
+          '/images/products/PFC/home-jersey-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '👕'
+      },
+
+      {
+        id: 'away-jersey',
+        category: 'maillot',
+        name: 'Maillot Extérieur PFC 2025/2026',
+        description: 'Maillot Paris FC Extérieur 25/26, design moderne et respirant pour les supporters.',
+        price: 57,
+        image: '/images/products/PFC/away-jersey-recto.jpg',
+        images: [
+          '/images/products/PFC/away-jersey-recto.jpg',
+          '/images/products/PFC/away-jersey-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+        emoji: '👕'
+      },
+
+      // ── SWEAT ─────────────────────────────────────────────────
+      {
+        id: 'hoodie',
+        category: 'sweat',
+        name: 'Sweat-shirt à capuche Paris FC',
+        description: 'Sweat-shirt supporter Paris FC zippé à capuche, confortable et chaud pour les matchs.',
+        price: 33,
+        image: '/images/products/PFC/hoodie-recto.jpg',
+        images: [
+          '/images/products/PFC/hoodie-recto.jpg',
+          '/images/products/PFC/hoodie-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'L'],
+        emoji: '🥋'
+      },
+
+      // ── T-SHIRT ───────────────────────────────────────────────
+      {
+        id: 'tshirt',
+        category: 't-shirt',
+        name: 'T-Shirt Paris FC',
+        description: 'T-Shirt Logo Paris FC Blanc.',
+        price: 15.4,
+        image: '/images/products/PFC/T-shirt-recto.jpg',
+        images: [
+          '/images/products/PFC/T-shirt-recto.jpg',
+          '/images/products/PFC/T-shirt-verso.jpg',
+        ],
+        sizes: ['XS', 'S', 'M'],
+        emoji: '👕'
+      },
+
+      // ── ACCESSOIRES ───────────────────────────────────────────
+      {
+        id: 'scarf',
+        category: 'accessoire',
+        name: 'Écharpe Paris FC',
+        description: 'Écharpe De Noël Mascotte Enfant Paris FC.',
+        price: 15,
+        image: '/images/products/PFC/echarp.jpg',
+        images: [
+          '/images/products/PFC/echarp.jpg',
+        ],
+        emoji: '🧣'
+      },
+      {
+        id: 'cap',
+        category: 'accessoire',
+        name: 'Casquette Paris FC',
+        description: 'Casquette Paris FC x New Era.',
+        price: 20.8,
+        image: '/images/products/PFC/casquette-recto.jpg',
+        images: [
+          '/images/products/PFC/casquette-recto.jpg',
+          '/images/products/PFC/casquette-verso.jpg'
+        ],
+        emoji: '🧢'
+      },
+      {
+        id: 'bag',
+        category: 'accessoire',
+        name: 'Sac à dos Paris FC',
+        description: 'Sac à dos Essentiel Paris FC x adidas.',
+        price: 39,
+        image: '/images/products/PFC/bag-recto.jpg',
+        images: [
+          '/images/products/PFC/bag-recto.jpg',
+          '/images/products/PFC/bag-verso.jpg'
+        ],
+        emoji: '🎒'
+      },
       
+      // ── COLLECTION ────────────────────────────────────────────
+      {
+        id: 'ball',
+        category: 'autre',
+        name: 'Ballon Paris FC',
+        description: 'Mini Ballon Kids Paris FC.',
+        price: 13.5,
+        image: '/images/products/PFC/ballon-recto.jpg',
+        images: [
+          '/images/products/PFC/ballon-recto.jpg',
+          '/images/products/PFC/ballon-verso.jpg'
+        ],
+        emoji: '⚽'
+      },
     ]
   },
 
