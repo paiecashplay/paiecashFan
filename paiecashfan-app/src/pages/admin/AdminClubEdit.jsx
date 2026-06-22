@@ -5,10 +5,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Plus, Trash2, Star,
-  Info, Users, Trophy, ShoppingBag, Loader2, Check, X
+  Info, Users, Trophy, ShoppingBag, Loader2, Check, X, Download
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
 import { cn } from '@/lib/cn';
 
 const TABS = [
@@ -48,9 +49,11 @@ export function AdminClubEdit() {
   const [toast,   setToast]   = useState(null);   // { msg, ok }
   const [club,    setClub]    = useState(null);    // données chargées
   const [loading, setLoading] = useState(!isNew);
+  const [importOpen, setImportOpen] = useState(false);
+  const [dataKey, setDataKey] = useState(0);       // force le reload des onglets après import
 
   // Charge le club si mode édition
-  useEffect(() => {
+  function loadClub() {
     if (isNew) return;
     apiFetch(`/api/v2/marketplace/clubs/${id}`)
       .then((json) => {
@@ -58,7 +61,8 @@ export function AdminClubEdit() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [id]);
+  }
+  useEffect(() => { loadClub(); }, [id]);
 
   function showToast(msg, ok = true) {
     setToast({ msg, ok });
@@ -79,13 +83,30 @@ export function AdminClubEdit() {
           className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors">
           <ArrowLeft size={15} />
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="font-display text-2xl font-black text-bone-50">
             {isNew ? 'Nouveau club' : club?.name || 'Éditer le club'}
           </h1>
           <p className="text-sm text-bone-400">{isNew ? 'Créer un tenant' : `Slug : ${club?.slug}`}</p>
         </div>
+        {!isNew && (
+          <button onClick={() => setImportOpen(true)}
+            className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors">
+            <Download size={14} /> Importer depuis API-Football
+          </button>
+        )}
       </div>
+
+      {/* Import API-Football (ce club) */}
+      <AnimatePresence>
+        {importOpen && (
+          <ImportFromFootball
+            tenantId={id}
+            onClose={() => setImportOpen(false)}
+            onImported={() => { loadClub(); setDataKey((k) => k + 1); }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-xl border border-white/8 bg-ink-800/40 p-1 w-fit">
@@ -120,13 +141,13 @@ export function AdminClubEdit() {
             />
           )}
           {tab === 'players' && !isNew && (
-            <PlayersTab tenantId={id} showToast={showToast} />
+            <PlayersTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab === 'trophies' && !isNew && (
-            <TrophiesTab tenantId={id} showToast={showToast} />
+            <TrophiesTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab === 'products' && !isNew && (
-            <ProductsTab tenantId={id} showToast={showToast} />
+            <ProductsTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab !== 'info' && isNew && (
             <div className="py-12 text-center text-sm text-bone-500">

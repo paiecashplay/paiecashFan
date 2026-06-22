@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Check, X, Pause, RefreshCw, Plus, Pencil } from 'lucide-react';
+import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
 import { cn } from '@/lib/cn';
 
 const STATUS_META = {
@@ -25,6 +26,7 @@ export function AdminClubs() {
   const [toast, setToast]     = useState('');
   const [rejectModal, setRejectModal] = useState(null); // { id, name }
   const [rejectReason, setRejectReason] = useState('');
+  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -99,6 +101,12 @@ export function AdminClubs() {
             className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors"
           >
             <RefreshCw size={14} />
+          </button>
+          <button
+            onClick={() => setImportOpen(true)}
+            className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
+          >
+            <Download size={14} /> Importer depuis API-Football
           </button>
           <button
             onClick={() => navigate('/admin/clubs/new')}
@@ -236,6 +244,16 @@ export function AdminClubs() {
           </table>
         )}
       </div>
+
+      {/* Import API-Football (global → crée/complète par slug) */}
+      <AnimatePresence>
+        {importOpen && (
+          <ImportFromFootball
+            onClose={() => setImportOpen(false)}
+            onImported={() => load()}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Modal rejet */}
       <AnimatePresence>
