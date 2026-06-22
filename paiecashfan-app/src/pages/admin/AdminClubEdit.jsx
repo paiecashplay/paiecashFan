@@ -1,7 +1,7 @@
 // BO Super Admin — Création / édition complète d'un club
 // Tabs : Infos générales | Joueurs | Palmarès | Boutique
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Plus, Trash2, Star,
@@ -43,8 +43,12 @@ export function AdminClubEdit() {
   const { id } = useParams();           // undefined = création
   const isNew   = !id;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [tab,     setTab]     = useState('info');
+  // Onglet initial : ?tab=products|players|trophies|info (ex: depuis /admin/products)
+  const initialTab = ['info', 'players', 'trophies', 'products'].includes(searchParams.get('tab'))
+    ? searchParams.get('tab') : 'info';
+  const [tab,     setTab]     = useState(initialTab);
   const [saving,  setSaving]  = useState(false);
   const [toast,   setToast]   = useState(null);   // { msg, ok }
   const [club,    setClub]    = useState(null);    // données chargées

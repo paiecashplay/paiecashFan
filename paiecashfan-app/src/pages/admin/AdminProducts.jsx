@@ -1,21 +1,37 @@
-// BO Super Admin — Gestion des produits (Phase 2.B stub — à enrichir en P2.C)
+// BO Super Admin — Gestion globale des produits (tous clubs)
+// Permet de filtrer, changer le statut, et ouvrir l'édition complète
+// d'un produit dans la boutique de son club.
 import { useEffect, useState } from 'react';
-import { Search, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, RefreshCw, Pencil, ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { cn } from '@/lib/cn';
 
+const PRODUCT_STATUS = {
+  active:   { label: 'Actif',     color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+  inactive: { label: 'Inactif',   color: 'text-bone-400    bg-white/5        border-white/10'      },
+  sold_out: { label: 'Épuisé',    color: 'text-amber-400   bg-amber-500/10   border-amber-500/20'  },
+  draft:    { label: 'Brouillon', color: 'text-cyan-400    bg-cyan-500/10    border-cyan-500/20'   },
+};
+const STATUS_OPTIONS = ['active', 'inactive', 'sold_out', 'draft'];
+
 export function AdminProducts() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState('');
+  const [saving, setSaving]     = useState(null);
+  const [toast, setToast]       = useState('');
 
   async function load() {
     setLoading(true);
     const { data } = await supabase
       .from('products')
       .select(`
-        id, name, eur_price, pcc_price, status, category_slug, display_order,
+        id, name, eur_price, pcc_price, status, category_slug, display_order, tenant_id,
         tenant:tenants(name, slug)
       `)
       .order('created_at', { ascending: false });
@@ -25,8 +41,26 @@ export function AdminProducts() {
 
   useEffect(() => { load(); }, []);
 
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(''), 2500); }
+
+  async function changeStatus(id, status) {
+    setSaving(id);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/products/${id}`, {
+        method: 'PUT', body: JSON.stringify({ status })
+      });
+      if (!json.success) throw new Error(json.error);
+      setProducts((prev) => prev.map((p) => p.id === id ? { ...p, status } : p));
+      showToast(`Statut → ${PRODUCT_STATUS[status]?.label || status}`);
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setSaving(null);
+  }
+
   const filtered = products.filter((p) =>
-    !search || (p.name || '').toLowerCase().includes(search.toLowerCase())
+    !search ||
+    (p.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (p.tenant?.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (p.category_slug || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -45,7 +79,7 @@ export function AdminProducts() {
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-500" />
         <input
           type="text"
-          placeholder="Nom du produit…"
+          placeholder="Nom, club, catégorie…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-10 pl-9 pr-4 rounded-xl border border-white/10 bg-ink-800/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40"
@@ -66,8 +100,9 @@ export function AdminProducts() {
                 <th className="text-left px-5 py-3 font-semibold">Produit</th>
                 <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Club</th>
                 <th className="text-left px-5 py-3 font-semibold">Prix EUR</th>
-                <th className="text-left px-5 py-3 font-semibold">Prix PCC</th>
+                <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Prix PCC</th>
                 <th className="text-left px-5 py-3 font-semibold">Statut</th>
+                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -83,18 +118,27 @@ export function AdminProducts() {
                   <td className="px-5 py-3.5 text-xs font-mono text-bone-200">
                     {p.eur_price != null ? `${p.eur_price} €` : '—'}
                   </td>
-                  <td className="px-5 py-3.5 text-xs font-mono text-emerald-400">
+                  <td className="px-5 py-3.5 text-xs font-mono text-emerald-400 hidden md:table-cell">
                     {p.pcc_price != null ? `${p.pcc_price} PCC` : '—'}
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={cn(
-                      'inline-flex px-2 py-0.5 rounded-md border text-[10px] font-bold',
-                      p.status === 'active'
-                        ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                        : 'text-bone-400 bg-white/5 border-white/10'
-                    )}>
-                      {p.status || 'draft'}
-                    </span>
+                    <ProductStatusDropdown
+                      status={p.status || 'draft'}
+                      saving={saving === p.id}
+                      onChange={(s) => changeStatus(p.id, s)}
+                    />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex justify-end">
+                      <button
+                        title="Modifier dans la boutique du club"
+                        disabled={!p.tenant_id}
+                        onClick={() => navigate(`/admin/clubs/${p.tenant_id}/edit?tab=products`)}
+                        className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors disabled:opacity-30"
+                      >
+                        <Pencil size={12} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -102,6 +146,69 @@ export function AdminProducts() {
           </table>
         )}
       </div>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-semibold text-emerald-400 shadow-lg"
+          >
+            ✓ {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Menu déroulant de statut produit ─────────────────────────────────
+function ProductStatusDropdown({ status, saving, onChange }) {
+  const [open, setOpen] = useState(false);
+  const meta = PRODUCT_STATUS[status] || PRODUCT_STATUS.draft;
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        disabled={saving}
+        className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-opacity hover:opacity-80 disabled:opacity-50', meta.color)}
+      >
+        {saving
+          ? <span className="h-3 w-3 rounded-full border border-current border-t-transparent animate-spin" />
+          : meta.label}
+        <ChevronDown size={11} className={cn('transition-transform', open && 'rotate-180')} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 4 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.1 }}
+              className="absolute left-0 mt-1 w-36 rounded-xl border border-white/10 bg-ink-800 shadow-xl z-20 overflow-hidden"
+            >
+              {STATUS_OPTIONS.map((s) => {
+                const m = PRODUCT_STATUS[s];
+                return (
+                  <button
+                    key={s}
+                    onClick={() => { setOpen(false); if (s !== status) onChange(s); }}
+                    className={cn(
+                      'w-full flex items-center justify-between gap-2 px-3 py-2.5 text-xs font-semibold transition-colors',
+                      s === status ? 'text-emerald-400 bg-emerald-500/10' : 'text-bone-300 hover:text-bone-50 hover:bg-white/5'
+                    )}
+                  >
+                    {m.label}
+                    {s === status && <Check size={11} />}
+                  </button>
+                );
+              })}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download } from 'lucide-react';
+import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
@@ -66,6 +66,19 @@ export function AdminClubs() {
     setSaving(null);
     setRejectModal(null);
     setRejectReason('');
+  }
+
+  async function changeStatus(id, status) {
+    setSaving(id);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${id}`, {
+        method: 'PUT', body: JSON.stringify({ status })
+      });
+      if (!json.success) throw new Error(json.error);
+      setClubs((prev) => prev.map((c) => c.id === id ? { ...c, status } : c));
+      showToast(`Statut → ${STATUS_META[status]?.label || status}`);
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setSaving(null);
   }
 
   function showToast(msg) {
@@ -195,11 +208,13 @@ export function AdminClubs() {
                       {club.country || '—'}
                     </td>
 
-                    {/* Statut */}
+                    {/* Statut (modifiable) */}
                     <td className="px-5 py-3.5">
-                      <span className={cn('inline-flex px-2.5 py-1 rounded-lg border text-[11px] font-bold', meta.color)}>
-                        {meta.label}
-                      </span>
+                      <StatusDropdown
+                        status={status}
+                        saving={saving === club.id}
+                        onChange={(s) => changeStatus(club.id, s)}
+                      />
                     </td>
 
                     {/* Actions */}
@@ -311,6 +326,59 @@ export function AdminClubs() {
           >
             ✓ {toast}
           </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Menu déroulant de statut (changement direct depuis la liste) ──────
+const STATUS_OPTIONS = ['active', 'pending', 'suspended', 'rejected'];
+function StatusDropdown({ status, saving, onChange }) {
+  const [open, setOpen] = useState(false);
+  const meta = STATUS_META[status] || STATUS_META.pending;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        disabled={saving}
+        className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-opacity hover:opacity-80 disabled:opacity-50', meta.color)}
+      >
+        {saving
+          ? <span className="h-3 w-3 rounded-full border border-current border-t-transparent animate-spin" />
+          : meta.label}
+        <ChevronDown size={11} className={cn('transition-transform', open && 'rotate-180')} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 4 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.1 }}
+              className="absolute left-0 mt-1 w-36 rounded-xl border border-white/10 bg-ink-800 shadow-xl z-20 overflow-hidden"
+            >
+              {STATUS_OPTIONS.map((s) => {
+                const m = STATUS_META[s];
+                return (
+                  <button
+                    key={s}
+                    onClick={() => { setOpen(false); if (s !== status) onChange(s); }}
+                    className={cn(
+                      'w-full flex items-center justify-between gap-2 px-3 py-2.5 text-xs font-semibold transition-colors',
+                      s === status ? 'text-emerald-400 bg-emerald-500/10' : 'text-bone-300 hover:text-bone-50 hover:bg-white/5'
+                    )}
+                  >
+                    {m.label}
+                    {s === status && <Check size={11} />}
+                  </button>
+                );
+              })}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
