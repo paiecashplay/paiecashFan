@@ -10,6 +10,7 @@ const multer   = require('multer');
 const path     = require('path');
 const supabase = require('../../../db/supabase');
 const apiFootball = require('../../../services/apiFootball');
+const footmercato = require('../../../services/footmercato');
 const router   = express.Router();
 
 // Mapping postes API-Football → contrainte players_position_check (FR)
@@ -225,6 +226,59 @@ router.post('/import-from-football', async (req, res) => {
     if (err.code === 'NO_KEY') return fail(res, err.message, 500);
     console.error('[import-from-football]', err.message);
     return fail(res, err.response?.data?.message || err.message, 502);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/import-trophies-footmercato
+// body: { tenantId, slug }  — slug = identifiant Foot Mercato (ex: ol, psg, om)
+// NON DESTRUCTIF : n'ajoute que les trophées dont le label n'existe pas déjà.
+router.post('/import-trophies-footmercato', async (req, res) => {
+  try {
+    const { tenantId, slug } = req.body;
+    if (!tenantId) return fail(res, 'tenantId requis');
+    if (!slug)     return fail(res, 'slug Foot Mercato requis (ex: ol, psg, om)');
+
+    // Vérifie le club
+    const { data: tenant, error: tErr } = await supabase
+      .from('tenants').select('id').eq('id', tenantId).single();
+    if (tErr || !tenant) return fail(res, 'Club cible introuvable', 404);
+
+    const scraped = await footmercato.getTrophies(slug);
+    if (!scraped.length) return fail(res, 'Aucun trophée trouvé (slug incorrect ?)', 404);
+
+    // Trophées déjà en base (dédup par label, insensible à la casse)
+    const { data: existing } = await supabase
+      .from('trophies').select('label').eq('tenant_id', tenantId);
+    const seen = new Set((existing || []).map((t) => (t.label || '').toLowerCase().trim()));
+    let order = (existing || []).length;
+
+    const toInsert = [];
+    let skipped = 0;
+    for (const t of scraped) {
+      if (seen.has(t.label.toLowerCase().trim())) { skipped++; continue; }
+      toInsert.push({
+        tenant_id:     tenantId,
+        label:         t.label,
+        count:         t.count,
+        years_text:    t.years_text,
+        scope:         t.scope,
+        display_order: order++
+      });
+    }
+    if (toInsert.length) {
+      const { error } = await supabase.from('trophies').insert(toInsert);
+      if (error) throw error;
+    }
+
+    return ok(res, {
+      found: scraped.length,
+      added: toInsert.length,
+      skipped,
+      trophies: scraped
+    }, 201);
+  } catch (err) {
+    console.error('[import-trophies-footmercato]', err.message);
+    return fail(res, err.message, 502);
   }
 });
 

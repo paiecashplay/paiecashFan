@@ -550,6 +550,8 @@ function TrophiesTab({ tenantId, showToast }) {
   const [trophies, setTrophies] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [editRow,  setEditRow]  = useState(null);
+  const [fmSlug,   setFmSlug]   = useState('');
+  const [importing, setImporting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -558,6 +560,26 @@ function TrophiesTab({ tenantId, showToast }) {
     setLoading(false);
   }
   useEffect(() => { load(); }, [tenantId]);
+
+  async function importFromFootmercato() {
+    const slug = fmSlug.trim();
+    if (!slug) { showToast('Renseigne le slug Foot Mercato (ex: ol)', false); return; }
+    setImporting(true);
+    try {
+      const json = await apiFetch('/api/v2/admin/clubs-crud/import-trophies-footmercato', {
+        method: 'POST', body: JSON.stringify({ tenantId, slug })
+      });
+      if (!json.success) throw new Error(json.error);
+      const { added, skipped, found } = json.data;
+      showToast(`Palmarès : ${added} ajouté(s)${skipped ? `, ${skipped} déjà présent(s)` : ''} sur ${found}`);
+      setFmSlug('');
+      load();
+    } catch (e) {
+      showToast('Import échoué : ' + e.message, false);
+    } finally {
+      setImporting(false);
+    }
+  }
 
   async function saveTrophy(form) {
     const isNew = !form.id;
@@ -587,6 +609,25 @@ function TrophiesTab({ tenantId, showToast }) {
           className="flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors">
           <Plus size={13} /> Ajouter un trophée
         </button>
+      </div>
+
+      {/* Import palmarès depuis Foot Mercato */}
+      <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3 flex items-center gap-2 flex-wrap">
+        <Download size={14} className="text-bone-400 shrink-0" />
+        <span className="text-xs text-bone-300 font-semibold">Importer le palmarès depuis Foot Mercato</span>
+        <input
+          value={fmSlug}
+          onChange={(e) => setFmSlug(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') importFromFootmercato(); }}
+          placeholder="slug (ex: ol, psg, om)"
+          className="h-8 px-3 rounded-lg border border-white/10 bg-ink-900/60 text-xs text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 w-40"
+        />
+        <button onClick={importFromFootmercato} disabled={importing}
+          className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 disabled:opacity-40 transition-colors">
+          {importing ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+          Importer
+        </button>
+        <span className="text-[10px] text-bone-600 w-full">N'ajoute que les trophées manquants · slug = fin de l'URL footmercato.net/club/<b>ol</b>/palmares</span>
       </div>
 
       <AnimatePresence>
