@@ -12,7 +12,9 @@
 
 const axios = require('axios');
 
-const RAPIDAPI_HOST = 'api-football-v1.p.rapidapi.com';
+// Host RapidAPI par défaut (API-Football d'API-SPORTS). Surchargé via
+// API_FOOTBALL_RAPIDAPI_HOST si ton abonnement utilise un autre host.
+const DEFAULT_RAPIDAPI_HOST = 'api-football-v1.p.rapidapi.com';
 
 function client() {
   const key = process.env.API_FOOTBALL_KEY;
@@ -24,9 +26,10 @@ function client() {
   const provider = (process.env.API_FOOTBALL_PROVIDER || 'apisports').toLowerCase();
 
   if (provider === 'rapidapi') {
+    const host = (process.env.API_FOOTBALL_RAPIDAPI_HOST || DEFAULT_RAPIDAPI_HOST).trim();
     return axios.create({
-      baseURL: `https://${RAPIDAPI_HOST}/v3`,
-      headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': RAPIDAPI_HOST },
+      baseURL: `https://${host}/v3`,
+      headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': host },
       timeout: 15000
     });
   }
