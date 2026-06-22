@@ -1,13 +1,18 @@
 // ═══════════════════════════════════════════════════════════════
-// services/apiFootball.js — Wrapper API-Football v3 (api-football.com)
-// Abonnement direct → en-tête x-apisports-key, base v3.football.api-sports.io
-// Clé : process.env.API_FOOTBALL_KEY (dans backend/.env)
+// services/apiFootball.js — Wrapper API-Football v3
+// Supporte les 2 fournisseurs (variable API_FOOTBALL_PROVIDER) :
+//   • apisports (défaut) — abonnement direct dashboard.api-football.com
+//       base https://v3.football.api-sports.io · en-tête x-apisports-key
+//   • rapidapi            — clé obtenue sur RapidAPI (abonnement requis)
+//       base https://api-football-v1.p.rapidapi.com/v3
+//       en-têtes x-rapidapi-key + x-rapidapi-host
+// Clé : process.env.API_FOOTBALL_KEY (backend/.env)
 // Doc : https://www.api-football.com/documentation-v3
 // ═══════════════════════════════════════════════════════════════
 
 const axios = require('axios');
 
-const BASE = 'https://v3.football.api-sports.io';
+const RAPIDAPI_HOST = 'api-football-v1.p.rapidapi.com';
 
 function client() {
   const key = process.env.API_FOOTBALL_KEY;
@@ -16,14 +21,40 @@ function client() {
     e.code = 'NO_KEY';
     throw e;
   }
+  const provider = (process.env.API_FOOTBALL_PROVIDER || 'apisports').toLowerCase();
+
+  if (provider === 'rapidapi') {
+    return axios.create({
+      baseURL: `https://${RAPIDAPI_HOST}/v3`,
+      headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': RAPIDAPI_HOST },
+      timeout: 15000
+    });
+  }
   return axios.create({
-    baseURL: BASE,
+    baseURL: 'https://v3.football.api-sports.io',
     headers: { 'x-apisports-key': key },
     timeout: 15000
   });
 }
 
-// Normalise la shape team+venue renvoyée par /teams
+// API-Football renvoie HTTP 200 même en cas d'erreur : l'info est dans
+// `data.errors` (objet/tableau) ou un `message` (RapidAPI non abonné).
+// On lève une erreur explicite pour la remonter au front.
+function check(data) {
+  if (!data) throw new Error('Réponse vide d\'API-Football');
+  if (typeof data.message === 'string' && !data.response) {
+    throw new Error(`API-Football : ${data.message}`);
+  }
+  const errs = data.errors;
+  if (Array.isArray(errs) && errs.length) {
+    throw new Error('API-Football : ' + errs.join(' · '));
+  }
+  if (errs && typeof errs === 'object' && Object.keys(errs).length) {
+    throw new Error('API-Football : ' + Object.values(errs).join(' · '));
+  }
+  return data;
+}
+
 function mapTeam(r) {
   if (!r?.team) return null;
   return {
@@ -39,27 +70,27 @@ function mapTeam(r) {
   };
 }
 
-// GET /teams?search= — recherche un club par nom
 async function searchTeams(q) {
   const { data } = await client().get('/teams', { params: { search: q } });
+  check(data);
   return (data.response || []).map(mapTeam).filter(Boolean);
 }
 
-// GET /teams?id= — détail d'un club
 async function getTeam(teamId) {
   const { data } = await client().get('/teams', { params: { id: teamId } });
+  check(data);
   return mapTeam((data.response || [])[0]) || null;
 }
 
-// GET /players/squads?team= — effectif courant
 async function getSquad(teamId) {
   const { data } = await client().get('/players/squads', { params: { team: teamId } });
+  check(data);
   const squad = (data.response || [])[0];
   return (squad?.players || []).map((p) => ({
     apiId:        p.id,
     full_name:    p.name,
     shirt_number: p.number ?? null,
-    position:     p.position || null,   // Goalkeeper | Defender | Midfielder | Attacker
+    position:     p.position || null,
     photo:        p.photo || null
   }));
 }
