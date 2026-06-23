@@ -663,10 +663,7 @@ Coloris : Bleu et blanc`,
       { number: 13, name: 'Fodé Doucouré', position: 'Défenseur', country: 'ML', image: '/images/players/HAC/fode-doucoure.jpg' },
       { number: 15, name: 'Ayumu Seko', position: 'Défenseur', country: 'JP', image: '/images/players/HAC/ayumu-seko.jpg' },
       { number: 18, name: 'Yanis Zouaoui', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/yanis-zouaoui.jpg' },
-      /*{ number: 29, name: 'Stephan Zagadou', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/stephan-zagadou.jpg' },
-      { number: 32, name: 'Timothée Pembélé', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/timothee-pembele.jpg' },
-      { number: 93, name: 'Arouna Sangante', position: 'Défenseur', country: 'SN', image: '/images/players/HAC/arouna-sangante.jpg' },*/
-
+      
       // Milieux
       { number: 8, name: 'Yassine Kechta', position: 'Milieu de terrain', country: 'MA', image: '/images/players/HAC/yassine-kechta.jpg' },
       { number: 14, name: 'Rassoul Ndiaye', position: 'Milieu de terrain', country: 'SN', image: '/images/players/HAC/rassoul-ndiaye.jpg' },
@@ -674,11 +671,8 @@ Coloris : Bleu et blanc`,
       { number: 19, name: 'Lucas Gourna-Douath', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/lucas-gourna-douath.jpg' },
       { number: 24, name: 'Guy Noël Zohouri', position: 'Milieu de terrain', country: 'CI', image: '/images/players/HAC/guy-noel-zohouri.jpg' },
       { number: 26, name: 'Simon Ebonog', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/simon-ebonog.jpg' },
-       { number: 94, name: 'Abdoulaye Touré', position: 'Milieu de terrain', country: 'GN', image: '/images/players/HAC/abdoulaye-toure.jpg' },
-      /*{ number: 30, name: 'Reda Khadra', position: 'Milieu de terrain', country: 'DE', image: '/images/players/HAC/reda-khadra.jpg' },
-      { number: 78, name: 'Daren Mosengo', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/daren-mosengo.jpg' },*/
-     
-
+      { number: 94, name: 'Abdoulaye Touré', position: 'Milieu de terrain', country: 'GN', image: '/images/players/HAC/abdoulaye-toure.jpg' },
+      
       // Attaquants
       { number: 10, name: 'Felix Mambimbi', position: 'Attaquant', country: 'CH', image: '/images/players/HAC/felix-mambimbi.jpg' },
       { number: 11, name: 'Godson Kyeremeh', position: 'Attaquant', country: 'FR', image: '/images/players/HAC/godson-kyeremeh.jpg' },
