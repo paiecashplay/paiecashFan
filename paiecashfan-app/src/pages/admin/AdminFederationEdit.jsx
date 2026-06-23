@@ -256,7 +256,7 @@ function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClub
         hub ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' : 'border-amber-500/20 bg-amber-500/5 text-amber-400')}>
         <Globe size={14} />
         {hub
-          ? <span>Page hub active : <b>{hub.name}</b> → <a className="underline" href={`/clubs/${hub.slug}`} target="_blank" rel="noreferrer">/clubs/{hub.slug}</a></span>
+          ? <span>Page fédération active → <a className="underline" href={`/federations/${fed.slug}`} target="_blank" rel="noreferrer">/federations/{fed.slug}</a></span>
           : <span>Aucun hub. Clique « Créer le hub » pour générer la page d'accueil de la fédération.</span>}
       </div>
 

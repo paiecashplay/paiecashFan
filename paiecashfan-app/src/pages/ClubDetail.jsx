@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
@@ -29,6 +29,13 @@ export function ClubDetail() {
   const { club, players, starPlayer, trophies, products, members, loading } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
+
+  // Un hub de fédération (ex: tenant "Cameroun") a sa page CANONIQUE sur
+  // /federations/:slug. On y redirige pour éviter la double page club/fédé.
+  // (routes différentes /clubs ↔ /federations → aucun risque de boucle)
+  if (club.isFederationHub && club.federationSlug) {
+    return <Navigate to={`/federations/${club.federationSlug}`} replace />;
+  }
 
   // Page Fédération : si ce tenant est un hub, on remplace la boutique par
   // la grille des clubs membres. Priorité aux membres venant de la BASE
