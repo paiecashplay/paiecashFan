@@ -40,6 +40,7 @@ export function ClubDetail() {
         code:         m.short_code,
         city:         m.city,
         stadium:      m.stadium,
+        stadiumImage: m.stadium_image_url,
         founded:      m.founded_year,
         logo:         m.logo_url,
         primaryColor: m.primary_color || club.primaryColor,

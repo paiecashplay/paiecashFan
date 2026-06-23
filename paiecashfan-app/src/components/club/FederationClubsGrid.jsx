@@ -84,8 +84,13 @@ export function FederationClubsGrid({
 //  │ FAN TOKENS | PRODUCTS | 1936 EST.      │ ← footer stats
 //  └────────────────────────────────────────┘
 // Hover : scale 1.03 + ring jaune + soulignement cyan en bas.
+// Image IA générique utilisée si le club n'a pas de photo de stade
+const DEFAULT_STADIUM = '/images/futuristic_stadium_hero.png';
+
 function FederationClubCard({ club, index, cardBackground }) {
   const [hovered, setHovered] = useState(false);
+  // Priorité : photo du stade du club (BO) → image de la fédération → défaut IA
+  const [imgSrc, setImgSrc] = useState(club.stadiumImage || cardBackground || DEFAULT_STADIUM);
 
   return (
     <motion.div
@@ -109,29 +114,18 @@ function FederationClubCard({ club, index, cardBackground }) {
         to={`/clubs/${club.slug}`}
         className="block relative h-[360px] md:h-[400px]"
       >
-        {/* Background : photo du stade en <img> (plus fiable que
-            background-image qui peut être masqué selon le
-            navigateur / format). Fallback solide si l'image
-            échoue à charger. */}
-        {cardBackground ? (
-          <img
-            src={cardBackground}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
-            style={{ transform: hovered ? 'scale(1.08)' : 'scale(1.02)' }}
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-        ) : (
-          <div
-            className="absolute inset-0 transition-transform duration-500"
-            style={{
-              background: `linear-gradient(135deg, ${club.primaryColor}40, ${club.primaryColor}20)`,
-              transform: hovered ? 'scale(1.08)' : 'scale(1.02)'
-            }}
-          />
-        )}
+        {/* Background : photo du stade DU CLUB (BO) ou image IA par défaut.
+            En <img> (plus fiable que background-image). Si l'URL échoue,
+            on bascule sur l'image par défaut plutôt que de masquer. */}
+        <img
+          src={imgSrc}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
+          style={{ transform: hovered ? 'scale(1.08)' : 'scale(1.02)' }}
+          onError={() => { if (imgSrc !== DEFAULT_STADIUM) setImgSrc(DEFAULT_STADIUM); }}
+        />
 
         {/* Couche solide en-dessous pour fallback en cas d'image
             qui n'a pas chargé (sinon on verrait le DOM derrière) */}

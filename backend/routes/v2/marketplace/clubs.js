@@ -86,7 +86,7 @@ router.get('/:slugOrId', async (req, res) => {
     if (club.is_federation_hub && club.federation?.id) {
       const { data: mem } = await supabase
         .from('tenants')
-        .select('id, slug, name, short_code, country, city, logo_url, primary_color, stadium, founded_year')
+        .select('id, slug, name, short_code, country, city, logo_url, primary_color, stadium, stadium_image_url, founded_year')
         .eq('federation_id', club.federation.id)
         .eq('is_federation_hub', false)
         .eq('status', 'active')
