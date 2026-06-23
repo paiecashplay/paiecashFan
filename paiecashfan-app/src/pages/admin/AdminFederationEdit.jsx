@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Loader2, Check, X, Globe, Plus, Pencil,
-  Star, ExternalLink
+  Star, ExternalLink, Download
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -80,6 +80,14 @@ export function AdminFederationEdit() {
             showToast(json.data.created ? 'Hub créé' : 'Hub déjà existant');
             loadAll();
           } catch (e) { showToast('Erreur : ' + e.message, false); }
+        }}
+        onImportClubs={async () => {
+          const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${fed.id}/import-clubs`, { method: 'POST' });
+          if (!json.success) throw new Error(json.error);
+          const { added, skipped, found } = json.data;
+          showToast(`${added} club(s) importé(s)${skipped ? `, ${skipped} déjà présent(s)` : ''} sur ${found}`);
+          loadAll();
+          return json.data;
         }}
       />
 
@@ -201,8 +209,18 @@ function FederationInfoForm({ fed, onSaved }) {
 }
 
 // ── Section clubs membres ────────────────────────────────────────────
-function MembersSection({ fed, members, hub, navigate, onCreateHub }) {
+function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClubs }) {
   const clubs = members.filter((m) => !m.is_federation_hub);
+  const [importing, setImporting] = useState(false);
+  const [importErr, setImportErr] = useState('');
+
+  async function handleImport() {
+    if (!confirm(`Importer automatiquement les clubs de « ${fed.name} » depuis API-Football ?\n\nLes championnats du pays (${fed.country_code}) seront scannés. Les clubs déjà présents seront ignorés.`)) return;
+    setImporting(true); setImportErr('');
+    try { await onImportClubs(); }
+    catch (e) { setImportErr(e.message || 'Import échoué'); }
+    setImporting(false);
+  }
 
   return (
     <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5 space-y-4">
@@ -211,7 +229,11 @@ function MembersSection({ fed, members, hub, navigate, onCreateHub }) {
           <h2 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Clubs membres</h2>
           <p className="text-xs text-bone-400 mt-1">{clubs.length} club{clubs.length > 1 ? 's' : ''} rattaché{clubs.length > 1 ? 's' : ''}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={handleImport} disabled={importing}
+            className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 disabled:opacity-40 transition-colors">
+            {importing ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />} Importer les clubs (API-Football)
+          </button>
           {!hub && (
             <button onClick={onCreateHub}
               className="flex items-center gap-2 h-9 px-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-colors">
@@ -224,6 +246,10 @@ function MembersSection({ fed, members, hub, navigate, onCreateHub }) {
           </button>
         </div>
       </div>
+
+      {importErr && (
+        <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400">{importErr}</div>
+      )}
 
       {/* Statut hub */}
       <div className={cn('rounded-xl border p-3 text-xs flex items-center gap-2',

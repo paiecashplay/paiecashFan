@@ -390,6 +390,86 @@ router.put('/federations/:id', async (req, res) => {
   }
 });
 
+// POST /api/v2/admin/clubs-crud/federations/:id/import-clubs
+// Importe en masse les clubs du pays de la fédération depuis API-Football
+// (championnats type "League"). NON DESTRUCTIF : n'ajoute que les clubs
+// absents (dédup par nom dans la fédération), federation_id pré-rempli.
+router.post('/federations/:id/import-clubs', async (req, res) => {
+  try {
+    const { data: fed, error: fErr } = await supabase
+      .from('federations').select('id, name, country_code, primary_color')
+      .eq('id', req.params.id).single();
+    if (fErr || !fed) return fail(res, 'Fédération introuvable', 404);
+    if (!fed.country_code) return fail(res, 'Code pays manquant sur la fédération');
+
+    const warnings = [];
+
+    // 1. Championnats du pays
+    const leagues = (await apiFootball.getLeaguesByCountryCode(fed.country_code))
+      .filter((l) => l.type === 'League');
+    if (!leagues.length) return fail(res, `Aucun championnat trouvé pour ${fed.country_code} sur API-Football`, 404);
+
+    // 2. Équipes par championnat (saison courante, sinon la plus récente), dédupliquées
+    const teamsById = new Map();
+    for (const lg of leagues) {
+      const season = (lg.seasons.find((s) => s.current) || lg.seasons.slice(-1)[0] || {}).year;
+      if (!season) { warnings.push(`Pas de saison pour ${lg.name}`); continue; }
+      try {
+        const teams = await apiFootball.getTeamsByLeagueSeason(lg.id, season);
+        teams.forEach((t) => { if (!teamsById.has(t.id)) teamsById.set(t.id, t); });
+      } catch (e) {
+        warnings.push(`${lg.name} : ${e.message}`);
+      }
+    }
+    const teams = [...teamsById.values()].filter((t) => !t.national); // exclut la sélection nationale
+    if (!teams.length) return fail(res, 'Aucun club récupéré (couverture API limitée pour ce pays ?)', 404);
+
+    // 3. État existant (dédup nom dans la fédé + unicité slug globale)
+    const { data: allTenants } = await supabase.from('tenants').select('name, slug, federation_id');
+    const slugSet = new Set((allTenants || []).map((t) => t.slug));
+    const fedNames = new Set((allTenants || []).filter((t) => t.federation_id === fed.id).map((t) => (t.name || '').toLowerCase().trim()));
+
+    const toInsert = [];
+    let skipped = 0;
+    for (const t of teams) {
+      const nameKey = (t.name || '').toLowerCase().trim();
+      if (!t.name || fedNames.has(nameKey)) { skipped++; continue; }
+
+      let slug = cleanSlug(t.name);
+      if (slugSet.has(slug)) slug = `${slug}-${fed.country_code.toLowerCase()}`;
+      if (slugSet.has(slug)) { skipped++; warnings.push(`Slug en conflit : ${t.name}`); continue; }
+
+      slugSet.add(slug); fedNames.add(nameKey);
+      toInsert.push({
+        name: t.name, slug, type: 'club', status: 'active',
+        federation_id: fed.id, is_federation_hub: false,
+        country: t.country || null, city: t.city || null,
+        logo_url: t.logo || null, founded_year: toIntOrNull(t.founded),
+        stadium: t.stadium || null, stadium_image_url: t.stadium_image_url || null,
+        primary_color: fed.primary_color || '#10b981',
+        metadata: { api_football_id: t.id }
+      });
+    }
+
+    if (toInsert.length) {
+      const { error } = await supabase.from('tenants').insert(toInsert);
+      if (error) throw error;
+    }
+
+    return ok(res, {
+      leaguesScanned: leagues.length,
+      found: teams.length,
+      added: toInsert.length,
+      skipped,
+      warnings
+    }, 201);
+  } catch (err) {
+    if (err.code === 'NO_KEY') return fail(res, err.message, 500);
+    console.error('[import-clubs]', err.message);
+    return fail(res, err.response?.data?.message || err.message, 502);
+  }
+});
+
 // POST /api/v2/admin/clubs-crud/federations/:id/create-hub
 // Crée (ou retourne) le tenant hub d'une fédération.
 router.post('/federations/:id/create-hub', async (req, res) => {
