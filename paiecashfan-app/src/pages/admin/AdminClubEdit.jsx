@@ -202,7 +202,18 @@ function InfoTab({ club, clubId, isNew, onSaved, saving, setSaving }) {
     coach:         club?.coach         || '',
     president:     club?.president     || '',
     is_federation_hub: club?.is_federation_hub || false,
+    federation_id: club?.federation_id || club?.federation?.id || '',
   });
+
+  // Liste des fédérations (pour le sélecteur de rattachement)
+  const [federations, setFederations] = useState([]);
+  const [showNewFed, setShowNewFed]   = useState(false);
+  function loadFederations() {
+    apiFetch('/api/v2/admin/clubs-crud/federations')
+      .then((j) => { if (j.success) setFederations(j.data.federations || []); })
+      .catch(() => {});
+  }
+  useEffect(() => { loadFederations(); }, []);
 
   function set(k) { return (e) => setForm((f) => ({ ...f, [k]: e.target.value })); }
   function autoSlug(name) {
@@ -338,12 +349,45 @@ function InfoTab({ club, clubId, isNew, onSaved, saving, setSaving }) {
         </Field>
       </div>
 
-      {/* Fédération hub */}
-      <label className="flex items-center gap-3 cursor-pointer w-fit">
-        <input type="checkbox" checked={form.is_federation_hub} onChange={(e) => setForm((f) => ({ ...f, is_federation_hub: e.target.checked }))}
-          className="h-4 w-4 rounded border border-white/20 bg-ink-800 accent-emerald-400" />
-        <span className="text-sm text-bone-200">C'est une fédération (page hub avec grille de clubs)</span>
-      </label>
+      {/* ─── Rattachement à une fédération ─────────────────────────── */}
+      <div className="rounded-xl border border-white/8 bg-white/[0.02] p-4 space-y-3">
+        <p className="text-[11px] font-bold text-bone-300 uppercase tracking-wider">Fédération</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Rattacher ce club à une fédération">
+            <select value={form.federation_id} onChange={set('federation_id')} className={input()}>
+              <option value="">— Aucune —</option>
+              {federations.map((fed) => (
+                <option key={fed.id} value={fed.id}>{fed.name} ({fed.country})</option>
+              ))}
+            </select>
+            <button type="button" onClick={() => setShowNewFed((v) => !v)}
+              className="mt-1.5 flex items-center gap-1.5 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
+              <Plus size={12} /> Créer une fédération
+            </button>
+          </Field>
+
+          {/* Hub : ce tenant EST la page d'accueil de sa fédération */}
+          <Field label="Type de page">
+            <label className="flex items-center gap-3 cursor-pointer h-10">
+              <input type="checkbox" checked={form.is_federation_hub} onChange={(e) => setForm((f) => ({ ...f, is_federation_hub: e.target.checked }))}
+                className="h-4 w-4 rounded border border-white/20 bg-ink-800 accent-emerald-400" />
+              <span className="text-sm text-bone-200">Page hub (grille des clubs de la fédération)</span>
+            </label>
+            <p className="text-[10px] text-bone-600 mt-1">À cocher uniquement sur le tenant qui sert de page d'accueil de la fédération — pas sur un club membre.</p>
+          </Field>
+        </div>
+
+        <AnimatePresence>
+          {showNewFed && (
+            <NewFederationForm onCreated={(fed) => {
+              loadFederations();
+              setForm((f) => ({ ...f, federation_id: fed.id }));
+              setShowNewFed(false);
+            }} onCancel={() => setShowNewFed(false)} />
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Save */}
       <button onClick={save} disabled={saving || uploading || !form.name || !form.slug}
@@ -1014,6 +1058,58 @@ function ProductForm({ initial, onSave, onCancel }) {
         )}
       </div>
     </div>
+  );
+}
+
+// ─── Création inline d'une fédération ────────────────────────
+const CONFEDERATIONS = ['CAF', 'UEFA', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC'];
+function NewFederationForm({ onCreated, onCancel }) {
+  const [f, setF] = useState({ name: '', country: '', country_code: '', confederation_code: 'CAF' });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+  const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
+
+  async function submit() {
+    setErr('');
+    if (!f.name || !f.country_code) { setErr('Nom et code pays requis'); return; }
+    setSaving(true);
+    try {
+      const json = await apiFetch('/api/v2/admin/clubs-crud/federations', { method: 'POST', body: JSON.stringify(f) });
+      if (!json.success) throw new Error(json.error);
+      onCreated(json.data.federation);
+    } catch (e) { setErr(e.message); }
+    setSaving(false);
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+      className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 mt-2">
+      <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3">Nouvelle fédération</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Field label="Nom *" cls="col-span-2">
+          <input value={f.name} onChange={set('name')} placeholder="Fédération Camerounaise de Football" className={input()} />
+        </Field>
+        <Field label="Pays">
+          <input value={f.country} onChange={set('country')} placeholder="Cameroun" className={input()} />
+        </Field>
+        <Field label="Code pays *">
+          <input value={f.country_code} onChange={set('country_code')} placeholder="CM" maxLength={3} className={input()} />
+        </Field>
+        <Field label="Confédération" cls="col-span-2">
+          <select value={f.confederation_code} onChange={set('confederation_code')} className={input()}>
+            {CONFEDERATIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </Field>
+      </div>
+      {err && <p className="text-[11px] text-red-400 mt-2">{err}</p>}
+      <div className="flex gap-3 mt-3">
+        <button onClick={submit} disabled={saving || !f.name || !f.country_code}
+          className="flex items-center gap-2 h-9 px-5 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 disabled:opacity-40 transition-colors">
+          {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Créer
+        </button>
+        <button onClick={onCancel} className="h-9 px-4 rounded-xl border border-white/10 text-xs text-bone-400 hover:text-bone-100 transition-colors">Annuler</button>
+      </div>
+    </motion.div>
   );
 }
 

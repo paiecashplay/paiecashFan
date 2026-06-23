@@ -26,14 +26,27 @@ const fmtRel = (n) =>
 
 export function ClubDetail() {
   const { slug } = useParams();
-  const { club, players, starPlayer, trophies, products, loading } = useClubDetail(slug);
+  const { club, players, starPlayer, trophies, products, members, loading } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
 
-  // Page Fédération nationale (ex: /clubs/tanzanie) : on remplace la
-  // boutique par la grille des clubs membres si le profil expose
-  // isFederationHub ET qu'on a une liste de clubs rattachés.
-  const federationClubs = club.isFederationHub ? getFederationClubs(slug) : null;
+  // Page Fédération : si ce tenant est un hub, on remplace la boutique par
+  // la grille des clubs membres. Priorité aux membres venant de la BASE
+  // (federation_id), avec repli sur la liste statique (ex: Tanzanie héritée).
+  const dbMembers = members.length > 0
+    ? members.map((m) => ({
+        slug:         m.slug,
+        name:         m.name,
+        code:         m.short_code,
+        city:         m.city,
+        stadium:      m.stadium,
+        founded:      m.founded_year,
+        logo:         m.logo_url,
+        primaryColor: m.primary_color || club.primaryColor,
+        countryFlag:  club.flagEmoji || ''
+      }))
+    : null;
+  const federationClubs = club.isFederationHub ? (dbMembers || getFederationClubs(slug)) : null;
   const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
 
   // Bouton "Retour" dynamique : si on est sur un club rattaché à une

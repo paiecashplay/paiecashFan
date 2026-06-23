@@ -54,6 +54,7 @@ export function useClubDetail(slug) {
   const [starPlayer, setStarPlayer] = useState(staticClub?.starPlayer || null);
   const [trophies, setTrophies]   = useState(staticClub?.trophies?.breakdown || []);
   const [products, setProducts]   = useState([]);
+  const [members, setMembers]     = useState([]);   // clubs membres si fédération hub
   const [loading, setLoading]     = useState(true);
   const [fromApi, setFromApi]     = useState(false);
 
@@ -67,6 +68,7 @@ export function useClubDetail(slug) {
     setStarPlayer(base?.starPlayer || null);
     setTrophies(base?.trophies?.breakdown || []);
     setProducts([]);
+    setMembers([]);
     setFromApi(false);
     setLoading(true);
 
@@ -77,7 +79,7 @@ export function useClubDetail(slug) {
         if (cancelled || !json?.success) return;
 
         const { club: apiClub, starPlayer: apiStar, players: apiPlayers,
-                trophies: apiTrophies, products: apiProducts } = json.data;
+                trophies: apiTrophies, products: apiProducts, members: apiMembers } = json.data;
 
         if (!apiClub) return;
 
@@ -90,6 +92,7 @@ export function useClubDetail(slug) {
         if (apiPlayers?.length)  setPlayers(apiPlayers);
         if (apiTrophies?.length) setTrophies(apiTrophies);
         if (apiProducts?.length) setProducts(apiProducts);
+        if (apiMembers?.length)  setMembers(apiMembers);
 
         setFromApi(true);
       })
@@ -103,5 +106,5 @@ export function useClubDetail(slug) {
     return () => { cancelled = true; };
   }, [slug]);
 
-  return { club, players, starPlayer, trophies, products, loading, fromApi };
+  return { club, players, starPlayer, trophies, products, members, loading, fromApi };
 }

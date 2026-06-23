@@ -80,12 +80,27 @@ router.get('/:slugOrId', async (req, res) => {
 
     if (productsRes.error) throw productsRes.error;
 
+    // Page fédération : si ce tenant est un hub, on récupère les clubs membres
+    // (mêmes federation_id, hors hub, actifs) pour afficher la grille Équipes.
+    let members = [];
+    if (club.is_federation_hub && club.federation?.id) {
+      const { data: mem } = await supabase
+        .from('tenants')
+        .select('id, slug, name, short_code, country, city, logo_url, primary_color, stadium, founded_year')
+        .eq('federation_id', club.federation.id)
+        .eq('is_federation_hub', false)
+        .eq('status', 'active')
+        .order('name', { ascending: true });
+      members = mem || [];
+    }
+
     return ok(res, {
       club,
       starPlayer,
       players,
       trophies,
-      products: productsRes.data || []
+      products: productsRes.data || [],
+      members
     });
   } catch (err) {
     console.error('[clubs] GET /:slugOrId error:', err.message);

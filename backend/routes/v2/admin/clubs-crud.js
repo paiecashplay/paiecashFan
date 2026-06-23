@@ -283,6 +283,56 @@ router.post('/import-trophies-footmercato', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// FÉDÉRATIONS
+// ═══════════════════════════════════════════════════════════════
+
+// GET /api/v2/admin/clubs-crud/federations — liste pour le sélecteur BO
+router.get('/federations', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('federations')
+      .select('id, slug, name, country, country_code, confederation_code, logo_url')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return ok(res, { federations: data || [] });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/federations — créer une fédération
+// body: { name, country, country_code, confederation_code, slug? }
+const CONFEDERATIONS = ['CAF', 'UEFA', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC'];
+router.post('/federations', async (req, res) => {
+  try {
+    const { name, country, country_code, confederation_code, slug } = req.body;
+    if (!name) return fail(res, 'name requis');
+    if (!country_code) return fail(res, 'country_code requis (ex: CM pour Cameroun)');
+    const conf = (confederation_code || '').toUpperCase();
+    if (!CONFEDERATIONS.includes(conf)) return fail(res, 'confederation_code invalide (CAF, UEFA, CONMEBOL, CONCACAF, AFC, OFC)');
+
+    const cleanedSlug = cleanSlug(slug || name);
+    if (!cleanedSlug) return fail(res, 'slug invalide');
+
+    const { data, error } = await supabase
+      .from('federations')
+      .insert({
+        name,
+        slug: cleanedSlug,
+        country: country || name,
+        country_code: country_code.toUpperCase(),
+        confederation_code: conf
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return ok(res, { federation: data }, 201);
+  } catch (err) {
+    return fail(res, err.message.includes('duplicate') ? 'Une fédération avec ce slug existe déjà' : err.message, 500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
 // CLUBS (tenants)
 // ═══════════════════════════════════════════════════════════════
 
@@ -341,6 +391,8 @@ router.put('/clubs/:id', async (req, res) => {
     allowed.forEach((k) => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     // Colonne integer : "" → null
     if ('founded_year' in updates) updates.founded_year = toIntOrNull(updates.founded_year);
+    // FK fédération : "" → null (sinon violation de clé étrangère)
+    if ('federation_id' in updates && !updates.federation_id) updates.federation_id = null;
     // Nettoie le slug si fourni
     if ('slug' in updates) {
       updates.slug = cleanSlug(updates.slug);
