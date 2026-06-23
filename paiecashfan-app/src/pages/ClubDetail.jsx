@@ -176,26 +176,26 @@ function ClubHero({ club, backTo = '/', loading = false }) {
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
       {/* Background stade — image custom du club ou fallback générique */}
       <ClubStadiumBg src={stadiumImage} fallback="/images/futuristic_stadium_hero.png" />
-      {/* Voile couleur club — mix-blend-color teinte uniformément toute l'image
-          quelle que soit la teinte (vif comme l'OM ou marine foncé comme l'OL),
-          tout en préservant les détails clairs/sombres du stade. */}
+      {/* Voile couleur club — mix-blend-color teinte uniformément l'image.
+          Opacité modérée pour rester visible sur les couleurs foncées
+          (ex: vert #006400) sans noyer la photo du stade. */}
       <div
         className="absolute inset-0 mix-blend-color"
-        style={{ background: club.primaryColor, opacity: 0.55 }}
+        style={{ background: club.primaryColor, opacity: 0.4 }}
       />
-      {/* Renfort de teinte en haut + assombrissement progressif en bas pour
-          garantir la lisibilité du texte du hero. */}
+      {/* Teinte légère en haut, MILIEU transparent (on voit le stade),
+          assombrissement en bas pour la lisibilité du texte. */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(180deg,
-            ${club.primaryColor}33 0%,
-            ${club.primaryColor}1A 30%,
-            rgba(4,8,13,0.6) 65%,
-            rgba(4,8,13,1) 100%)`
+            ${club.primaryColor}26 0%,
+            transparent 38%,
+            rgba(4,8,13,0.55) 75%,
+            rgba(4,8,13,0.98) 100%)`
         }}
       />
-      <div className="absolute inset-0 bg-ink-900/30" />
+      <div className="absolute inset-0 bg-ink-900/15" />
 
       <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
         <Link

@@ -384,6 +384,18 @@ router.put('/federations/:id', async (req, res) => {
     const { data, error } = await supabase
       .from('federations').update(updates).eq('id', req.params.id).select(FED_SELECT).single();
     if (error) throw error;
+
+    // Synchronise le hero vers le tenant HUB de la fédération, pour que
+    // /clubs/<hub> reflète le logo / la photo / la couleur saisis ici.
+    const heroSync = {};
+    ['logo_url', 'stadium_image_url', 'primary_color', 'name'].forEach((k) => {
+      if (data[k]) heroSync[k] = data[k];
+    });
+    if (Object.keys(heroSync).length) {
+      await supabase.from('tenants').update(heroSync)
+        .eq('federation_id', req.params.id).eq('is_federation_hub', true);
+    }
+
     return ok(res, { federation: data });
   } catch (err) {
     return fail(res, err.message, 500);
