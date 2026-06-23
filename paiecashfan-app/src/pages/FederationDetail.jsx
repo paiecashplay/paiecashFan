@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Search, Globe } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
+import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { useFederationDetail } from '@/hooks/useFederationDetail';
 import { federations } from '@/data/federations';
 import { cafMembers, cafStats } from '@/data/caf-members';
 import { uefaMembers } from '@/data/uefa-members';
@@ -77,12 +79,94 @@ const datasets = {
 
 export function FederationDetail() {
   const { fedId } = useParams();
-  const federation = federations.find((f) => f.id === fedId);
-  const dataset = datasets[fedId];
 
-  if (!federation) return <NotFound />;
-  if (!dataset) return <ComingSoon federation={federation} />;
-  return <FederationView federation={federation} dataset={dataset} />;
+  // Confédérations statiques connues (caf/uefa/…) : on garde le rendu existant
+  // et on n'appelle PAS l'API (elles ne sont pas en base).
+  const isStaticConfed = Boolean(datasets[fedId]);
+
+  // API-first uniquement pour les autres slugs (fédérations nationales en base)
+  const { federation: dbFed, members: dbMembers, loading } =
+    useFederationDetail(isStaticConfed ? null : fedId);
+
+  // 1) Confédération statique → inchangé
+  if (isStaticConfed) {
+    const federation = federations.find((f) => f.id === fedId);
+    return <FederationView federation={federation} dataset={datasets[fedId]} />;
+  }
+
+  // 2) Fédération nationale en base → vue dynamique
+  if (loading) return <FedLoading />;
+  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} />;
+
+  // 3) Repli : entrée statique sans dataset, ou inconnue
+  const federation = federations.find((f) => f.id === fedId);
+  if (federation) return <ComingSoon federation={federation} />;
+  return <NotFound />;
+}
+
+function FedLoading() {
+  return (
+    <section className="min-h-[60vh] grid place-items-center">
+      <Loader2 size={28} className="text-emerald-400 animate-spin" />
+    </section>
+  );
+}
+
+// ── Vue dynamique d'une fédération nationale (depuis la base) ────────
+// Hero (logo/nom/pays) + grille des clubs membres (FederationClubsGrid).
+function DynamicFederationView({ federation, members }) {
+  const color = federation.primary_color || '#10b981';
+  const clubs = (members || []).map((m) => ({
+    slug:         m.slug,
+    name:         m.name,
+    code:         m.short_code,
+    city:         m.city,
+    stadium:      m.stadium,
+    founded:      m.founded_year,
+    logo:         m.logo_url,
+    primaryColor: m.primary_color || color,
+    countryFlag:  federation.flag_emoji || ''
+  }));
+
+  return (
+    <>
+      <section className="relative overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 opacity-25" style={{ background: `linear-gradient(135deg, ${color}, transparent)` }} />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900/60 via-ink-900/40 to-ink-900" />
+        <Container className="relative pt-8 pb-16 md:pt-10 md:pb-20">
+          <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
+            <ArrowLeft size={14} /> Retour
+          </Link>
+          <div className="mt-12 md:mt-16 flex items-center gap-5">
+            {federation.logo_url && (
+              <img src={federation.logo_url} alt="" className="h-20 w-20 rounded-2xl object-contain bg-white/5 border border-white/10" />
+            )}
+            <div>
+              <h1 className="font-display text-3xl md:text-5xl font-black uppercase tracking-tight text-bone-50" style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}>
+                {federation.name}
+              </h1>
+              <p className="mt-2 text-sm md:text-base text-bone-300 font-semibold">
+                {[federation.country, federation.founded_year && `Depuis ${federation.founded_year}`, `${clubs.length} clubs`].filter(Boolean).join(' • ')}
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {clubs.length > 0 ? (
+        <FederationClubsGrid
+          clubs={clubs}
+          federationColor={color}
+          leagueName={`Clubs · ${federation.name}`}
+          cardBackground={federation.stadium_image_url}
+        />
+      ) : (
+        <Container className="py-20 text-center text-sm text-bone-400">
+          Aucun club rattaché à cette fédération pour le moment.
+        </Container>
+      )}
+    </>
+  );
 }
 
 function FederationView({ federation, dataset }) {

@@ -36,7 +36,11 @@ router.get('/:slugOrId', async (req, res) => {
 
     let fedQuery = supabase
       .from('federations')
-      .select('id, slug, name, country, country_code, confederation_code, logo_url, founded_year, national_team_name, metadata');
+      .select(`
+        id, slug, name, country, country_code, confederation_code, founded_year,
+        logo_url, primary_color, accent_color, flag_emoji, stadium, stadium_image_url,
+        motto, motto_color, national_team_name, president, metadata
+      `);
 
     fedQuery = isUuid ? fedQuery.eq('id', p) : fedQuery.eq('slug', p);
     const { data: federation, error: fedErr } = await fedQuery.maybeSingle();
@@ -49,7 +53,7 @@ router.get('/:slugOrId', async (req, res) => {
       supabase
         .from('tenants')
         .select(`
-          id, slug, name, city, logo_url, primary_color,
+          id, slug, name, short_code, city, logo_url, primary_color,
           stadium, founded_year, status
         `)
         .eq('federation_id', federation.id)
