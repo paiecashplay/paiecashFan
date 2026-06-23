@@ -23,7 +23,8 @@ export const ligue1 = {
   clubs: [
     { id: 'om',     name: 'Olympique de Marseille', city: 'Marseille',     logo: crest(516),  primaryColor: '#0099D8' },
     { id: 'psg',    name: 'Paris Saint-Germain',    city: 'Paris',         logo: crest(524),  primaryColor: '#004170' },
-    { id: 'parisfc',   name: 'Paris FC',            city: 'Paris',         logo: '/images/logos/clubs-france/logo-paris-fc.png',  primaryColor: '#0033A0' }, //Trouver le logo du Paris FC sur football-data.org
+    { id: 'paris-fc',   name: 'Paris FC',            city: 'Paris',         logo: '/images/logos/clubs-france/logo-paris-fc.png',  primaryColor: '#0033A0' }, //Trouver le logo du Paris FC sur football-data.org
+    { id: 'le-havre-ac', name: 'Le Havre AC',          city: 'Le Havre',      logo: '/images/logos/clubs-france/logo-le-havre-ac.png',  primaryColor: '#00A3E0' }, //Trouver le logo du Paris FC sur football-data.org
     { id: 'lyon',   name: 'Olympique Lyonnais',     city: 'Lyon',          logo: crest(523),  primaryColor: '#003B82' },
     { id: 'monaco', name: 'AS Monaco',              city: 'Monaco',        logo: crest(548),  primaryColor: '#E60026' },
     { id: 'lille',  name: 'LOSC Lille',             city: 'Lille',         logo: crest(521),  primaryColor: '#C8102E' },

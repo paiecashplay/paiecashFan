@@ -424,14 +424,12 @@ Coloris : Bleu et blanc`,
   // ────────────────────────────────────────────────────────────
   'paris-fc': {
     motto: 'Une ambition capitale',
-    mottoColor: '#0033A0',            // rouge PSG
+    mottoColor: '#0033A0',            
     founded: 1969,
     stadium: 'Jean-Bouin',
-    stadiumImage: '/images/clubs/parisFC-stadium.jpg', // poser le fichier ici
+    stadiumImage: '/images/clubs/parisFC-stadium.jpg', 
     coach: 'Pierre Ferracci',
     president: 'Antoine Kombouaré',
-    // Palmarès complet du PSG (58 trophées au total).
-    // Pour étendre à d'autres clubs : reprendre la même structure.
     trophies: {
       total: 0,
       breakdown: [
@@ -451,8 +449,6 @@ Coloris : Bleu et blanc`,
         assists: 4
       }
     },
-    // Liste officielle 2026 (24 joueurs). Photos posées dans /public/images/players/
-    // avec noms hétérogènes — référencés explicitement via le champ image.
     squad: [
       { number: 1,  name: 'Rémy Riou',            position: 'Gardien de but',     country: 'FR', image: '/images/players/PFC/remy-riou.png' },
       { number: 16,  name: 'Obed Nkambadio',      position: 'Gardien de but',     country: 'FR', image: '/images/players/PFC/obed-nkambadio.png' },
@@ -606,6 +602,197 @@ Coloris : Bleu et blanc`,
       },
     ]
   },
+
+  // ────────────────────────────────────────────────────────────
+  // Le Havre AC — Ligue 1
+  // ────────────────────────────────────────────────────────────
+  'le-havre-ac': {
+    motto: 'À jamais le premier !',
+    mottoColor: '#00A3E0',
+    founded: 1872,
+    stadium: 'Stade CMA CGM Océane',
+    stadiumImage: '/images/clubs/havre-ac-stadium.jpg',
+    coach: 'Didier Digard',
+    president: 'Jean-Michel Roussier',
+    trophies: {
+      total: 10,
+      breakdown: [
+        {
+          label: 'Championnat de France USFSA',
+          count: 3,
+          years: '1899, 1900, 1919',
+          scope: 'national'
+        },
+
+        {
+          label: 'Ligue 2',
+          count: 6,
+          years: '1938, 1959, 1985, 1991, 2008, 2023',
+          scope: 'national'
+        },
+
+        {
+          label: 'Coupe de France',
+          count: 1,
+          years: '1959',
+          scope: 'national'
+        }
+      ]
+    },
+    starPlayer: {
+      number: 94,
+      name: 'Abdoulaye Touré',
+      position: 'Milieu de terrain',
+      image: '/images/players/HAC/abdoulaye-toure.jpg',
+      stats: {
+        goals: 10,
+        assists: 1
+      }
+    },
+    squad: [
+
+      // Gardiens
+      { number: 50, name: 'Paul Argney', position: 'Gardien de but', country: 'FR', image: '/images/players/HAC/paul-argney.jpg' },
+      { number: 77, name: 'Lionel Mpasi', position: 'Gardien de but', country: 'CD', image: '/images/players/HAC/lionel-mpasi.jpg' },
+      { number: 99, name: 'Mory Diaw', position: 'Gardien de but', country: 'SN', image: '/images/players/HAC/mory-diaw.jpg' },
+
+      // Défenseurs
+      { number: 4, name: 'Gautier Lloris', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/gautier-lloris.jpg' },
+      { number: 6, name: 'Étienne Youté', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/etienne-youte.jpg' },
+      { number: 7, name: 'Loïc Négo', position: 'Défenseur', country: 'HU', image: '/images/players/HAC/loic-nego.jpg' },
+      { number: 13, name: 'Fodé Doucouré', position: 'Défenseur', country: 'ML', image: '/images/players/HAC/fode-doucoure.jpg' },
+      { number: 15, name: 'Ayumu Seko', position: 'Défenseur', country: 'JP', image: '/images/players/HAC/ayumu-seko.jpg' },
+      { number: 18, name: 'Yanis Zouaoui', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/yanis-zouaoui.jpg' },
+      /*{ number: 29, name: 'Stephan Zagadou', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/stephan-zagadou.jpg' },
+      { number: 32, name: 'Timothée Pembélé', position: 'Défenseur', country: 'FR', image: '/images/players/HAC/timothee-pembele.jpg' },
+      { number: 93, name: 'Arouna Sangante', position: 'Défenseur', country: 'SN', image: '/images/players/HAC/arouna-sangante.jpg' },*/
+
+      // Milieux
+      { number: 8, name: 'Yassine Kechta', position: 'Milieu de terrain', country: 'MA', image: '/images/players/HAC/yassine-kechta.jpg' },
+      { number: 14, name: 'Rassoul Ndiaye', position: 'Milieu de terrain', country: 'SN', image: '/images/players/HAC/rassoul-ndiaye.jpg' },
+      { number: 17, name: 'Sofiane Boufal', position: 'Milieu de terrain', country: 'MA', image: '/images/players/HAC/sofiane-boufal.jpg' },
+      { number: 19, name: 'Lucas Gourna-Douath', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/lucas-gourna-douath.jpg' },
+      { number: 24, name: 'Guy Noël Zohouri', position: 'Milieu de terrain', country: 'CI', image: '/images/players/HAC/guy-noel-zohouri.jpg' },
+      { number: 26, name: 'Simon Ebonog', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/simon-ebonog.jpg' },
+       { number: 94, name: 'Abdoulaye Touré', position: 'Milieu de terrain', country: 'GN', image: '/images/players/HAC/abdoulaye-toure.jpg' },
+      /*{ number: 30, name: 'Reda Khadra', position: 'Milieu de terrain', country: 'DE', image: '/images/players/HAC/reda-khadra.jpg' },
+      { number: 78, name: 'Daren Mosengo', position: 'Milieu de terrain', country: 'FR', image: '/images/players/HAC/daren-mosengo.jpg' },*/
+     
+
+      // Attaquants
+      { number: 10, name: 'Felix Mambimbi', position: 'Attaquant', country: 'CH', image: '/images/players/HAC/felix-mambimbi.jpg' },
+      { number: 11, name: 'Godson Kyeremeh', position: 'Attaquant', country: 'FR', image: '/images/players/HAC/godson-kyeremeh.jpg' },
+      { number: 20, name: 'Noam Obougou', position: 'Attaquant', country: 'FR', image: '/images/players/HAC/noam-obougou.jpg' },
+      { number: 25, name: 'Mbwana Samatta', position: 'Attaquant', country: 'TZ', image: '/images/players/HAC/mbwana-samatta.jpg' },
+      { number: 27, name: 'Enzo Koffi Vinette', position: 'Attaquant', country: 'FR', image: '/images/players/HAC/enzo-koffi.jpg' },
+      { number: 45, name: 'Issa Soumaré', position: 'Attaquant', country: 'SN', image: '/images/players/HAC/issa-soumare.jpg' }
+    ],
+
+    merchandise: [
+      // ── Maillots ──────────────────────────────────────────────
+      {
+        id: 'home-jersey',
+        name: 'Maillot Domicile HAC 25/26',
+        category: 'maillot',
+        description: 'Ce maillot est identique à la version porté par les joueurs lors des matchs de Ligue 1 McDonald\'s.',
+        price: 60,
+        image: '/images/products/le-havre-ac/home-jersey-recto.jpg',
+        images: [
+          '/images/products/le-havre-ac/home-jersey-recto.jpg',
+          '/images/products/le-havre-ac/home-jersey-verso.jpg'
+        ],
+        sizes: ['S', 'M', 'XL'],
+        emoji: '👕'
+      },
+      {
+        id: 'away-jersey',
+        category: 'maillot',
+        name: 'Maillot Extérieur HAC 25/26',
+        description: 'La nouvelle tunique Away : technicité, modernité et clin d\'oeil à l\'Union Jack !',
+        price: 40,
+        image: '/images/products/le-havre-ac/away-jersey-recto.jpg',
+        images: [
+          '/images/products/le-havre-ac/away-jersey-recto.jpg',
+          '/images/products/le-havre-ac/away-jersey-verso.jpg'
+        ],
+        sizes: ['L', 'XL', 'XXL', 'XXXL', 'XXXXL'],
+        emoji: '👕'
+      },
+
+      // ── SWEAT ─────────────────────────────────────────────────
+      {
+        id: 'hoodie',
+        category: 'sweat',
+        name: 'Sweat Havrais - Marine',
+        description: 'Porter “Havrais.”, c’est ressentir le lien avec sa ville, dans une pièce légère, épurée et résolument lifestyle.',
+        price: 49.9,
+        image: '/images/products/le-havre-ac/hoodie-recto.jpg',
+        images: [
+          '/images/products/le-havre-ac/hoodie-recto.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        emoji: '🧥'
+      },
+
+      // ── T-SHIRT ───────────────────────────────────────────────
+      {
+        id: 'tshirt',
+        category: 't-shirt',
+        name: 'T-shirt Havrais - Vert',
+        description: 'Ce T-shirt offre un mélange parfait de confort et de style, que ce soit en ville, au stade ou à la maison.',
+        price: 29.9,
+        image: '/images/products/le-havre-ac/T-shirt-recto.jpg',
+        images: [
+          '/images/products/le-havre-ac/T-shirt-recto.jpg'
+        ],
+        sizes: ['S', 'M', 'L', 'XL'],
+        emoji: '👕'
+      },
+
+      // ── ACCESSOIRES ───────────────────────────────────────────
+      {
+        id: 'scarf',
+        category: 'accessoire',
+        name: 'Écharpe Officielle HAC-OM',
+        description: 'L’écharpe officielle HAC – OM, parfaite pour marquer cette 33ème journée de Ligue 1 McDonald\'s.',
+        price: 10,
+        image: '/images/products/le-havre-ac/echarp.jpg',
+        images: [
+          '/images/products/le-havre-ac/echarp.jpg'
+        ],
+        emoji: '🧣'
+      },
+      {
+        id: 'cap',
+        category: 'accessoire',
+        name: 'Casquette Cordelette 1872',
+        description: 'La Casquette Cordelette 1872 met à l’honneur l’héritage du HAC avec une broderie en relief distinctive et une finition cordelette inspirée de l’univers maritime.',
+        price: 20,
+        image: '/images/products/le-havre-ac/casquette-recto.jpg',
+        images: [
+          '/images/products/le-havre-ac/casquette-recto.jpg',
+          '/images/products/le-havre-ac/casquette-verso.jpg'
+        ],
+        emoji: '🧢'
+      },
+
+      // ── COLLECTION ────────────────────────────────────────────
+      {
+        id: 'ball',
+        category: 'autre',
+        name: 'Ballon T5 Historique',
+        description: 'Un ballon qui raconte l\'histoire du club et de sa ville.',
+        price: 20,
+        image: '/images/products/le-havre-ac/ballon.jpg',
+        images: [
+          '/images/products/le-havre-ac/ballon.jpg'
+        ],
+        emoji: '⚽'
+      }
+    ]
+  },
+
+  
 
   // ────────────────────────────────────────────────────────────
   // Sélection nationale Tanzanie (Taifa Stars) — page Fédération.
