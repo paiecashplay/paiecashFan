@@ -129,26 +129,61 @@ function DynamicFederationView({ federation, members }) {
     countryFlag:  federation.flag_emoji || ''
   }));
 
+  const heroImg = federation.stadium_image_url || '/images/futuristic_stadium_hero.png';
+
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 opacity-25" style={{ background: `linear-gradient(135deg, ${color}, transparent)` }} />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink-900/60 via-ink-900/40 to-ink-900" />
-        <Container className="relative pt-8 pb-16 md:pt-10 md:pb-20">
-          <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
+      {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
+      <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
+        <img src={heroImg} alt="" aria-hidden loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => { e.currentTarget.src = '/images/futuristic_stadium_hero.png'; }} />
+        {/* Voile couleur fédé (modéré) + assombrissement bas pour le texte */}
+        <div className="absolute inset-0 mix-blend-color" style={{ background: color, opacity: 0.4 }} />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${color}26 0%, transparent 38%, rgba(4,8,13,0.55) 75%, rgba(4,8,13,0.98) 100%)` }} />
+        <div className="absolute inset-0 bg-ink-900/15" />
+
+        <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
+          <Link to="/" className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
             <ArrowLeft size={14} /> Retour
           </Link>
-          <div className="mt-12 md:mt-16 flex items-center gap-5">
-            {federation.logo_url && (
-              <img src={federation.logo_url} alt="" className="h-20 w-20 rounded-2xl object-contain bg-white/5 border border-white/10" />
-            )}
-            <div>
-              <h1 className="font-display text-3xl md:text-5xl font-black uppercase tracking-tight text-bone-50" style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}>
-                {federation.name}
-              </h1>
-              <p className="mt-2 text-sm md:text-base text-bone-300 font-semibold">
-                {[federation.country, federation.founded_year && `Depuis ${federation.founded_year}`, `${clubs.length} clubs`].filter(Boolean).join(' • ')}
-              </p>
+
+          {/* Crest / logo */}
+          {federation.logo_url && (
+            <div className="h-28 w-28 md:h-36 md:w-36 rounded-full grid place-items-center"
+              style={{ background: `radial-gradient(circle, ${color}40, transparent 70%)`, boxShadow: `0 0 80px -10px ${color}88` }}>
+              <div className="h-24 w-24 md:h-32 md:w-32 rounded-full grid place-items-center backdrop-blur-sm"
+                style={{ background: `${color}20`, border: `2px solid ${color}80` }}>
+                <img src={federation.logo_url} alt={federation.name}
+                  className="h-16 w-16 md:h-20 md:w-20 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              </div>
+            </div>
+          )}
+
+          <h1 className="mt-6 font-display text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-bone-50" style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}>
+            {federation.name}
+          </h1>
+          {federation.motto && (
+            <p className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]" style={{ color: federation.motto_color || '#a8c0b3', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}>
+              « {federation.motto} »
+            </p>
+          )}
+
+          {/* Chips infos */}
+          <div className="mt-6 inline-flex items-center gap-px overflow-hidden rounded-full border border-white/10 bg-ink-900/60 backdrop-blur-md flex-wrap">
+            {federation.founded_year && <FedChip label="Fondation" value={federation.founded_year} />}
+            <FedChip label="Confédération" value={federation.confederation_code} />
+            {federation.national_team_name && <FedChip label="Sélection" value={federation.national_team_name} />}
+            {federation.president && <FedChip label="Président" value={federation.president} />}
+          </div>
+
+          {/* Stats bas */}
+          <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
+              <FedStat value={clubs.length} label="Clubs" />
+              <FedStat value={federation.founded_year || '—'} label="Fondée" />
+              <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} />
             </div>
           </div>
         </Container>
@@ -167,6 +202,24 @@ function DynamicFederationView({ federation, members }) {
         </Container>
       )}
     </>
+  );
+}
+
+function FedChip({ label, value }) {
+  return (
+    <div className="px-3 py-2 md:px-4 md:py-2.5">
+      <div className="text-[8px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+      <div className="text-[11px] md:text-xs font-mono text-bone-100 mt-0.5">{value}</div>
+    </div>
+  );
+}
+
+function FedStat({ value, label }) {
+  return (
+    <div>
+      <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{value}</div>
+      <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+    </div>
   );
 }
 
