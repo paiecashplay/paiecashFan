@@ -31,9 +31,12 @@ function normalizeApiClub(c) {
   if (c.is_federation_hub != null)  out.isFederationHub = c.is_federation_hub;
   if (c.motto_color)                out.mottoColor     = c.motto_color;
   // `federation` peut être un objet (join API) : on le réduit à une string
-  // (nom) pour le rendu, sinon React #31 (objet rendu comme enfant).
+  // (nom) pour le rendu, sinon React #31 (objet rendu comme enfant). On
+  // conserve slug + confédération à part pour la navigation (bouton Retour).
   if (c.federation && typeof c.federation === 'object') {
-    out.federation = c.federation.name || undefined;
+    out.federationSlug         = c.federation.slug || undefined;
+    out.federationConfederation = c.federation.confederation_code || undefined;
+    out.federation             = c.federation.name || undefined;
   }
   return out;
 }

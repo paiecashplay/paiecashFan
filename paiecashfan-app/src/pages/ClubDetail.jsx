@@ -49,11 +49,20 @@ export function ClubDetail() {
   const federationClubs = club.isFederationHub ? (dbMembers || getFederationClubs(slug)) : null;
   const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
 
-  // Bouton "Retour" dynamique : si on est sur un club rattaché à une
-  // fédération (ex: Simba SC → tanzanie), retour vers la page de la
-  // fédération. Sinon retour HomePage.
-  const federationParentSlug = isFederationHub ? null : getClubFederation(slug);
-  const backTo = federationParentSlug ? `/clubs/${federationParentSlug}` : '/';
+  // Bouton "Retour" dynamique, piloté par la base :
+  //  • Page hub (ex: Cameroun)  → retour vers la confédération /federations/caf
+  //  • Club membre (ex: Canon)  → retour vers le hub de sa fédération /clubs/<slug>
+  //  • Sinon                    → repli statique (Tanzanie) ou accueil
+  let backTo = '/';
+  if (isFederationHub) {
+    const conf = club.federationConfederation;
+    backTo = conf ? `/federations/${conf.toLowerCase()}` : '/';
+  } else if (club.federationSlug) {
+    backTo = `/clubs/${club.federationSlug}`;
+  } else {
+    const parent = getClubFederation(slug);
+    if (parent) backTo = `/clubs/${parent}`;
+  }
 
   // Normalise les trophées : accepte la shape API (tableau plat avec champ
   // scope/label/count/years_text) ET la shape statique (trophies.breakdown).

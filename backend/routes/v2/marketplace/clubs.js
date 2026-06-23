@@ -57,7 +57,7 @@ router.get('/:slugOrId', async (req, res) => {
         id, slug, name, short_code, country, city, sport, logo_url, primary_color,
         stadium, stadium_image_url, founded_year, is_federation_hub,
         motto, motto_color, coach, president, status, metadata,
-        federation:federations(id, slug, name, logo_url, country_code)
+        federation:federations(id, slug, name, logo_url, country_code, confederation_code)
       `);
 
     query = isUuid ? query.eq('id', p) : query.eq('slug', p);
