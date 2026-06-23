@@ -17,6 +17,8 @@ import { AdminClubs } from './pages/admin/AdminClubs';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
+import { AdminFederations } from './pages/admin/AdminFederations';
+import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
 
 export default function App() {
   return (
@@ -33,6 +35,8 @@ export default function App() {
         >
           <Route index                      element={<AdminOverview />} />
           <Route path="users"               element={<AdminUsers />} />
+          <Route path="federations"         element={<AdminFederations />} />
+          <Route path="federations/:id/edit" element={<AdminFederationEdit />} />
           <Route path="clubs"               element={<AdminClubs />} />
           <Route path="clubs/new"           element={<AdminClubEdit />} />
           <Route path="clubs/:id/edit"      element={<AdminClubEdit />} />

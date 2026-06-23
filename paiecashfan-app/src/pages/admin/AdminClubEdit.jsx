@@ -48,6 +48,8 @@ export function AdminClubEdit() {
   // Onglet initial : ?tab=products|players|trophies|info (ex: depuis /admin/products)
   const initialTab = ['info', 'players', 'trophies', 'products'].includes(searchParams.get('tab'))
     ? searchParams.get('tab') : 'info';
+  // Fédération pré-remplie quand on arrive depuis /admin/federations/:id (?federation=)
+  const presetFederationId = searchParams.get('federation') || '';
   const [tab,     setTab]     = useState(initialTab);
   const [saving,  setSaving]  = useState(false);
   const [toast,   setToast]   = useState(null);   // { msg, ok }
@@ -135,10 +137,15 @@ export function AdminClubEdit() {
               club={club}
               clubId={id}
               isNew={isNew}
+              presetFederationId={presetFederationId}
               onSaved={(c) => {
                 setClub(c);
                 showToast(isNew ? 'Club créé !' : 'Infos sauvegardées');
-                if (isNew) navigate(`/admin/clubs/${c.id}/edit`, { replace: true });
+                if (isNew) {
+                  // Retour vers la fédération si on venait de là, sinon édition du club
+                  if (presetFederationId) navigate(`/admin/federations/${presetFederationId}/edit`);
+                  else navigate(`/admin/clubs/${c.id}/edit`, { replace: true });
+                }
               }}
               setSaving={setSaving}
               saving={saving}
@@ -182,7 +189,7 @@ export function AdminClubEdit() {
 // ═══════════════════════════════════════════════════════════════
 // TAB : INFOS GÉNÉRALES
 // ═══════════════════════════════════════════════════════════════
-function InfoTab({ club, clubId, isNew, onSaved, saving, setSaving }) {
+function InfoTab({ club, clubId, isNew, presetFederationId = '', onSaved, saving, setSaving }) {
   const { uploadImage, uploading } = useImageUpload();
   const logoRef    = useRef();
   const stadiumRef = useRef();
@@ -202,7 +209,7 @@ function InfoTab({ club, clubId, isNew, onSaved, saving, setSaving }) {
     coach:         club?.coach         || '',
     president:     club?.president     || '',
     is_federation_hub: club?.is_federation_hub || false,
-    federation_id: club?.federation_id || club?.federation?.id || '',
+    federation_id: club?.federation_id || club?.federation?.id || presetFederationId || '',
   });
 
   // Liste des fédérations (pour le sélecteur de rattachement)

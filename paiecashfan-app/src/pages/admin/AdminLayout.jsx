@@ -2,17 +2,18 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Users, Shield, ShoppingBag,
-  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft
+  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
 
 const sideNav = [
-  { to: '/admin',        label: 'Vue d\'ensemble', icon: LayoutDashboard, end: true },
-  { to: '/admin/users',  label: 'Utilisateurs',    icon: Users },
-  { to: '/admin/clubs',  label: 'Clubs & Tenants', icon: Shield },
-  { to: '/admin/products', label: 'Produits',      icon: ShoppingBag },
-  { to: '/admin/settings', label: 'Paramètres',    icon: Settings },
+  { to: '/admin',            label: 'Vue d\'ensemble', icon: LayoutDashboard, end: true },
+  { to: '/admin/users',      label: 'Utilisateurs',    icon: Users },
+  { to: '/admin/federations', label: 'Fédérations',    icon: Globe },
+  { to: '/admin/clubs',      label: 'Clubs',           icon: Shield },
+  { to: '/admin/products',   label: 'Produits',        icon: ShoppingBag },
+  { to: '/admin/settings',   label: 'Paramètres',      icon: Settings },
 ];
 
 export function AdminLayout() {

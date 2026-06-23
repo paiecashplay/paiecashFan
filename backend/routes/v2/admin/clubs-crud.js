@@ -286,12 +286,25 @@ router.post('/import-trophies-footmercato', async (req, res) => {
 // FÉDÉRATIONS
 // ═══════════════════════════════════════════════════════════════
 
-// GET /api/v2/admin/clubs-crud/federations — liste pour le sélecteur BO
+const CONFEDERATIONS = ['CAF', 'UEFA', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC'];
+// Champs éditables d'une fédération (tout ce qui alimente le hero)
+const FED_FIELDS = [
+  'name', 'country', 'founded_year', 'president', 'national_team_name',
+  'logo_url', 'stadium', 'stadium_image_url', 'card_image_url',
+  'primary_color', 'accent_color', 'flag_emoji', 'motto', 'motto_color', 'metadata'
+];
+const FED_SELECT = `
+  id, slug, name, country, country_code, confederation_code, founded_year,
+  president, national_team_name, logo_url, stadium, stadium_image_url, card_image_url,
+  primary_color, accent_color, flag_emoji, motto, motto_color, metadata
+`;
+
+// GET /api/v2/admin/clubs-crud/federations — liste
 router.get('/federations', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('federations')
-      .select('id, slug, name, country, country_code, confederation_code, logo_url')
+      .select(FED_SELECT)
       .order('name', { ascending: true });
     if (error) throw error;
     return ok(res, { federations: data || [] });
@@ -300,9 +313,35 @@ router.get('/federations', async (req, res) => {
   }
 });
 
-// POST /api/v2/admin/clubs-crud/federations — créer une fédération
-// body: { name, country, country_code, confederation_code, slug? }
-const CONFEDERATIONS = ['CAF', 'UEFA', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC'];
+// GET /api/v2/admin/clubs-crud/federations/:id — une fédération
+router.get('/federations/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('federations').select(FED_SELECT).eq('id', req.params.id).single();
+    if (error || !data) return fail(res, 'Fédération introuvable', 404);
+    return ok(res, { federation: data });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// GET /api/v2/admin/clubs-crud/federations/:id/members — clubs rattachés (+ hub)
+router.get('/federations/:id/members', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('tenants')
+      .select('id, slug, name, logo_url, city, is_federation_hub, status')
+      .eq('federation_id', req.params.id)
+      .order('is_federation_hub', { ascending: false })
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return ok(res, { members: data || [] });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/federations — créer une fédération (hero complet)
 router.post('/federations', async (req, res) => {
   try {
     const { name, country, country_code, confederation_code, slug } = req.body;
@@ -314,21 +353,76 @@ router.post('/federations', async (req, res) => {
     const cleanedSlug = cleanSlug(slug || name);
     if (!cleanedSlug) return fail(res, 'slug invalide');
 
-    const { data, error } = await supabase
-      .from('federations')
-      .insert({
-        name,
-        slug: cleanedSlug,
-        country: country || name,
-        country_code: country_code.toUpperCase(),
-        confederation_code: conf
-      })
-      .select()
-      .single();
+    const row = { slug: cleanedSlug, country_code: country_code.toUpperCase(), confederation_code: conf };
+    FED_FIELDS.forEach((k) => { if (req.body[k] !== undefined) row[k] = req.body[k]; });
+    if ('founded_year' in row) row.founded_year = toIntOrNull(row.founded_year);
+    if (!row.country) row.country = name;
+
+    const { data, error } = await supabase.from('federations').insert(row).select(FED_SELECT).single();
     if (error) throw error;
     return ok(res, { federation: data }, 201);
   } catch (err) {
     return fail(res, err.message.includes('duplicate') ? 'Une fédération avec ce slug existe déjà' : err.message, 500);
+  }
+});
+
+// PUT /api/v2/admin/clubs-crud/federations/:id — mettre à jour (hero)
+router.put('/federations/:id', async (req, res) => {
+  try {
+    const updates = {};
+    FED_FIELDS.forEach((k) => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
+    if ('founded_year' in updates) updates.founded_year = toIntOrNull(updates.founded_year);
+    if (req.body.country_code) updates.country_code = req.body.country_code.toUpperCase();
+    if (req.body.confederation_code) {
+      const conf = req.body.confederation_code.toUpperCase();
+      if (!CONFEDERATIONS.includes(conf)) return fail(res, 'confederation_code invalide');
+      updates.confederation_code = conf;
+    }
+    if (req.body.slug) updates.slug = cleanSlug(req.body.slug);
+    updates.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('federations').update(updates).eq('id', req.params.id).select(FED_SELECT).single();
+    if (error) throw error;
+    return ok(res, { federation: data });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/federations/:id/create-hub
+// Crée (ou retourne) le tenant hub d'une fédération.
+router.post('/federations/:id/create-hub', async (req, res) => {
+  try {
+    const { data: fed, error: fErr } = await supabase
+      .from('federations').select('id, slug, name, country, country_code, primary_color, logo_url, stadium_image_url')
+      .eq('id', req.params.id).single();
+    if (fErr || !fed) return fail(res, 'Fédération introuvable', 404);
+
+    // Hub déjà existant ?
+    const { data: existing } = await supabase
+      .from('tenants').select('id, slug, name')
+      .eq('federation_id', fed.id).eq('is_federation_hub', true).maybeSingle();
+    if (existing) return ok(res, { hub: existing, created: false });
+
+    // Slug du hub = slug de la fédération si libre, sinon suffixe
+    let hubSlug = fed.slug;
+    const { data: clash } = await supabase.from('tenants').select('id').eq('slug', hubSlug).maybeSingle();
+    if (clash) hubSlug = `${fed.slug}-federation`;
+
+    const { data, error } = await supabase.from('tenants').insert({
+      name: fed.name, slug: hubSlug, type: 'national_team',
+      is_federation_hub: true, federation_id: fed.id,
+      country: fed.country, country_code: fed.country_code,
+      primary_color: fed.primary_color || '#10b981',
+      logo_url: fed.logo_url || null,
+      stadium_image_url: fed.stadium_image_url || null,
+      status: 'active'
+    }).select('id, slug, name').single();
+    if (error) throw error;
+    return ok(res, { hub: data, created: true }, 201);
+  } catch (err) {
+    return fail(res, err.message, 500);
   }
 });
 
