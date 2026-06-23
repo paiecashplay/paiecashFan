@@ -173,11 +173,15 @@ function ClubHero({ club, backTo = '/', loading = false }) {
     if (club.squad?.length) s.squad = club.squad.length;
     return s;
   }, [club]);
-  // Image du stade : custom du club si dispo. Tant que l'API charge et qu'on
-  // n'a pas encore d'image (ex: club uniquement en BDD comme l'OL), on n'affiche
-  // PAS le stade générique → on évite le flash « défaut puis saut ». Le fallback
-  // générique n'est utilisé qu'une fois le chargement terminé sans image custom.
-  const stadiumImage = club.stadiumImage || (loading ? null : '/images/futuristic_stadium_hero.png');
+  // Image du stade — cascade de repli en 3 niveaux :
+  //   1. stade propre du club (club.stadiumImage)
+  //   2. à défaut, stade de sa fédération (club.federationStadiumImage)
+  //   3. à défaut, stade générique IA — mais SEULEMENT une fois l'API chargée
+  //      (tant que `loading`, on n'affiche rien → évite le flash « défaut puis saut »).
+  const stadiumImage =
+    club.stadiumImage ||
+    club.federationStadiumImage ||
+    (loading ? null : '/images/futuristic_stadium_hero.png');
 
   return (
     <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">

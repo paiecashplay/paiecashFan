@@ -34,9 +34,10 @@ function normalizeApiClub(c) {
   // (nom) pour le rendu, sinon React #31 (objet rendu comme enfant). On
   // conserve slug + confédération à part pour la navigation (bouton Retour).
   if (c.federation && typeof c.federation === 'object') {
-    out.federationSlug         = c.federation.slug || undefined;
+    out.federationSlug          = c.federation.slug || undefined;
     out.federationConfederation = c.federation.confederation_code || undefined;
-    out.federation             = c.federation.name || undefined;
+    out.federationStadiumImage  = c.federation.stadium_image_url || undefined;
+    out.federation              = c.federation.name || undefined;
   }
   return out;
 }

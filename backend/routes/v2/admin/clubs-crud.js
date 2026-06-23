@@ -421,17 +421,35 @@ router.post('/federations/:id/import-clubs', async (req, res) => {
       .filter((l) => l.type === 'League');
     if (!leagues.length) return fail(res, `Aucun championnat trouvé pour ${fed.country_code} sur API-Football`, 404);
 
-    // 2. Équipes par championnat (saison courante, sinon la plus récente), dédupliquées
+    // 2. Équipes par championnat, dédupliquées.
+    //    On essaie les saisons de la plus récente à la plus ancienne et on
+    //    garde la première qui répond : les plans gratuits API-Football ne
+    //    couvrent que 2022–2024, donc la saison "courante" (ex: 2026) est
+    //    refusée → on retombe automatiquement sur une saison accessible.
     const teamsById = new Map();
     for (const lg of leagues) {
-      const season = (lg.seasons.find((s) => s.current) || lg.seasons.slice(-1)[0] || {}).year;
-      if (!season) { warnings.push(`Pas de saison pour ${lg.name}`); continue; }
-      try {
-        const teams = await apiFootball.getTeamsByLeagueSeason(lg.id, season);
-        teams.forEach((t) => { if (!teamsById.has(t.id)) teamsById.set(t.id, t); });
-      } catch (e) {
-        warnings.push(`${lg.name} : ${e.message}`);
+      const seasons = [...(lg.seasons || [])]
+        .map((s) => s.year)
+        .filter(Boolean)
+        .sort((a, b) => b - a);
+      if (!seasons.length) { warnings.push(`Pas de saison pour ${lg.name}`); continue; }
+
+      let usedSeason = null;
+      let lastErr = null;
+      for (const season of seasons) {
+        try {
+          const teams = await apiFootball.getTeamsByLeagueSeason(lg.id, season);
+          if (teams.length) {
+            teams.forEach((t) => { if (!teamsById.has(t.id)) teamsById.set(t.id, t); });
+            usedSeason = season;
+            break; // saison accessible avec des équipes → on s'arrête
+          }
+        } catch (e) {
+          lastErr = e.message; // saison inaccessible (plan) → on tente la précédente
+        }
       }
+      if (usedSeason) warnings.push(`${lg.name} : saison ${usedSeason}`);
+      else warnings.push(`${lg.name} : aucune saison accessible${lastErr ? ` (${lastErr})` : ''}`);
     }
     const teams = [...teamsById.values()].filter((t) => !t.national); // exclut la sélection nationale
     if (!teams.length) return fail(res, 'Aucun club récupéré (couverture API limitée pour ce pays ?)', 404);

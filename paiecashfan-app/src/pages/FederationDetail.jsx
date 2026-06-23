@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Search, Globe, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -131,8 +131,16 @@ function DynamicFederationView({ federation, members }) {
 
   const heroImg = federation.stadium_image_url || '/images/futuristic_stadium_hero.png';
 
+  // Retour dynamique : vers la confédération de rattachement (ex: /federations/caf)
+  // si connue, sinon l'accueil.
+  const conf = federation.confederation_code;
+  const backTo = conf ? `/federations/${conf.toLowerCase()}` : '/';
+
   return (
     <>
+      {/* Nav latérale flottante (mobile : barre du bas, desktop : à gauche) */}
+      <FedSideActions primaryColor={color} hasClubs={clubs.length > 0} />
+
       {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
       <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
         <img src={heroImg} alt="" aria-hidden loading="lazy"
@@ -144,8 +152,8 @@ function DynamicFederationView({ federation, members }) {
         <div className="absolute inset-0 bg-ink-900/15" />
 
         <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
-          <Link to="/" className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
-            <ArrowLeft size={14} /> Retour
+          <Link to={backTo} className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
+            <ArrowLeft size={14} /> {conf ? `Retour ${conf}` : 'Retour'}
           </Link>
 
           {/* Crest / logo */}
@@ -219,6 +227,57 @@ function FedStat({ value, label }) {
     <div>
       <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{value}</div>
       <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+    </div>
+  );
+}
+
+// ── Nav latérale flottante de la page fédération ─────────────────────
+// Même ergonomie que les SideActions des clubs : barre flottante en bas
+// sur mobile, colonne verticale à gauche sur desktop. Actions : aller aux
+// clubs (scroll vers #clubs), partager, rechercher.
+function FedSideActions({ primaryColor, hasClubs = true }) {
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleShare = async () => {
+    const shareData = { title: document.title, text: 'Découvre cette fédération sur PaieCashFan', url: window.location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard?.writeText(window.location.href);
+    } catch { /* annulé / non supporté */ }
+  };
+
+  const actions = [
+    hasClubs && { key: 'clubs',  icon: Volleyball, label: 'Clubs',     bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') },
+    { key: 'share', icon: Share2, label: 'Partager',  bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
+    { key: 'top',   icon: Globe,  label: 'Haut de page', bg: 'from-bone-300 to-bone-500',     onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  ].filter(Boolean);
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:right-auto md:inset-x-auto md:justify-start">
+      <motion.div
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="pointer-events-auto flex md:flex-col gap-2 p-2 rounded-full border border-white/10 bg-ink-900/80 backdrop-blur-xl shadow-card"
+      >
+        {actions.map((a) => {
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.key}
+              aria-label={a.label}
+              title={a.label}
+              onClick={a.onClick}
+              className={`relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${a.bg} text-ink-900 hover:scale-110 active:scale-95 transition-transform shadow-lg`}
+            >
+              <Icon size={16} strokeWidth={2.4} />
+            </button>
+          );
+        })}
+      </motion.div>
     </div>
   );
 }
