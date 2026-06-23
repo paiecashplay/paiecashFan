@@ -9,7 +9,17 @@ const express  = require('express');
 const multer   = require('multer');
 const path     = require('path');
 const supabase = require('../../../db/supabase');
+const apiFootball = require('../../../services/apiFootball');
+const footmercato = require('../../../services/footmercato');
 const router   = express.Router();
+
+// Mapping postes API-Football → contrainte players_position_check (FR)
+const POSITION_FR = {
+  Goalkeeper: 'Gardien de but',
+  Defender:   'Défenseur',
+  Midfielder: 'Milieu de terrain',
+  Attacker:   'Attaquant'
+};
 
 const ok   = (res, data, s = 200) => res.status(s).json({ success: true,  data,  error: '' });
 const fail = (res, msg,  s = 400) => res.status(s).json({ success: false, data: null, error: msg });
@@ -82,6 +92,193 @@ router.post('/upload', (req, res, next) => {
   } catch (err) {
     console.error('[upload] error:', err.message);
     return fail(res, 'Upload failed: ' + err.message, 500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// IMPORT API-FOOTBALL
+// ═══════════════════════════════════════════════════════════════
+
+// GET /api/v2/admin/clubs-crud/football-search?q=lyon
+// Recherche un club par nom sur API-Football (proxy serveur, clé cachée).
+router.get('/football-search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+    if (q.length < 2) return fail(res, 'Saisis au moins 2 caractères');
+    const teams = await apiFootball.searchTeams(q);
+    return ok(res, { teams });
+  } catch (err) {
+    if (err.code === 'NO_KEY') return fail(res, err.message, 500);
+    console.error('[football-search]', err.message);
+    return fail(res, err.response?.data?.message || err.message, 502);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/import-from-football
+// body: { teamId, tenantId? }
+//  - teamId   : identifiant API-Football du club
+//  - tenantId : (optionnel) club Supabase cible ; sinon upsert par slug
+// NON DESTRUCTIF : ne remplit que les champs vides, n'ajoute que les
+// joueurs absents (match par nom). Le fallback statique reste intact.
+router.post('/import-from-football', async (req, res) => {
+  try {
+    const { teamId, tenantId } = req.body;
+    if (!teamId) return fail(res, 'teamId requis');
+
+    const team = await apiFootball.getTeam(teamId);
+    if (!team) return fail(res, 'Club introuvable sur API-Football', 404);
+
+    const warnings = [];
+
+    // 1. Résoudre le tenant cible
+    let tenant;
+    if (tenantId) {
+      const { data, error } = await supabase.from('tenants').select('*').eq('id', tenantId).single();
+      if (error || !data) return fail(res, 'Club cible introuvable', 404);
+      tenant = data;
+    } else {
+      const slug = cleanSlug(team.name);
+      const { data: existing } = await supabase.from('tenants').select('*').eq('slug', slug).maybeSingle();
+      if (existing) {
+        tenant = existing;
+      } else {
+        const { data, error } = await supabase.from('tenants').insert({
+          name: team.name, slug, status: 'active',
+          type: team.national ? 'national_team' : 'club',
+          country:           team.country || null,
+          city:              team.city || null,
+          logo_url:          team.logo || null,
+          founded_year:      toIntOrNull(team.founded),
+          stadium:           team.stadium || null,
+          stadium_image_url: team.stadium_image_url || null,
+          metadata:          { api_football_id: team.id }
+        }).select().single();
+        if (error) throw error;
+        tenant = data;
+      }
+    }
+
+    // 2. Compléter UNIQUEMENT les champs vides (non destructif)
+    const fill = {};
+    if (!tenant.logo_url          && team.logo)              fill.logo_url          = team.logo;
+    if (!tenant.founded_year      && team.founded)           fill.founded_year      = toIntOrNull(team.founded);
+    if (!tenant.stadium           && team.stadium)           fill.stadium           = team.stadium;
+    if (!tenant.stadium_image_url && team.stadium_image_url) fill.stadium_image_url = team.stadium_image_url;
+    if (!tenant.country           && team.country)           fill.country           = team.country;
+    if (!tenant.city              && team.city)              fill.city              = team.city;
+    fill.metadata = { ...(tenant.metadata || {}), api_football_id: team.id };
+
+    const filledFields = Object.keys(fill).filter((k) => k !== 'metadata');
+    {
+      const { data } = await supabase.from('tenants').update(fill).eq('id', tenant.id).select().single();
+      tenant = data || tenant;
+    }
+    // API-Football ne fournit pas les couleurs du club
+    if (!tenant.primary_color || tenant.primary_color === '#1B7E7E') {
+      warnings.push("Couleur du club non fournie par API-Football (à définir manuellement).");
+    }
+
+    // 3. Effectif — n'ajoute que les joueurs absents (par nom)
+    let playersAdded = 0, playersSkipped = 0;
+    try {
+      const squad = await apiFootball.getSquad(team.id);
+      const { data: existingPlayers } = await supabase
+        .from('players').select('full_name').eq('tenant_id', tenant.id);
+      const existingNames = new Set((existingPlayers || []).map((p) => (p.full_name || '').toLowerCase().trim()));
+      let order = (existingPlayers || []).length;
+
+      const toInsert = [];
+      for (const p of squad) {
+        if (!p.full_name) continue;
+        if (existingNames.has(p.full_name.toLowerCase().trim())) { playersSkipped++; continue; }
+        toInsert.push({
+          tenant_id:     tenant.id,
+          full_name:     p.full_name,
+          shirt_number:  toIntOrNull(p.shirt_number),
+          position:      POSITION_FR[p.position] || 'Autre',
+          image_url:     p.photo || null,
+          display_order: order++,
+          metadata:      { api_football_id: p.apiId }
+        });
+      }
+      if (toInsert.length) {
+        const { error } = await supabase.from('players').insert(toInsert);
+        if (error) throw error;
+        playersAdded = toInsert.length;
+      }
+    } catch (sqErr) {
+      warnings.push('Effectif non importé : ' + (sqErr.response?.data?.message || sqErr.message));
+    }
+
+    // 4. Palmarès & joueur star — non exposés par les endpoints "team" d'API-Football
+    warnings.push('Palmarès non disponible via API-Football → à saisir dans l\'onglet Palmarès.');
+    warnings.push('Joueur star à cocher manuellement dans l\'onglet Joueurs.');
+
+    return ok(res, {
+      tenant: { id: tenant.id, slug: tenant.slug, name: tenant.name },
+      created: !tenantId && filledFields.length >= 0,
+      filledFields,
+      playersAdded,
+      playersSkipped,
+      warnings
+    }, 201);
+  } catch (err) {
+    if (err.code === 'NO_KEY') return fail(res, err.message, 500);
+    console.error('[import-from-football]', err.message);
+    return fail(res, err.response?.data?.message || err.message, 502);
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/import-trophies-footmercato
+// body: { tenantId, slug }  — slug = identifiant Foot Mercato (ex: ol, psg, om)
+// NON DESTRUCTIF : n'ajoute que les trophées dont le label n'existe pas déjà.
+router.post('/import-trophies-footmercato', async (req, res) => {
+  try {
+    const { tenantId, slug } = req.body;
+    if (!tenantId) return fail(res, 'tenantId requis');
+    if (!slug)     return fail(res, 'slug Foot Mercato requis (ex: ol, psg, om)');
+
+    // Vérifie le club
+    const { data: tenant, error: tErr } = await supabase
+      .from('tenants').select('id').eq('id', tenantId).single();
+    if (tErr || !tenant) return fail(res, 'Club cible introuvable', 404);
+
+    const scraped = await footmercato.getTrophies(slug);
+    if (!scraped.length) return fail(res, 'Aucun trophée trouvé (slug incorrect ?)', 404);
+
+    // Trophées déjà en base (dédup par label, insensible à la casse)
+    const { data: existing } = await supabase
+      .from('trophies').select('label').eq('tenant_id', tenantId);
+    const seen = new Set((existing || []).map((t) => (t.label || '').toLowerCase().trim()));
+    let order = (existing || []).length;
+
+    const toInsert = [];
+    let skipped = 0;
+    for (const t of scraped) {
+      if (seen.has(t.label.toLowerCase().trim())) { skipped++; continue; }
+      toInsert.push({
+        tenant_id:     tenantId,
+        label:         t.label,
+        count:         t.count,
+        years_text:    t.years_text,
+        scope:         t.scope,
+        display_order: order++
+      });
+    }
+    if (toInsert.length) {
+      const { error } = await supabase.from('trophies').insert(toInsert);
+      if (error) throw error;
+    }
+
+    return ok(res, {
+      found: scraped.length,
+      added: toInsert.length,
+      skipped,
+      trophies: scraped
+    }, 201);
+  } catch (err) {
+    console.error('[import-trophies-footmercato]', err.message);
+    return fail(res, err.message, 502);
   }
 });
 

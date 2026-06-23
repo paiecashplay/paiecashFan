@@ -1,14 +1,15 @@
 // BO Super Admin — Création / édition complète d'un club
 // Tabs : Infos générales | Joueurs | Palmarès | Boutique
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Plus, Trash2, Star,
-  Info, Users, Trophy, ShoppingBag, Loader2, Check, X
+  Info, Users, Trophy, ShoppingBag, Loader2, Check, X, Download, Pencil, Search
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
 import { cn } from '@/lib/cn';
 
 const TABS = [
@@ -42,15 +43,21 @@ export function AdminClubEdit() {
   const { id } = useParams();           // undefined = création
   const isNew   = !id;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [tab,     setTab]     = useState('info');
+  // Onglet initial : ?tab=products|players|trophies|info (ex: depuis /admin/products)
+  const initialTab = ['info', 'players', 'trophies', 'products'].includes(searchParams.get('tab'))
+    ? searchParams.get('tab') : 'info';
+  const [tab,     setTab]     = useState(initialTab);
   const [saving,  setSaving]  = useState(false);
   const [toast,   setToast]   = useState(null);   // { msg, ok }
   const [club,    setClub]    = useState(null);    // données chargées
   const [loading, setLoading] = useState(!isNew);
+  const [importOpen, setImportOpen] = useState(false);
+  const [dataKey, setDataKey] = useState(0);       // force le reload des onglets après import
 
   // Charge le club si mode édition
-  useEffect(() => {
+  function loadClub() {
     if (isNew) return;
     apiFetch(`/api/v2/marketplace/clubs/${id}`)
       .then((json) => {
@@ -58,7 +65,8 @@ export function AdminClubEdit() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [id]);
+  }
+  useEffect(() => { loadClub(); }, [id]);
 
   function showToast(msg, ok = true) {
     setToast({ msg, ok });
@@ -79,13 +87,30 @@ export function AdminClubEdit() {
           className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors">
           <ArrowLeft size={15} />
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="font-display text-2xl font-black text-bone-50">
             {isNew ? 'Nouveau club' : club?.name || 'Éditer le club'}
           </h1>
           <p className="text-sm text-bone-400">{isNew ? 'Créer un tenant' : `Slug : ${club?.slug}`}</p>
         </div>
+        {!isNew && (
+          <button onClick={() => setImportOpen(true)}
+            className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors">
+            <Download size={14} /> Importer depuis API-Football
+          </button>
+        )}
       </div>
+
+      {/* Import API-Football (ce club) */}
+      <AnimatePresence>
+        {importOpen && (
+          <ImportFromFootball
+            tenantId={id}
+            onClose={() => setImportOpen(false)}
+            onImported={() => { loadClub(); setDataKey((k) => k + 1); }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-xl border border-white/8 bg-ink-800/40 p-1 w-fit">
@@ -120,13 +145,13 @@ export function AdminClubEdit() {
             />
           )}
           {tab === 'players' && !isNew && (
-            <PlayersTab tenantId={id} showToast={showToast} />
+            <PlayersTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab === 'trophies' && !isNew && (
-            <TrophiesTab tenantId={id} showToast={showToast} />
+            <TrophiesTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab === 'products' && !isNew && (
-            <ProductsTab tenantId={id} showToast={showToast} />
+            <ProductsTab key={dataKey} tenantId={id} showToast={showToast} />
           )}
           {tab !== 'info' && isNew && (
             <div className="py-12 text-center text-sm text-bone-500">
@@ -337,6 +362,7 @@ function PlayersTab({ tenantId, showToast }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editRow, setEditRow] = useState(null);  // { mode:'new'|id, form }
+  const [search, setSearch]   = useState('');
 
   async function load() {
     setLoading(true);
@@ -365,27 +391,33 @@ function PlayersTab({ tenantId, showToast }) {
 
   const blankPlayer = { full_name: '', jersey_number: '', position: 'Milieu de terrain', country: '', image_url: '', is_star_player: false, stats: { goals: 0, assists: 0 } };
 
+  const q = search.toLowerCase().trim();
+  const filtered = !q ? players : players.filter((p) =>
+    [p.full_name, p.position, p.nationality_code, p.country, String(p.shirt_number ?? '')]
+      .some((v) => (v || '').toLowerCase().includes(q)));
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-bone-400">{players.length} joueurs</p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-sm text-bone-400 shrink-0">{players.length} joueurs</p>
+        <SearchBar value={search} onChange={setSearch} placeholder="Rechercher un joueur (nom, poste, n°)…" />
         <button onClick={() => setEditRow({ id: null, ...blankPlayer })}
-          className="flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors">
+          className="flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors shrink-0">
           <Plus size={13} /> Ajouter un joueur
         </button>
       </div>
 
-      {/* Formulaire inline */}
+      {/* Formulaire en modale centrée */}
       <AnimatePresence>
         {editRow !== null && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+          <FormModal onClose={() => setEditRow(null)}>
             <PlayerForm
               initial={editRow}
               tenantId={tenantId}
               onSave={savePlayer}
               onCancel={() => setEditRow(null)}
             />
-          </motion.div>
+          </FormModal>
         )}
       </AnimatePresence>
 
@@ -393,7 +425,9 @@ function PlayersTab({ tenantId, showToast }) {
       {loading ? <SkeletonRows n={5} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {players.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun joueur. Ajoutez-en un ci-dessus.</p>
+            <p className="py-12 text-center text-sm text-bone-500">Aucun joueur. Ajoutez-en un.</p>
+          ) : filtered.length === 0 ? (
+            <p className="py-12 text-center text-sm text-bone-500">Aucun joueur pour « {search} ».</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -406,7 +440,7 @@ function PlayersTab({ tenantId, showToast }) {
                 </tr>
               </thead>
               <tbody>
-                {players.map((p) => (
+                {filtered.map((p) => (
                   <tr key={p.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                     <td className="px-4 py-3 font-mono text-xs text-bone-400">{p.shirt_number ?? p.jersey_number ?? '—'}</td>
                     <td className="px-4 py-3">
@@ -417,13 +451,13 @@ function PlayersTab({ tenantId, showToast }) {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-bone-400 hidden md:table-cell">{p.position || '—'}</td>
-                    <td className="px-4 py-3 text-xs text-bone-400 hidden md:table-cell">{p.country || '—'}</td>
+                    <td className="px-4 py-3 text-xs text-bone-400 hidden md:table-cell">{p.nationality_code || p.country || '—'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 justify-end">
-                        <button onClick={() => setEditRow({ ...p, jersey_number: p.shirt_number, country: p.nationality_code })} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors">
-                          <Info size={12} />
+                        <button title="Modifier" onClick={() => setEditRow({ ...p, jersey_number: p.shirt_number, country: p.nationality_code })} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors">
+                          <Pencil size={12} />
                         </button>
-                        <button onClick={() => deletePlayer(p.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center transition-colors">
+                        <button title="Supprimer" onClick={() => deletePlayer(p.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center transition-colors">
                           <Trash2 size={12} />
                         </button>
                       </div>
@@ -464,8 +498,22 @@ function PlayerForm({ initial, tenantId, onSave, onCancel }) {
   }
 
   return (
-    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 space-y-4">
-      <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{form.id ? 'Modifier le joueur' : 'Nouveau joueur'}</h3>
+    <div className="rounded-2xl border border-white/10 bg-ink-800 shadow-2xl p-5 space-y-4">
+      {/* En-tête fiche : photo + nom + fermer */}
+      <div className="flex items-center gap-3 -m-1 mb-1">
+        <div className="h-12 w-12 rounded-xl overflow-hidden bg-white/5 border border-white/10 grid place-items-center shrink-0">
+          {form.image_url
+            ? <img src={form.image_url} alt="" className="h-full w-full object-cover" />
+            : <Users size={18} className="text-bone-600" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{form.id ? 'Modifier le joueur' : 'Nouveau joueur'}</h3>
+          <p className="text-sm font-semibold text-bone-100 truncate">{form.full_name || 'Sans nom'}{form.jersey_number ? ` · #${form.jersey_number}` : ''}</p>
+        </div>
+        <button onClick={onCancel} className="h-8 w-8 rounded-lg border border-white/10 text-bone-400 hover:text-bone-100 grid place-items-center shrink-0">
+          <X size={14} />
+        </button>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Field label="Nom complet *" cls="col-span-2">
           <input value={form.full_name} onChange={set('full_name')} placeholder="Pierre Kalulu" className={input()} />
@@ -529,6 +577,8 @@ function TrophiesTab({ tenantId, showToast }) {
   const [trophies, setTrophies] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [editRow,  setEditRow]  = useState(null);
+  const [fmSlug,   setFmSlug]   = useState('');
+  const [importing, setImporting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -537,6 +587,26 @@ function TrophiesTab({ tenantId, showToast }) {
     setLoading(false);
   }
   useEffect(() => { load(); }, [tenantId]);
+
+  async function importFromFootmercato() {
+    const slug = fmSlug.trim();
+    if (!slug) { showToast('Renseigne le slug Foot Mercato (ex: ol)', false); return; }
+    setImporting(true);
+    try {
+      const json = await apiFetch('/api/v2/admin/clubs-crud/import-trophies-footmercato', {
+        method: 'POST', body: JSON.stringify({ tenantId, slug })
+      });
+      if (!json.success) throw new Error(json.error);
+      const { added, skipped, found } = json.data;
+      showToast(`Palmarès : ${added} ajouté(s)${skipped ? `, ${skipped} déjà présent(s)` : ''} sur ${found}`);
+      setFmSlug('');
+      load();
+    } catch (e) {
+      showToast('Import échoué : ' + e.message, false);
+    } finally {
+      setImporting(false);
+    }
+  }
 
   async function saveTrophy(form) {
     const isNew = !form.id;
@@ -568,18 +638,37 @@ function TrophiesTab({ tenantId, showToast }) {
         </button>
       </div>
 
+      {/* Import palmarès depuis Foot Mercato */}
+      <div className="rounded-xl border border-white/8 bg-white/[0.02] p-3 flex items-center gap-2 flex-wrap">
+        <Download size={14} className="text-bone-400 shrink-0" />
+        <span className="text-xs text-bone-300 font-semibold">Importer le palmarès depuis Foot Mercato</span>
+        <input
+          value={fmSlug}
+          onChange={(e) => setFmSlug(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') importFromFootmercato(); }}
+          placeholder="slug (ex: ol, psg, om)"
+          className="h-8 px-3 rounded-lg border border-white/10 bg-ink-900/60 text-xs text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 w-40"
+        />
+        <button onClick={importFromFootmercato} disabled={importing}
+          className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 disabled:opacity-40 transition-colors">
+          {importing ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+          Importer
+        </button>
+        <span className="text-[10px] text-bone-600 w-full">N'ajoute que les trophées manquants · slug = fin de l'URL footmercato.net/club/<b>ol</b>/palmares</span>
+      </div>
+
       <AnimatePresence>
         {editRow !== null && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+          <FormModal onClose={() => setEditRow(null)}>
             <TrophyForm initial={editRow} onSave={saveTrophy} onCancel={() => setEditRow(null)} />
-          </motion.div>
+          </FormModal>
         )}
       </AnimatePresence>
 
       {loading ? <SkeletonRows n={4} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {trophies.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun trophée. Ajoutez-en un ci-dessus.</p>
+            <p className="py-12 text-center text-sm text-bone-500">Aucun trophée. Ajoutez-en un.</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -600,10 +689,10 @@ function TrophiesTab({ tenantId, showToast }) {
                     <td className="px-4 py-3 text-xs text-bone-500 hidden md:table-cell">{t.years_text || '—'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 justify-end">
-                        <button onClick={() => setEditRow(t)} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center">
-                          <Info size={12} />
+                        <button title="Modifier" onClick={() => setEditRow(t)} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center">
+                          <Pencil size={12} />
                         </button>
-                        <button onClick={() => deleteTrophy(t.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center">
+                        <button title="Supprimer" onClick={() => deleteTrophy(t.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center">
                           <Trash2 size={12} />
                         </button>
                       </div>
@@ -633,8 +722,19 @@ function TrophyForm({ initial, onSave, onCancel }) {
   }
 
   return (
-    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-4">
-      <h3 className="text-xs font-bold text-amber-400 uppercase tracking-widest">{form.id ? 'Modifier' : 'Nouveau trophée'}</h3>
+    <div className="rounded-2xl border border-white/10 bg-ink-800 shadow-2xl p-5 space-y-4">
+      <div className="flex items-center gap-3 mb-1">
+        <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 grid place-items-center text-amber-400 shrink-0">
+          <Trophy size={16} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xs font-bold text-amber-400 uppercase tracking-widest">{form.id ? 'Modifier le trophée' : 'Nouveau trophée'}</h3>
+          <p className="text-sm font-semibold text-bone-100 truncate">{form.label || 'Sans nom'}{form.count ? ` · ×${form.count}` : ''}</p>
+        </div>
+        <button onClick={onCancel} className="h-8 w-8 rounded-lg border border-white/10 text-bone-400 hover:text-bone-100 grid place-items-center shrink-0">
+          <X size={14} />
+        </button>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Field label="Nom du trophée *" cls="col-span-2">
           <input value={form.label} onChange={set('label')} placeholder="Ligue 1" className={input()} />
@@ -669,6 +769,7 @@ function ProductsTab({ tenantId, showToast }) {
   const [products, setProducts] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [editRow,  setEditRow]  = useState(null);
+  const [search,   setSearch]   = useState('');
 
   async function load() {
     setLoading(true);
@@ -698,28 +799,35 @@ function ProductsTab({ tenantId, showToast }) {
 
   const blank = { name: '', description: '', eur_price: '', pcc_price: '', category_slug: 'maillot', display_order: products.length, status: 'active', images_list: [''], sizes_raw: 'S,M,L,XL' };
 
+  const q = search.toLowerCase().trim();
+  const filtered = !q ? products : products.filter((p) =>
+    [p.name, p.category_slug, p.description].some((v) => (v || '').toLowerCase().includes(q)));
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-bone-400">{products.length} produits</p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-sm text-bone-400 shrink-0">{products.length} produits</p>
+        <SearchBar value={search} onChange={setSearch} placeholder="Rechercher un produit (nom, catégorie)…" />
         <button onClick={() => setEditRow(blank)}
-          className="flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors">
+          className="flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors shrink-0">
           <Plus size={13} /> Ajouter un produit
         </button>
       </div>
 
       <AnimatePresence>
         {editRow !== null && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+          <FormModal onClose={() => setEditRow(null)}>
             <ProductForm initial={editRow} onSave={saveProduct} onCancel={() => setEditRow(null)} />
-          </motion.div>
+          </FormModal>
         )}
       </AnimatePresence>
 
       {loading ? <SkeletonRows n={4} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {products.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun produit. Ajoutez-en un ci-dessus.</p>
+            <p className="py-12 text-center text-sm text-bone-500">Aucun produit. Ajoutez-en un.</p>
+          ) : filtered.length === 0 ? (
+            <p className="py-12 text-center text-sm text-bone-500">Aucun produit pour « {search} ».</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -732,7 +840,7 @@ function ProductsTab({ tenantId, showToast }) {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => {
+                {filtered.map((p) => {
                   const img = Array.isArray(p.images) ? p.images[0] : null;
                   return (
                     <tr key={p.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
@@ -747,10 +855,10 @@ function ProductsTab({ tenantId, showToast }) {
                       <td className="px-4 py-3 text-xs text-bone-400 hidden md:table-cell">{p.category_slug || '—'}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2 justify-end">
-                          <button onClick={() => setEditRow({ ...p, images_list: p.images || [''], sizes_raw: (p.sizes || []).join(', ') })} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center">
-                            <Info size={12} />
+                          <button title="Modifier" onClick={() => setEditRow({ ...p, images_list: p.images || [''], sizes_raw: (p.sizes || []).join(', ') })} className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center">
+                            <Pencil size={12} />
                           </button>
-                          <button onClick={() => deleteProduct(p.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center">
+                          <button title="Supprimer" onClick={() => deleteProduct(p.id)} className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/15 grid place-items-center">
                             <Trash2 size={12} />
                           </button>
                         </div>
@@ -806,8 +914,22 @@ function ProductForm({ initial, onSave, onCancel }) {
   }
 
   return (
-    <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-5 space-y-4">
-      <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{form.id ? 'Modifier le produit' : 'Nouveau produit'}</h3>
+    <div className="rounded-2xl border border-white/10 bg-ink-800 shadow-2xl p-5 space-y-4">
+      {/* En-tête fiche produit : visuel + nom + fermer */}
+      <div className="flex items-center gap-3 mb-1">
+        <div className="h-12 w-12 rounded-xl overflow-hidden bg-white/5 border border-white/10 grid place-items-center shrink-0">
+          {form.images_list?.[0]
+            ? <img src={form.images_list[0]} alt="" className="h-full w-full object-cover" />
+            : <ShoppingBag size={18} className="text-bone-600" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{form.id ? 'Modifier le produit' : 'Nouveau produit'}</h3>
+          <p className="text-sm font-semibold text-bone-100 truncate">{form.name || 'Sans nom'}{form.pcc_price ? ` · ${form.pcc_price} PCC` : ''}</p>
+        </div>
+        <button onClick={onCancel} className="h-8 w-8 rounded-lg border border-white/10 text-bone-400 hover:text-bone-100 grid place-items-center shrink-0">
+          <X size={14} />
+        </button>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Field label="Nom du produit *" cls="col-span-2">
           <input value={form.name} onChange={set('name')} placeholder="Maillot domicile 2025" className={input()} />
@@ -907,4 +1029,50 @@ function Field({ label, children, cls = '' }) {
 function input() { return 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 transition-colors'; }
 function SkeletonRows({ n }) {
   return <div className="space-y-2 p-4">{Array.from({ length: n }).map((_, i) => <div key={i} className="h-12 rounded-xl bg-white/5 animate-pulse" />)}</div>;
+}
+
+// Modale centrée réutilisable : plafonnée à 90vh avec scroll interne, ferme
+// au clic backdrop ou Échap. Plus besoin de scroller pour voir le formulaire.
+function FormModal({ onClose, children }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+  }, [onClose]);
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 bg-ink-900/80 backdrop-blur overflow-y-auto"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ scale: 0.97, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.97 }}
+        className="w-full max-w-2xl my-4 max-h-[92vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Barre de recherche compacte pour filtrer une liste
+function SearchBar({ value, onChange, placeholder }) {
+  return (
+    <div className="relative flex-1 min-w-[180px]">
+      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-500" />
+      {value && (
+        <button onClick={() => onChange('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-bone-500 hover:text-bone-200">
+          <X size={13} />
+        </button>
+      )}
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full h-9 pl-9 pr-8 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40"
+      />
+    </div>
+  );
 }

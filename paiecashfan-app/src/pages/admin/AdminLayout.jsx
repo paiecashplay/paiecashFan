@@ -1,8 +1,8 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Users, Shield, ShoppingBag,
-  Trophy, LogOut, ChevronRight, Bell, Settings
+  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
@@ -23,8 +23,8 @@ export function AdminLayout() {
     <div className="flex min-h-screen bg-ink-900">
       {/* ─── Sidebar ─────────────────────────────────────────── */}
       <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-white/5 bg-ink-800/50 backdrop-blur-xl">
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 border-b border-white/5 shrink-0">
+        {/* Logo (clic → accueil) */}
+        <Link to="/" className="flex items-center gap-3 px-5 h-16 border-b border-white/5 shrink-0 hover:bg-white/[0.03] transition-colors" title="Retour au site">
           <div className="h-8 w-8 rounded-xl bg-gradient-hero grid place-items-center">
             <span className="font-black text-xs text-white">P</span>
           </div>
@@ -32,7 +32,7 @@ export function AdminLayout() {
             <p className="font-display font-bold text-sm text-bone-50 leading-none">PaieCashFan</p>
             <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Super Admin</p>
           </div>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
@@ -53,6 +53,17 @@ export function AdminLayout() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Retour au site */}
+        <div className="px-3 pb-1 shrink-0">
+          <Link
+            to="/"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-bone-400 hover:text-emerald-400 hover:bg-white/5 transition-all"
+          >
+            <ArrowLeft size={15} />
+            Retour au site
+          </Link>
+        </div>
 
         {/* Profile bas */}
         <div className="p-3 border-t border-white/5 shrink-0">
@@ -84,10 +95,18 @@ export function AdminLayout() {
             <ChevronRight size={12} />
             <span className="text-bone-200 font-semibold">Administration</span>
           </div>
-          <button className="relative grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-bone-300 hover:text-bone-50">
-            <Bell size={15} />
-            <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-red-400" />
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 h-9 px-3 rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-bone-300 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
+            >
+              <ArrowLeft size={13} /> Voir le site
+            </Link>
+            <button className="relative grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-bone-300 hover:text-bone-50">
+              <Bell size={15} />
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-red-400" />
+            </button>
+          </div>
         </header>
 
         {/* Page content */}
