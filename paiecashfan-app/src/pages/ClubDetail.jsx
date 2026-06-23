@@ -216,21 +216,28 @@ function ClubHero({ club, backTo = '/', loading = false }) {
             {club.name}
           </motion.h1>
 
-          {/* Motto / devise / federation */}
-          {(club.motto || club.federation) && (
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.6 }}
-              className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]"
-              style={{
-                color: club.mottoColor || '#a8c0b3',
-                textShadow: '0 2px 16px rgba(0,0,0,0.7)'
-              }}
-            >
-              « {club.motto || club.federation} »
-            </motion.p>
-          )}
+          {/* Motto / devise / federation — `federation` peut être un objet
+              (join API) ou une string (statique) : on normalise en string. */}
+          {(() => {
+            const fedLabel = typeof club.federation === 'string'
+              ? club.federation
+              : club.federation?.name;
+            const label = club.motto || fedLabel;
+            return label ? (
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55, duration: 0.6 }}
+                className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]"
+                style={{
+                  color: club.mottoColor || '#a8c0b3',
+                  textShadow: '0 2px 16px rgba(0,0,0,0.7)'
+                }}
+              >
+                « {label} »
+              </motion.p>
+            ) : null;
+          })()}
 
           {/* Méta chips inline — Fondation / Stade / Coach / Président pour clubs,
               Fondation / Ligue / Président pour sélections nationales */}
