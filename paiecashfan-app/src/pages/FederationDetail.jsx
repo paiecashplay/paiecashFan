@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2 } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -249,11 +249,17 @@ function FedSideActions({ primaryColor, hasClubs = true }) {
     } catch { /* annulé / non supporté */ }
   };
 
+  // Barre identique à celle des clubs, mais le bouton « Boutique » est
+  // remplacé par « Clubs » (ballon) placé EN PREMIER : la page fédération
+  // liste des clubs, pas des produits.
   const actions = [
-    hasClubs && { key: 'clubs',  icon: Volleyball, label: 'Clubs',     bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') },
-    { key: 'share', icon: Share2, label: 'Partager',  bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
-    { key: 'top',   icon: Globe,  label: 'Haut de page', bg: 'from-bone-300 to-bone-500',     onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  ].filter(Boolean);
+    { key: 'clubs', icon: Volleyball, label: 'Clubs',      bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') },
+    { key: 'play',  icon: Trophy,     label: 'Palmarès',   bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices,      label: 'Effectif',   bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
+    { key: 'like',  icon: Heart,      label: 'J\'aime',    bg: 'from-rose-400 to-rose-600' },
+    { key: 'share', icon: Share2,     label: 'Partager',   bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
+    { key: 'find',  icon: Search,     label: 'Rechercher', bg: 'from-bone-300 to-bone-500' }
+  ];
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:right-auto md:inset-x-auto md:justify-start">
