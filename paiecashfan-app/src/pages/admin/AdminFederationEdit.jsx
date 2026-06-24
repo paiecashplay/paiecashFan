@@ -135,6 +135,7 @@ function FederationInfoForm({ fed, onSaved }) {
     primary_color: fed.primary_color || '#10b981', accent_color: fed.accent_color || '',
     flag_emoji: fed.flag_emoji || '', motto: fed.motto || '',
     logo_url: fed.logo_url || '', stadium_image_url: fed.stadium_image_url || '',
+    acronym: fed.metadata?.acronym || '',
   });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -147,7 +148,11 @@ function FederationInfoForm({ fed, onSaved }) {
   async function save() {
     setSaving(true);
     try {
-      const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${fed.id}`, { method: 'PUT', body: JSON.stringify(form) });
+      // Le sigle (FECAFOOT…) est stocké dans metadata.acronym pour la recherche.
+      // On préserve le reste du metadata existant.
+      const { acronym, ...rest } = form;
+      const body = { ...rest, metadata: { ...(fed.metadata || {}), acronym: acronym.trim().toUpperCase() } };
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${fed.id}`, { method: 'PUT', body: JSON.stringify(body) });
       if (!json.success) throw new Error(json.error);
       onSaved(json.data.federation);
     } catch (e) { alert('Erreur : ' + e.message); }
@@ -170,6 +175,7 @@ function FederationInfoForm({ fed, onSaved }) {
         <Field label="Année de fondation"><input type="number" value={form.founded_year} onChange={set('founded_year')} placeholder="1959" className={inputCls()} /></Field>
         <Field label="Président"><input value={form.president} onChange={set('president')} placeholder="Samuel Eto'o" className={inputCls()} /></Field>
         <Field label="Sélection nationale"><input value={form.national_team_name} onChange={set('national_team_name')} placeholder="Lions Indomptables" className={inputCls()} /></Field>
+        <Field label="Sigle / acronyme (recherche)"><input value={form.acronym} onChange={set('acronym')} placeholder="FECAFOOT" className={inputCls()} /></Field>
         <Field label="Devise"><input value={form.motto} onChange={set('motto')} placeholder="Ex : Fierté du Cameroun" className={inputCls()} /></Field>
         <Field label="Drapeau (emoji)"><input value={form.flag_emoji} onChange={set('flag_emoji')} placeholder="🇨🇲" className={inputCls()} /></Field>
         <Field label="Couleur principale">
