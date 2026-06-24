@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
         federation:federations(id, slug, name, logo_url)
       `)
       .eq('status', 'active')
-      .eq('is_federation_hub', false)
+      .not('is_federation_hub', 'is', true)
       .range(from, from + Number(limit) - 1)
       .order('name', { ascending: true });
 
@@ -88,7 +88,7 @@ router.get('/:slugOrId', async (req, res) => {
         .from('tenants')
         .select('id, slug, name, short_code, country, city, logo_url, primary_color, stadium, stadium_image_url, founded_year')
         .eq('federation_id', club.federation.id)
-        .eq('is_federation_hub', false)
+        .not('is_federation_hub', 'is', true)
         .eq('status', 'active')
         .order('name', { ascending: true });
       members = mem || [];

@@ -57,7 +57,7 @@ router.get('/:slugOrId', async (req, res) => {
           stadium, stadium_image_url, founded_year, status
         `)
         .eq('federation_id', federation.id)
-        .eq('is_federation_hub', false)
+        .not('is_federation_hub', 'is', true)
         .eq('status', 'active')
         .order('name', { ascending: true }),
 

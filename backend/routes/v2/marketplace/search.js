@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
       .from('tenants')
       .select('id, slug, name, city, country, logo_url, primary_color, federation:federations(slug, name)')
       .eq('status', 'active')
-      .eq('is_federation_hub', false)
+      .not('is_federation_hub', 'is', true)
       .or(`name.ilike.${like},slug.ilike.${like},short_code.ilike.${like},city.ilike.${like}`)
       .order('name', { ascending: true })
       .limit(25);
