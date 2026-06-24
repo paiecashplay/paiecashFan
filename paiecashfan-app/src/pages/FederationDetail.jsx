@@ -152,11 +152,13 @@ function DynamicFederationView({ federation, members }) {
         <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${color}26 0%, transparent 38%, rgba(4,8,13,0.55) 75%, rgba(4,8,13,0.98) 100%)` }} />
         <div className="absolute inset-0 bg-ink-900/15" />
 
-        <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
-          <Link to={backTo} className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
+        <Container className="relative flex-1 flex flex-col items-center text-center py-16 md:py-24">
+          <Link to={backTo} className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
             <ArrowLeft size={14} /> {conf ? `Retour ${conf}` : 'Retour'}
           </Link>
 
+          {/* Bloc central centré dans l'espace au-dessus des stats */}
+          <div className="flex-1 flex flex-col items-center justify-center">
           {/* Crest / logo */}
           {federation.logo_url && (
             <div className="h-28 w-28 md:h-36 md:w-36 rounded-full grid place-items-center"
@@ -186,14 +188,13 @@ function DynamicFederationView({ federation, members }) {
             {federation.national_team_name && <FedChip label="Sélection" value={federation.national_team_name} />}
             {federation.president && <FedChip label="Président" value={federation.president} />}
           </div>
+          </div>
 
-          {/* Stats bas */}
-          <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
-              <FedStat value={clubs.length} label="Clubs" />
-              <FedStat value={federation.founded_year || '—'} label="Fondée" />
-              <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} />
-            </div>
+          {/* Stats — DANS LE FLUX en bas (plus d'absolute → aucun chevauchement) */}
+          <div className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center pb-2">
+            <FedStat value={clubs.length} label="Clubs" />
+            <FedStat value={federation.founded_year || '—'} label="Fondée" />
+            <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} />
           </div>
         </Container>
       </section>

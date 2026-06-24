@@ -253,7 +253,7 @@ function ClubHero({ club, backTo = '/', loading = false }) {
       {/* Braises / particules d'ambiance qui montent lentement */}
       {!reduce && <Embers color={pc} />}
 
-      <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
+      <Container className="relative flex-1 flex flex-col items-center text-center py-16 md:py-24">
         <Link
           to={backTo}
           className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
@@ -263,7 +263,7 @@ function ClubHero({ club, backTo = '/', loading = false }) {
         </Link>
 
         <motion.div
-          className="flex flex-col items-center"
+          className="flex-1 flex flex-col items-center justify-center"
           style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
         >
           {/* Logo / Crest avec halo pulsant */}
@@ -311,20 +311,19 @@ function ClubHero({ club, backTo = '/', loading = false }) {
           </motion.div>
         </motion.div>
 
-        {/* Stats inline en bas du Hero — compteurs animés */}
+        {/* Stats inline — DANS LE FLUX en bas (plus d'absolute → aucun
+            chevauchement avec les méta chips, même sur hero haut). */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.7 }}
-          className="absolute bottom-20 md:bottom-24 left-0 right-0 flex justify-center px-4"
+          className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center px-4 pb-4"
           style={reduce ? undefined : { opacity: contentOpacity }}
         >
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
-            <BigStat value={stats.trophies} label="Total Trophies" count reduce={reduce} />
-            <BigStat value={stats.founded}  label="Year Founded" />
-            <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" count reduce={reduce} />
-            <BigStat value={stats.tokens}   label="Fan Tokens" />
-          </div>
+          <BigStat value={stats.trophies} label="Total Trophies" count reduce={reduce} />
+          <BigStat value={stats.founded}  label="Year Founded" />
+          <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" count reduce={reduce} />
+          <BigStat value={stats.tokens}   label="Fan Tokens" />
         </motion.div>
 
         {/* Indicateur de scroll (s'efface au défilement) */}
