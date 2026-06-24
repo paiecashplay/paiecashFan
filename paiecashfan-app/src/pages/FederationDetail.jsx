@@ -5,6 +5,7 @@ import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, H
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { SideDock } from '@/components/SideDock';
 import { useFederationDetail } from '@/hooks/useFederationDetail';
 import { federations } from '@/data/federations';
 import { cafMembers, cafStats } from '@/data/caf-members';
@@ -138,8 +139,8 @@ function DynamicFederationView({ federation, members }) {
 
   return (
     <>
-      {/* Nav latérale flottante (mobile : barre du bas, desktop : à gauche) */}
-      <FedSideActions primaryColor={color} hasClubs={clubs.length > 0} />
+      {/* Dock d'actions flottant (bas centré, ou rail gauche sur très grand écran) */}
+      <FedSideActions primaryColor={color} />
 
       {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
       <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
@@ -232,10 +233,10 @@ function FedStat({ value, label }) {
 }
 
 // ── Nav latérale flottante de la page fédération ─────────────────────
-// Même ergonomie que les SideActions des clubs : barre flottante en bas
-// sur mobile, colonne verticale à gauche sur desktop. Actions : aller aux
-// clubs (scroll vers #clubs), partager, rechercher.
-function FedSideActions({ primaryColor, hasClubs = true }) {
+// Réutilise le dock partagé (SideDock). Le bouton « Boutique » des clubs est
+// remplacé par « Clubs » (ballon) placé EN PREMIER : une fédération liste des
+// clubs, pas des produits.
+function FedSideActions({ primaryColor }) {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -249,43 +250,16 @@ function FedSideActions({ primaryColor, hasClubs = true }) {
     } catch { /* annulé / non supporté */ }
   };
 
-  // Barre identique à celle des clubs, mais le bouton « Boutique » est
-  // remplacé par « Clubs » (ballon) placé EN PREMIER : la page fédération
-  // liste des clubs, pas des produits.
   const actions = [
-    { key: 'clubs', icon: Volleyball, label: 'Clubs',      bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') },
-    { key: 'play',  icon: Trophy,     label: 'Palmarès',   bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
-    { key: 'games', icon: Dices,      label: 'Effectif',   bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
-    { key: 'like',  icon: Heart,      label: 'J\'aime',    bg: 'from-rose-400 to-rose-600' },
-    { key: 'share', icon: Share2,     label: 'Partager',   bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
-    { key: 'find',  icon: Search,     label: 'Rechercher', bg: 'from-bone-300 to-bone-500' }
+    { key: 'clubs', icon: Volleyball, label: 'Clubs',      onClick: () => scrollTo('clubs') },
+    { key: 'play',  icon: Trophy,     label: 'Palmarès',   onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices,      label: 'Effectif',   onClick: () => scrollTo('squad') },
+    { key: 'like',  icon: Heart,      label: 'J\'aime' },
+    { key: 'share', icon: Share2,     label: 'Partager',   onClick: handleShare },
+    { key: 'find',  icon: Search,     label: 'Rechercher' }
   ];
 
-  return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:right-auto md:inset-x-auto md:justify-start">
-      <motion.div
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="pointer-events-auto flex md:flex-col gap-2 p-2 rounded-full border border-white/10 bg-ink-900/80 backdrop-blur-xl shadow-card"
-      >
-        {actions.map((a) => {
-          const Icon = a.icon;
-          return (
-            <button
-              key={a.key}
-              aria-label={a.label}
-              title={a.label}
-              onClick={a.onClick}
-              className={`relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${a.bg} text-ink-900 hover:scale-110 active:scale-95 transition-transform shadow-lg`}
-            >
-              <Icon size={16} strokeWidth={2.4} />
-            </button>
-          );
-        })}
-      </motion.div>
-    </div>
-  );
+  return <SideDock actions={actions} accent={primaryColor} />;
 }
 
 function FederationView({ federation, dataset }) {

@@ -14,6 +14,7 @@ import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { SideDock } from '@/components/SideDock';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { useCart } from '@/hooks/useCart';
 import { slugify } from '@/lib/slugify';
@@ -678,43 +679,19 @@ function SideActions({ primaryColor, isFederationHub = false }) {
   // Page fédération : icône ballon de foot (Volleyball) au lieu du
   // panier — visuel plus parlant pour signaler une liste de clubs.
   const shopAction = isFederationHub
-    ? { key: 'clubs', icon: Volleyball,  label: 'Clubs',    bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') }
-    : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('merchandise') };
+    ? { key: 'clubs', icon: Volleyball,  label: 'Clubs',    onClick: () => scrollTo('clubs') }
+    : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise') };
 
   const actions = [
     shopAction,
-    { key: 'play',  icon: Trophy,      label: 'Palmarès',     bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
-    { key: 'games', icon: Dices,       label: 'Effectif',     bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
-    { key: 'like',  icon: Heart,       label: 'J\'aime',      bg: 'from-rose-400 to-rose-600' },
-    { key: 'share', icon: Share2,      label: 'Partager',     bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
-    { key: 'find',  icon: Search,      label: 'Rechercher',   bg: 'from-bone-300 to-bone-500' }
+    { key: 'play',  icon: Trophy,  label: 'Palmarès',   onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices,   label: 'Effectif',   onClick: () => scrollTo('squad') },
+    { key: 'like',  icon: Heart,   label: 'J\'aime' },
+    { key: 'share', icon: Share2,  label: 'Partager',   onClick: handleShare },
+    { key: 'find',  icon: Search,  label: 'Rechercher' }
   ];
 
-  return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:right-auto md:inset-x-auto md:justify-start">
-      <motion.div
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="pointer-events-auto flex md:flex-col gap-2 p-2 rounded-full border border-white/10 bg-ink-900/80 backdrop-blur-xl shadow-card"
-      >
-        {actions.map((a) => {
-          const Icon = a.icon;
-          return (
-            <button
-              key={a.key}
-              aria-label={a.label}
-              title={a.label}
-              onClick={a.onClick}
-              className={`relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${a.bg} text-ink-900 hover:scale-110 active:scale-95 transition-transform shadow-lg`}
-            >
-              <Icon size={16} strokeWidth={2.4} />
-            </button>
-          );
-        })}
-      </motion.div>
-    </div>
-  );
+  return <SideDock actions={actions} accent={primaryColor} />;
 }
 
 // ── STADIUM BACKGROUND ───────────────────────────────────────────────
