@@ -311,17 +311,17 @@ function ClubHero({ club, backTo = '/', loading = false }) {
           </motion.div>
 
           {/* Stats — DANS LA MÊME COLONNE, en flux normal sous les chips.
-              Aucune position absolue → chevauchement impossible. */}
+              Apparition en cascade (stagger) + compteurs animés. */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.7 }}
+            variants={reduce ? undefined : { hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.9 } } }}
+            initial={reduce ? undefined : 'hidden'}
+            animate={reduce ? undefined : 'show'}
             className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-x-8 md:gap-x-10 gap-y-5 text-center"
           >
-            <BigStat value={stats.trophies} label="Total Trophies" count reduce={reduce} />
-            <BigStat value={stats.founded}  label="Year Founded" />
-            <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" count reduce={reduce} />
-            <BigStat value={stats.tokens}   label="Fan Tokens" />
+            <BigStat value={stats.trophies} label="Total Trophies" count reduce={reduce} accent={pc} />
+            <BigStat value={stats.founded}  label="Year Founded" accent={pc} />
+            <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" count reduce={reduce} accent={pc} />
+            <BigStat value={stats.tokens}   label="Fan Tokens" accent={pc} />
           </motion.div>
         </motion.div>
 
@@ -467,14 +467,30 @@ function Divider() {
   return <div className="w-px h-8 self-center bg-white/10" />;
 }
 
-function BigStat({ value, label, suffix = '', count = false, reduce = false }) {
+// Variants d'apparition en cascade pour la rangée de stats.
+const STAT_ITEM = {
+  hidden: { opacity: 0, y: 18 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: HERO_EASE } }
+};
+
+function BigStat({ value, label, suffix = '', count = false, reduce = false, accent = '#10b981' }) {
   return (
-    <div>
+    <motion.div
+      variants={reduce ? undefined : STAT_ITEM}
+      whileHover={reduce ? undefined : { y: -4 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+      className="group px-2 cursor-default"
+    >
       <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
         {count ? <CountUp value={value} reduce={reduce} /> : value}{suffix}
       </div>
-      <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
-    </div>
+      {/* Soulignement accent qui grandit au survol */}
+      <div
+        className="mx-auto mt-1.5 h-0.5 w-5 rounded-full opacity-50 transition-all duration-300 group-hover:w-10 group-hover:opacity-100"
+        style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
+      />
+      <div className="mt-1.5 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+    </motion.div>
   );
 }
 

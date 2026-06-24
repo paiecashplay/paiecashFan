@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
@@ -116,6 +116,7 @@ function FedLoading() {
 // ── Vue dynamique d'une fédération nationale (depuis la base) ────────
 // Hero (logo/nom/pays) + grille des clubs membres (FederationClubsGrid).
 function DynamicFederationView({ federation, members }) {
+  const reduce = useReducedMotion();
   const color = federation.primary_color || '#10b981';
   const clubs = (members || []).map((m) => ({
     slug:         m.slug,
@@ -189,12 +190,17 @@ function DynamicFederationView({ federation, members }) {
             {federation.president && <FedChip label="Président" value={federation.president} />}
           </div>
 
-          {/* Stats — dans la même colonne, en flux normal sous les chips */}
-          <div className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-x-8 md:gap-x-10 gap-y-5 text-center">
-            <FedStat value={clubs.length} label="Clubs" />
-            <FedStat value={federation.founded_year || '—'} label="Fondée" />
-            <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} />
-          </div>
+          {/* Stats — dans la même colonne, apparition en cascade */}
+          <motion.div
+            variants={reduce ? undefined : { hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.5 } } }}
+            initial={reduce ? undefined : 'hidden'}
+            animate={reduce ? undefined : 'show'}
+            className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-x-8 md:gap-x-10 gap-y-5 text-center"
+          >
+            <FedStat value={clubs.length} label="Clubs" accent={color} reduce={reduce} />
+            <FedStat value={federation.founded_year || '—'} label="Fondée" accent={color} reduce={reduce} />
+            <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} accent={color} reduce={reduce} />
+          </motion.div>
           </div>
         </Container>
       </section>
@@ -230,12 +236,26 @@ function FedChip({ label, value }) {
   );
 }
 
-function FedStat({ value, label }) {
+const FED_STAT_ITEM = {
+  hidden: { opacity: 0, y: 18 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
+
+function FedStat({ value, label, accent = '#10b981', reduce = false }) {
   return (
-    <div>
+    <motion.div
+      variants={reduce ? undefined : FED_STAT_ITEM}
+      whileHover={reduce ? undefined : { y: -4 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+      className="group px-2 cursor-default"
+    >
       <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{value}</div>
-      <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
-    </div>
+      <div
+        className="mx-auto mt-1.5 h-0.5 w-5 rounded-full opacity-50 transition-all duration-300 group-hover:w-10 group-hover:opacity-100"
+        style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
+      />
+      <div className="mt-1.5 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+    </motion.div>
   );
 }
 
