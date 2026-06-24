@@ -85,6 +85,26 @@ async function getTeam(teamId) {
   return mapTeam((data.response || [])[0]) || null;
 }
 
+// GET /leagues?code= — championnats d'un pays (code 2 lettres, ex: CM)
+async function getLeaguesByCountryCode(code) {
+  const { data } = await client().get('/leagues', { params: { code } });
+  check(data);
+  return (data.response || []).map((l) => ({
+    id:          l.league?.id,
+    name:        l.league?.name,
+    type:        l.league?.type,          // 'League' | 'Cup'
+    countryName: l.country?.name || null,
+    seasons:     (l.seasons || []).map((s) => ({ year: s.year, current: Boolean(s.current) }))
+  })).filter((l) => l.id);
+}
+
+// GET /teams?league=&season= — équipes d'un championnat pour une saison
+async function getTeamsByLeagueSeason(leagueId, season) {
+  const { data } = await client().get('/teams', { params: { league: leagueId, season } });
+  check(data);
+  return (data.response || []).map(mapTeam).filter(Boolean);
+}
+
 async function getSquad(teamId) {
   const { data } = await client().get('/players/squads', { params: { team: teamId } });
   check(data);
@@ -98,4 +118,4 @@ async function getSquad(teamId) {
   }));
 }
 
-module.exports = { searchTeams, getTeam, getSquad };
+module.exports = { searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getTeamsByLeagueSeason };

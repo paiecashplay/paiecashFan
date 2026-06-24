@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
         federation:federations(id, slug, name, logo_url)
       `)
       .eq('status', 'active')
-      .eq('is_federation_hub', false)
+      .not('is_federation_hub', 'is', true)
       .range(from, from + Number(limit) - 1)
       .order('name', { ascending: true });
 
@@ -57,7 +57,7 @@ router.get('/:slugOrId', async (req, res) => {
         id, slug, name, short_code, country, city, sport, logo_url, primary_color,
         stadium, stadium_image_url, founded_year, is_federation_hub,
         motto, motto_color, coach, president, status, metadata,
-        federation:federations(id, slug, name, logo_url, country_code)
+        federation:federations(id, slug, name, logo_url, country_code, confederation_code, stadium_image_url)
       `);
 
     query = isUuid ? query.eq('id', p) : query.eq('slug', p);
@@ -80,12 +80,27 @@ router.get('/:slugOrId', async (req, res) => {
 
     if (productsRes.error) throw productsRes.error;
 
+    // Page fédération : si ce tenant est un hub, on récupère les clubs membres
+    // (mêmes federation_id, hors hub, actifs) pour afficher la grille Équipes.
+    let members = [];
+    if (club.is_federation_hub && club.federation?.id) {
+      const { data: mem } = await supabase
+        .from('tenants')
+        .select('id, slug, name, short_code, country, city, logo_url, primary_color, stadium, stadium_image_url, founded_year')
+        .eq('federation_id', club.federation.id)
+        .not('is_federation_hub', 'is', true)
+        .eq('status', 'active')
+        .order('name', { ascending: true });
+      members = mem || [];
+    }
+
     return ok(res, {
       club,
       starPlayer,
       players,
       trophies,
-      products: productsRes.data || []
+      products: productsRes.data || [],
+      members
     });
   } catch (err) {
     console.error('[clubs] GET /:slugOrId error:', err.message);

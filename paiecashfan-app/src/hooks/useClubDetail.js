@@ -30,6 +30,15 @@ function normalizeApiClub(c) {
   if (c.short_code)                 out.code           = c.short_code;
   if (c.is_federation_hub != null)  out.isFederationHub = c.is_federation_hub;
   if (c.motto_color)                out.mottoColor     = c.motto_color;
+  // `federation` peut être un objet (join API) : on le réduit à une string
+  // (nom) pour le rendu, sinon React #31 (objet rendu comme enfant). On
+  // conserve slug + confédération à part pour la navigation (bouton Retour).
+  if (c.federation && typeof c.federation === 'object') {
+    out.federationSlug          = c.federation.slug || undefined;
+    out.federationConfederation = c.federation.confederation_code || undefined;
+    out.federationStadiumImage  = c.federation.stadium_image_url || undefined;
+    out.federation              = c.federation.name || undefined;
+  }
   return out;
 }
 
@@ -54,6 +63,7 @@ export function useClubDetail(slug) {
   const [starPlayer, setStarPlayer] = useState(staticClub?.starPlayer || null);
   const [trophies, setTrophies]   = useState(staticClub?.trophies?.breakdown || []);
   const [products, setProducts]   = useState([]);
+  const [members, setMembers]     = useState([]);   // clubs membres si fédération hub
   const [loading, setLoading]     = useState(true);
   const [fromApi, setFromApi]     = useState(false);
 
@@ -67,6 +77,7 @@ export function useClubDetail(slug) {
     setStarPlayer(base?.starPlayer || null);
     setTrophies(base?.trophies?.breakdown || []);
     setProducts([]);
+    setMembers([]);
     setFromApi(false);
     setLoading(true);
 
@@ -77,7 +88,7 @@ export function useClubDetail(slug) {
         if (cancelled || !json?.success) return;
 
         const { club: apiClub, starPlayer: apiStar, players: apiPlayers,
-                trophies: apiTrophies, products: apiProducts } = json.data;
+                trophies: apiTrophies, products: apiProducts, members: apiMembers } = json.data;
 
         if (!apiClub) return;
 
@@ -90,6 +101,7 @@ export function useClubDetail(slug) {
         if (apiPlayers?.length)  setPlayers(apiPlayers);
         if (apiTrophies?.length) setTrophies(apiTrophies);
         if (apiProducts?.length) setProducts(apiProducts);
+        if (apiMembers?.length)  setMembers(apiMembers);
 
         setFromApi(true);
       })
@@ -103,5 +115,5 @@ export function useClubDetail(slug) {
     return () => { cancelled = true; };
   }, [slug]);
 
-  return { club, players, starPlayer, trophies, products, loading, fromApi };
+  return { club, players, starPlayer, trophies, products, members, loading, fromApi };
 }

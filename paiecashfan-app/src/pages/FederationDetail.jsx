@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Search, Globe } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
+import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { useFederationDetail } from '@/hooks/useFederationDetail';
 import { federations } from '@/data/federations';
 import { cafMembers, cafStats } from '@/data/caf-members';
 import { uefaMembers } from '@/data/uefa-members';
@@ -77,12 +79,213 @@ const datasets = {
 
 export function FederationDetail() {
   const { fedId } = useParams();
-  const federation = federations.find((f) => f.id === fedId);
-  const dataset = datasets[fedId];
 
-  if (!federation) return <NotFound />;
-  if (!dataset) return <ComingSoon federation={federation} />;
-  return <FederationView federation={federation} dataset={dataset} />;
+  // Confédérations statiques connues (caf/uefa/…) : on garde le rendu existant
+  // et on n'appelle PAS l'API (elles ne sont pas en base).
+  const isStaticConfed = Boolean(datasets[fedId]);
+
+  // API-first uniquement pour les autres slugs (fédérations nationales en base)
+  const { federation: dbFed, members: dbMembers, loading } =
+    useFederationDetail(isStaticConfed ? null : fedId);
+
+  // 1) Confédération statique → inchangé
+  if (isStaticConfed) {
+    const federation = federations.find((f) => f.id === fedId);
+    return <FederationView federation={federation} dataset={datasets[fedId]} />;
+  }
+
+  // 2) Fédération nationale en base → vue dynamique
+  if (loading) return <FedLoading />;
+  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} />;
+
+  // 3) Repli : entrée statique sans dataset, ou inconnue
+  const federation = federations.find((f) => f.id === fedId);
+  if (federation) return <ComingSoon federation={federation} />;
+  return <NotFound />;
+}
+
+function FedLoading() {
+  return (
+    <section className="min-h-[60vh] grid place-items-center">
+      <Loader2 size={28} className="text-emerald-400 animate-spin" />
+    </section>
+  );
+}
+
+// ── Vue dynamique d'une fédération nationale (depuis la base) ────────
+// Hero (logo/nom/pays) + grille des clubs membres (FederationClubsGrid).
+function DynamicFederationView({ federation, members }) {
+  const color = federation.primary_color || '#10b981';
+  const clubs = (members || []).map((m) => ({
+    slug:         m.slug,
+    name:         m.name,
+    code:         m.short_code,
+    city:         m.city,
+    stadium:      m.stadium,
+    stadiumImage: m.stadium_image_url,
+    founded:      m.founded_year,
+    logo:         m.logo_url,
+    primaryColor: m.primary_color || color,
+    countryFlag:  federation.flag_emoji || ''
+  }));
+
+  const heroImg = federation.stadium_image_url || '/images/futuristic_stadium_hero.png';
+
+  // Retour dynamique : vers la confédération de rattachement (ex: /federations/caf)
+  // si connue, sinon l'accueil.
+  const conf = federation.confederation_code;
+  const backTo = conf ? `/federations/${conf.toLowerCase()}` : '/';
+
+  return (
+    <>
+      {/* Nav latérale flottante (mobile : barre du bas, desktop : à gauche) */}
+      <FedSideActions primaryColor={color} hasClubs={clubs.length > 0} />
+
+      {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
+      <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
+        <img src={heroImg} alt="" aria-hidden loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => { e.currentTarget.src = '/images/futuristic_stadium_hero.png'; }} />
+        {/* Voile couleur fédé (modéré) + assombrissement bas pour le texte */}
+        <div className="absolute inset-0 mix-blend-color" style={{ background: color, opacity: 0.4 }} />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${color}26 0%, transparent 38%, rgba(4,8,13,0.55) 75%, rgba(4,8,13,0.98) 100%)` }} />
+        <div className="absolute inset-0 bg-ink-900/15" />
+
+        <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
+          <Link to={backTo} className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors">
+            <ArrowLeft size={14} /> {conf ? `Retour ${conf}` : 'Retour'}
+          </Link>
+
+          {/* Crest / logo */}
+          {federation.logo_url && (
+            <div className="h-28 w-28 md:h-36 md:w-36 rounded-full grid place-items-center"
+              style={{ background: `radial-gradient(circle, ${color}40, transparent 70%)`, boxShadow: `0 0 80px -10px ${color}88` }}>
+              <div className="h-24 w-24 md:h-32 md:w-32 rounded-full grid place-items-center backdrop-blur-sm"
+                style={{ background: `${color}20`, border: `2px solid ${color}80` }}>
+                <img src={federation.logo_url} alt={federation.name}
+                  className="h-16 w-16 md:h-20 md:w-20 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              </div>
+            </div>
+          )}
+
+          <h1 className="mt-6 font-display text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-bone-50" style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}>
+            {federation.name}
+          </h1>
+          {federation.motto && (
+            <p className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]" style={{ color: federation.motto_color || '#a8c0b3', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}>
+              « {federation.motto} »
+            </p>
+          )}
+
+          {/* Chips infos */}
+          <div className="mt-6 inline-flex items-center gap-px overflow-hidden rounded-full border border-white/10 bg-ink-900/60 backdrop-blur-md flex-wrap">
+            {federation.founded_year && <FedChip label="Fondation" value={federation.founded_year} />}
+            <FedChip label="Confédération" value={federation.confederation_code} />
+            {federation.national_team_name && <FedChip label="Sélection" value={federation.national_team_name} />}
+            {federation.president && <FedChip label="Président" value={federation.president} />}
+          </div>
+
+          {/* Stats bas */}
+          <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
+              <FedStat value={clubs.length} label="Clubs" />
+              <FedStat value={federation.founded_year || '—'} label="Fondée" />
+              <FedStat value={federation.flag_emoji || federation.country_code || '—'} label={federation.country || 'Pays'} />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {clubs.length > 0 ? (
+        <FederationClubsGrid
+          clubs={clubs}
+          federationColor={color}
+          leagueName={`Clubs · ${federation.name}`}
+          cardBackground={federation.stadium_image_url}
+        />
+      ) : (
+        <Container className="py-20 text-center text-sm text-bone-400">
+          Aucun club rattaché à cette fédération pour le moment.
+        </Container>
+      )}
+    </>
+  );
+}
+
+function FedChip({ label, value }) {
+  return (
+    <div className="px-3 py-2 md:px-4 md:py-2.5">
+      <div className="text-[8px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+      <div className="text-[11px] md:text-xs font-mono text-bone-100 mt-0.5">{value}</div>
+    </div>
+  );
+}
+
+function FedStat({ value, label }) {
+  return (
+    <div>
+      <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>{value}</div>
+      <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
+    </div>
+  );
+}
+
+// ── Nav latérale flottante de la page fédération ─────────────────────
+// Même ergonomie que les SideActions des clubs : barre flottante en bas
+// sur mobile, colonne verticale à gauche sur desktop. Actions : aller aux
+// clubs (scroll vers #clubs), partager, rechercher.
+function FedSideActions({ primaryColor, hasClubs = true }) {
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleShare = async () => {
+    const shareData = { title: document.title, text: 'Découvre cette fédération sur PaieCashFan', url: window.location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard?.writeText(window.location.href);
+    } catch { /* annulé / non supporté */ }
+  };
+
+  // Barre identique à celle des clubs, mais le bouton « Boutique » est
+  // remplacé par « Clubs » (ballon) placé EN PREMIER : la page fédération
+  // liste des clubs, pas des produits.
+  const actions = [
+    { key: 'clubs', icon: Volleyball, label: 'Clubs',      bg: 'from-emerald-400 to-emerald-600', onClick: () => scrollTo('clubs') },
+    { key: 'play',  icon: Trophy,     label: 'Palmarès',   bg: 'from-amber-400 to-amber-600',     onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices,      label: 'Effectif',   bg: 'from-orange-400 to-rose-500',     onClick: () => scrollTo('squad') },
+    { key: 'like',  icon: Heart,      label: 'J\'aime',    bg: 'from-rose-400 to-rose-600' },
+    { key: 'share', icon: Share2,     label: 'Partager',   bg: 'from-cyan-400 to-cyan-600',       onClick: handleShare },
+    { key: 'find',  icon: Search,     label: 'Rechercher', bg: 'from-bone-300 to-bone-500' }
+  ];
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:right-auto md:inset-x-auto md:justify-start">
+      <motion.div
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="pointer-events-auto flex md:flex-col gap-2 p-2 rounded-full border border-white/10 bg-ink-900/80 backdrop-blur-xl shadow-card"
+      >
+        {actions.map((a) => {
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.key}
+              aria-label={a.label}
+              title={a.label}
+              onClick={a.onClick}
+              className={`relative grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br ${a.bg} text-ink-900 hover:scale-110 active:scale-95 transition-transform shadow-lg`}
+            >
+              <Icon size={16} strokeWidth={2.4} />
+            </button>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
 }
 
 function FederationView({ federation, dataset }) {

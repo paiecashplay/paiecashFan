@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams, Navigate } from 'react-router-dom';
+import {
+  motion, AnimatePresence,
+  useScroll, useTransform, useReducedMotion, animate
+} from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight, Volleyball
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -26,21 +29,51 @@ const fmtRel = (n) =>
 
 export function ClubDetail() {
   const { slug } = useParams();
-  const { club, players, starPlayer, trophies, products, loading } = useClubDetail(slug);
+  const { club, players, starPlayer, trophies, products, members, loading } = useClubDetail(slug);
 
   if (!club) return <NotFound slug={slug} />;
 
-  // Page Fédération nationale (ex: /clubs/tanzanie) : on remplace la
-  // boutique par la grille des clubs membres si le profil expose
-  // isFederationHub ET qu'on a une liste de clubs rattachés.
-  const federationClubs = club.isFederationHub ? getFederationClubs(slug) : null;
+  // Un hub de fédération (ex: tenant "Cameroun") a sa page CANONIQUE sur
+  // /federations/:slug. On y redirige pour éviter la double page club/fédé.
+  // (routes différentes /clubs ↔ /federations → aucun risque de boucle)
+  if (club.isFederationHub && club.federationSlug) {
+    return <Navigate to={`/federations/${club.federationSlug}`} replace />;
+  }
+
+  // Page Fédération : si ce tenant est un hub, on remplace la boutique par
+  // la grille des clubs membres. Priorité aux membres venant de la BASE
+  // (federation_id), avec repli sur la liste statique (ex: Tanzanie héritée).
+  const dbMembers = members.length > 0
+    ? members.map((m) => ({
+        slug:         m.slug,
+        name:         m.name,
+        code:         m.short_code,
+        city:         m.city,
+        stadium:      m.stadium,
+        stadiumImage: m.stadium_image_url,
+        founded:      m.founded_year,
+        logo:         m.logo_url,
+        primaryColor: m.primary_color || club.primaryColor,
+        countryFlag:  club.flagEmoji || ''
+      }))
+    : null;
+  const federationClubs = club.isFederationHub ? (dbMembers || getFederationClubs(slug)) : null;
   const isFederationHub = Boolean(federationClubs && federationClubs.length > 0);
 
-  // Bouton "Retour" dynamique : si on est sur un club rattaché à une
-  // fédération (ex: Simba SC → tanzanie), retour vers la page de la
-  // fédération. Sinon retour HomePage.
-  const federationParentSlug = isFederationHub ? null : getClubFederation(slug);
-  const backTo = federationParentSlug ? `/clubs/${federationParentSlug}` : '/';
+  // Bouton "Retour" dynamique, piloté par la base :
+  //  • Page hub (ex: Cameroun)  → retour vers la confédération /federations/caf
+  //  • Club membre (ex: Canon)  → retour vers le hub de sa fédération /clubs/<slug>
+  //  • Sinon                    → repli statique (Tanzanie) ou accueil
+  let backTo = '/';
+  if (isFederationHub) {
+    const conf = club.federationConfederation;
+    backTo = conf ? `/federations/${conf.toLowerCase()}` : '/';
+  } else if (club.federationSlug) {
+    backTo = `/clubs/${club.federationSlug}`;
+  } else {
+    const parent = getClubFederation(slug);
+    if (parent) backTo = `/clubs/${parent}`;
+  }
 
   // Normalise les trophées : accepte la shape API (tableau plat avec champ
   // scope/label/count/years_text) ET la shape statique (trophies.breakdown).
@@ -135,184 +168,285 @@ export function ClubDetail() {
 }
 
 // ── HERO ─────────────────────────────────────────────────────────────
+// Hero cinématique « stade nocturne » : photo plein écran avec zoom Ken Burns
+// + parallax au scroll, projecteurs lumineux animés (couleur du club), braises
+// flottantes, vignette nuit, crest à halo pulsant et stats à compteur animé.
+// Toutes les animations décoratives respectent prefers-reduced-motion.
+const HERO_EASE = [0.22, 1, 0.36, 1];
+
 function ClubHero({ club, backTo = '/', loading = false }) {
+  const reduce = useReducedMotion();
+  const sectionRef = useRef(null);
+
+  // Progression du scroll sur la hauteur du hero (0 = en haut, 1 = sorti).
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start']
+  });
+  // Parallax : le stade dérive plus lentement que le scroll → sensation de profondeur.
+  const bgY            = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
+  const contentY       = useTransform(scrollYProgress, [0, 1], [0, -70]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const darken         = useTransform(scrollYProgress, [0, 0.9], [0, 0.6]);
+
   const stats = useMemo(() => {
     const s = fallbackHeroStats(club);
-    // Override le compteur de trophées avec la vraie data du profil si dispo
     if (club.trophies?.total != null) s.trophies = club.trophies.total;
     if (club.squad?.length) s.squad = club.squad.length;
     return s;
   }, [club]);
-  // Image du stade : custom du club si dispo. Tant que l'API charge et qu'on
-  // n'a pas encore d'image (ex: club uniquement en BDD comme l'OL), on n'affiche
-  // PAS le stade générique → on évite le flash « défaut puis saut ». Le fallback
-  // générique n'est utilisé qu'une fois le chargement terminé sans image custom.
-  const stadiumImage = club.stadiumImage || (loading ? null : '/images/futuristic_stadium_hero.png');
+
+  // Image du stade — cascade de repli en 3 niveaux :
+  //   1. stade propre du club  2. stade de sa fédération  3. stade générique IA
+  //   (rien tant que `loading` → évite le flash « défaut puis saut »).
+  const stadiumImage =
+    club.stadiumImage ||
+    club.federationStadiumImage ||
+    (loading ? null : '/images/futuristic_stadium_hero.png');
+
+  const pc = club.primaryColor;
+  const fedLabel = typeof club.federation === 'string' ? club.federation : club.federation?.name;
+  const mottoLabel = club.motto || fedLabel;
 
   return (
-    <section className="relative overflow-hidden border-b border-white/5 min-h-[70vh] flex flex-col">
-      {/* Background stade — image custom du club ou fallback générique */}
-      <ClubStadiumBg src={stadiumImage} fallback="/images/futuristic_stadium_hero.png" />
-      {/* Voile couleur club — mix-blend-color teinte uniformément toute l'image
-          quelle que soit la teinte (vif comme l'OM ou marine foncé comme l'OL),
-          tout en préservant les détails clairs/sombres du stade. */}
-      <div
-        className="absolute inset-0 mix-blend-color"
-        style={{ background: club.primaryColor, opacity: 0.55 }}
-      />
-      {/* Renfort de teinte en haut + assombrissement progressif en bas pour
-          garantir la lisibilité du texte du hero. */}
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden border-b border-white/5 min-h-[88vh] flex flex-col"
+    >
+      {/* Stade plein écran + parallax (le zoom Ken Burns vit dans ClubStadiumBg) */}
+      <motion.div className="absolute inset-0" style={reduce ? undefined : { y: bgY }}>
+        <ClubStadiumBg src={stadiumImage} fallback="/images/futuristic_stadium_hero.png" kenBurns={!reduce} />
+      </motion.div>
+
+      {/* Voile couleur du club (teinte uniforme via mix-blend-color) */}
+      <div className="absolute inset-0 mix-blend-color" style={{ background: pc, opacity: 0.4 }} />
+
+      {/* Projecteurs de stade : 2 faisceaux lumineux qui pulsent doucement */}
+      {!reduce && <Floodlights color={pc} />}
+
+      {/* Gradient nuit : sombre haut + bas, transparent au centre (on voit le stade) */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(180deg,
-            ${club.primaryColor}33 0%,
-            ${club.primaryColor}1A 30%,
-            rgba(4,8,13,0.6) 65%,
-            rgba(4,8,13,1) 100%)`
+            rgba(2,6,12,0.72) 0%,
+            ${pc}24 20%,
+            transparent 46%,
+            rgba(2,6,12,0.55) 73%,
+            rgba(2,6,12,0.98) 100%)`
         }}
       />
-      <div className="absolute inset-0 bg-ink-900/30" />
+      {/* Vignette : assombrit les bords pour concentrer le regard au centre */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(120% 75% at 50% 32%, transparent 52%, rgba(2,6,12,0.82) 100%)' }}
+      />
+      {/* Assombrissement progressif piloté par le scroll */}
+      {!reduce && <motion.div className="absolute inset-0 bg-ink-950 pointer-events-none" style={{ opacity: darken }} />}
+
+      {/* Braises / particules d'ambiance qui montent lentement */}
+      {!reduce && <Embers color={pc} />}
 
       <Container className="relative flex-1 flex flex-col items-center justify-center text-center py-16 md:py-24">
         <Link
           to={backTo}
-          className="absolute top-6 left-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
+          className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-200 hover:text-emerald-400 transition-colors"
         >
           <ArrowLeft size={14} />
           Retour
         </Link>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center"
+          style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
         >
-          {/* Logo / Crest */}
-          <CrestLarge club={club} />
+          {/* Logo / Crest avec halo pulsant */}
+          <CrestLarge club={club} reduce={reduce} />
 
-          {/* Nom du club */}
+          {/* Nom du club — révélation montante */}
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
+            initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ delay: 0.35, duration: 0.9, ease: HERO_EASE }}
             className="mt-6 font-display text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-bone-50"
-            style={{ textShadow: '0 4px 32px rgba(0,0,0,0.8)' }}
+            style={{ textShadow: `0 4px 32px rgba(0,0,0,0.85), 0 0 60px ${pc}40` }}
           >
             {club.name}
           </motion.h1>
 
-          {/* Motto / devise / federation */}
-          {(club.motto || club.federation) && (
+          {/* Motto / fédération */}
+          {mottoLabel && (
             <motion.p
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.6 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
               className="mt-3 text-xs md:text-sm italic uppercase tracking-[0.18em]"
-              style={{
-                color: club.mottoColor || '#a8c0b3',
-                textShadow: '0 2px 16px rgba(0,0,0,0.7)'
-              }}
+              style={{ color: club.mottoColor || '#a8c0b3', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}
             >
-              « {club.motto || club.federation} »
+              « {mottoLabel} »
             </motion.p>
           )}
 
-          {/* Méta chips inline — Fondation / Stade / Coach / Président pour clubs,
-              Fondation / Ligue / Président pour sélections nationales */}
+          {/* Méta chips inline */}
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
+            transition={{ delay: 0.75, duration: 0.6 }}
             className="mt-6 inline-flex items-center gap-px overflow-hidden rounded-full border border-white/10 bg-ink-900/60 backdrop-blur-md flex-wrap"
           >
             <MetaChip label="Fondation" value={club.founded || '—'} />
             <Divider />
-            <MetaChip
-              label={club.type === 'national' ? 'Ligue' : 'Stade'}
-              value={club.stadium || club.league}
-            />
-            {club.coach && (
-              <>
-                <Divider />
-                <MetaChip label="Coach" value={club.coach} />
-              </>
-            )}
-            {club.president && (
-              <>
-                <Divider />
-                <MetaChip label="Président" value={club.president} />
-              </>
-            )}
+            <MetaChip label={club.type === 'national' ? 'Ligue' : 'Stade'} value={club.stadium || club.league} />
+            {club.coach && (<><Divider /><MetaChip label="Coach" value={club.coach} /></>)}
+            {club.president && (<><Divider /><MetaChip label="Président" value={club.president} /></>)}
             {!club.coach && !club.president && (club.manager || club.type === 'national') && (
-              <>
-                <Divider />
-                <MetaChip
-                  label={club.type === 'national' ? 'Président' : 'Coach'}
-                  value={club.president || club.manager || '—'}
-                />
-              </>
+              <><Divider /><MetaChip label={club.type === 'national' ? 'Président' : 'Coach'} value={club.president || club.manager || '—'} /></>
             )}
           </motion.div>
         </motion.div>
 
-        {/* Stats inline en bas du Hero */}
+        {/* Stats inline en bas du Hero — compteurs animés */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.7 }}
-          className="absolute bottom-8 left-0 right-0 flex justify-center"
+          className="absolute bottom-20 md:bottom-24 left-0 right-0 flex justify-center px-4"
+          style={reduce ? undefined : { opacity: contentOpacity }}
         >
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-center">
-            <BigStat value={stats.trophies} label="Total Trophies" />
+            <BigStat value={stats.trophies} label="Total Trophies" count reduce={reduce} />
             <BigStat value={stats.founded}  label="Year Founded" />
-            <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" />
+            <BigStat value={stats.squad}    label="Squad Size" suffix=" Players" count reduce={reduce} />
             <BigStat value={stats.tokens}   label="Fan Tokens" />
           </div>
         </motion.div>
+
+        {/* Indicateur de scroll (s'efface au défilement) */}
+        {!reduce && <ScrollCue progress={scrollYProgress} />}
       </Container>
     </section>
   );
 }
 
-function CrestLarge({ club }) {
-  const colorBg = `${club.primaryColor}20`;
-  if (club.logo) {
-    return (
+// Deux faisceaux de projecteurs (cônes lumineux flous) en haut, pulsant en
+// opacité — évoque l'éclairage d'un stade la nuit. Couleur = teinte du club.
+function Floodlights({ color }) {
+  const beam = 'absolute -top-1/3 h-[120%] w-[42%] blur-3xl mix-blend-screen pointer-events-none';
+  return (
+    <div className="absolute inset-0 overflow-hidden" aria-hidden>
+      <motion.div
+        className={`${beam} left-[2%]`}
+        style={{ background: `linear-gradient(180deg, ${color}66, transparent 70%)`, transform: 'rotate(14deg)', transformOrigin: 'top center' }}
+        animate={{ opacity: [0.35, 0.7, 0.35] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className={`${beam} right-[2%]`}
+        style={{ background: `linear-gradient(180deg, ${color}66, transparent 70%)`, transform: 'rotate(-14deg)', transformOrigin: 'top center' }}
+        animate={{ opacity: [0.5, 0.3, 0.5] }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
+    </div>
+  );
+}
+
+// Braises / particules d'ambiance qui s'élèvent lentement (positions figées par
+// index → stable entre les rendus, pas de Math.random au render).
+const EMBERS = Array.from({ length: 16 }, (_, i) => ({
+  left: (i * 6.1 + (i % 3) * 11) % 100,
+  size: 2 + (i % 3),
+  delay: (i % 8) * 0.9,
+  duration: 9 + (i % 5) * 2,
+  drift: ((i % 5) - 2) * 14
+}));
+
+function Embers({ color }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+      {EMBERS.map((e, i) => (
+        <motion.span
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            left: `${e.left}%`,
+            bottom: '-5%',
+            width: e.size,
+            height: e.size,
+            background: color,
+            boxShadow: `0 0 6px ${color}`
+          }}
+          initial={{ opacity: 0, y: 0 }}
+          animate={{ opacity: [0, 0.8, 0], y: '-115vh', x: e.drift }}
+          transition={{ duration: e.duration, repeat: Infinity, delay: e.delay, ease: 'easeOut' }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Chevron animé en bas du hero, dont l'opacité décroît avec le scroll.
+function ScrollCue({ progress }) {
+  const opacity = useTransform(progress, [0, 0.18], [1, 0]);
+  return (
+    <motion.div
+      className="absolute bottom-6 left-1/2 -translate-x-1/2 text-bone-300 pointer-events-none"
+      style={{ opacity }}
+      aria-hidden
+    >
+      <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
+        <ChevronDown size={22} strokeWidth={2.4} />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function CrestLarge({ club, reduce = false }) {
+  const pc = club.primaryColor;
+  const colorBg = `${pc}20`;
+
+  // Entrée du crest + halo lumineux pulsant derrière (désactivé en reduced-motion).
+  const enter = {
+    initial: { opacity: 0, scale: 0.8, filter: 'blur(6px)' },
+    animate: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+    transition: { duration: 0.9, ease: HERO_EASE }
+  };
+
+  const inner = club.logo ? (
+    <img
+      src={club.logo}
+      alt={club.name}
+      className="h-16 w-16 md:h-20 md:w-20 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+    />
+  ) : (
+    <span className="text-4xl md:text-5xl font-display font-black" style={{ color: pc }}>
+      {club.code?.slice(0, 3) || '⚽'}
+    </span>
+  );
+
+  return (
+    <motion.div className="relative h-28 w-28 md:h-36 md:w-36 grid place-items-center" {...enter}>
+      {/* Halo pulsant */}
+      {!reduce && (
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          style={{ background: `radial-gradient(circle, ${pc}66, transparent 68%)` }}
+          animate={{ opacity: [0.45, 0.9, 0.45], scale: [1, 1.18, 1] }}
+          transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
+      {/* Anneau du crest */}
       <div
-        className="relative h-28 w-28 md:h-36 md:w-36 rounded-full grid place-items-center"
+        className="relative h-24 w-24 md:h-32 md:w-32 rounded-full grid place-items-center backdrop-blur-sm"
         style={{
-          background: `radial-gradient(circle, ${club.primaryColor}40, transparent 70%)`,
-          boxShadow: `0 0 80px -10px ${club.primaryColor}88`
+          background: colorBg,
+          border: `2px solid ${pc}80`,
+          boxShadow: `0 0 80px -10px ${pc}aa, inset 0 0 24px -8px ${pc}88`
         }}
       >
-        <div
-          className="h-24 w-24 md:h-32 md:w-32 rounded-full grid place-items-center backdrop-blur-sm"
-          style={{ background: colorBg, border: `2px solid ${club.primaryColor}80` }}
-        >
-          <img
-            src={club.logo}
-            alt={club.name}
-            className="h-16 w-16 md:h-20 md:w-20 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-        </div>
+        {inner}
       </div>
-    );
-  }
-  return (
-    <div
-      className="h-28 w-28 md:h-36 md:w-36 rounded-full grid place-items-center text-4xl md:text-5xl font-display font-black"
-      style={{
-        background: colorBg,
-        border: `2px solid ${club.primaryColor}80`,
-        color: club.primaryColor,
-        boxShadow: `0 0 80px -10px ${club.primaryColor}88`
-      }}
-    >
-      {club.code?.slice(0, 3) || '⚽'}
-    </div>
+    </motion.div>
   );
 }
 
@@ -329,15 +463,34 @@ function Divider() {
   return <div className="w-px h-8 self-center bg-white/10" />;
 }
 
-function BigStat({ value, label, suffix = '' }) {
+function BigStat({ value, label, suffix = '', count = false, reduce = false }) {
   return (
     <div>
       <div className="font-display text-2xl md:text-3xl font-black text-bone-50 tabular-nums" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
-        {value}{suffix}
+        {count ? <CountUp value={value} reduce={reduce} /> : value}{suffix}
       </div>
       <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
     </div>
   );
+}
+
+// Compteur animé de 0 → value. Ne s'anime que pour des entiers et hors
+// reduced-motion ; sinon affiche la valeur telle quelle.
+function CountUp({ value, reduce = false }) {
+  const numeric = typeof value === 'number' && isFinite(value);
+  const [display, setDisplay] = useState(numeric && !reduce ? 0 : value);
+
+  useEffect(() => {
+    if (!numeric || reduce) { setDisplay(value); return; }
+    const controls = animate(0, value, {
+      duration: 1.4,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplay(Math.round(v))
+    });
+    return () => controls.stop();
+  }, [value, numeric, reduce]);
+
+  return <>{display}</>;
 }
 
 // ── WALLET ───────────────────────────────────────────────────────────
@@ -569,7 +722,7 @@ function SideActions({ primaryColor, isFederationHub = false }) {
 // et fallback automatique si l'image custom du club n'existe pas (404).
 // Tant que `src` est null (API en cours), seul un fond sombre est affiché —
 // pas de stade générique → aucun flash « défaut puis saut ».
-function ClubStadiumBg({ src, fallback }) {
+function ClubStadiumBg({ src, fallback, kenBurns = false }) {
   const [errored, setErrored] = useState(false);
   const [loaded, setLoaded]   = useState(false);
   const finalSrc = errored ? fallback : src;
@@ -583,9 +736,17 @@ function ClubStadiumBg({ src, fallback }) {
       <div className="absolute inset-0 bg-ink-950" />
 
       {finalSrc && (
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-out"
-          style={{ backgroundImage: `url('${finalSrc}')`, opacity: loaded ? 1 : 0 }}
+        <motion.div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('${finalSrc}')` }}
+          initial={{ opacity: 0, scale: kenBurns ? 1.0 : 1 }}
+          animate={loaded
+            ? { opacity: 1, scale: kenBurns ? 1.12 : 1 }
+            : { opacity: 0, scale: kenBurns ? 1.0 : 1 }}
+          transition={{
+            opacity: { duration: 0.9, ease: 'easeOut' },
+            scale: kenBurns ? { duration: 24, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' } : { duration: 0 }
+          }}
         />
       )}
 

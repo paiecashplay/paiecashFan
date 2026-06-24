@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { cn } from '@/lib/cn';
+import { apiFetch } from '@/lib/api';
 import { ligue1, championsEurope } from '@/data/leagues';
 import { federations } from '@/data/federations';
 import { slugify } from '@/lib/slugify';
@@ -23,6 +24,7 @@ function buildSearchIndex() {
       items.push({
         type: 'club',
         id: `club-${c.id}`,
+        slug: slugify(c.name),
         label: c.name,
         sub: `${c.city} · ${league.name}`,
         color: c.primaryColor,
@@ -34,6 +36,7 @@ function buildSearchIndex() {
     items.push({
       type: 'federation',
       id: `fed-${f.id}`,
+      slug: f.id,
       label: f.code,
       sub: `${f.shortName} · ${f.region}`,
       flag: f.flag
@@ -47,16 +50,17 @@ const allItems = buildSearchIndex();
 export function HeroSearch() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [apiResults, setApiResults] = useState([]);
+  const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
   const handleSelect = (it) => {
     setOpen(false);
-    if (it.type === 'club') {
-      navigate(`/clubs/${slugify(it.label)}`);
-    } else if (it.type === 'federation') {
-      const fedId = it.id.replace('fed-', '');
-      navigate(`/federations/${fedId}`);
+    if (it.type === 'club' && it.slug) {
+      navigate(`/clubs/${it.slug}`);
+    } else if (it.type === 'federation' && it.slug) {
+      navigate(`/federations/${it.slug}`);
     } else {
       setQuery(it.label);
     }
@@ -71,13 +75,44 @@ export function HeroSearch() {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
+  // Recherche côté base (clubs + fédérations) avec debounce. Fusionnée ensuite
+  // avec l'index statique (clubs/ligues européens codés en dur).
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) { setApiResults([]); setLoading(false); return; }
+    let cancelled = false;
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const json = await apiFetch(`/api/v2/marketplace/search?q=${encodeURIComponent(q)}`);
+        if (!cancelled) setApiResults(json?.data?.results || []);
+      } catch {
+        if (!cancelled) setApiResults([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 250);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [query]);
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return allItems
-      .filter((it) => it.label.toLowerCase().includes(q) || it.sub.toLowerCase().includes(q))
-      .slice(0, 8);
-  }, [query]);
+    const staticMatches = allItems.filter(
+      (it) => it.label.toLowerCase().includes(q) || it.sub.toLowerCase().includes(q)
+    );
+    // La base prime : on place les résultats API en tête puis on complète avec
+    // le statique, en dédoublonnant par type + libellé.
+    const seen = new Set();
+    const merged = [];
+    for (const it of [...apiResults, ...staticMatches]) {
+      const key = `${it.type}:${(it.label || '').toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(it);
+    }
+    return merged.slice(0, 8);
+  }, [query, apiResults]);
 
   return (
     <div ref={containerRef} className="relative w-full max-w-2xl">
@@ -112,8 +147,11 @@ export function HeroSearch() {
           >
             {results.length === 0 ? (
               <div className="px-5 py-8 text-center text-bone-400 text-sm">
-                <Sparkles size={16} className="mx-auto mb-2 opacity-60" />
-                Aucun résultat pour "<span className="text-bone-200">{query}</span>"
+                {loading ? (
+                  <><Loader2 size={16} className="mx-auto mb-2 animate-spin text-emerald-400" />Recherche…</>
+                ) : (
+                  <><Sparkles size={16} className="mx-auto mb-2 opacity-60" />Aucun résultat pour "<span className="text-bone-200">{query}</span>"</>
+                )}
               </div>
             ) : (
               <ul className="divide-y divide-white/5">
@@ -142,13 +180,19 @@ export function HeroSearch() {
 }
 
 function ResultIcon({ item }) {
-  if (item.type === 'club' && item.logo) {
+  if (item.logo) {
     return (
       <span
         className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 border border-white/10 overflow-hidden"
-        style={{ borderColor: `${item.color}44` }}
+        style={item.color ? { borderColor: `${item.color}44` } : undefined}
       >
-        <img src={item.logo} alt="" className="h-7 w-7 object-contain" loading="lazy" />
+        <img
+          src={item.logo}
+          alt=""
+          className="h-7 w-7 object-contain"
+          loading="lazy"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
       </span>
     );
   }
