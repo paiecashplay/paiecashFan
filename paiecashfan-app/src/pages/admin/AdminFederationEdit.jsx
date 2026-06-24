@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Loader2, Check, X, Globe, Plus, Pencil,
-  Star, ExternalLink, Download
+  Star, ExternalLink, Download, Trash2
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -88,6 +88,12 @@ export function AdminFederationEdit() {
           showToast(`${added} club(s) importé(s)${skipped ? `, ${skipped} déjà présent(s)` : ''} sur ${found}`);
           loadAll();
           return json.data;
+        }}
+        onDeleteClub={async (club) => {
+          const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${club.id}`, { method: 'DELETE' });
+          if (!json.success) throw new Error(json.error);
+          showToast(`« ${club.name} » supprimé`);
+          setMembers((ms) => ms.filter((m) => m.id !== club.id));
         }}
       />
 
@@ -209,10 +215,19 @@ function FederationInfoForm({ fed, onSaved }) {
 }
 
 // ── Section clubs membres ────────────────────────────────────────────
-function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClubs }) {
+function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClubs, onDeleteClub }) {
   const clubs = members.filter((m) => !m.is_federation_hub);
   const [importing, setImporting] = useState(false);
   const [importErr, setImportErr] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+
+  async function handleDelete(club) {
+    if (!confirm(`Supprimer définitivement « ${club.name} » ?\n\nCette action est irréversible (joueurs, palmarès et produits liés seront aussi supprimés).`)) return;
+    setDeletingId(club.id);
+    try { await onDeleteClub(club); }
+    catch (e) { alert('Erreur : ' + (e.message || 'Suppression échouée')); }
+    setDeletingId(null);
+  }
 
   async function handleImport() {
     if (!confirm(`Importer automatiquement les clubs de « ${fed.name} » depuis API-Football ?\n\nLes championnats du pays (${fed.country_code}) seront scannés. Les clubs déjà présents seront ignorés.`)) return;
@@ -280,10 +295,16 @@ function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClub
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => navigate(`/admin/clubs/${c.id}/edit`)} title="Éditer"
-                      className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors inline-grid">
-                      <Pencil size={12} />
-                    </button>
+                    <div className="inline-flex items-center gap-2">
+                      <button onClick={() => navigate(`/admin/clubs/${c.id}/edit`)} title="Éditer"
+                        className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors">
+                        <Pencil size={12} />
+                      </button>
+                      <button onClick={() => handleDelete(c)} disabled={deletingId === c.id} title="Supprimer"
+                        className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors disabled:opacity-40">
+                        {deletingId === c.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
