@@ -18,6 +18,18 @@ const IMG_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/gif,image/s
 const IMG_HINT   = 'JPG, PNG, WEBP, AVIF, GIF ou SVG · 10 Mo max';
 const inputCls = () => 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 transition-colors';
 
+// Défini au niveau module (PAS dans le composant) : sinon il est recréé à
+// chaque rendu → React démonte/remonte les inputs → perte du focus à chaque
+// frappe. C'était la cause du « il faut recliquer entre chaque lettre ».
+function Field({ label, children, cls = '' }) {
+  return (
+    <div className={cls}>
+      <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>
+      {children}
+    </div>
+  );
+}
+
 export function AdminFederationEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -141,13 +153,6 @@ function FederationInfoForm({ fed, onSaved }) {
     } catch (e) { alert('Erreur : ' + e.message); }
     setSaving(false);
   }
-
-  const Field = ({ label, children, cls = '' }) => (
-    <div className={cls}>
-      <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5 space-y-5">
