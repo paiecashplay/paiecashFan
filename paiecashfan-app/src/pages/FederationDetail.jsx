@@ -198,18 +198,24 @@ function DynamicFederationView({ federation, members }) {
         </Container>
       </section>
 
-      {clubs.length > 0 ? (
-        <FederationClubsGrid
-          clubs={clubs}
-          federationColor={color}
-          leagueName={`Clubs · ${federation.name}`}
-          cardBackground={federation.stadium_image_url}
-        />
-      ) : (
-        <Container className="py-20 text-center text-sm text-bone-400">
-          Aucun club rattaché à cette fédération pour le moment.
-        </Container>
-      )}
+      {/* Contenu sous le hero : voie réservée à gauche (md→2xl) pour le rail. */}
+      <div className="md:pl-24 2xl:pl-0">
+        {clubs.length > 0 ? (
+          <FederationClubsGrid
+            clubs={clubs}
+            federationColor={color}
+            leagueName={`Clubs · ${federation.name}`}
+            cardBackground={federation.stadium_image_url}
+          />
+        ) : (
+          <Container className="py-20 text-center text-sm text-bone-400">
+            Aucun club rattaché à cette fédération pour le moment.
+          </Container>
+        )}
+      </div>
+
+      {/* Espace bas pour le dock mobile (barre flottante en bas < md) */}
+      <div className="pb-32 md:pb-0" />
     </>
   );
 }

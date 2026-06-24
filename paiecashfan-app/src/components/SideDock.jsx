@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 
 // Dock d'actions flottant, vitré et premium. Partagé par les pages club &
-// fédération. Deux dispositions automatiques pour ne JAMAIS déborder sur le
-// contenu :
-//   • < 1536px : dock horizontal centré en bas (façon dock macOS)
-//   • ≥ 1536px : rail vertical à gauche (la gouttière est alors assez large)
+// fédération. Deux dispositions automatiques :
+//   • mobile (< md) : dock horizontal centré en bas (pouce-friendly)
+//   • md et + : rail vertical à gauche. Le contenu réserve une voie à gauche
+//     (md:pl-24…) pour qu'il ne soit JAMAIS masqué par le rail.
 // Chaque action affiche son libellé en tooltip au survol. Accent = couleur du
 // club / de la fédération.
 //
@@ -12,12 +12,12 @@ import { motion } from 'framer-motion';
 export function SideDock({ actions, accent = '#10b981' }) {
   return (
     <div className="pointer-events-none fixed z-40 inset-x-0 bottom-5 flex justify-center
-                    2xl:inset-x-auto 2xl:bottom-auto 2xl:top-1/2 2xl:-translate-y-1/2 2xl:left-5 2xl:justify-start">
+                    md:inset-x-auto md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-4 md:justify-start">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-auto flex 2xl:flex-col items-center gap-1 p-1.5 rounded-2xl
+        className="pointer-events-auto flex md:flex-col items-center gap-1 p-1.5 rounded-2xl
                    border border-white/10 bg-ink-900/70 backdrop-blur-xl
                    shadow-[0_8px_40px_-8px_rgba(0,0,0,0.75)] ring-1 ring-inset ring-white/5"
       >
@@ -53,8 +53,8 @@ export function SideDock({ actions, accent = '#10b981' }) {
                            opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0
                            group-focus-visible:opacity-100 transition-all duration-200
                            bottom-full mb-2 left-1/2 -translate-x-1/2
-                           2xl:bottom-auto 2xl:mb-0 2xl:left-full 2xl:ml-3 2xl:translate-x-0
-                           2xl:top-1/2 2xl:-translate-y-1/2"
+                           md:bottom-auto md:mb-0 md:left-full md:ml-3 md:translate-x-0
+                           md:top-1/2 md:-translate-y-1/2"
               >
                 {a.label}
               </span>

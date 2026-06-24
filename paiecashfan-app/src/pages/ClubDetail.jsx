@@ -113,56 +113,61 @@ export function ClubDetail() {
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
       <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
 
-      {/* ═══ HERO style marketplace ═══════════════════════════════════ */}
+      {/* ═══ HERO style marketplace (plein écran, edge-to-edge) ════════ */}
       <ClubHero club={club} backTo={backTo} loading={loading} />
 
-      {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
-      <Container className="relative pt-12 md:pt-16 pb-6">
-        <WalletSection wallet={mockWallet} primaryColor={club.primaryColor} />
-      </Container>
+      {/* Contenu sous le hero : réserve une voie à gauche pour le rail du
+          SideDock (md→2xl) afin qu'aucune card ne soit masquée. À partir de
+          2xl la gouttière est assez large → plus besoin de décaler. */}
+      <div className="md:pl-24 2xl:pl-0">
+        {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
+        <Container className="relative pt-12 md:pt-16 pb-6">
+          <WalletSection wallet={mockWallet} primaryColor={club.primaryColor} />
+        </Container>
 
-      {/* ═══ FANS STORIES (avatars carrousel) ═══════════════════════ */}
-      <Container className="relative pt-6 pb-6">
-        <FansStorySection fans={mockFans} club={club} />
-      </Container>
+        {/* ═══ FANS STORIES (avatars carrousel) ═══════════════════════ */}
+        <Container className="relative pt-6 pb-6">
+          <FansStorySection fans={mockFans} club={club} />
+        </Container>
 
-      {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ */}
-      <Container className="relative pt-6 pb-12">
-        <TransactionsLiveSection items={mockTransactions} club={club} />
-      </Container>
+        {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ */}
+        <Container className="relative pt-6 pb-12">
+          <TransactionsLiveSection items={mockTransactions} club={club} />
+        </Container>
 
-      {/* ═══ TROPHY CABINET ═══════════════════════════════════════════ */}
-      {trophyList.length > 0 && (
-        <TrophyCabinet
-          trophies={{ total: trophyTotal, breakdown: trophyList }}
-          primaryColor={club.primaryColor}
-        />
-      )}
+        {/* ═══ TROPHY CABINET ═══════════════════════════════════════════ */}
+        {trophyList.length > 0 && (
+          <TrophyCabinet
+            trophies={{ total: trophyTotal, breakdown: trophyList }}
+            primaryColor={club.primaryColor}
+          />
+        )}
 
-      {/* ═══ STAR PLAYER ══════════════════════════════════════════════ */}
-      {starData && (
-        <StarPlayerSection player={starData} primaryColor={club.primaryColor} />
-      )}
+        {/* ═══ STAR PLAYER ══════════════════════════════════════════════ */}
+        {starData && (
+          <StarPlayerSection player={starData} primaryColor={club.primaryColor} />
+        )}
 
-      {/* ═══ SQUAD SPOTLIGHT ══════════════════════════════════════════ */}
-      {squadList.length > 0 && (
-        <SquadSpotlight squad={squadList} primaryColor={club.primaryColor} />
-      )}
+        {/* ═══ SQUAD SPOTLIGHT ══════════════════════════════════════════ */}
+        {squadList.length > 0 && (
+          <SquadSpotlight squad={squadList} primaryColor={club.primaryColor} />
+        )}
 
-      {/* ═══ Page Fédération : grille des clubs (au lieu de Boutique) ═ */}
-      {isFederationHub ? (
-        <FederationClubsGrid
-          clubs={federationClubs}
-          federationName={club.name}
-          federationColor={club.primaryColor}
-          leagueName="🌐 Équipes Masculines - Ligi Kuu Bara"
-          cardBackground={club.cardBackground || club.stadiumImage}
-        />
-      ) : (
-        <MerchandiseSection club={club} apiProducts={products} />
-      )}
+        {/* ═══ Page Fédération : grille des clubs (au lieu de Boutique) ═ */}
+        {isFederationHub ? (
+          <FederationClubsGrid
+            clubs={federationClubs}
+            federationName={club.name}
+            federationColor={club.primaryColor}
+            leagueName="🌐 Équipes Masculines - Ligi Kuu Bara"
+            cardBackground={club.cardBackground || club.stadiumImage}
+          />
+        ) : (
+          <MerchandiseSection club={club} apiProducts={products} />
+        )}
+      </div>
 
-      {/* Espace bas pour la barre side actions mobile */}
+      {/* Espace bas pour le dock mobile (barre flottante en bas < md) */}
       <div className="pb-32 md:pb-12" />
     </div>
   );
@@ -390,7 +395,7 @@ function ScrollCue({ progress }) {
   const opacity = useTransform(progress, [0, 0.18], [1, 0]);
   return (
     <motion.div
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 text-bone-300 pointer-events-none"
+      className="hidden md:block absolute bottom-6 left-1/2 -translate-x-1/2 text-bone-300 pointer-events-none"
       style={{ opacity }}
       aria-hidden
     >
