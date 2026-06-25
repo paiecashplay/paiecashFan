@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown } from 'lucide-react';
+import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown, Trash2, Loader2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
@@ -23,6 +23,7 @@ export function AdminClubs() {
   const [search, setSearch]   = useState('');
   const [filter, setFilter]   = useState('all');
   const [saving, setSaving]   = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const [toast, setToast]     = useState('');
   const [rejectModal, setRejectModal] = useState(null); // { id, name }
   const [rejectReason, setRejectReason] = useState('');
@@ -79,6 +80,18 @@ export function AdminClubs() {
       showToast(`Statut → ${STATUS_META[status]?.label || status}`);
     } catch (e) { showToast('Erreur : ' + e.message); }
     setSaving(null);
+  }
+
+  async function deleteClub(id, name) {
+    if (!confirm(`Supprimer définitivement « ${name} » ?\n\nCette action est irréversible (joueurs, palmarès et produits liés seront aussi supprimés).`)) return;
+    setDeleting(id);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${id}`, { method: 'DELETE' });
+      if (!json.success) throw new Error(json.error);
+      setClubs((prev) => prev.filter((c) => c.id !== id));
+      showToast('Club supprimé');
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setDeleting(null);
   }
 
   function showToast(msg) {
@@ -226,6 +239,14 @@ export function AdminClubs() {
                           className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors"
                         >
                           <Pencil size={12} />
+                        </button>
+                        <button
+                          onClick={() => deleteClub(club.id, name)}
+                          disabled={deleting === club.id}
+                          title="Supprimer"
+                          className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors disabled:opacity-40"
+                        >
+                          {deleting === club.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                         </button>
                         {status === 'pending' && (
                           <>

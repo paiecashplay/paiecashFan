@@ -402,6 +402,27 @@ router.put('/federations/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/v2/admin/clubs-crud/federations/:id — supprime une fédération
+// NON DESTRUCTIF pour les clubs : on détache les clubs membres (federation_id
+// → null, ils restent en base) et on supprime le hub de la fédération.
+router.delete('/federations/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    // 1. Détache les clubs membres (on garde les clubs)
+    await supabase.from('tenants').update({ federation_id: null })
+      .eq('federation_id', id).not('is_federation_hub', 'is', true);
+    // 2. Supprime le(s) hub(s) de la fédération
+    await supabase.from('tenants').delete()
+      .eq('federation_id', id).eq('is_federation_hub', true);
+    // 3. Supprime la fédération
+    const { error } = await supabase.from('federations').delete().eq('id', id);
+    if (error) throw error;
+    return ok(res, { deleted: true });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
 // POST /api/v2/admin/clubs-crud/federations/:id/import-clubs
 // Importe en masse les clubs du pays de la fédération depuis API-Football
 // (championnats type "League"). NON DESTRUCTIF : n'ajoute que les clubs

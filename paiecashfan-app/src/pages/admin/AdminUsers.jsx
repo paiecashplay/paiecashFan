@@ -3,7 +3,7 @@
 // et de valider ou rejeter les demandes d'accès club_admin (role_request = 'club_admin').
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronDown, Check, X, Shield, User, Crown, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Search, ChevronDown, Check, X, Shield, User, Crown, UserPlus, Loader2, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -56,6 +56,18 @@ export function AdminUsers() {
     const profile = profiles.find((p) => p.id === userId);
     if (!profile?.role_request) return;
     await changeRole(userId, profile.role_request);
+  }
+
+  async function deleteUser(userId, name) {
+    if (!confirm(`Supprimer définitivement le compte « ${name || userId.slice(0, 8)} » ?\n\nLe compte et son profil seront supprimés. Action irréversible.`)) return;
+    setSaving(userId);
+    try {
+      const json = await apiFetch(`/api/v2/admin/users/${userId}`, { method: 'DELETE' });
+      if (!json.success) throw new Error(json.error);
+      setProfiles((prev) => prev.filter((p) => p.id !== userId));
+      showToast('Compte supprimé');
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setSaving(null);
   }
 
   async function rejectRoleRequest(userId) {
@@ -173,6 +185,7 @@ export function AdminUsers() {
                   onChangeRole={(role) => changeRole(p.id, role)}
                   onApprove={() => approveRoleRequest(p.id)}
                   onReject={() => rejectRoleRequest(p.id)}
+                  onDelete={() => deleteUser(p.id, p.display_name)}
                 />
               ))}
             </tbody>
@@ -331,7 +344,7 @@ function CreateUserModal({ onClose, onCreated }) {
   );
 }
 
-function UserRow({ profile, saving, onChangeRole, onApprove, onReject }) {
+function UserRow({ profile, saving, onChangeRole, onApprove, onReject, onDelete }) {
   const [open, setOpen] = useState(false);
   const { role, role_request } = profile;
   const meta = ROLE_META[role] || ROLE_META.fan;
@@ -443,6 +456,16 @@ function UserRow({ profile, saving, onChangeRole, onApprove, onReject }) {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Supprimer le compte */}
+          <button
+            onClick={onDelete}
+            disabled={saving}
+            title="Supprimer le compte"
+            className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors disabled:opacity-40"
+          >
+            {saving ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+          </button>
         </div>
       </td>
     </tr>

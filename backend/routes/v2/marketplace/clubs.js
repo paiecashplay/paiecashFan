@@ -66,6 +66,10 @@ router.get('/:slugOrId', async (req, res) => {
     if (error) throw error;
     if (!club) return fail(res, 'Club not found', 404);
 
+    // Masque côté public les clubs non actifs (suspendus / rejetés / en
+    // attente). Seuls les clubs 'active' sont visibles sur le site.
+    if (club.status && club.status !== 'active') return fail(res, 'Club not found', 404);
+
     const [players, starPlayer, trophies, productsRes] = await Promise.all([
       getPlayersByTenant(club.id),
       getStarPlayer(club.id),

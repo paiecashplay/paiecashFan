@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Plus, Pencil, Loader2, Check, X, Search } from 'lucide-react';
+import { Globe, Plus, Pencil, Loader2, Check, X, Search, Trash2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { cn } from '@/lib/cn';
@@ -17,7 +17,20 @@ export function AdminFederations() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch]   = useState('');
   const [createOpen, setCreateOpen] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [toast, setToast]     = useState('');
+
+  async function deleteFed(id, name) {
+    if (!confirm(`Supprimer la fédération « ${name} » ?\n\nLes clubs membres seront détachés (conservés, sans fédération) et la page d'accueil de la fédération (hub) sera supprimée.`)) return;
+    setDeleting(id);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${id}`, { method: 'DELETE' });
+      if (!json.success) throw new Error(json.error);
+      setFeds((prev) => prev.filter((f) => f.id !== id));
+      showToast('Fédération supprimée');
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setDeleting(null);
+  }
 
   async function load() {
     setLoading(true);
@@ -93,10 +106,17 @@ export function AdminFederations() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex justify-end">
+                    <div className="flex justify-end items-center gap-2">
                       <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/federations/${f.id}/edit`); }}
+                        title="Éditer"
                         className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors">
                         <Pencil size={12} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); deleteFed(f.id, f.name); }}
+                        disabled={deleting === f.id}
+                        title="Supprimer"
+                        className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors disabled:opacity-40">
+                        {deleting === f.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                       </button>
                     </div>
                   </td>

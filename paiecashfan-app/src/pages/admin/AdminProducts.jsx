@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, RefreshCw, Pencil, ChevronDown, Check } from 'lucide-react';
+import { Search, RefreshCw, Pencil, ChevronDown, Check, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -24,6 +24,7 @@ export function AdminProducts() {
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState('');
   const [saving, setSaving]     = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const [toast, setToast]       = useState('');
 
   async function load() {
@@ -54,6 +55,18 @@ export function AdminProducts() {
       showToast(`Statut → ${PRODUCT_STATUS[status]?.label || status}`);
     } catch (e) { showToast('Erreur : ' + e.message); }
     setSaving(null);
+  }
+
+  async function deleteProduct(id, name) {
+    if (!confirm(`Supprimer définitivement le produit « ${name} » ?\n\nCette action est irréversible.`)) return;
+    setDeleting(id);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/products/${id}`, { method: 'DELETE' });
+      if (!json.success) throw new Error(json.error);
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+      showToast('Produit supprimé');
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setDeleting(null);
   }
 
   const filtered = products.filter((p) =>
@@ -129,7 +142,7 @@ export function AdminProducts() {
                     />
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex justify-end">
+                    <div className="flex justify-end items-center gap-2">
                       <button
                         title="Modifier dans la boutique du club"
                         disabled={!p.tenant_id}
@@ -137,6 +150,14 @@ export function AdminProducts() {
                         className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 grid place-items-center transition-colors disabled:opacity-30"
                       >
                         <Pencil size={12} />
+                      </button>
+                      <button
+                        title="Supprimer"
+                        disabled={deleting === p.id}
+                        onClick={() => deleteProduct(p.id, p.name)}
+                        className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors disabled:opacity-40"
+                      >
+                        {deleting === p.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                       </button>
                     </div>
                   </td>
