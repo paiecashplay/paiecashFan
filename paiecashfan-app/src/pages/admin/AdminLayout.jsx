@@ -110,6 +110,27 @@ export function AdminLayout() {
           </div>
         </header>
 
+        {/* Nav mobile/tablette (la sidebar est masquée < lg) — barre
+            horizontale scrollable pour naviguer entre les sections. */}
+        <nav className="lg:hidden flex gap-2 overflow-x-auto px-4 py-3 border-b border-white/5 bg-ink-800/30 backdrop-blur scrollbar-none shrink-0">
+          {sideNav.map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) => cn(
+                'shrink-0 inline-flex items-center gap-2 h-9 px-3.5 rounded-full text-xs font-semibold transition-colors',
+                isActive
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                  : 'text-bone-400 bg-white/5 border border-white/10 hover:text-bone-100'
+              )}
+            >
+              <Icon size={14} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
         {/* Page content */}
         <main className="flex-1 overflow-auto p-6">
           <motion.div

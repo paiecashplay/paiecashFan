@@ -117,19 +117,51 @@ router.patch('/contests/:id/status', async (req, res) => {
 });
 
 // GET /api/v2/admin/overview
+// Stats réelles calculées depuis Supabase (source de vérité du marketplace) +
+// alertes / treasury legacy (tolérantes aux erreurs : un échec n'empêche pas
+// le reste de s'afficher).
 router.get('/overview', async (req, res) => {
+  const supabase = require('../../../db/supabase');
+
+  const countRows = async (table, build) => {
+    let q = supabase.from(table).select('*', { count: 'exact', head: true });
+    if (build) q = build(q);
+    const { count, error } = await q;
+    return error ? null : count;
+  };
+  const safe = async (fn, fallback) => { try { return await fn(); } catch { return fallback; } };
+
   try {
-    const stats = await db.getAdminStats();
-    const treasury = await treasuryService.getTreasurySummary();
-    const pendingWithdrawals = await sharedDb.getAllWithdrawals({ status: 'pending' });
-    const pendingApps = await sharedDb.getClubApplications({ status: 'submitted' });
-    const fraudFlags = await sharedDb.getFraudFlags({ status: 'open' });
+    const [totalUsers, activeClubs, totalClubs, totalFederations, totalProducts] = await Promise.all([
+      countRows('profiles'),
+      countRows('tenants', (q) => q.eq('type', 'club').not('is_federation_hub', 'is', true).eq('status', 'active')),
+      countRows('tenants', (q) => q.eq('type', 'club').not('is_federation_hub', 'is', true)),
+      countRows('federations'),
+      countRows('products'),
+    ]);
+
+    // Transactions = commandes hors panier ; volume = somme des total_pcc.
+    let totalTransactions = 0, totalVolumePCC = 0;
+    const { data: orders } = await supabase.from('orders').select('total_pcc, status').neq('status', 'cart');
+    if (orders) {
+      totalTransactions = orders.length;
+      totalVolumePCC = orders.reduce((s, o) => s + Number(o.total_pcc || 0), 0);
+    }
+
+    const [treasury, pendingWithdrawals, pendingApps, fraudFlags] = await Promise.all([
+      safe(() => treasuryService.getTreasurySummary(), null),
+      safe(() => sharedDb.getAllWithdrawals({ status: 'pending' }), []),
+      safe(() => sharedDb.getClubApplications({ status: 'submitted' }), []),
+      safe(() => sharedDb.getFraudFlags({ status: 'open' }), []),
+    ]);
 
     return ok(res, {
-      ...stats, treasury,
+      totalUsers, activeClubs, totalClubs, totalFederations, totalProducts,
+      totalTransactions, totalVolumePCC,
+      treasury,
       pendingWithdrawals: pendingWithdrawals.length,
       pendingClubApplications: pendingApps.length,
-      openFraudFlags: fraudFlags.length
+      openFraudFlags: fraudFlags.length,
     });
   } catch (err) {
     return fail(res, 'Overview failed: ' + err.message, 500);
