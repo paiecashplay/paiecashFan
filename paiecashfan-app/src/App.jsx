@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -19,6 +19,8 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
 import { AdminFederations } from './pages/admin/AdminFederations';
 import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
+import { Billetterie } from './pages/Billetterie';
+import { ClubBilletterie } from './pages/ClubBilletterie';
 
 export default function App() {
   return (
@@ -59,6 +61,7 @@ export default function App() {
                   <Route path="/fan-club" element={<FanClub />} />
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
+                  <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/mon-compte"
@@ -69,6 +72,7 @@ export default function App() {
                     }
                   />
                   <Route path="*" element={<Home />} />
+                  <Route path="/billetterie" element={<Billetterie />} />
                 </Routes>
               </main>
               <Footer />
