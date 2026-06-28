@@ -11,7 +11,8 @@ const nav = [
   { label: 'Accueil',   to: '/' },
   { label: 'Boutique',  to: '/boutique' },
   { label: 'Tombola',   to: '/tombola' },
-  { label: 'Fan club',  to: '/fan-club' }
+  { label: 'Fan club',  to: '/fan-club' },
+  { label: 'Billetterie', to: '/billetterie' }
 ];
 
 export function Navbar() {

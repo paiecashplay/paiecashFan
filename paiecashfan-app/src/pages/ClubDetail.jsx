@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate, useNavigate} from 'react-router-dom';
 import {
   motion, AnimatePresence,
   useScroll, useTransform, useReducedMotion, animate
 } from 'framer-motion';
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
-  ShoppingBag, Trophy, Dices, Heart, Share2, Award,
+  ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
   Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
@@ -111,7 +111,7 @@ export function ClubDetail() {
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
-      <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} />
+      <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} clubSlug={slug}/>
 
       {/* ═══ HERO style marketplace (plein écran, edge-to-edge) ════════ */}
       <ClubHero club={club} backTo={backTo} loading={loading} />
@@ -672,7 +672,9 @@ function TransactionsLiveSection({ items, club }) {
 // ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
 // Sur une page fédération (Tanzanie etc.), le bouton "Boutique" est
 // remplacé par "Clubs" qui scrolle vers la grille des clubs membres.
-function SideActions({ primaryColor, isFederationHub = false }) {
+function SideActions({ primaryColor,  isFederationHub = false, clubSlug  }) {
+  const navigate = useNavigate();
+
   // Scroll smooth vers une section. La classe scroll-mt-20 sur la section
   // cible compense la hauteur de la Navbar pour ne pas masquer le header.
   const scrollTo = (id) => {
@@ -686,28 +688,37 @@ function SideActions({ primaryColor, isFederationHub = false }) {
       text: 'Découvre cette page sur PaieCashFan',
       url: window.location.href
     };
+
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard?.writeText(window.location.href);
       }
-    } catch { /* user cancelled or unsupported */ }
+    } catch {/* user cancelled or unsupported */ }
   };
 
   // Page fédération : icône ballon de foot (Volleyball) au lieu du
   // panier — visuel plus parlant pour signaler une liste de clubs.
   const shopAction = isFederationHub
-    ? { key: 'clubs', icon: Volleyball,  label: 'Clubs',    onClick: () => scrollTo('clubs') }
-    : { key: 'shop',  icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise') };
+    ? { key: 'clubs', icon: Volleyball, label: 'Clubs', onClick: () => scrollTo('clubs') }
+    : { key: 'shop', icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise') };
+
+  const ticketingAction = {
+    key: 'ticketing',
+    icon: Ticket,
+    label: 'Billetterie',
+    onClick: () => navigate(`/clubs/${clubSlug}/billetterie`)
+  };
 
   const actions = [
     shopAction,
-    { key: 'play',  icon: Trophy,  label: 'Palmarès',   onClick: () => scrollTo('trophies') },
-    { key: 'games', icon: Dices,   label: 'Effectif',   onClick: () => scrollTo('squad') },
-    { key: 'like',  icon: Heart,   label: 'J\'aime' },
-    { key: 'share', icon: Share2,  label: 'Partager',   onClick: handleShare },
-    { key: 'find',  icon: Search,  label: 'Rechercher' }
+    ...(!isFederationHub ? [ticketingAction] : []),
+    { key: 'play', icon: Trophy, label: 'Palmarès', onClick: () => scrollTo('trophies') },
+    { key: 'games', icon: Dices, label: 'Effectif', onClick: () => scrollTo('squad') },
+    { key: 'like', icon: Heart, label: 'J\'aime' },
+    { key: 'share', icon: Share2, label: 'Partager', onClick: handleShare },
+    { key: 'find', icon: Search, label: 'Rechercher' }
   ];
 
   return <SideDock actions={actions} accent={primaryColor} />;
