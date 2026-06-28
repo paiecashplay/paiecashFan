@@ -651,6 +651,43 @@ router.delete('/clubs/:id', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// BILLETTERIE (offres stockées dans tenants.metadata.ticketing)
+// ═══════════════════════════════════════════════════════════════
+
+// GET /api/v2/admin/clubs-crud/clubs/:tenantId/ticketing
+router.get('/clubs/:tenantId/ticketing', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('tenants').select('metadata').eq('id', req.params.tenantId).single();
+    if (error) throw error;
+    return ok(res, { ticketing: data?.metadata?.ticketing || null });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// PUT /api/v2/admin/clubs-crud/clubs/:tenantId/ticketing
+// Fusionne { subscriptions, tickets } dans metadata.ticketing sans écraser le
+// reste du metadata.
+router.put('/clubs/:tenantId/ticketing', async (req, res) => {
+  try {
+    const subscriptions = Array.isArray(req.body.subscriptions) ? req.body.subscriptions : [];
+    const tickets       = Array.isArray(req.body.tickets)       ? req.body.tickets       : [];
+    const { data: cur, error: gErr } = await supabase
+      .from('tenants').select('metadata').eq('id', req.params.tenantId).single();
+    if (gErr) throw gErr;
+
+    const metadata = { ...(cur?.metadata || {}), ticketing: { subscriptions, tickets } };
+    const { error } = await supabase
+      .from('tenants').update({ metadata }).eq('id', req.params.tenantId);
+    if (error) throw error;
+    return ok(res, { ticketing: metadata.ticketing });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
 // PLAYERS
 // ═══════════════════════════════════════════════════════════════
 
