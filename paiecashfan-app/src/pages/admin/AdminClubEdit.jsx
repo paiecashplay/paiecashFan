@@ -5,18 +5,20 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Plus, Trash2, Star,
-  Info, Users, Trophy, ShoppingBag, Loader2, Check, X, Download, Pencil, Search
+  Info, Users, Trophy, ShoppingBag, Ticket, Loader2, Check, X, Download, Pencil, Search
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
+import { buildDefaultTicketing } from '@/utils/ticketingPrices';
 import { cn } from '@/lib/cn';
 
 const TABS = [
-  { id: 'info',     label: 'Infos',     icon: Info       },
-  { id: 'players',  label: 'Joueurs',   icon: Users      },
-  { id: 'trophies', label: 'Palmarès',  icon: Trophy     },
-  { id: 'products', label: 'Boutique',  icon: ShoppingBag},
+  { id: 'info',       label: 'Infos',       icon: Info       },
+  { id: 'players',    label: 'Joueurs',     icon: Users      },
+  { id: 'trophies',   label: 'Palmarès',    icon: Trophy     },
+  { id: 'products',   label: 'Boutique',    icon: ShoppingBag},
+  { id: 'ticketing',  label: 'Billetterie', icon: Ticket     },
 ];
 
 // Doivent correspondre EXACTEMENT à la contrainte players_position_check en DB
@@ -46,7 +48,7 @@ export function AdminClubEdit() {
   const [searchParams] = useSearchParams();
 
   // Onglet initial : ?tab=products|players|trophies|info (ex: depuis /admin/products)
-  const initialTab = ['info', 'players', 'trophies', 'products'].includes(searchParams.get('tab'))
+  const initialTab = ['info', 'players', 'trophies', 'products', 'ticketing'].includes(searchParams.get('tab'))
     ? searchParams.get('tab') : 'info';
   // Fédération pré-remplie quand on arrive depuis /admin/federations/:id (?federation=)
   const presetFederationId = searchParams.get('federation') || '';
@@ -159,6 +161,9 @@ export function AdminClubEdit() {
           )}
           {tab === 'products' && !isNew && (
             <ProductsTab key={dataKey} tenantId={id} showToast={showToast} />
+          )}
+          {tab === 'ticketing' && !isNew && (
+            <TicketingTab key={dataKey} tenantId={id} club={club} showToast={showToast} />
           )}
           {tab !== 'info' && isNew && (
             <div className="py-12 text-center text-sm text-bone-500">
@@ -1176,6 +1181,124 @@ function SearchBar({ value, onChange, placeholder }) {
         placeholder={placeholder}
         className="w-full h-9 pl-9 pr-8 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40"
       />
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Onglet BILLETTERIE — édite les offres (abonnements / billets) du club,
+// stockées dans tenants.metadata.ticketing. Pré-rempli avec des valeurs par
+// défaut si aucune offre n'a encore été saisie.
+// ═══════════════════════════════════════════════════════════════
+function TicketingTab({ tenantId, club, showToast }) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
+  const [data, setData]       = useState({ subscriptions: [], tickets: [] });
+
+  useEffect(() => {
+    let cancelled = false;
+    const fallback = () => buildDefaultTicketing(club || { slug: tenantId, name: 'le club' });
+    apiFetch(`/api/v2/admin/clubs-crud/clubs/${tenantId}/ticketing`)
+      .then((json) => {
+        if (cancelled) return;
+        const t = json?.data?.ticketing || fallback();
+        setData({ subscriptions: t.subscriptions || [], tickets: t.tickets || [] });
+      })
+      .catch(() => { if (!cancelled) setData(fallback()); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function updateOffer(listKey, index, patch) {
+    setData((d) => ({
+      ...d,
+      [listKey]: d[listKey].map((o, i) => (i === index ? { ...o, ...patch } : o)),
+    }));
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${tenantId}/ticketing`, {
+        method: 'PUT', body: JSON.stringify(data),
+      });
+      if (!json.success) throw new Error(json.error);
+      showToast('Billetterie sauvegardée');
+    } catch (e) { showToast('Erreur : ' + e.message, false); }
+    setSaving(false);
+  }
+
+  if (loading) return <SkeletonRows n={3} />;
+
+  return (
+    <div className="space-y-5">
+      <p className="text-xs text-bone-400">
+        Offres affichées sur la page billetterie publique du club. Les prix sont en <strong className="text-bone-200">PCC</strong>.
+      </p>
+
+      <OfferSection title="Abonnements" offers={data.subscriptions} onChange={(i, p) => updateOffer('subscriptions', i, p)} />
+      <OfferSection title="Billets"     offers={data.tickets}       onChange={(i, p) => updateOffer('tickets', i, p)} />
+
+      <button onClick={save} disabled={saving}
+        className="flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
+        {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />} Sauvegarder la billetterie
+      </button>
+    </div>
+  );
+}
+
+function OfferSection({ title, offers, onChange }) {
+  if (!offers?.length) return null;
+  return (
+    <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5 space-y-5">
+      <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{title}</h3>
+      {offers.map((offer, i) => (
+        <OfferEditor key={offer.id || i} offer={offer} onChange={(p) => onChange(i, p)} />
+      ))}
+    </div>
+  );
+}
+
+function OfferEditor({ offer, onChange }) {
+  // Les listes (avantages / conditions) sont éditées en texte brut (une ligne =
+  // un élément) ; on garde le texte tel quel pour ne pas gêner la saisie et on
+  // propage le tableau nettoyé au parent.
+  const [benefitsText, setBenefitsText]     = useState((offer.benefits || []).join('\n'));
+  const [conditionsText, setConditionsText] = useState((offer.conditions || []).join('\n'));
+  const toLines = (txt) => txt.split('\n').map((s) => s.trim()).filter(Boolean);
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-ink-900/40 p-4 space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Field label="Nom de l'offre" cls="md:col-span-2">
+          <input value={offer.name || ''} onChange={(e) => onChange({ name: e.target.value })} className={input()} />
+        </Field>
+        <Field label="Prix (PCC)">
+          <input type="number" min="0" value={offer.price ?? ''}
+            onChange={(e) => onChange({ price: e.target.value === '' ? '' : Number(e.target.value) })}
+            className={input()} />
+        </Field>
+      </div>
+      <Field label="Durée / période">
+        <input value={offer.duration || ''} onChange={(e) => onChange({ duration: e.target.value })}
+          placeholder="Saison 2026-2027 / Match à domicile" className={input()} />
+      </Field>
+      <Field label="Description">
+        <textarea value={offer.description || ''} onChange={(e) => onChange({ description: e.target.value })}
+          rows={2} className={cn(input(), 'h-auto py-2 resize-none')} />
+      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Avantages (un par ligne)">
+          <textarea value={benefitsText}
+            onChange={(e) => { setBenefitsText(e.target.value); onChange({ benefits: toLines(e.target.value) }); }}
+            rows={4} className={cn(input(), 'h-auto py-2 resize-none font-mono text-xs')} />
+        </Field>
+        <Field label="Conditions (une par ligne)">
+          <textarea value={conditionsText}
+            onChange={(e) => { setConditionsText(e.target.value); onChange({ conditions: toLines(e.target.value) }); }}
+            rows={4} className={cn(input(), 'h-auto py-2 resize-none font-mono text-xs')} />
+        </Field>
+      </div>
     </div>
   );
 }

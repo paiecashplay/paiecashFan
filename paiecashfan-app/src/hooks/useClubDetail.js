@@ -30,6 +30,8 @@ function normalizeApiClub(c) {
   if (c.short_code)                 out.code           = c.short_code;
   if (c.is_federation_hub != null)  out.isFederationHub = c.is_federation_hub;
   if (c.motto_color)                out.mottoColor     = c.motto_color;
+  // Offres de billetterie saisies dans le BO (metadata.ticketing).
+  if (c.metadata?.ticketing)        out.ticketing      = c.metadata.ticketing;
   // `federation` peut être un objet (join API) : on le réduit à une string
   // (nom) pour le rendu, sinon React #31 (objet rendu comme enfant). On
   // conserve slug + confédération à part pour la navigation (bouton Retour).

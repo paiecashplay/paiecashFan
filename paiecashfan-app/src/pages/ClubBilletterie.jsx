@@ -18,58 +18,9 @@ import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { useClubDetail } from '@/hooks/useClubDetail';
+import { useTicketingCart } from '@/hooks/useTicketingCart';
 import { formatPCC } from '@/data/clubMerchandise';
-import { getAutoTicketingPrices } from '@/utils/ticketingPrices';
-
-
-function generateClubTicketing(club) {
-  const prices = getAutoTicketingPrices({
-    ...club,
-    slug: club.slug
-  });
-  return {
-    subscriptions: [
-      {
-        id: `${club.slug}-season-pass`,
-        type: 'subscription',
-        name: `Abonnement ${club.name}`,
-        price: prices.subscription,
-        duration: 'Saison 2026-2027',
-        description: `Abonnement saison pour suivre ${club.name} à domicile.`,
-        benefits: [
-          'Accès aux matchs à domicile',
-          'Priorité billetterie',
-          'Paiement possible en 10 fois avec 5 % de frais'
-        ],
-        conditions: [
-          'Offre soumise aux disponibilités',
-          'Tarifs variables selon la tribune',
-          'Données à confirmer avec le club'
-        ]
-      }
-    ],
-    tickets: [
-      {
-        id: `${club.slug}-single-ticket`,
-        type: 'ticket',
-        name: `Billet match ${club.name}`,
-        price: prices.ticket,
-        duration: 'Match à domicile',
-        description: `Billet individuel pour assister à un match à domicile de ${club.name}.`,
-        benefits: [
-          'Billet pour un match',
-          'Prix selon catégorie',
-          'Places selon disponibilité'
-        ],
-        conditions: [
-          'Prix variable selon l’affiche',
-          'Offre soumise aux disponibilités',
-          'Données à confirmer avec le club'
-        ]
-      }
-    ]
-  };
-}
+import { buildDefaultTicketing } from '@/utils/ticketingPrices';
 
 function QtyButton({ children, onClick, ariaLabel }) {
   return (
@@ -88,13 +39,14 @@ export function ClubBilletterie() {
   const { slug } = useParams();
   const { club, loading } = useClubDetail(slug);
   const [activeTab, setActiveTab] = useState('subscriptions');
-  const [cart, setCart] = useState([]);
+  const { cart, addItem, removeItem } = useTicketingCart();
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Offres : saisies dans le BO (club.ticketing) ; sinon valeurs par défaut.
   const ticketing = useMemo(() => {
     if (!club) return { subscriptions: [], tickets: [] };
-    return club.ticketing || generateClubTicketing(club);
+    return club.ticketing || buildDefaultTicketing(club);
   }, [club]);
 
   if (loading && !club) {
@@ -277,9 +229,7 @@ export function ClubBilletterie() {
             club={club}
             offer={selectedOffer}
             onClose={() => setSelectedOffer(null)}
-            onAddToCart={(item) => {
-            setCart((prev) => [...prev, item]);
-            }}
+            onAddToCart={(item) => addItem(item)}
         />
        )}
 
@@ -287,9 +237,7 @@ export function ClubBilletterie() {
         <TicketingCartModal
             cart={cart}
             onClose={() => setIsCartOpen(false)}
-            onRemoveItem={(indexToRemove) => {
-                setCart((prev) => prev.filter((_, index) => index !== indexToRemove));
-            }}
+            onRemoveItem={(indexToRemove) => removeItem(indexToRemove)}
         />
         )}
     </div>
