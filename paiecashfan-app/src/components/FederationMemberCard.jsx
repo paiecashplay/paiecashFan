@@ -63,14 +63,37 @@ function getDisplayCode(member) {
 //   • Badge région : abbrev 2-letter dans le coin top-right avec tooltip
 //   • Métadonnées Président / Fondation / FIFA
 //   • CTA "Voir le détail" en bas
-export function FederationMemberCard({ member, index = 0 }) {
+// Normalise un nom de pays pour la comparaison (minuscules, sans accents).
+function normName(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+// Résout la destination de la card : si une fédération existe EN BASE pour ce
+// pays (créée via le BO), on pointe vers sa page DB /federations/<slug>. Sinon
+// on garde le repli statique /clubs/<slug> (évite les pages blanches).
+function resolveMemberTo(member, federations) {
+  const fallback = `/clubs/${slugify(member.nameFR || member.name)}`;
+  if (!federations?.length) return fallback;
+
+  const iso2 = flagToCountryCode(member.flag);                 // ex: 🇰🇪 → KE
+  const name = normName(member.nameFR || member.name);
+
+  const fed =
+    (iso2 && federations.find((f) => (f.country_code || '').toUpperCase() === iso2)) ||
+    federations.find((f) => normName(f.country) === name);
+
+  return fed?.slug ? `/federations/${fed.slug}` : fallback;
+}
+
+export function FederationMemberCard({ member, index = 0, federations = [] }) {
   const primaryColor = member.colors?.[0] || '#10b981';
   const flagCdnCode = getFlagCdnCode(member);
   const displayCode = getDisplayCode(member);
+  const to = resolveMemberTo(member, federations);
 
   return (
     <MotionLink
-      to={`/clubs/${slugify(member.nameFR || member.name)}`}
+      to={to}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}

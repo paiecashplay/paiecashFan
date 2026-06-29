@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { SideDock } from '@/components/SideDock';
+import { apiFetch } from '@/lib/api';
 import { useFederationDetail } from '@/hooks/useFederationDetail';
 import { federations } from '@/data/federations';
 import { cafMembers, cafStats } from '@/data/caf-members';
@@ -301,6 +302,17 @@ function FederationView({ federation, dataset }) {
   const [region, setRegion] = useState('Toutes');
   const [query, setQuery] = useState('');
 
+  // Fédérations créées en base : sert à rediriger les cards membres vers la
+  // VRAIE page /federations/<slug> quand elle existe (au lieu du stub /clubs).
+  const [dbFeds, setDbFeds] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch('/api/v2/marketplace/federations')
+      .then((j) => { if (!cancelled) setDbFeds(j?.data?.federations || []); })
+      .catch(() => { /* repli statique conservé */ });
+    return () => { cancelled = true; };
+  }, []);
+
   // Compteur de membres par région.
   const countByRegion = useMemo(() => {
     return dataset.members.reduce((acc, m) => {
@@ -392,7 +404,7 @@ function FederationView({ federation, dataset }) {
         ) : (
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filtered.map((m, i) => (
-              <FederationMemberCard key={m.code || m.name} member={m} index={i} />
+              <FederationMemberCard key={m.code || m.name} member={m} index={i} federations={dbFeds} />
             ))}
           </div>
         )}
