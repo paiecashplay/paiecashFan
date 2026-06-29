@@ -1,6 +1,7 @@
 import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { ScrollToTop } from './components/ScrollToTop';
+import { ScrollTopButton } from './components/ScrollTopButton';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -79,6 +80,7 @@ export default function App() {
                 </Routes>
               </main>
               <Footer />
+              <ScrollTopButton />
             </div>
           }
         />
