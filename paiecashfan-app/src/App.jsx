@@ -1,5 +1,6 @@
 import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
+import { ScrollToTop } from './components/ScrollToTop';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -25,6 +26,8 @@ import { ClubBilletterie } from './pages/ClubBilletterie';
 export default function App() {
   return (
     <AuthProvider>
+      {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}
+      <ScrollToTop />
       {/* Routes admin : pas de Navbar/Footer public */}
       <Routes>
         <Route
