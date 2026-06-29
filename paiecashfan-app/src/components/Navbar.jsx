@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search } from 'lucide-react';
+import { Bell, LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock } from 'lucide-react';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -217,6 +217,17 @@ function UserMenu() {
               )}
             </div>
 
+            {/* Accès back-office — réservé au super_admin */}
+            {profile?.role === 'super_admin' && (
+              <Link
+                to="/admin"
+                onClick={() => setDropOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 transition-colors border-b border-white/5"
+              >
+                <Lock size={14} /> Admin
+              </Link>
+            )}
+
             <DropItem icon={<User size={14} />} label="Mon compte" to="/mon-compte" onClose={() => setDropOpen(false)} />
             <DropItem icon={<Settings size={14} />} label="Paramètres" to="/mon-compte" onClose={() => setDropOpen(false)} />
 
@@ -274,16 +285,27 @@ function MobileAuthButton() {
 
 // ─── Mobile drawer auth buttons ───────────────────────────────
 function MobileAuthButtons({ onClose }) {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   if (user) return (
-    <button
-      onClick={async () => { onClose(); await signOut(); navigate('/'); }}
-      className="flex items-center gap-2 mt-3 w-full py-2.5 px-3 rounded-xl border border-red-500/20 text-red-400 text-sm font-semibold"
-    >
-      <LogOut size={14} /> Se déconnecter
-    </button>
+    <div className="mt-3 space-y-2">
+      {profile?.role === 'super_admin' && (
+        <Link
+          to="/admin"
+          onClick={onClose}
+          className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm font-bold"
+        >
+          <Lock size={14} /> Admin
+        </Link>
+      )}
+      <button
+        onClick={async () => { onClose(); await signOut(); navigate('/'); }}
+        className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-red-500/20 text-red-400 text-sm font-semibold"
+      >
+        <LogOut size={14} /> Se déconnecter
+      </button>
+    </div>
   );
 
   return (

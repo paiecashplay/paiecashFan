@@ -1,6 +1,3 @@
-import { Link } from 'react-router-dom';
-import { Lock } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 import { Container } from './ui/Container';
 
 const columns = [
@@ -19,7 +16,6 @@ const columns = [
 ];
 
 export function Footer() {
-  const { isAdmin } = useAuth();
   return (
     <footer className="border-t border-white/5 bg-ink-950 mt-12">
       <Container className="py-16 md:py-20">
@@ -73,26 +69,6 @@ export function Footer() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Tous les services opérationnels
             </div>
-            {/* Lien admin discret — visible uniquement si super_admin connecté */}
-            {isAdmin ? (
-              <Link
-                to="/admin"
-                className="flex items-center gap-1.5 text-emerald-400/60 hover:text-emerald-400 transition-colors"
-                title="Back-office"
-              >
-                <Lock size={10} />
-                Admin
-              </Link>
-            ) : (
-              <Link
-                to="/admin"
-                className="flex items-center gap-1.5 text-bone-700 hover:text-bone-500 transition-colors"
-                title="Accès réservé"
-              >
-                <Lock size={10} />
-                Admin
-              </Link>
-            )}
           </div>
         </div>
       </Container>
