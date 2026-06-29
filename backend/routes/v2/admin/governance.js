@@ -203,10 +203,34 @@ router.get('/transactions', async (req, res) => {
 // GET /api/v2/admin/clubs
 router.get('/clubs', async (req, res) => {
   try {
-    const clubs = await db.getAllTenants(req.query);
-    return ok(res, { clubs });
+    const supabase = require('../../../db/supabase');
+    const { search = '', status = '', country = '' } = req.query;
+    const page  = Math.max(1, parseInt(req.query.page, 10)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
+    const from  = (page - 1) * limit;
+
+    let query = supabase
+      .from('tenants')
+      .select('id, slug, name, short_code, country, city, logo_url, status, is_federation_hub, created_at', { count: 'exact' })
+      .not('is_federation_hub', 'is', true); // les hubs de fédération sont gérés ailleurs
+
+    if (status && status !== 'all') query = query.eq('status', status);
+    if (country) query = query.eq('country', country);
+
+    const q = String(search).trim().replace(/[,()]/g, ' ').trim();
+    if (q) {
+      const like = `%${q}%`;
+      query = query.or(`name.ilike.${like},slug.ilike.${like},short_code.ilike.${like},city.ilike.${like},country.ilike.${like}`);
+    }
+
+    query = query.order('name', { ascending: true }).range(from, from + limit - 1);
+
+    const { data: clubs, count, error } = await query;
+    if (error) throw error;
+
+    return ok(res, { clubs: clubs || [], total: count ?? 0, page, limit });
   } catch (err) {
-    return fail(res, 'Clubs fetch failed', 500);
+    return fail(res, 'Clubs fetch failed: ' + err.message, 500);
   }
 });
 

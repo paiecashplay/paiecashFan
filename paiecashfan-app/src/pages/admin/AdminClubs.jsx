@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown, Trash2, Loader2 } from 'lucide-react';
+import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown, ChevronLeft, ChevronRight, Trash2, Loader2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
@@ -28,12 +28,24 @@ export function AdminClubs() {
   const [rejectModal, setRejectModal] = useState(null); // { id, name }
   const [rejectReason, setRejectReason] = useState('');
   const [importOpen, setImportOpen] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [page, setPage]   = useState(1);
+  const [pendingCount, setPendingCount] = useState(0);
 
-  async function load() {
+  const LIMIT = 50;
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+
+  // Chargement serveur : recherche multi-colonnes + filtre statut + pagination.
+  async function load(p = page) {
     setLoading(true);
     try {
-      const json = await apiFetch('/api/v2/admin/clubs');
+      const params = new URLSearchParams({ page: String(p), limit: String(LIMIT) });
+      if (search.trim())   params.set('search', search.trim());
+      if (filter !== 'all') params.set('status', filter);
+      const json = await apiFetch(`/api/v2/admin/clubs?${params.toString()}`);
       setClubs(json.data?.clubs || []);
+      setTotal(json.data?.total ?? 0);
+      setPage(p);
     } catch (e) {
       console.error(e);
     } finally {
@@ -41,7 +53,20 @@ export function AdminClubs() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  // Recherche / filtre → recharge la page 1 (debounce sur la frappe).
+  useEffect(() => {
+    const t = setTimeout(() => { load(1); }, 300);
+    return () => clearTimeout(t);
+  }, [search, filter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Compteur "en attente" indépendant de la pagination courante.
+  async function loadPendingCount() {
+    try {
+      const json = await apiFetch('/api/v2/admin/clubs?status=pending&limit=1');
+      setPendingCount(json.data?.total ?? 0);
+    } catch { /* ignore */ }
+  }
+  useEffect(() => { loadPendingCount(); }, []);
 
   async function approve(id) {
     setSaving(id);
@@ -89,6 +114,7 @@ export function AdminClubs() {
       const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${id}`, { method: 'DELETE' });
       if (!json.success) throw new Error(json.error);
       setClubs((prev) => prev.filter((c) => c.id !== id));
+      setTotal((t) => Math.max(0, t - 1));
       showToast('Club supprimé');
     } catch (e) { showToast('Erreur : ' + e.message); }
     setDeleting(null);
@@ -99,21 +125,12 @@ export function AdminClubs() {
     setTimeout(() => setToast(''), 2500);
   }
 
-  const filtered = clubs.filter((c) => {
-    const q = search.toLowerCase();
-    const matchSearch = !search || (c.name || c.club_name || '').toLowerCase().includes(q) || c.slug?.includes(q);
-    const matchFilter = filter === 'all' ? true : c.status === filter;
-    return matchSearch && matchFilter;
-  });
-
-  const pendingCount = clubs.filter((c) => c.status === 'pending').length;
-
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-display text-2xl font-black text-bone-50">Clubs & Tenants</h1>
-          <p className="text-sm text-bone-400 mt-1">{clubs.length} tenants en base</p>
+          <p className="text-sm text-bone-400 mt-1">{total} club{total > 1 ? 's' : ''}</p>
         </div>
         <div className="flex items-center gap-3">
           {pendingCount > 0 && (
@@ -123,7 +140,7 @@ export function AdminClubs() {
             </div>
           )}
           <button
-            onClick={load}
+            onClick={() => load(page)}
             className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors"
           >
             <RefreshCw size={14} />
@@ -180,7 +197,7 @@ export function AdminClubs() {
           <div className="p-6 space-y-3">
             {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : clubs.length === 0 ? (
           <div className="py-16 text-center text-sm text-bone-500">Aucun club trouvé</div>
         ) : (
           <table className="w-full text-sm">
@@ -193,7 +210,7 @@ export function AdminClubs() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((club) => {
+              {clubs.map((club) => {
                 const name = club.name || club.club_name || '—';
                 const status = club.status || 'pending';
                 const meta = STATUS_META[status] || STATUS_META.pending;
@@ -280,6 +297,31 @@ export function AdminClubs() {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && total > LIMIT && (
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <p className="text-xs text-bone-500">
+            Page {page} / {totalPages} · {total} club{total > 1 ? 's' : ''}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => load(page - 1)}
+              disabled={page <= 1}
+              className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={14} /> Précédent
+            </button>
+            <button
+              onClick={() => load(page + 1)}
+              disabled={page >= totalPages}
+              className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Suivant <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Import API-Football (global → crée/complète par slug) */}
       <AnimatePresence>
