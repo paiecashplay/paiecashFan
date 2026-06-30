@@ -688,6 +688,95 @@ router.put('/clubs/:tenantId/ticketing', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// SYNC LIGUE 1 (depuis API-Football)
+// ═══════════════════════════════════════════════════════════════
+// POST /api/v2/admin/clubs-crud/sync-ligue1
+// Synchronise la Ligue 1 française : tague les clubs actuels
+// (league_name='Ligue 1'), rétrograde en 'Ligue 2' ceux qui n'y sont plus,
+// crée les promus absents. NON DESTRUCTIF (aucune suppression). Matching par
+// metadata.api_football_id ; dé-doublonne (garde le nom le plus complet).
+//
+// Plan API gratuit : seules les saisons 2022–2024 sont accessibles → on prend
+// la plus récente accessible (renvoyée dans `season`). Avec un plan payant la
+// saison courante reflétera les vraies montées/descentes.
+router.post('/sync-ligue1', async (req, res) => {
+  const TARGET = 'Ligue 1';
+  const RELEGATE = 'Ligue 2';
+  try {
+    // 1. Localiser la Ligue 1 sur API-Football (pays FR, type League)
+    const leagues = await apiFootball.getLeaguesByCountryCode('FR');
+    const l1 = leagues.find((l) => l.type === 'League' && /ligue\s*1/i.test(l.name));
+    if (!l1) return fail(res, 'Ligue 1 introuvable sur API-Football', 404);
+
+    // 2. Équipes de la saison la plus récente accessible
+    const seasons = [...(l1.seasons || [])].map((s) => s.year).filter(Boolean).sort((a, b) => b - a);
+    let teams = [], usedSeason = null, lastErr = null;
+    for (const season of seasons) {
+      try {
+        const t = await apiFootball.getTeamsByLeagueSeason(l1.id, season);
+        if (t.length) { teams = t.filter((x) => !x.national); usedSeason = season; break; }
+      } catch (e) { lastErr = e.message; }
+    }
+    if (!teams.length) return fail(res, `Aucune équipe récupérée${lastErr ? ` (${lastErr})` : ''}`, 502);
+
+    const freshIds = new Set(teams.map((t) => String(t.id)));
+
+    // 3. Rétrograder en Ligue 2 les clubs actuellement L1 absents de la liste fraîche
+    const { data: currentL1 } = await supabase
+      .from('tenants').select('id, metadata').eq('league_name', TARGET);
+    let relegated = 0;
+    for (const c of (currentL1 || [])) {
+      const apiId = c.metadata?.api_football_id;
+      if (!apiId || !freshIds.has(String(apiId))) {
+        await supabase.from('tenants').update({ league_name: RELEGATE }).eq('id', c.id);
+        relegated++;
+      }
+    }
+
+    // 4. Taguer (ou créer) les clubs de la liste fraîche
+    const { data: allTenants } = await supabase.from('tenants').select('slug');
+    const slugSet = new Set((allTenants || []).map((t) => t.slug));
+    let tagged = 0, added = 0;
+    for (const t of teams) {
+      const { data: matches } = await supabase
+        .from('tenants').select('id, name')
+        .eq('metadata->>api_football_id', String(t.id));
+
+      if (matches && matches.length) {
+        // Garde le nom le plus complet comme L1, neutralise les doublons.
+        matches.sort((a, b) => (b.name || '').length - (a.name || '').length);
+        await supabase.from('tenants').update({
+          league_name: TARGET, country: 'France', sport: 'football', status: 'active',
+        }).eq('id', matches[0].id);
+        tagged++;
+        for (const dup of matches.slice(1)) {
+          await supabase.from('tenants').update({ league_name: null }).eq('id', dup.id);
+        }
+      } else {
+        let slug = cleanSlug(t.name);
+        if (slugSet.has(slug)) slug = `${slug}-fr`;
+        if (slugSet.has(slug)) continue;
+        slugSet.add(slug);
+        await supabase.from('tenants').insert({
+          name: t.name, slug, type: 'club', status: 'active',
+          country: 'France', city: t.city || null, league_name: TARGET,
+          logo_url: t.logo || null, founded_year: toIntOrNull(t.founded),
+          stadium: t.stadium || null, primary_color: '#10b981',
+          is_federation_hub: false, metadata: { api_football_id: t.id },
+        });
+        added++;
+      }
+    }
+
+    return ok(res, { season: usedSeason, found: teams.length, tagged, added, relegated }, 201);
+  } catch (err) {
+    if (err.code === 'NO_KEY') return fail(res, err.message, 500);
+    console.error('[sync-ligue1]', err.message);
+    return fail(res, err.response?.data?.message || err.message, 502);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
 // PLAYERS
 // ═══════════════════════════════════════════════════════════════
 

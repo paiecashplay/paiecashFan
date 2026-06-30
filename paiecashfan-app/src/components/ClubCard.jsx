@@ -9,7 +9,7 @@ const MotionLink = motion(Link);
 export function ClubCard({ club, index = 0 }) {
   return (
     <MotionLink
-      to={`/clubs/${slugify(club.name)}`}
+      to={`/clubs/${club.slug || slugify(club.name)}`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}

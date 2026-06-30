@@ -15,7 +15,7 @@ const fail = (res, msg,  s = 400) => res.status(s).json({ success: false, data: 
 // Liste tous les clubs actifs. Supporte ?country=&sport=&search=&page=&limit=
 router.get('/', async (req, res) => {
   try {
-    const { country, sport, search, page = 1, limit = 50 } = req.query;
+    const { country, sport, search, league, page = 1, limit = 50 } = req.query;
     const from = (page - 1) * limit;
 
     let query = supabase
@@ -32,6 +32,7 @@ router.get('/', async (req, res) => {
 
     if (country) query = query.eq('country', country);
     if (sport)   query = query.eq('sport', sport);
+    if (league)  query = query.eq('league_name', league);
     if (search)  query = query.ilike('name', `%${search}%`);
 
     const { data: clubs, error } = await query;

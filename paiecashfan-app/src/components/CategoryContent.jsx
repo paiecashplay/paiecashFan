@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Container } from './ui/Container';
 import { Skeleton } from './ui/Skeleton';
@@ -8,6 +9,7 @@ import { DataSourceBadge } from './DataSourceBadge';
 import { ligue1, championsEurope, otherSports, events } from '@/data/leagues';
 import { federations as fallbackFederations, normalizeFederation } from '@/data/federations';
 import { useApi } from '@/hooks/useApi';
+import { apiFetch } from '@/lib/api';
 
 // Renderer du contenu selon la catégorie active.
 // Onglet "federations" → fetch /api/federations (live, fallback mock).
@@ -23,7 +25,7 @@ export function CategoryContent({ active }) {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-          {active === 'fr'          && <LeagueSection league={ligue1} />}
+          {active === 'fr'          && <Ligue1Live />}
           {active === 'eu'          && (
             <div className="space-y-16">
               {championsEurope.map((l) => <LeagueSection key={l.id} league={l} />)}
@@ -39,6 +41,64 @@ export function CategoryContent({ active }) {
         </motion.div>
       </AnimatePresence>
     </Container>
+  );
+}
+
+// Section Ligue 1 connectée à la base : les clubs sont tagués league_name =
+// 'Ligue 1' via la synchro API-Football du BO (montées/descentes gérées là).
+// Repli sur les données statiques si l'API ne répond pas ou ne renvoie rien
+// (évite une section vide / page blanche).
+function Ligue1Live() {
+  const [clubs, setClubs] = useState(null); // null = en cours, [] = vide
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch('/api/v2/marketplace/clubs?league=' + encodeURIComponent('Ligue 1') + '&limit=40')
+      .then((json) => {
+        if (cancelled) return;
+        const list = (json?.data?.clubs || []).map((c) => ({
+          id: c.id,
+          slug: c.slug,
+          name: c.name,
+          city: c.city || '',
+          logo: c.logo_url || '',
+          primaryColor: c.primary_color || '#10b981',
+        }));
+        setClubs(list);
+        setIsLive(list.length > 0);
+      })
+      .catch(() => { if (!cancelled) { setClubs([]); setIsLive(false); } });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (clubs === null) return <Ligue1Skeleton />;
+
+  // Repli statique si la base ne renvoie aucun club tagué Ligue 1.
+  const league = clubs.length > 0
+    ? { id: 'ligue-1', name: 'Ligue 1', country: 'France', flag: '🇫🇷', clubs }
+    : ligue1;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <DataSourceBadge isLive={isLive} />
+      </div>
+      <LeagueSection league={league} />
+    </div>
+  );
+}
+
+function Ligue1Skeleton() {
+  return (
+    <section className="space-y-6">
+      <Skeleton className="h-9 w-48" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+        ))}
+      </div>
+    </section>
   );
 }
 

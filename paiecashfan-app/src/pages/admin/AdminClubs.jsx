@@ -31,8 +31,22 @@ export function AdminClubs() {
   const [total, setTotal] = useState(0);
   const [page, setPage]   = useState(1);
   const [pendingCount, setPendingCount] = useState(0);
+  const [syncingL1, setSyncingL1] = useState(false);
 
   const LIMIT = 50;
+
+  async function syncLigue1() {
+    if (!confirm('Synchroniser la Ligue 1 depuis API-Football ?\n\nLes clubs actuels de L1 seront tagués, ceux qui n\'y sont plus passeront en Ligue 2, les promus seront ajoutés. Aucune suppression.')) return;
+    setSyncingL1(true);
+    try {
+      const json = await apiFetch('/api/v2/admin/clubs-crud/sync-ligue1', { method: 'POST' });
+      if (!json.success) throw new Error(json.error);
+      const { season, found, tagged, added, relegated } = json.data;
+      showToast(`Ligue 1 (saison ${season}) : ${tagged} tagué(s), ${added} ajouté(s), ${relegated} rétrogradé(s) sur ${found}`);
+      load(1);
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setSyncingL1(false);
+  }
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
   // Chargement serveur : recherche multi-colonnes + filtre statut + pagination.
@@ -144,6 +158,14 @@ export function AdminClubs() {
             className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center transition-colors"
           >
             <RefreshCw size={14} />
+          </button>
+          <button
+            onClick={syncLigue1}
+            disabled={syncingL1}
+            title="Tague les clubs de Ligue 1 (montées/descentes) depuis API-Football"
+            className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-40"
+          >
+            {syncingL1 ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Sync Ligue 1
           </button>
           <button
             onClick={() => setImportOpen(true)}
