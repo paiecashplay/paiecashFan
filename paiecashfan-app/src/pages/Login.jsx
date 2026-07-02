@@ -58,15 +58,17 @@ export function Login() {
         navigate(next, { replace: true });
       } else {
         if (!form.displayName.trim()) { setError('Ton prénom est requis.'); setLoading(false); return; }
-        const { data } = await signUp({
+        // signUp renvoie directement { user, session }
+        const data = await signUp({
           email: form.email,
           password: form.password,
           displayName: form.displayName
         });
 
-        // Si demande club_admin → on pose role_request sur le profil
-        // (le trigger crée le profil, on attend un tick puis on update)
-        if (form.roleRequest === 'club_admin' && data?.user) {
+        // Demande club_admin → on pose role_request sur le profil
+        // (le trigger crée le profil, on attend un tick puis on update).
+        const isClub = form.roleRequest === 'club_admin';
+        if (isClub && data?.user) {
           await new Promise((r) => setTimeout(r, 800));
           await supabase
             .from('profiles')
@@ -74,11 +76,18 @@ export function Login() {
             .eq('id', data.user.id);
         }
 
-        setSuccess(
-          form.roleRequest === 'club_admin'
-            ? 'Compte créé ! Vérifie ton email, puis ta demande d\'accès club sera examinée par notre équipe.'
-            : 'Compte créé ! Vérifie ton email pour confirmer ton inscription.'
-        );
+        if (data?.session) {
+          // Auto-connecté (confirmation email désactivée) → on redirige :
+          // club → espace onboarding, fan → destination initiale.
+          navigate(isClub ? '/mon-club' : next, { replace: true });
+        } else {
+          // Confirmation email requise (session null tant que non confirmé).
+          setSuccess(
+            isClub
+              ? 'Compte créé ! Confirme ton email, puis connecte-toi pour finaliser ta demande d\'accès club.'
+              : 'Compte créé ! Vérifie ton email pour confirmer ton inscription.'
+          );
+        }
       }
     } catch (err) {
       setError(translateError(err.message));
