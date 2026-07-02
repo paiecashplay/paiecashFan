@@ -83,7 +83,7 @@ export function Billetterie() {
   const clubs = useMemo(() => {
     return allClubs()
         .filter((club) => club.country === 'France' && club.league === 'Ligue 1' && club.sport === 'football')
-        .map(generateTicketingForClub);
+        .map((club) => club.ticketing || generateTicketingForClub(club));
     }, []);
 
   const filteredClubs = useMemo(() => {

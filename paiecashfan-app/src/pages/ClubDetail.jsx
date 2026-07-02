@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
-import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
+import { mockWallet, mockFans, /*mockTransactions,*/ fallbackHeroStats, onlineCount, mockFanPosts, mockComments} from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { SideDock } from '@/components/SideDock';
@@ -19,6 +19,7 @@ import { useClubDetail } from '@/hooks/useClubDetail';
 import { useCart } from '@/hooks/useCart';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
+import { ClubFanCommunity } from '@/components/club/ClubFanCommunity';
 
 const fmtAmount = (n, currency = 'EUR') =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
@@ -108,6 +109,58 @@ export function ClubDetail() {
       }
     : club.starPlayer;
 
+  // ── FANS STORIES ─────────────────────────────────────────────────────  
+  const [fanPosts, setFanPosts] = useState(mockFanPosts);
+  const [newPost, setNewPost] = useState('');
+  const [fanComments, setFanComments] = useState(mockComments);
+
+  // Publie une nouvelle story : ajoute à la liste locale (mock) et vide le champ.
+  function handlePublish() {
+    if (!newPost.trim()) return;
+
+    setFanPosts((prev) => [
+      {
+        id: crypto.randomUUID(),
+        clubSlug: club.slug,
+        authorId: 'current-user',
+        content: newPost.trim(),
+        createdAt: 'Maintenant',
+        likes: 0,
+        comments: 0
+      },
+      ...prev
+    ]);
+
+    setNewPost('');
+  }
+
+  // Like une story : incrémente le compteur de likes dans la liste locale (mock).
+  function handleLikePost(postId) {
+    setFanPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? { ...post, likes: post.likes + 1 }
+          : post
+      )
+    );
+  }
+
+  // Ajoute un commentaire à une story : ajoute à la liste locale (mock) et vide le champ.
+  function handleAddComment(postId, content) {
+    if (!content.trim()) return;
+
+    setFanComments((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        postId,
+        authorId: "current-user",
+        content,
+        createdAt: "Maintenant"
+      }
+    ]);
+  }
+
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
@@ -127,13 +180,23 @@ export function ClubDetail() {
 
         {/* ═══ FANS STORIES (avatars carrousel) ═══════════════════════ */}
         <Container className="relative pt-6 pb-6">
-          <FansStorySection fans={mockFans} club={club} />
+          <ClubFanCommunity
+            club={club}
+            fans={mockFans}
+            posts={fanPosts}
+            comments={fanComments}
+            newPost={newPost}
+            setNewPost={setNewPost}
+            onPublish={handlePublish}
+            onLikePost={handleLikePost}
+            onAddComment={handleAddComment}
+          />
         </Container>
 
-        {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ */}
+        {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ 
         <Container className="relative pt-6 pb-12">
           <TransactionsLiveSection items={mockTransactions} club={club} />
-        </Container>
+        </Container> */}
 
         {/* ═══ TROPHY CABINET ═══════════════════════════════════════════ */}
         {trophyList.length > 0 && (
@@ -566,7 +629,7 @@ function WalletCard({ icon, accentColor, label, amount, sub }) {
 }
 
 // ── FANS STORIES ─────────────────────────────────────────────────────
-function FansStorySection({ fans, club }) {
+export function FansStorySection({ fans, club }) {
   const count = onlineCount(fans);
   return (
     <div>
@@ -624,7 +687,7 @@ function FansStorySection({ fans, club }) {
 }
 
 // ── TRANSACTIONS LIVE ────────────────────────────────────────────────
-function TransactionsLiveSection({ items, club }) {
+/*function TransactionsLiveSection({ items, club }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4 px-1">
@@ -667,7 +730,7 @@ function TransactionsLiveSection({ items, club }) {
       </ul>
     </div>
   );
-}
+}*/
 
 // ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
 // Sur une page fédération (Tanzanie etc.), le bouton "Boutique" est
@@ -711,9 +774,17 @@ function SideActions({ primaryColor,  isFederationHub = false, clubSlug  }) {
     onClick: () => navigate(`/clubs/${clubSlug}/billetterie`)
   };
 
+  const transactionsAction = {
+    key: 'transactions',
+    icon: CreditCard,
+    label: 'Transactions',
+    onClick: () => navigate(`/clubs/${clubSlug}/transactions`)
+  };
+
   const actions = [
     shopAction,
     ...(!isFederationHub ? [ticketingAction] : []),
+    ...(!isFederationHub ? [transactionsAction] : []),  // Transactions à modifier plutard
     { key: 'play', icon: Trophy, label: 'Palmarès', onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices, label: 'Effectif', onClick: () => scrollTo('squad') },
     { key: 'like', icon: Heart, label: 'J\'aime' },

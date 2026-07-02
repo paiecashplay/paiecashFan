@@ -13,7 +13,7 @@ export const mockWallet = {
     note: 'Compte courant principal'
   },
   crypto: {
-    label: 'Wallet Crypto',
+    label: 'Wallet PCC',
     balance: 250.00,
     currency: 'USDC',
     address: '0x1234…5678'
@@ -30,6 +30,73 @@ export const mockFans = [
   { id: 'u7', name: 'Emma Laurent',   avatar: 'https://i.pravatar.cc/100?img=9',  online: true  },
   { id: 'u8', name: 'Lucas Bernard',  avatar: 'https://i.pravatar.cc/100?img=15', online: false },
   { id: 'u9', name: 'Camille Roux',   avatar: 'https://i.pravatar.cc/100?img=10', online: true  }
+];
+
+
+// Posts des fans (mock) pour le feed de la page club
+export const mockFanPosts = [
+  {
+    id: 'p1',
+    clubSlug: null,
+    authorId: 'u2',
+    content: 'Gros soutien au club aujourd’hui 🔥',
+    createdAt: 'Il y a 2 min',
+    likes: 12,
+    comments: 3
+  },
+  {
+    id: 'p2',
+    clubSlug: null,
+    authorId: 'u3',
+    content: 'Qui regarde le prochain match ?',
+    createdAt: 'Il y a 8 min',
+    likes: 7,
+    comments: 1
+  },
+
+  /*{
+    id: 'p3',
+    clubSlug: null,
+    authorId: 'u4',
+    content: 'Allez les gars, on y croit ! 💪',
+    createdAt: 'Il y a 12 min',
+    likes: 7,
+    comments: 2
+  },
+  {
+    id: 'p4',
+    clubSlug: null,
+    authorId: 'u5',
+    content: 'Le match d\'aujourd\'hui a été incroyable !',
+    createdAt: 'Il y a 15 min',
+    likes: 10,
+    comments: 4
+  } */
+];
+
+// Commentaires mock pour les posts des fans
+export const mockComments = [
+  {
+    id: "c1",
+    postId: "p1",
+    authorId: "u3",
+    content: "Quel match incroyable 😍",
+    createdAt: "Il y a 2 min"
+  },
+  {
+    id: "c2",
+    postId: "p1",
+    authorId: "u2",
+    content: "Vivement le prochain !",
+    createdAt: "Il y a 1 min"
+  },
+  {
+    id: "c3",
+    postId: "p2",
+    authorId: "u1",
+    content: "Je serai au stade samedi 🔥",
+    createdAt: "À l'instant"
+  }
 ];
 
 export const mockTransactions = [
