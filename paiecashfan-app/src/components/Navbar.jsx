@@ -165,16 +165,20 @@ function UserMenu() {
 
   if (!user) {
     return (
-      <button
-        onClick={() => navigate('/login')}
-        className="inline-flex items-center gap-2 h-10 pl-1 pr-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md hover:border-emerald-500/40 transition-colors group"
-      >
-        <span className="h-7 w-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-400 ring-2 ring-ink-800 grid place-items-center">
-          <User size={12} className="text-white" />
-        </span>
-        <span className="text-xs font-bold text-bone-50">Se connecter</span>
-        <ChevronDown size={14} className="text-bone-400 transition-transform group-hover:rotate-180" />
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => navigate('/login', { state: { tab: 'login' } })}
+          className="inline-flex items-center h-10 px-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-bold text-bone-100 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors"
+        >
+          Se connecter
+        </button>
+        <button
+          onClick={() => navigate('/login', { state: { tab: 'register' } })}
+          className="inline-flex items-center h-10 px-4 rounded-full bg-gradient-hero text-xs font-bold text-white shadow-md hover:opacity-90 transition-all"
+        >
+          S'inscrire
+        </button>
+      </div>
     );
   }
 
@@ -310,6 +314,15 @@ function MobileAuthButtons({ onClose }) {
           <Lock size={14} /> Admin
         </Link>
       )}
+      {(profile?.role === 'club_admin' || profile?.role_request === 'club_admin') && profile?.role !== 'super_admin' && (
+        <Link
+          to="/mon-club"
+          onClick={onClose}
+          className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-sm font-bold"
+        >
+          <Building2 size={14} /> Mon club
+        </Link>
+      )}
       <button
         onClick={async () => { onClose(); await signOut(); navigate('/'); }}
         className="flex items-center gap-2 w-full py-2.5 px-3 rounded-xl border border-red-500/20 text-red-400 text-sm font-semibold"
@@ -321,11 +334,11 @@ function MobileAuthButtons({ onClose }) {
 
   return (
     <div className="flex gap-2 pt-3">
-      <Button variant="outline" size="sm" className="flex-1" onClick={() => { onClose(); navigate('/login'); }}>
-        Connexion
+      <Button variant="outline" size="sm" className="flex-1" onClick={() => { onClose(); navigate('/login', { state: { tab: 'login' } }); }}>
+        Se connecter
       </Button>
-      <Button variant="primary" size="sm" className="flex-1" onClick={() => { onClose(); navigate('/login'); }}>
-        Inscription
+      <Button variant="primary" size="sm" className="flex-1" onClick={() => { onClose(); navigate('/login', { state: { tab: 'register' } }); }}>
+        S'inscrire
       </Button>
     </div>
   );

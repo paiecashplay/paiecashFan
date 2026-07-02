@@ -30,7 +30,10 @@ export function Login() {
   const location = useLocation();
   const next = location.state?.next || '/';
 
-  const [tab, setTab]           = useState('login');
+  // Onglet initial : ?tab=register ou state.tab (depuis les boutons du header).
+  const params = new URLSearchParams(location.search);
+  const initialTab = (location.state?.tab === 'register' || params.get('tab') === 'register') ? 'register' : 'login';
+  const [tab, setTab]           = useState(initialTab);
   const [showPwd, setShowPwd]   = useState(false);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
