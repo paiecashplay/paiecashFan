@@ -346,11 +346,19 @@ function Field({ label, icon, ...inputProps }) {
 }
 
 // ─── Traduction des erreurs Supabase ─────────────────────────
-function translateError(msg) {
+function translateError(msg = '') {
   if (msg.includes('Invalid login credentials'))  return 'Email ou mot de passe incorrect.';
   if (msg.includes('Email not confirmed'))         return 'Vérifie ta boîte mail pour confirmer ton compte.';
   if (msg.includes('User already registered'))     return 'Cet email est déjà utilisé. Connecte-toi.';
   if (msg.includes('Password should be'))          return 'Le mot de passe doit faire au moins 8 caractères.';
-  if (msg.includes('rate limit'))                  return 'Trop de tentatives. Attends quelques minutes.';
+  // Rate-limit Supabase (envoi d'emails de confirmation)
+  if (/for security purposes.*after (\d+) seconds/i.test(msg)) {
+    const s = msg.match(/after (\d+) seconds/i)?.[1] || 'quelques';
+    return `Trop de tentatives rapprochées. Réessaie dans ${s} secondes.`;
+  }
+  if (/rate limit|too many requests|429|email.*rate/i.test(msg)) {
+    return 'Limite d\'envoi d\'emails atteinte. Réessaie dans quelques minutes.';
+  }
+  if (/signups?.*(not allowed|disabled)/i.test(msg)) return 'Les inscriptions sont momentanément désactivées.';
   return msg;
 }
