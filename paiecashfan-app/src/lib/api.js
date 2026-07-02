@@ -20,14 +20,37 @@ export function apiUrl(path) {
   return `${API_BASE}${path}`;
 }
 
+// Jeton d'accès Supabase courant (pour les routes protégées côté backend).
+// Import dynamique pour éviter un cycle de dépendances au chargement.
+async function authHeader() {
+  try {
+    const { supabase } = await import('./supabase');
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
+  const auth = await authHeader();
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options
+    ...options,
+    headers: {
+      // FormData : on laisse le navigateur poser le Content-Type (boundary).
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      ...auth,
+      ...(options.headers || {}),
+    },
   });
   if (!res.ok) {
-    throw new Error(`API ${res.status} on ${path}`);
+    // On tente de remonter le message d'erreur JSON du backend si présent.
+    let msg = `API ${res.status} on ${path}`;
+    try { const j = await res.json(); if (j?.error) msg = j.error; } catch { /* pas de JSON */ }
+    throw new Error(msg);
   }
   return res.json();
 }
