@@ -23,6 +23,7 @@ import { AdminFederations } from './pages/admin/AdminFederations';
 import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
+import { MonClub } from './pages/MonClub';
 
 export default function App() {
   return (
@@ -66,6 +67,14 @@ export default function App() {
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
+                  <Route
+                    path="/mon-club"
+                    element={
+                      <ProtectedRoute>
+                        <MonClub />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/mon-compte"

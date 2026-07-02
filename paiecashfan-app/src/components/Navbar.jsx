@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock } from 'lucide-react';
+import { Bell, LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -225,6 +225,17 @@ function UserMenu() {
                 className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 transition-colors border-b border-white/5"
               >
                 <Lock size={14} /> Admin
+              </Link>
+            )}
+
+            {/* Espace représentant de club (club_admin ou demande en cours) */}
+            {(profile?.role === 'club_admin' || profile?.role_request === 'club_admin') && profile?.role !== 'super_admin' && (
+              <Link
+                to="/mon-club"
+                onClick={() => setDropOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-cyan-400 hover:bg-cyan-500/10 transition-colors border-b border-white/5"
+              >
+                <Building2 size={14} /> Mon club
               </Link>
             )}
 
