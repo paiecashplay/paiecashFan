@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Plus, Pencil, Loader2, Check, X, Search, Trash2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { searchCountries } from '@/data/countries';
 import { cn } from '@/lib/cn';
 
 const CONFEDERATIONS = ['CAF', 'UEFA', 'CONMEBOL', 'CONCACAF', 'AFC', 'OFC'];
@@ -150,11 +151,28 @@ export function AdminFederations() {
 
 // ── Modale création (minimal) → redirige vers l'édition complète ──────
 function CreateFederationModal({ onClose, onCreated }) {
-  const [f, setF] = useState({ name: '', country: '', country_code: '', confederation_code: 'CAF' });
+  const [f, setF] = useState({ name: '', country: '', country_code: '', confederation_code: 'CAF', flag_emoji: '' });
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
+  const [showSug, setShowSug] = useState(false);
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
   const input = 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
+
+  const suggestions = showSug ? searchCountries(f.country) : [];
+
+  // Sélection d'un pays → auto-remplit code, drapeau, confédération et suggère
+  // un nom de fédération (éditable).
+  function pickCountry(c) {
+    setF((p) => ({
+      ...p,
+      country: c.name,
+      country_code: c.code,
+      confederation_code: c.confederation || p.confederation_code,
+      flag_emoji: c.flag,
+      name: p.name || `Fédération de ${c.name}`,
+    }));
+    setShowSug(false);
+  }
 
   async function submit() {
     setErr('');
@@ -182,19 +200,46 @@ function CreateFederationModal({ onClose, onCreated }) {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
+          {/* Pays d'abord : sa sélection pré-remplit le reste */}
+          <div className="col-span-2 relative">
+            <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Pays</label>
+            <input
+              value={f.country}
+              onChange={(e) => { setF((p) => ({ ...p, country: e.target.value })); setShowSug(true); }}
+              onFocus={() => setShowSug(true)}
+              onBlur={() => setTimeout(() => setShowSug(false), 150)}
+              placeholder="Rechercher un pays…"
+              className={input}
+              autoComplete="off"
+            />
+            {f.flag_emoji && <span className="absolute right-3 top-[34px] text-lg pointer-events-none">{f.flag_emoji}</span>}
+            {suggestions.length > 0 && (
+              <div className="absolute z-20 left-0 right-0 mt-1 rounded-xl border border-white/10 bg-ink-800 shadow-xl overflow-hidden max-h-56 overflow-y-auto">
+                {suggestions.map((c) => (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onMouseDown={(e) => { e.preventDefault(); pickCountry(c); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-bone-200 hover:bg-white/5 text-left"
+                  >
+                    <span className="text-base">{c.flag}</span>
+                    <span className="flex-1">{c.name}</span>
+                    <span className="text-[10px] font-mono text-bone-500">{c.code} · {c.confederation}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="col-span-2">
             <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Nom *</label>
             <input value={f.name} onChange={set('name')} placeholder="Fédération Camerounaise de Football" className={input} />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Pays</label>
-            <input value={f.country} onChange={set('country')} placeholder="Cameroun" className={input} />
-          </div>
-          <div>
             <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Code pays *</label>
             <input value={f.country_code} onChange={set('country_code')} placeholder="CM" maxLength={3} className={input} />
           </div>
-          <div className="col-span-2">
+          <div>
             <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Confédération</label>
             <select value={f.confederation_code} onChange={set('confederation_code')} className={input}>
               {CONFEDERATIONS.map((c) => <option key={c} value={c}>{c}</option>)}
