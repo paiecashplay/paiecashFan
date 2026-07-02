@@ -1216,6 +1216,14 @@ function TicketingTab({ tenantId, club, showToast }) {
     }));
   }
 
+  function addOffer(listKey, type) {
+    setData((d) => ({ ...d, [listKey]: [...d[listKey], blankOffer(type)] }));
+  }
+
+  function removeOffer(listKey, index) {
+    setData((d) => ({ ...d, [listKey]: d[listKey].filter((_, i) => i !== index) }));
+  }
+
   async function save() {
     setSaving(true);
     try {
@@ -1236,8 +1244,20 @@ function TicketingTab({ tenantId, club, showToast }) {
         Offres affichées sur la page billetterie publique du club. Les prix sont en <strong className="text-bone-200">PCC</strong>.
       </p>
 
-      <OfferSection title="Abonnements" offers={data.subscriptions} onChange={(i, p) => updateOffer('subscriptions', i, p)} />
-      <OfferSection title="Billets"     offers={data.tickets}       onChange={(i, p) => updateOffer('tickets', i, p)} />
+      <OfferSection
+        title="Abonnements"
+        offers={data.subscriptions}
+        onChange={(i, p) => updateOffer('subscriptions', i, p)}
+        onAdd={() => addOffer('subscriptions', 'subscription')}
+        onRemove={(i) => removeOffer('subscriptions', i)}
+      />
+      <OfferSection
+        title="Billets"
+        offers={data.tickets}
+        onChange={(i, p) => updateOffer('tickets', i, p)}
+        onAdd={() => addOffer('tickets', 'ticket')}
+        onRemove={(i) => removeOffer('tickets', i)}
+      />
 
       <button onClick={save} disabled={saving}
         className="flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
@@ -1247,19 +1267,42 @@ function TicketingTab({ tenantId, club, showToast }) {
   );
 }
 
-function OfferSection({ title, offers, onChange }) {
-  if (!offers?.length) return null;
+// Génère une offre vierge (id unique pour la clé React + le panier).
+function blankOffer(type) {
+  const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `offer-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  return { id, type, name: '', price: 0, duration: '', description: '', benefits: [], conditions: [] };
+}
+
+function OfferSection({ title, offers = [], onChange, onAdd, onRemove }) {
   return (
     <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5 space-y-5">
-      <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{title}</h3>
-      {offers.map((offer, i) => (
-        <OfferEditor key={offer.id || i} offer={offer} onChange={(p) => onChange(i, p)} />
-      ))}
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+          {title} {offers.length > 0 && <span className="text-bone-500">({offers.length})</span>}
+        </h3>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+        >
+          <Plus size={13} /> Ajouter
+        </button>
+      </div>
+
+      {offers.length === 0 ? (
+        <p className="py-6 text-center text-xs text-bone-500">Aucune offre. Clique « Ajouter » pour en créer une.</p>
+      ) : (
+        offers.map((offer, i) => (
+          <OfferEditor key={offer.id || i} offer={offer} onChange={(p) => onChange(i, p)} onRemove={() => onRemove(i)} />
+        ))
+      )}
     </div>
   );
 }
 
-function OfferEditor({ offer, onChange }) {
+function OfferEditor({ offer, onChange, onRemove }) {
   // Les listes (avantages / conditions) sont éditées en texte brut (une ligne =
   // un élément) ; on garde le texte tel quel pour ne pas gêner la saisie et on
   // propage le tableau nettoyé au parent.
@@ -1268,7 +1311,17 @@ function OfferEditor({ offer, onChange }) {
   const toLines = (txt) => txt.split('\n').map((s) => s.trim()).filter(Boolean);
 
   return (
-    <div className="rounded-xl border border-white/8 bg-ink-900/40 p-4 space-y-4">
+    <div className="relative rounded-xl border border-white/8 bg-ink-900/40 p-4 space-y-4">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onRemove}
+          title="Supprimer cette offre"
+          className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-red-400 hover:border-red-500/30 grid place-items-center transition-colors"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Nom de l'offre" cls="md:col-span-2">
           <input value={offer.name || ''} onChange={(e) => onChange({ name: e.target.value })} className={input()} />
