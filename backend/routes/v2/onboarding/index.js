@@ -37,14 +37,24 @@ router.get('/application', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('club_applications')
-      .select('*, tenant:tenants(id, slug, name, status, logo_url)')
+      .select('*')
       .eq('user_id', req.authUser.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     if (error) throw error;
-    return ok(res, { application: data || null });
+
+    // Pas de FK → on récupère le club lié à part (embed impossible sinon).
+    let tenant = null;
+    if (data?.tenant_id) {
+      const { data: t } = await supabase
+        .from('tenants').select('id, slug, name, status, logo_url')
+        .eq('id', data.tenant_id).maybeSingle();
+      tenant = t || null;
+    }
+    return ok(res, { application: data ? { ...data, tenant } : null });
   } catch (err) {
+    console.error('[onboarding] GET /application:', err.message);
     return fail(res, err.message, 500);
   }
 });
