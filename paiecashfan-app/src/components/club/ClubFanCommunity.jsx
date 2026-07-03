@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import { onlineCount } from '@/data/clubMocks';
-import { FansStorySection } from '@/pages/ClubDetail';
 import { useState } from 'react';
 
 export function ClubFanCommunity({
@@ -13,7 +12,8 @@ export function ClubFanCommunity({
   setNewPost,
   onPublish,
   onLikePost,
-  onAddComment
+  onAddComment,
+  mode = 'club'
 }) {
   const getAuthor = (authorId) => fans.find((fan) => fan.id === authorId);
   const [openedPostId, setOpenedPostId] = useState(null);
@@ -40,23 +40,15 @@ export function ClubFanCommunity({
       <div className="border-b border-white/10 p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="flex items-center gap-2 text-xl font-black text-bone-50">
+            <h6 className="flex items-center gap-2 text-xl font-black text-bone-50">
               <MessageCircle
-                size={22}
+                size={50}
                 style={{ color: club.primaryColor }}
               />
-              Fans de {club.name}
-            </h2>
-
-            <p className="mt-1 text-sm text-bone-400">
-              Partage tes réactions avec les supporters du club.
-            </p>
-          </div>
-
-          <div className="rounded-full bg-emerald-500/15 px-4 py-2">
-            <span className="text-xs font-bold text-emerald-400">
-              {onlineCount(fans)} en ligne
-            </span>
+              {mode === 'club'
+                ? 'Partage tes réactions avec tous les supporters du club'
+                : 'Partage tes réactions avec tes amis'}
+            </h6>
           </div>
         </div>
 
@@ -64,6 +56,7 @@ export function ClubFanCommunity({
           <FansStorySection
             fans={fans}
             club={club}
+            mode={mode}
           />
         </div>
       </div>
@@ -276,6 +269,63 @@ function AddCommentBox({ postId, club, onAddComment }) {
       >
         Envoyer
       </button>
+    </div>
+  );
+}
+
+export function FansStorySection({ fans, club, mode = 'club' }) {
+  const count = onlineCount(fans);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-bone-300">
+            {mode === 'club' ? 'Supporters connectés' : 'Mes amis'}
+        </h2>
+        <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-emerald-400 font-bold">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
+          {count} en ligne
+        </span>
+      </div>
+
+      <div className="overflow-x-auto mask-fade-x -mx-2 px-2">
+        <div className="flex gap-3 min-w-max">
+          {fans.map((f, i) => (
+            <motion.button
+              key={f.id}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: i * 0.04 }}
+              whileHover={{ y: -3 }}
+              className="flex flex-col items-center shrink-0 w-16"
+            >
+              <span
+                className="relative h-14 w-14 rounded-full p-0.5 ring-2"
+                style={{ borderColor: club.primaryColor, ringColor: `${club.primaryColor}66` }}
+              >
+                <span className="block h-full w-full rounded-full overflow-hidden bg-ink-700">
+                  {f.avatar ? (
+                    <img src={f.avatar} alt={f.name} className="h-full w-full object-cover" loading="lazy" />
+                  ) : (
+                    <span className="h-full w-full grid place-items-center text-[10px] font-bold text-bone-300">
+                      {f.initials || f.name?.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </span>
+                {f.online && (
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-ink-900" />
+                )}
+              </span>
+              <span className="mt-1.5 text-[10px] text-bone-400 truncate w-full text-center" title={f.name}>
+                {f.name.length > 8 ? f.name.slice(0, 8) + '…' : f.name}
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,12 +7,18 @@ import {
   ArrowUpRight,
   Search,
   Filter,
-  ArrowLeft
+  ArrowLeft,
+  CreditCard,
+  Wallet 
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { mockTransactions } from '@/data/clubMocks';
+import { mockTransactions, mockWallet } from '@/data/clubMocks';
+
+
+const fmtAmount = (n, currency = 'EUR') =>
+  new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
 
 export function Transactions() {
   const [transactions, setTransactions] = useState(mockTransactions);
@@ -72,6 +78,11 @@ export function Transactions() {
             </p>
           </div>
         </div>
+
+
+        <Container className="relative pt-12 md:pt-16 pb-6">
+            <WalletSection wallet={mockWallet} />
+        </Container>
 
         {/* Stats */}
 
@@ -199,5 +210,56 @@ export function Transactions() {
 
       </Container>
     </div>
+  );
+}
+
+function WalletSection({ wallet}) {
+  return (
+    <div className="grid gap-3 md:gap-4 md:grid-cols-2">
+      <WalletCard
+        icon={<CreditCard size={18} />}
+        accentColor="#10b981"
+        label={wallet.bank.label}
+        amount={fmtAmount(wallet.bank.balance, wallet.bank.currency)}
+        sub={wallet.bank.note}
+      />
+      <WalletCard
+        icon={<Wallet size={18} />}
+        accentColor="#a78bfa"
+        label={wallet.crypto.label}
+        amount={fmtAmount(wallet.crypto.balance, 'EUR')}
+        sub={`${wallet.crypto.currency} · ${wallet.crypto.address}`}
+      />
+    </div>
+  );
+}
+
+function WalletCard({ icon, accentColor, label, amount, sub }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -2 }}
+      className="relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-5 md:p-6 overflow-hidden"
+    >
+      <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl opacity-30" style={{ background: accentColor }} />
+
+      <div className="flex items-center gap-3">
+        <div
+          className="grid h-10 w-10 place-items-center rounded-xl ring-1"
+          style={{ color: accentColor, background: `${accentColor}1A`, borderColor: `${accentColor}40` }}
+        >
+          {icon}
+        </div>
+        <div className="text-sm font-semibold text-bone-200">{label}</div>
+      </div>
+
+      <div className="mt-4 font-display text-3xl md:text-4xl font-black text-bone-50 tabular-nums">
+        {amount}
+      </div>
+      <div className="mt-1 text-xs text-bone-400 font-mono">{sub}</div>
+    </motion.div>
   );
 }

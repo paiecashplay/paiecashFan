@@ -109,58 +109,6 @@ export function ClubDetail() {
       }
     : club.starPlayer;
 
-  // ── FANS STORIES ─────────────────────────────────────────────────────  
-  const [fanPosts, setFanPosts] = useState(mockFanPosts);
-  const [newPost, setNewPost] = useState('');
-  const [fanComments, setFanComments] = useState(mockComments);
-
-  // Publie une nouvelle story : ajoute à la liste locale (mock) et vide le champ.
-  function handlePublish() {
-    if (!newPost.trim()) return;
-
-    setFanPosts((prev) => [
-      {
-        id: crypto.randomUUID(),
-        clubSlug: club.slug,
-        authorId: 'current-user',
-        content: newPost.trim(),
-        createdAt: 'Maintenant',
-        likes: 0,
-        comments: 0
-      },
-      ...prev
-    ]);
-
-    setNewPost('');
-  }
-
-  // Like une story : incrémente le compteur de likes dans la liste locale (mock).
-  function handleLikePost(postId) {
-    setFanPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? { ...post, likes: post.likes + 1 }
-          : post
-      )
-    );
-  }
-
-  // Ajoute un commentaire à une story : ajoute à la liste locale (mock) et vide le champ.
-  function handleAddComment(postId, content) {
-    if (!content.trim()) return;
-
-    setFanComments((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        postId,
-        authorId: "current-user",
-        content,
-        createdAt: "Maintenant"
-      }
-    ]);
-  }
-
   return (
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
@@ -174,24 +122,12 @@ export function ClubDetail() {
           2xl la gouttière est assez large → plus besoin de décaler. */}
       <div className="md:pl-24 2xl:pl-0">
         {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
-        <Container className="relative pt-12 md:pt-16 pb-6">
-          <WalletSection wallet={mockWallet} primaryColor={club.primaryColor} />
-        </Container>
-
-        {/* ═══ FANS STORIES (avatars carrousel) ═══════════════════════ */}
-        <Container className="relative pt-6 pb-6">
-          <ClubFanCommunity
-            club={club}
-            fans={mockFans}
-            posts={fanPosts}
-            comments={fanComments}
-            newPost={newPost}
-            setNewPost={setNewPost}
-            onPublish={handlePublish}
-            onLikePost={handleLikePost}
-            onAddComment={handleAddComment}
-          />
-        </Container>
+        
+        {/*
+          <Container className="relative pt-12 md:pt-16 pb-6">
+            <WalletSection wallet={mockWallet} primaryColor={club.primaryColor} />
+          </Container> 
+        */}
 
         {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ 
         <Container className="relative pt-6 pb-12">
@@ -625,64 +561,6 @@ function WalletCard({ icon, accentColor, label, amount, sub }) {
       </div>
       <div className="mt-1 text-xs text-bone-400 font-mono">{sub}</div>
     </motion.div>
-  );
-}
-
-// ── FANS STORIES ─────────────────────────────────────────────────────
-export function FansStorySection({ fans, club }) {
-  const count = onlineCount(fans);
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-bone-300">
-          Fans en ligne
-        </h2>
-        <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-emerald-400 font-bold">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          </span>
-          {count} en ligne
-        </span>
-      </div>
-
-      <div className="overflow-x-auto mask-fade-x -mx-2 px-2">
-        <div className="flex gap-3 min-w-max">
-          {fans.map((f, i) => (
-            <motion.button
-              key={f.id}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: i * 0.04 }}
-              whileHover={{ y: -3 }}
-              className="flex flex-col items-center shrink-0 w-16"
-            >
-              <span
-                className="relative h-14 w-14 rounded-full p-0.5 ring-2"
-                style={{ borderColor: club.primaryColor, ringColor: `${club.primaryColor}66` }}
-              >
-                <span className="block h-full w-full rounded-full overflow-hidden bg-ink-700">
-                  {f.avatar ? (
-                    <img src={f.avatar} alt={f.name} className="h-full w-full object-cover" loading="lazy" />
-                  ) : (
-                    <span className="h-full w-full grid place-items-center text-[10px] font-bold text-bone-300">
-                      {f.initials || f.name?.slice(0, 2).toUpperCase()}
-                    </span>
-                  )}
-                </span>
-                {f.online && (
-                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-ink-900" />
-                )}
-              </span>
-              <span className="mt-1.5 text-[10px] text-bone-400 truncate w-full text-center" title={f.name}>
-                {f.name.length > 8 ? f.name.slice(0, 8) + '…' : f.name}
-              </span>
-            </motion.button>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }
 
