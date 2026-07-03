@@ -21,11 +21,17 @@
 - [ ] Phase 4 — BO club scopé (`/mon-club/bo`) verrouillé sur `club_id`
 - [ ] Phase 5 — Gating (redirections selon statut) & finitions
 
-## ✉️ Infra email (prérequis notifications + confirmations)
+## ✉️ Infra email (prérequis notifications + confirmations) — À FAIRE EN PROD
 - [ ] Brancher un fournisseur SMTP/API (Resend / Brevo / SendGrid) :
         - `RESEND_API_KEY` (+ `RESEND_FROM`) côté backend pour les notifications,
         - SMTP custom dans Supabase Auth pour les emails de confirmation.
 - [ ] Réactiver « Confirm email » dans Supabase avant la mise en prod publique.
+- [ ] **Mot de passe oublié (self-service)** : la page `/reset-password` et le
+      bouton « Mot de passe oublié ? » existent déjà côté code. À activer EN PROD :
+        - ajouter `https://<domaine>/reset-password` dans Supabase → Auth →
+          URL Configuration (Redirect URLs),
+        - avoir le SMTP configuré (sinon l'email de reset est rate-limité).
+      → Rien de plus à coder pour l'instant.
 
 ## 💳 Paiement
 - [ ] Checkout PCC (boutique + billetterie) — Crossmint/Stripe + webhooks.

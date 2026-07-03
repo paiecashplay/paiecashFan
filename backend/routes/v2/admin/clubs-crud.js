@@ -51,6 +51,12 @@ function requireSubScope(table) {
     } catch { return fail(res, 'Erreur d\'autorisation', 500); }
   };
 }
+// Scope basé sur le tenant ciblé dans le corps (imports vers SON club).
+function requireBodyClubScope(req, res, next) {
+  clubOwnedByUser(req, req.body?.tenantId)
+    .then((okAccess) => (okAccess ? next() : fail(res, 'Accès refusé à ce club', 403)))
+    .catch(() => fail(res, 'Erreur d\'autorisation', 500));
+}
 
 router.use('/clubs/:tenantId', requireClubScope);
 router.use('/players/:id',   requireSubScope('players'));
@@ -154,7 +160,7 @@ router.get('/football-search', async (req, res) => {
 //  - tenantId : (optionnel) club Supabase cible ; sinon upsert par slug
 // NON DESTRUCTIF : ne remplit que les champs vides, n'ajoute que les
 // joueurs absents (match par nom). Le fallback statique reste intact.
-router.post('/import-from-football', requireRole('super_admin'), async (req, res) => {
+router.post('/import-from-football', requireBodyClubScope, async (req, res) => {
   try {
     const { teamId, tenantId } = req.body;
     if (!teamId) return fail(res, 'teamId requis');
@@ -266,7 +272,7 @@ router.post('/import-from-football', requireRole('super_admin'), async (req, res
 // POST /api/v2/admin/clubs-crud/import-trophies-footmercato
 // body: { tenantId, slug }  — slug = identifiant Foot Mercato (ex: ol, psg, om)
 // NON DESTRUCTIF : n'ajoute que les trophées dont le label n'existe pas déjà.
-router.post('/import-trophies-footmercato', requireRole('super_admin'), async (req, res) => {
+router.post('/import-trophies-footmercato', requireBodyClubScope, async (req, res) => {
   try {
     const { tenantId, slug } = req.body;
     if (!tenantId) return fail(res, 'tenantId requis');
