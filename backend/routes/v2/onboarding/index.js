@@ -9,6 +9,7 @@ const multer = require('multer');
 const path = require('path');
 const supabase = require('../../../db/supabase');
 const { requireAuth } = require('../../../middleware/auth');
+const { sendEmail, getSuperAdminEmails } = require('../../../services/mailer');
 
 const router = express.Router();
 const ok   = (res, data, s = 200) => res.status(s).json({ success: true,  data,  error: '' });
@@ -220,6 +221,25 @@ router.post('/application/submit', async (req, res) => {
       .update({ status: 'submitted', updated_at: new Date().toISOString() })
       .eq('id', app.id).select().single();
     if (error) throw error;
+
+    // Notifie les super_admin (asynchrone, n'impacte pas la réponse).
+    (async () => {
+      const emails = await getSuperAdminEmails();
+      await sendEmail({
+        to: emails,
+        subject: `🏟️ Nouvelle candidature club : ${app.club_name || 'club'}`,
+        html: `
+          <div style="font-family:system-ui,sans-serif;line-height:1.6">
+            <h2>Nouvelle candidature de représentant de club</h2>
+            <p><strong>Club :</strong> ${app.club_name || '—'}<br/>
+               <strong>Type :</strong> ${app.claim_type === 'existing' ? 'Club existant revendiqué' : 'Nouveau club'}<br/>
+               <strong>Candidat :</strong> ${req.authUser.display_name || ''} (${req.authUser.email})<br/>
+               <strong>Documents :</strong> ${(app.documents || []).length} fichier(s)</p>
+            <p>À vérifier dans le back-office → <em>Candidatures</em>.</p>
+          </div>`,
+      });
+    })().catch((e) => console.error('[onboarding] notif email:', e.message));
+
     return ok(res, { application: data });
   } catch (err) {
     return fail(res, err.message, 500);

@@ -21,6 +21,7 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
 import { AdminFederations } from './pages/admin/AdminFederations';
 import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
+import { AdminApplications } from './pages/admin/AdminApplications';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
 import { MonClub } from './pages/MonClub';
@@ -42,6 +43,7 @@ export default function App() {
         >
           <Route index                      element={<AdminOverview />} />
           <Route path="users"               element={<AdminUsers />} />
+          <Route path="applications"        element={<AdminApplications />} />
           <Route path="federations"         element={<AdminFederations />} />
           <Route path="federations/:id/edit" element={<AdminFederationEdit />} />
           <Route path="clubs"               element={<AdminClubs />} />

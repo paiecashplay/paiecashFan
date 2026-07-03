@@ -148,10 +148,10 @@ router.get('/overview', async (req, res) => {
       totalVolumePCC = orders.reduce((s, o) => s + Number(o.total_pcc || 0), 0);
     }
 
-    const [treasury, pendingWithdrawals, pendingApps, fraudFlags] = await Promise.all([
+    const [treasury, pendingWithdrawals, pendingClubApps, fraudFlags] = await Promise.all([
       safe(() => treasuryService.getTreasurySummary(), null),
       safe(() => sharedDb.getAllWithdrawals({ status: 'pending' }), []),
-      safe(() => sharedDb.getClubApplications({ status: 'submitted' }), []),
+      countRows('club_applications', (q) => q.eq('status', 'submitted')),
       safe(() => sharedDb.getFraudFlags({ status: 'open' }), []),
     ]);
 
@@ -160,7 +160,7 @@ router.get('/overview', async (req, res) => {
       totalTransactions, totalVolumePCC,
       treasury,
       pendingWithdrawals: pendingWithdrawals.length,
-      pendingClubApplications: pendingApps.length,
+      pendingClubApplications: pendingClubApps ?? 0,
       openFraudFlags: fraudFlags.length,
     });
   } catch (err) {

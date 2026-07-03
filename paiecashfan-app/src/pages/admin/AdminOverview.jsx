@@ -47,7 +47,7 @@ export function AdminOverview() {
 
       {/* Alertes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <AlertCard loading={loading} icon={<Clock size={16} />}         label="Candidatures clubs en attente" value={data?.pendingClubApplications} to="/admin/clubs" color="amber" />
+        <AlertCard loading={loading} icon={<Clock size={16} />}         label="Candidatures clubs en attente" value={data?.pendingClubApplications} to="/admin/applications" color="amber" />
         <AlertCard loading={loading} icon={<Clock size={16} />}         label="Retraits en attente"            value={data?.pendingWithdrawals}        to="/admin/withdrawals" color="amber" />
         <AlertCard loading={loading} icon={<AlertTriangle size={16} />} label="Signalements fraude ouverts"    value={data?.openFraudFlags}            to="/admin/fraud" color="red" />
       </div>

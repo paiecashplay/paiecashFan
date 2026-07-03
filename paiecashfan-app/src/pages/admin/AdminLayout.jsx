@@ -2,7 +2,7 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Users, Shield, ShoppingBag,
-  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe
+  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe, FileCheck
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/cn';
 const sideNav = [
   { to: '/admin',            label: 'Vue d\'ensemble', icon: LayoutDashboard, end: true },
   { to: '/admin/users',      label: 'Utilisateurs',    icon: Users },
+  { to: '/admin/applications', label: 'Candidatures',  icon: FileCheck },
   { to: '/admin/federations', label: 'Fédérations',    icon: Globe },
   { to: '/admin/clubs',      label: 'Clubs',           icon: Shield },
   { to: '/admin/products',   label: 'Produits',        icon: ShoppingBag },
