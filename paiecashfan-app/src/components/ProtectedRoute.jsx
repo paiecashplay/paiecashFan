@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
@@ -6,6 +6,21 @@ export function ProtectedRoute({ children, requiredRole }) {
   const { user, profile, loading, refreshProfile } = useAuth();
   const location = useLocation();
   const [refreshing, setRefreshing] = useState(false);
+  const [autoTried, setAutoTried] = useState(false);
+
+  const hasRole =
+    !requiredRole ||
+    (requiredRole === 'super_admin' && profile?.role === 'super_admin') ||
+    (requiredRole === 'club_admin'  && (profile?.role === 'club_admin' || profile?.role === 'super_admin'));
+
+  // Auto-correction : si le rôle en cache est périmé (ex: club_admin fraîchement
+  // validé), on rafraîchit le profil UNE fois avant d'afficher « accès refusé ».
+  useEffect(() => {
+    if (!loading && user && requiredRole && !hasRole && !autoTried) {
+      setAutoTried(true);
+      refreshProfile?.();
+    }
+  }, [loading, user, requiredRole, hasRole, autoTried, refreshProfile]);
 
   if (loading) {
     return (
@@ -18,11 +33,6 @@ export function ProtectedRoute({ children, requiredRole }) {
   if (!user) {
     return <Navigate to="/login" state={{ next: location.pathname }} replace />;
   }
-
-  const hasRole =
-    !requiredRole ||
-    (requiredRole === 'super_admin' && profile?.role === 'super_admin') ||
-    (requiredRole === 'club_admin'  && (profile?.role === 'club_admin' || profile?.role === 'super_admin'));
 
   if (!hasRole) {
     // L'utilisateur est connecté mais n'a pas encore le bon rôle.

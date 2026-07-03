@@ -3,8 +3,8 @@
 //   • aucune / draft / rejected / more_info → wizard (choix club → docs → soumettre)
 //   • submitted / under_review             → écran « vérification en cours »
 //   • approved                             → accès au BO du club (Phase 4)
-import { useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Building2, Search, Upload, FileText, Check, X, Loader2,
@@ -13,6 +13,7 @@ import {
 import { Container } from '@/components/ui/Container';
 import { apiFetch } from '@/lib/api';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
 
 const DOC_DEFS = [
@@ -82,6 +83,21 @@ function PendingScreen({ application }) {
 }
 
 function ApprovedScreen({ application }) {
+  const { profile, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+  const [going, setGoing] = useState(false);
+
+  // Le rôle vient d'être mis à jour côté serveur → on rafraîchit le profil en
+  // cache pour débloquer l'accès au BO (sinon le garde de route bloque).
+  useEffect(() => { refreshProfile?.(); }, []); // eslint-disable-line
+
+  async function goToBO() {
+    setGoing(true);
+    await refreshProfile?.();           // garantit role=club_admin + club_id à jour
+    navigate('/mon-club/bo');
+    setGoing(false);
+  }
+
   return (
     <Panel>
       <div className="text-center py-6">
@@ -92,9 +108,14 @@ function ApprovedScreen({ application }) {
         <p className="mt-2 text-sm text-bone-400 max-w-md mx-auto">
           Bienvenue ! Tu as désormais accès au back-office de <strong className="text-bone-200">{application.club_name}</strong>.
         </p>
-        <Link to="/mon-club/bo" className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all">
+        <button onClick={goToBO} disabled={going}
+          className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-60">
+          {going ? <Loader2 size={15} className="animate-spin" /> : null}
           Accéder à mon back-office
-        </Link>
+        </button>
+        {profile && profile.role !== 'club_admin' && (
+          <p className="mt-3 text-[11px] text-bone-500">Rôle actuel : {profile.role} — clique pour rafraîchir tes droits.</p>
+        )}
       </div>
     </Panel>
   );
