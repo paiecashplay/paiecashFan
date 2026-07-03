@@ -25,6 +25,7 @@ import { AdminApplications } from './pages/admin/AdminApplications';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
 import { MonClub } from './pages/MonClub';
+import { MonClubBO } from './pages/MonClubBO';
 
 export default function App() {
   return (
@@ -74,6 +75,14 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <MonClub />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/mon-club/bo"
+                    element={
+                      <ProtectedRoute requiredRole="club_admin">
+                        <MonClubBO />
                       </ProtectedRoute>
                     }
                   />

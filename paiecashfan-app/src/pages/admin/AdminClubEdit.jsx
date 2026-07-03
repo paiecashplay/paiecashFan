@@ -414,7 +414,7 @@ function InfoTab({ club, clubId, isNew, presetFederationId = '', onSaved, saving
 // ═══════════════════════════════════════════════════════════════
 // TAB : JOUEURS
 // ═══════════════════════════════════════════════════════════════
-function PlayersTab({ tenantId, showToast }) {
+export function PlayersTab({ tenantId, showToast }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editRow, setEditRow] = useState(null);  // { mode:'new'|id, form }
@@ -629,7 +629,7 @@ function PlayerForm({ initial, tenantId, onSave, onCancel }) {
 // ═══════════════════════════════════════════════════════════════
 // TAB : PALMARÈS
 // ═══════════════════════════════════════════════════════════════
-function TrophiesTab({ tenantId, showToast }) {
+export function TrophiesTab({ tenantId, showToast }) {
   const [trophies, setTrophies] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [editRow,  setEditRow]  = useState(null);
@@ -821,7 +821,7 @@ function TrophyForm({ initial, onSave, onCancel }) {
 // ═══════════════════════════════════════════════════════════════
 // TAB : BOUTIQUE
 // ═══════════════════════════════════════════════════════════════
-function ProductsTab({ tenantId, showToast }) {
+export function ProductsTab({ tenantId, showToast }) {
   const [products, setProducts] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [editRow,  setEditRow]  = useState(null);
@@ -1190,7 +1190,7 @@ function SearchBar({ value, onChange, placeholder }) {
 // stockées dans tenants.metadata.ticketing. Pré-rempli avec des valeurs par
 // défaut si aucune offre n'a encore été saisie.
 // ═══════════════════════════════════════════════════════════════
-function TicketingTab({ tenantId, club, showToast }) {
+export function TicketingTab({ tenantId, club, showToast }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
   const [data, setData]       = useState({ subscriptions: [], tickets: [] });

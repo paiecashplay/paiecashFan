@@ -11,6 +11,7 @@ const path     = require('path');
 const supabase = require('../../../db/supabase');
 const apiFootball = require('../../../services/apiFootball');
 const footmercato = require('../../../services/footmercato');
+const { requireAuth, requireRole } = require('../../../middleware/auth');
 const router   = express.Router();
 
 // Mapping postes API-Football → contrainte players_position_check (FR)
@@ -23,6 +24,39 @@ const POSITION_FR = {
 
 const ok   = (res, data, s = 200) => res.status(s).json({ success: true,  data,  error: '' });
 const fail = (res, msg,  s = 400) => res.status(s).json({ success: false, data: null, error: msg });
+
+// ─── Sécurité ────────────────────────────────────────────────────────
+// Toutes les routes exigent une session. super_admin → accès total ;
+// club_admin → uniquement SON club (profiles.club_id). Le scoping s'applique
+// par chemin aux routes définies plus bas.
+router.use(requireAuth);
+
+async function clubOwnedByUser(req, tenantId) {
+  const u = req.authUser;
+  if (u.role === 'super_admin') return true;
+  return !!(u.role === 'club_admin' && u.club_id && tenantId && String(u.club_id) === String(tenantId));
+}
+function requireClubScope(req, res, next) {
+  clubOwnedByUser(req, req.params.tenantId)
+    .then((okAccess) => (okAccess ? next() : fail(res, 'Accès refusé à ce club', 403)))
+    .catch(() => fail(res, 'Erreur d\'autorisation', 500));
+}
+function requireSubScope(table) {
+  return async (req, res, next) => {
+    try {
+      if (req.authUser.role === 'super_admin') return next();
+      const { data } = await supabase.from(table).select('tenant_id').eq('id', req.params.id).maybeSingle();
+      const okAccess = await clubOwnedByUser(req, data?.tenant_id);
+      return okAccess ? next() : fail(res, 'Accès refusé', 403);
+    } catch { return fail(res, 'Erreur d\'autorisation', 500); }
+  };
+}
+
+router.use('/clubs/:tenantId', requireClubScope);
+router.use('/players/:id',   requireSubScope('players'));
+router.use('/trophies/:id',  requireSubScope('trophies'));
+router.use('/products/:id',  requireSubScope('products'));
+router.use('/federations',   requireRole('super_admin'));
 
 // Convertit "" / undefined → null, sinon entier (colonnes integer en DB)
 const toIntOrNull = (v) => {
@@ -120,7 +154,7 @@ router.get('/football-search', async (req, res) => {
 //  - tenantId : (optionnel) club Supabase cible ; sinon upsert par slug
 // NON DESTRUCTIF : ne remplit que les champs vides, n'ajoute que les
 // joueurs absents (match par nom). Le fallback statique reste intact.
-router.post('/import-from-football', async (req, res) => {
+router.post('/import-from-football', requireRole('super_admin'), async (req, res) => {
   try {
     const { teamId, tenantId } = req.body;
     if (!teamId) return fail(res, 'teamId requis');
@@ -232,7 +266,7 @@ router.post('/import-from-football', async (req, res) => {
 // POST /api/v2/admin/clubs-crud/import-trophies-footmercato
 // body: { tenantId, slug }  — slug = identifiant Foot Mercato (ex: ol, psg, om)
 // NON DESTRUCTIF : n'ajoute que les trophées dont le label n'existe pas déjà.
-router.post('/import-trophies-footmercato', async (req, res) => {
+router.post('/import-trophies-footmercato', requireRole('super_admin'), async (req, res) => {
   try {
     const { tenantId, slug } = req.body;
     if (!tenantId) return fail(res, 'tenantId requis');
@@ -562,7 +596,7 @@ router.post('/federations/:id/create-hub', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 
 // POST /api/v2/admin/clubs-crud/clubs — créer un club
-router.post('/clubs', async (req, res) => {
+router.post('/clubs', requireRole('super_admin'), async (req, res) => {
   try {
     const {
       name, slug, country, city, sport = 'football',
@@ -604,14 +638,31 @@ router.post('/clubs', async (req, res) => {
   }
 });
 
+// GET /api/v2/admin/clubs-crud/clubs/:tenantId — fiche club (scopée)
+router.get('/clubs/:tenantId', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('tenants').select('*').eq('id', req.params.tenantId).single();
+    if (error || !data) return fail(res, 'Club introuvable', 404);
+    return ok(res, { club: data });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
 // PUT /api/v2/admin/clubs-crud/clubs/:id — mettre à jour un club
 router.put('/clubs/:id', async (req, res) => {
   try {
-    const allowed = [
+    let allowed = [
       'name','slug','country','city','sport','logo_url','primary_color',
       'stadium','stadium_image_url','founded_year','motto','motto_color',
       'coach','president','is_federation_hub','federation_id','status','metadata'
     ];
+    // Un club_admin ne peut PAS toucher aux champs sensibles (statut → il
+    // s'auto-validerait, slug/fédération/hub → cohérence globale).
+    if (req.authUser.role !== 'super_admin') {
+      const forbidden = new Set(['slug', 'status', 'federation_id', 'is_federation_hub']);
+      allowed = allowed.filter((k) => !forbidden.has(k));
+    }
     const updates = {};
     allowed.forEach((k) => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     // Colonne integer : "" → null
@@ -640,7 +691,7 @@ router.put('/clubs/:id', async (req, res) => {
 });
 
 // DELETE /api/v2/admin/clubs-crud/clubs/:id
-router.delete('/clubs/:id', async (req, res) => {
+router.delete('/clubs/:id', requireRole('super_admin'), async (req, res) => {
   try {
     const { error } = await supabase.from('tenants').delete().eq('id', req.params.id);
     if (error) throw error;
@@ -699,7 +750,7 @@ router.put('/clubs/:tenantId/ticketing', async (req, res) => {
 // Plan API gratuit : seules les saisons 2022–2024 sont accessibles → on prend
 // la plus récente accessible (renvoyée dans `season`). Avec un plan payant la
 // saison courante reflétera les vraies montées/descentes.
-router.post('/sync-ligue1', async (req, res) => {
+router.post('/sync-ligue1', requireRole('super_admin'), async (req, res) => {
   const TARGET = 'Ligue 1';
   const RELEGATE = 'Ligue 2';
   try {
