@@ -3,7 +3,7 @@
 // et de valider ou rejeter les demandes d'accès club_admin (role_request = 'club_admin').
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronDown, Check, X, Shield, User, Crown, UserPlus, Loader2, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Search, ChevronDown, Check, X, Shield, User, Crown, UserPlus, Loader2, Eye, EyeOff, Trash2, Pencil, Mail, KeyRound } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -24,6 +24,7 @@ export function AdminUsers() {
   const [saving, setSaving]     = useState(null);     // userId en cours de save
   const [toast, setToast]       = useState('');
   const [createOpen, setCreateOpen] = useState(false);
+  const [editId, setEditId]     = useState(null);     // userId en cours d'édition
 
   async function load() {
     setLoading(true);
@@ -186,6 +187,7 @@ export function AdminUsers() {
                   onApprove={() => approveRoleRequest(p.id)}
                   onReject={() => rejectRoleRequest(p.id)}
                   onDelete={() => deleteUser(p.id, p.display_name)}
+                  onEdit={() => setEditId(p.id)}
                 />
               ))}
             </tbody>
@@ -199,6 +201,17 @@ export function AdminUsers() {
           <CreateUserModal
             onClose={() => setCreateOpen(false)}
             onCreated={(label) => { setCreateOpen(false); showToast(label); load(); }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Modale édition utilisateur */}
+      <AnimatePresence>
+        {editId && (
+          <EditUserModal
+            userId={editId}
+            onClose={() => setEditId(null)}
+            onSaved={(label) => { setEditId(null); showToast(label); load(); }}
           />
         )}
       </AnimatePresence>
@@ -344,7 +357,125 @@ function CreateUserModal({ onClose, onCreated }) {
   );
 }
 
-function UserRow({ profile, saving, onChangeRole, onApprove, onReject, onDelete }) {
+// ── Modale d'édition d'un compte (email / mot de passe / nom) ─────────
+function EditUserModal({ userId, onClose, onSaved }) {
+  const [form, setForm] = useState({ display_name: '', email: '', password: '' });
+  const [loading, setLoading] = useState(true);
+  const [showPwd, setShowPwd] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [sendingLink, setSendingLink] = useState(false);
+  const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch(`/api/v2/admin/users/${userId}`)
+      .then((j) => { if (!cancelled) setForm({ display_name: j.data.user.display_name || '', email: j.data.user.email || '', password: '' }); })
+      .catch((e) => setError(e.message))
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  function genPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    const arr = new Uint32Array(14); crypto.getRandomValues(arr);
+    let p = ''; for (let i = 0; i < 14; i++) p += chars[arr[i] % chars.length];
+    setForm((f) => ({ ...f, password: p })); setShowPwd(true);
+  }
+
+  async function submit() {
+    setError(''); setInfo('');
+    if (form.password && form.password.length < 8) { setError('Mot de passe : 8 caractères minimum'); return; }
+    setSubmitting(true);
+    try {
+      const body = { display_name: form.display_name, email: form.email };
+      if (form.password) body.password = form.password;
+      const json = await apiFetch(`/api/v2/admin/users/${userId}`, { method: 'PATCH', body: JSON.stringify(body) });
+      if (!json.success) throw new Error(json.error);
+      onSaved('Compte mis à jour');
+    } catch (e) { setError(e.message || 'Échec'); }
+    setSubmitting(false);
+  }
+
+  async function sendResetLink() {
+    setError(''); setInfo(''); setSendingLink(true);
+    try {
+      const { error: e } = await supabase.auth.resetPasswordForEmail(form.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (e) throw e;
+      setInfo('Lien de réinitialisation envoyé à ' + form.email);
+    } catch (e) { setError(e.message); }
+    setSendingLink(false);
+  }
+
+  const inputCls = 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 transition-colors';
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/80 backdrop-blur"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95 }}
+        className="w-full max-w-md rounded-2xl border border-white/10 bg-ink-800 p-6 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display font-bold text-bone-50">Modifier le compte</h3>
+          <button onClick={onClose} className="text-bone-400 hover:text-bone-100"><X size={18} /></button>
+        </div>
+
+        {loading ? (
+          <div className="py-10 grid place-items-center"><Loader2 size={24} className="text-emerald-400 animate-spin" /></div>
+        ) : (
+          <>
+            <div>
+              <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Nom affiché</label>
+              <input value={form.display_name} onChange={set('display_name')} className={inputCls} />
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Email</label>
+              <div className="relative">
+                <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-500" />
+                <input type="email" value={form.email} onChange={set('email')} className={cn(inputCls, 'pl-9')} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">Nouveau mot de passe (optionnel)</label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <KeyRound size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-500" />
+                  <input type={showPwd ? 'text' : 'password'} value={form.password} onChange={set('password')}
+                    placeholder="Laisser vide pour ne pas changer" className={cn(inputCls, 'pl-9 pr-9')} />
+                  <button type="button" onClick={() => setShowPwd((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-bone-500 hover:text-bone-200">
+                    {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                <button type="button" onClick={genPassword} className="shrink-0 h-10 px-3 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-300 hover:text-emerald-400 transition-colors">Générer</button>
+              </div>
+            </div>
+
+            <button type="button" onClick={sendResetLink} disabled={sendingLink || !form.email}
+              className="flex items-center gap-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300 disabled:opacity-40">
+              {sendingLink ? <Loader2 size={13} className="animate-spin" /> : <Mail size={13} />} Envoyer un lien de réinitialisation par email
+            </button>
+
+            {error && <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400">{error}</div>}
+            {info && <div className="px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">{info}</div>}
+
+            <div className="flex gap-3 justify-end pt-1">
+              <button onClick={onClose} disabled={submitting} className="h-9 px-4 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-50 transition-colors disabled:opacity-50">Annuler</button>
+              <button onClick={submit} disabled={submitting}
+                className="flex items-center gap-2 h-9 px-5 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
+                {submitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Enregistrer
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function UserRow({ profile, saving, onChangeRole, onApprove, onReject, onDelete, onEdit }) {
   const [open, setOpen] = useState(false);
   const { role, role_request } = profile;
   const meta = ROLE_META[role] || ROLE_META.fan;
@@ -456,6 +587,15 @@ function UserRow({ profile, saving, onChangeRole, onApprove, onReject, onDelete 
               )}
             </AnimatePresence>
           </div>
+
+          {/* Éditer (email / mot de passe / nom) */}
+          <button
+            onClick={onEdit}
+            title="Modifier le compte"
+            className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400 hover:border-emerald-500/30 grid place-items-center transition-colors"
+          >
+            <Pencil size={12} />
+          </button>
 
           {/* Supprimer le compte */}
           <button

@@ -11,6 +11,7 @@ import { FanClub } from './pages/FanClub';
 import { FederationDetail } from './pages/FederationDetail';
 import { ClubDetail } from './pages/ClubDetail';
 import { Login } from './pages/Login';
+import { ResetPassword } from './pages/ResetPassword';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOverview } from './pages/admin/AdminOverview';
@@ -87,6 +88,7 @@ export default function App() {
                     }
                   />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route
                     path="/mon-compte"
                     element={

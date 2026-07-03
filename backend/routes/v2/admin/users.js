@@ -10,12 +10,63 @@
 
 const express  = require('express');
 const supabase = require('../../../db/supabase');
+const { requireAuth, requireRole } = require('../../../middleware/auth');
 const router   = express.Router();
 
 const ok   = (res, data, s = 200) => res.status(s).json({ success: true,  data,  error: '' });
 const fail = (res, msg,  s = 400) => res.status(s).json({ success: false, data: null, error: msg });
 
 const VALID_ROLES = ['fan', 'club_admin', 'super_admin'];
+
+// Toute la gestion des comptes est réservée au super_admin.
+router.use(requireAuth, requireRole('super_admin'));
+
+// GET /api/v2/admin/users/:id — détail (dont email auth)
+router.get('/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase.auth.admin.getUserById(req.params.id);
+    if (error || !data?.user) return fail(res, 'Utilisateur introuvable', 404);
+    const { data: prof } = await supabase.from('profiles').select('display_name, role, role_request, club_id').eq('id', req.params.id).maybeSingle();
+    return ok(res, {
+      user: {
+        id: data.user.id, email: data.user.email,
+        display_name: prof?.display_name || null, role: prof?.role || 'fan',
+        role_request: prof?.role_request || null, club_id: prof?.club_id || null,
+      },
+    });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// PATCH /api/v2/admin/users/:id — modifier email / mot de passe / nom
+// body: { email?, password?, display_name? }
+router.patch('/:id', async (req, res) => {
+  try {
+    const { email, password, display_name } = req.body;
+    const authUpdate = {};
+    if (email) authUpdate.email = email;
+    if (password) {
+      if (password.length < 8) return fail(res, 'Le mot de passe doit faire au moins 8 caractères');
+      authUpdate.password = password;
+    }
+    if (Object.keys(authUpdate).length) {
+      // email_confirm: true → le nouvel email est marqué confirmé (pas de mail).
+      if (authUpdate.email) authUpdate.email_confirm = true;
+      const { error } = await supabase.auth.admin.updateUserById(req.params.id, authUpdate);
+      if (error) {
+        const msg = /already.*registered|exists/i.test(error.message) ? 'Cet email est déjà utilisé' : error.message;
+        return fail(res, msg);
+      }
+    }
+    if (display_name !== undefined) {
+      await supabase.from('profiles').update({ display_name }).eq('id', req.params.id);
+    }
+    return ok(res, { updated: true });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
 
 // POST /api/v2/admin/users/create
 // body: { email, password, display_name, role, club_id? }
