@@ -509,7 +509,7 @@ export function Tombola() {
                     </div>
 
                     <ul className="mt-6 grid gap-2">
-                      {game.benefits.slice(0, 3).map((benefit) => (
+                      {game.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-center gap-2 text-xs text-bone-300">
                           <Check size={13} className="text-emerald-400" />
                           {benefit}

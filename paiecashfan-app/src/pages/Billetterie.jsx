@@ -49,7 +49,8 @@ function generateTicketingForClub(club) {
           'Tarifs variables selon tribune',
           'Données à confirmer avec le club'
         ]
-      }
+      },
+      
     ],
 
     tickets: [
@@ -179,7 +180,7 @@ export function Billetterie() {
                     navigate(`/clubs/${club.clubSlug}/billetterie`)
                 }
               >
-                <GlassCard className="relative h-full p-6 overflow-hidden border border-white/10 hover:border-emerald-400/40 transition-all">
+                <GlassCard className="relative flex h-full flex-col p-6 overflow-hidden border border-white/10 hover:border-emerald-400/40 transition-all">
                   <div
                     className="absolute inset-0 opacity-20"
                     style={{
@@ -257,7 +258,7 @@ export function Billetterie() {
                     </ul>
                   </div>
 
-                  <div className="relative mt-6 flex justify-end">
+                  <div className="relative mt-auto pt-6 flex justify-end">
                     <Button
                         variant="primary"
                         size="md"

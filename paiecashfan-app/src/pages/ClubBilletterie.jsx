@@ -215,7 +215,7 @@ export function ClubBilletterie() {
               transition={{ delay: index * 0.04 }}
               onClick={() => setSelectedOffer(offer)}
             >
-              <GlassCard className="h-full p-6 border border-white/10 hover:border-emerald-400/40 transition-all">
+              <GlassCard className="flex h-full flex-col p-6 border border-white/10 hover:border-emerald-400/40 transition-all">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-emerald-400 font-black">
                   {offer.type === 'subscription' ? 'Abonnement' : 'Billet'}
                 </p>
@@ -237,7 +237,7 @@ export function ClubBilletterie() {
                 </p>
 
                 <ul className="mt-5 space-y-2">
-                  {offer.benefits.map((benefit) => (
+                  {offer.benefits.slice(0, 3).map((benefit) => (
                     <li key={benefit} className="flex items-center gap-2 text-xs text-bone-300">
                       <Check size={13} className="text-emerald-400" />
                       {benefit}
@@ -260,7 +260,7 @@ export function ClubBilletterie() {
                   </ul>
                 </div>
 
-                <div className="mt-6 flex justify-end">
+                <div className="mt-auto pt-6 flex justify-end">
                   <Button variant="primary" size="md">
                     <ShoppingBag size={15} />
                     {offer.type === 'subscription' ? 'Souscrire' : 'Acheter'}
