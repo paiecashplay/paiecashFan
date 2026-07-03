@@ -237,7 +237,7 @@ export function ClubBilletterie() {
                 </p>
 
                 <ul className="mt-5 space-y-2">
-                  {offer.benefits.slice(0, 3).map((benefit) => (
+                  {offer.benefits.slice(0, 4).map((benefit) => (
                     <li key={benefit} className="flex items-center gap-2 text-xs text-bone-300">
                       <Check size={13} className="text-emerald-400" />
                       {benefit}
