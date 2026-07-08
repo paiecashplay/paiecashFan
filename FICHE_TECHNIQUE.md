@@ -69,14 +69,22 @@ a tout, le club_admin est **scopé à son `club_id`**.
   club + documents) → super_admin valide (Candidatures) → `club_admin` + accès `/mon-club/bo`.
 - **Fédérations** : hub dynamique en base + repli statique ; import des clubs via API-Football.
 - **Ligue 1 dynamique** : sync API-Football (montées/descentes) → cards d'accueil.
-- **Billetterie** : offres éditables en BO (`metadata.ticketing`), panier localStorage,
-  **checkout PCC → EN COURS**.
+- **Billetterie** : offres éditables en BO (`metadata.ticketing`, prix **PCC + EUR**),
+  panier localStorage, **checkout → EN COURS** (délégué à PaieCashCoin, voir §7).
 
 ## 7. Intégrations externes
 - **API-Football** (v3, clé `apisports`) : import clubs, effectifs, championnats.
 - **Foot Mercato** (scraping) : import palmarès.
-- **Circle** : mint PCC on-chain.
+- **PaieCashCoin** (app séparée, Supabase distinct) : **source du wallet PCC**. Wallet
+  Crossmint + ledger off-chain `pcc_wallet_transactions` (balance = somme, 1 EUR = 1 PCC).
+  Expose une **API v1** (`x-api-key` + scopes) : `POST /api/v1/pay/execute` (modes
+  `pcc_full|pcc_split|card_full|bnpl`) → **le checkout PaieCashFan délègue le paiement ici**.
+  Lien entre les 2 apps par **email** (bonus +5% à la vérification). Repo :
+  `C:\Users\valer\OneDrive\Bureau\PAIECASHCOIN\paiecashcoins`.
+- **Stripe** : recharge wallet (côté PaieCashCoin) + prévu en direct pour les clubs hors
+  PaieCashCoin (Stripe Connect, à venir).
 - **Resend** (à activer en prod) : emails transactionnels (notifications, reset password).
+- ~~Circle~~ : ancien wallet on-chain, **remplacé par Crossmint/PaieCashCoin** (code local legacy).
 
 ## 8. Déploiement
 - Branche déployée : **`main`** (Vercel front + Railway back, auto-deploy).
@@ -90,7 +98,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
-- **2026-07-08** — Merge branche stagiaire : déconnexion auto (IdleLogout), page Fan Club
+- **2026-07-08 (b)** — Billetterie : ajout du **prix EUR** aux offres (BO + affichage
+  public PCC · €), en vue du checkout multi-rails. Exploration de **PaieCashCoin** :
+  wallet Crossmint + API v1 `pay/execute` → le checkout sera délégué à PaieCashCoin
+  (rail PCC), + Stripe direct pour les clubs hors PaieCashCoin.
+- **2026-07-08 (a)** — Merge branche stagiaire : déconnexion auto (IdleLogout), page Fan Club
   redesignée + interaction par club (front/mock), page Transactions club. Création de cette
   fiche technique. Démarrage du **checkout PCC** de la billetterie.
 - **2026-07-03/07** — Inscription club complète (Phases 1→4) : onboarding `/mon-club`,

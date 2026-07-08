@@ -30,7 +30,8 @@ export function buildDefaultTicketing(club) {
         id: `${slug}-season-pass`,
         type: 'subscription',
         name: `Abonnement ${name}`,
-        price: prices.subscription,
+        price: prices.subscription,        // PCC
+        price_eur: prices.subscription,    // EUR (1 EUR = 1 PCC par défaut)
         duration: 'Saison 2026-2027',
         description: `Abonnement saison pour suivre ${name} à domicile.`,
         benefits: [
@@ -50,7 +51,8 @@ export function buildDefaultTicketing(club) {
         id: `${slug}-single-ticket`,
         type: 'ticket',
         name: `Billet match ${name}`,
-        price: prices.ticket,
+        price: prices.ticket,          // PCC
+        price_eur: prices.ticket,      // EUR (1 EUR = 1 PCC par défaut)
         duration: 'Match à domicile',
         description: `Billet individuel pour assister à un match à domicile de ${name}.`,
         benefits: [

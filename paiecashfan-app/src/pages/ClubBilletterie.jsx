@@ -181,7 +181,7 @@ export function ClubBilletterie() {
                 </p>
 
                 <p className="mt-6 font-display text-3xl font-black text-emerald-400">
-                    À partir de {offer.price} PCC 
+                    À partir de {offer.price} PCC{offer.price_eur ? ` · ${offer.price_eur} €` : ''}
                 </p>
 
                 <p className="mt-4 text-sm text-bone-300">
@@ -251,6 +251,8 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
 
   const unitPrice = Number(offer.price) || 0;
   const totalPrice = isSubscription ? unitPrice : unitPrice * qty;
+  const unitEur = Number(offer.price_eur) || 0;
+  const totalEur = isSubscription ? unitEur : unitEur * qty;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4">
@@ -352,8 +354,11 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
                 Total
               </div>
 
-              <div className="font-display text-3xl font-black text-emerald-400 tabular-nums">
-                {formatPCC(totalPrice)} PCC
+              <div className="text-right">
+                <div className="font-display text-3xl font-black text-emerald-400 tabular-nums">
+                  {formatPCC(totalPrice)} PCC
+                </div>
+                {totalEur > 0 && <div className="text-sm text-bone-400 tabular-nums">soit {totalEur.toFixed(2).replace('.', ',')} €</div>}
               </div>
             </div>
           </div>
@@ -376,9 +381,11 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
                 type: offer.type,
                 clubName: club.name,
                 unitPrice,
+                unitEur,
                 quantity: isSubscription ? 1 : qty,
                 totalPrice,
-                priceLabel: `${formatPCC(totalPrice)} PCC`      
+                totalEur,
+                priceLabel: `${formatPCC(totalPrice)} PCC${totalEur ? ` · ${totalEur.toFixed(2).replace('.', ',')} €` : ''}`,
               });
 
                setSuccessMessage(
@@ -405,6 +412,7 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
 
 function TicketingCartModal({ cart, onClose, onRemoveItem }) {
   const total = cart.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
+  const totalEur = cart.reduce((sum, item) => sum + Number(item.totalEur || 0), 0);
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4">
@@ -496,8 +504,11 @@ function TicketingCartModal({ cart, onClose, onRemoveItem }) {
                 Total panier
               </div>
 
-              <div className="font-display text-3xl font-black text-emerald-400">
-                {total.toFixed(2).replace('.', ',')} PCC
+              <div className="text-right">
+                <div className="font-display text-3xl font-black text-emerald-400">
+                  {total.toFixed(2).replace('.', ',')} PCC
+                </div>
+                {totalEur > 0 && <div className="text-sm text-bone-400">soit {totalEur.toFixed(2).replace('.', ',')} €</div>}
               </div>
             </div>
 

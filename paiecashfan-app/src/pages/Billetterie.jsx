@@ -222,7 +222,7 @@ export function Billetterie() {
                       </p>
 
                       <p className="font-display text-3xl font-black text-emerald-400">
-                        À partir de {formatPCC(offer.price)} PCC 
+                        À partir de {formatPCC(offer.price)} PCC{offer.price_eur ? ` · ${offer.price_eur} €` : ''}
                       </p>
                     </div>
 

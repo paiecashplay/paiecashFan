@@ -1272,7 +1272,7 @@ function blankOffer(type) {
   const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
     ? crypto.randomUUID()
     : `offer-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  return { id, type, name: '', price: 0, duration: '', description: '', benefits: [], conditions: [] };
+  return { id, type, name: '', price: 0, price_eur: 0, duration: '', description: '', benefits: [], conditions: [] };
 }
 
 function OfferSection({ title, offers = [], onChange, onAdd, onRemove }) {
@@ -1322,13 +1322,18 @@ function OfferEditor({ offer, onChange, onRemove }) {
           <Trash2 size={12} />
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Field label="Nom de l'offre" cls="md:col-span-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Field label="Nom de l'offre" cls="col-span-2">
           <input value={offer.name || ''} onChange={(e) => onChange({ name: e.target.value })} className={input()} />
         </Field>
         <Field label="Prix (PCC)">
           <input type="number" min="0" value={offer.price ?? ''}
             onChange={(e) => onChange({ price: e.target.value === '' ? '' : Number(e.target.value) })}
+            className={input()} />
+        </Field>
+        <Field label="Prix (EUR)">
+          <input type="number" min="0" step="0.01" value={offer.price_eur ?? ''}
+            onChange={(e) => onChange({ price_eur: e.target.value === '' ? '' : Number(e.target.value) })}
             className={input()} />
         </Field>
       </div>
