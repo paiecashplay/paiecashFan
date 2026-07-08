@@ -24,10 +24,13 @@ import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
 import { Transactions } from './pages/Transaction';
+import { IdleLogout } from './components/IdleLogout';
 
 export default function App() {
   return (
     <AuthProvider>
+      {/* Gestion de la déconnexion automatique après inactivité */}
+       <IdleLogout />
       {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}
       <ScrollToTop />
       {/* Routes admin : pas de Navbar/Footer public */}
