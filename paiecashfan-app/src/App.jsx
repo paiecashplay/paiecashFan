@@ -27,10 +27,14 @@ import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
 import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
+import { Transactions } from './pages/Transaction';
+import { IdleLogout } from './components/IdleLogout';
 
 export default function App() {
   return (
     <AuthProvider>
+      {/* Gestion de la déconnexion automatique après inactivité */}
+       <IdleLogout />
       {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}
       <ScrollToTop />
       {/* Routes admin : pas de Navbar/Footer public */}
@@ -87,6 +91,7 @@ export default function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route path="/clubs/:slug/transactions" element={<Transactions />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route
