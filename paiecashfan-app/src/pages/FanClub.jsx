@@ -97,7 +97,7 @@ export function FanClub() {
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-6 md:p-8">
           <div
             className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full blur-3xl opacity-30"
             style={{ background: mockClub.primaryColor }}
@@ -109,7 +109,7 @@ export function FanClub() {
               Fan Club Live
             </div>
 
-            <h1 className="mt-5 font-display text-4xl md:text-6xl font-black uppercase text-bone-50">
+            <h1 className="mt-5 break-words font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl md:text-6xl">
               {mockClub.name}
             </h1>
 
@@ -119,7 +119,7 @@ export function FanClub() {
           </div>
         </header>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-3 md:mt-8 md:grid-cols-2">
           <StreamingModeCard
             active={mode === 'club'}
             icon={<Video size={22} />}
@@ -152,9 +152,9 @@ export function FanClub() {
           fanPoints={fanPoints}
         />
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_420px]">
+        <div className="mt-6 grid gap-5 md:mt-8 xl:grid-cols-[minmax(0,1.5fr)_420px]">
           <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+            <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div>
                 <h2 className="text-sm font-black uppercase tracking-[0.18em] text-bone-100">
                   Live officiel
@@ -208,7 +208,7 @@ export function FanClub() {
               Communauté
             </p>
 
-            <h2 className="mt-2 font-display text-3xl font-black uppercase text-bone-50">
+            <h2 className="mt-2 break-words font-display text-2xl font-black uppercase text-bone-50 sm:text-3xl">
               Publications des supporters
             </h2>
 
@@ -258,7 +258,7 @@ function StreamingModeCard({
   return (
     <button
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-3xl border p-6 text-left transition-all hover:-translate-y-1 ${
+      className={`group relative min-h-[160px] overflow-hidden rounded-3xl border p-5 text-left transition-all hover:-translate-y-1 sm:p-6 ${
         active
           ? activeClasses
           : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
