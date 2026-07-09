@@ -48,3 +48,11 @@ export function formatPCC(amount) {
     maximumFractionDigits: 2
   }).format(amount);
 }
+
+// Formate un montant en euro avec symbole et séparateur de milliers
+export function formatEuro(amount) {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(Number(amount || 0));
+}
