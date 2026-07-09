@@ -55,7 +55,7 @@ export function MonClubBO() {
 
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            {club?.logo_url && <img src={club.logo_url} alt="" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-contain bg-white/5 border border-white/10" />}
+            {club?.logo_url && <img src={club.logo_url} alt="" className="h-12 w-12 sm:h-12 sm:w-12 rounded-xl object-contain bg-white/5 border border-white/10" />}
             <div>
               <h1 className="font-display text-xl sm:text-2xl font-black text-bone-50 break-words">{club?.name || 'Mon club'}</h1>
               <p className="text-xs text-bone-400 mt-0.5">
@@ -74,10 +74,10 @@ export function MonClubBO() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-white/8 bg-ink-800/40 p-1 pb-2 w-full sm:w-fit mb-6">
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-white/8 bg-ink-800/40 p-1 pb-2 w-full sm:w-fit mb-6 scrollbar-hide">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={cn('flex shrink-0 items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
+              className={cn('flex min-h-10 shrink-0 items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
                 tab === id ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'text-bone-400 hover:text-bone-200')}>
               <Icon size={13} /> {label}
             </button>
@@ -181,7 +181,7 @@ function ClubInfoForm({ club, onSaved }) {
   );
 }
 
-const inp = 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
+const inp = 'w-full min-h-11 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
 function Field({ label, children }) {
   return <div><label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>{children}</div>;
 }
@@ -190,12 +190,12 @@ function UploadField({ label, preview, square, inputRef, onPick, uploading, onUr
     <div>
       <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-        {preview && <img src={preview} alt="" className={cn('object-cover bg-white/5 border border-white/10 mx-auto sm:mx-0 shrink-0', square ? 'h-14 w-14 rounded-xl object-contain' : 'h-14 w-20 rounded-xl')} />}
+        {preview && <img src={preview} alt="" className={cn('object-cover bg-white/5 border border-white/10 mx-auto sm:mx-0 shrink-0', square ? 'h-16 w-16 rounded-xl object-contain' : 'h-14 w-20 rounded-xl')} />}
         <div className="flex-1 space-y-2">
           <input value={value} onChange={onUrl} placeholder="https://… ou upload" className={inp} />
           <input type="file" accept="image/*" ref={inputRef} onChange={(e) => onPick(e.target.files?.[0])} className="hidden" />
           <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
-            className="flex items-center gap-2 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
+            className="flex min-h-10 items-center gap-2 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
             <Upload size={13} /> {uploading ? 'Upload…' : 'Uploader'}
           </button>
         </div>
