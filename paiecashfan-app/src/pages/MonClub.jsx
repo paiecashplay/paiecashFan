@@ -27,8 +27,8 @@ export function MonClub() {
   const { application, loading, reload } = useOnboarding();
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] py-12">
-      <Container className="max-w-3xl">
+    <div className="relative min-h-[calc(100vh-80px)] py-8 sm:py-12">
+      <Container className="max-w-3xl px-4 sm:px-6">
         <Link to="/" className="inline-flex items-center gap-2 text-xs text-bone-400 hover:text-bone-100 mb-8 transition-colors">
           <ArrowLeft size={14} /> Retour au site
         </Link>
@@ -146,13 +146,13 @@ function Wizard({ application, reload }) {
       )}
 
       {/* Étapes */}
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {steps.map((s, i) => (
-          <div key={s.n} className="flex items-center gap-2">
+          <div key={s.n} className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => { if (s.n === 1 || application?.tenant_id) setStep(s.n); }}
               className={cn(
-                'inline-flex items-center gap-2 h-9 px-3 rounded-full text-xs font-bold transition-colors',
+                'inline-flex min-h-10 shrink-0 items-center gap-2 px-3 rounded-full text-xs font-bold transition-colors',
                 step === s.n ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                   : 'bg-white/5 text-bone-400 border border-white/10'
               )}
@@ -211,10 +211,10 @@ function StepClub({ application, reload, onDone, showToast }) {
       <h2 className="font-display font-bold text-bone-50 mb-1">Quel club représentes-tu ?</h2>
       <p className="text-xs text-bone-400 mb-4">Revendique un club déjà référencé, ou crée-le s'il n'existe pas encore.</p>
 
-      <div className="flex gap-2 mb-5">
+      <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
         {[['existing', 'Club existant'], ['new', 'Nouveau club']].map(([m, label]) => (
           <button key={m} onClick={() => setMode(m)}
-            className={cn('flex-1 h-10 rounded-xl text-xs font-bold border transition-colors',
+            className={cn('min-h-11 rounded-xl text-xs font-bold border transition-colors',
               mode === m ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                 : 'bg-white/5 text-bone-400 border-white/10 hover:text-bone-200')}>
             {label}
@@ -240,7 +240,7 @@ function StepClub({ application, reload, onDone, showToast }) {
 
       <div className="mt-6 flex justify-end">
         <button onClick={save} disabled={!canSave || saving}
-          className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
+          className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-2 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
           {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />} Continuer
         </button>
       </div>
@@ -323,10 +323,10 @@ function StepDocuments({ application, reload, onBack, onDone, showToast }) {
         ))}
       </div>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button onClick={onBack} className="h-11 px-5 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-50 transition-colors">Précédent</button>
         <button onClick={onDone} disabled={!requiredOk}
-          className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
+          className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-2 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
           Continuer <Check size={15} />
         </button>
       </div>
@@ -363,7 +363,7 @@ function DocRow({ def, files, reload, showToast }) {
 
   return (
     <div className="rounded-xl border border-white/10 bg-ink-900/40 p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-sm font-semibold text-bone-100 flex items-center gap-2">
             {def.label} {def.required && <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">Requis</span>}
@@ -373,7 +373,7 @@ function DocRow({ def, files, reload, showToast }) {
         <input ref={inputRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className="hidden"
           onChange={(e) => upload(e.target.files?.[0])} />
         <button onClick={() => inputRef.current?.click()} disabled={busy}
-          className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-40">
+          className="shrink-0 inline-flex items-center gap-1.5 min-h-10 px-3 rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-40">
           {busy ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />} Ajouter
         </button>
       </div>
@@ -423,10 +423,10 @@ function StepSubmit({ application, reload, onBack, showToast }) {
         En soumettant, tu confirmes être habilité à représenter ce club. Notre équipe vérifiera tes documents avant de t'ouvrir l'accès complet au back-office.
       </div>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button onClick={onBack} className="h-11 px-5 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-50 transition-colors">Précédent</button>
         <button onClick={submit} disabled={submitting}
-          className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
+          className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-2 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
           {submitting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} Soumettre ma candidature
         </button>
       </div>
@@ -436,9 +436,27 @@ function StepSubmit({ application, reload, onBack, showToast }) {
 
 // ─── petits helpers UI ────────────────────────────────────────────────
 const inputCls = 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
-function Panel({ children }) { return <div className="rounded-2xl border border-white/10 bg-ink-800/50 p-6">{children}</div>; }
+function Panel({ children }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-ink-800/50 p-4 sm:p-6">
+      {children}
+    </div>
+  );
+}
 function Labeled({ label, children }) { return <div><label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>{children}</div>; }
-function Row({ label, children }) { return <div className="flex items-center justify-between gap-4"><dt className="text-bone-500">{label}</dt><dd>{children}</dd></div>; }
+function Row({ label, children }) {
+  return (
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <dt className="text-bone-500">
+        {label}
+      </dt>
+
+      <dd className="sm:text-right">
+        {children}
+      </dd>
+    </div>
+  );
+}
 function Banner({ tone, icon: Icon, text }) {
   const c = tone === 'red' ? 'border-red-500/20 bg-red-500/10 text-red-400' : 'border-amber-500/20 bg-amber-500/10 text-amber-400';
   return <div className={cn('flex items-start gap-2 rounded-xl border px-4 py-3 text-xs font-semibold', c)}><Icon size={15} className="shrink-0 mt-0.5" />{text}</div>;
