@@ -184,7 +184,7 @@ function ApplicationModal({ id, onClose, onReviewed }) {
             <div className="space-y-2 mb-5">
               {(app.documents || []).length === 0 && <p className="text-xs text-bone-500">Aucun document.</p>}
               {(app.documents || []).map((d) => (
-                <div key={d.path} className="flex items-center gap-2 rounded-lg border border-white/10 bg-ink-900/40 px-3 py-2">
+                <div key={d.path} className="flex flex-col gap-3 rounded-lg border border-white/10 bg-ink-900/40 px-3 py-2 sm:flex-row sm:items-center">
                   <FileText size={14} className="text-emerald-400 shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-semibold text-bone-100 truncate">{DOC_LABEL[d.type] || d.type}</div>
@@ -229,10 +229,17 @@ function ApplicationModal({ id, onClose, onReviewed }) {
 
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center gap-2 text-bone-300">
-      <Icon size={13} className="text-bone-500 shrink-0" />
-      <span className="text-bone-500 text-xs">{label} :</span>
-      <span className="text-bone-100 truncate">{value}</span>
+    <div className="flex flex-col gap-1 text-bone-300 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-2 shrink-0">
+        <Icon size={13} className="text-bone-500" />
+        <span className="text-xs text-bone-500">
+          {label} :
+        </span>
+      </div>
+
+      <span className="break-all text-bone-100">
+        {value}
+      </span>
     </div>
   );
 }
