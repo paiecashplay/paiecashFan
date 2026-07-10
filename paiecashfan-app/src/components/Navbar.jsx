@@ -244,7 +244,7 @@ function UserMenu() {
             )}
 
             <DropItem icon={<User size={14} />} label="Mon compte" to="/mon-compte" onClose={() => setDropOpen(false)} />
-            <DropItem icon={<Settings size={14} />} label="Paramètres" to="/mon-compte" onClose={() => setDropOpen(false)} />
+            <DropItem icon={<Settings size={14} />} label="Paramètres" to="/parametres" onClose={() => setDropOpen(false)} />
 
             <div className="border-t border-white/5">
               <button

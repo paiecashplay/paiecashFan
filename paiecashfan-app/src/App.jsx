@@ -30,6 +30,7 @@ import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
 import { MonCompte } from './pages/MonCompte';
+import { Parametres } from './pages/Parametres';
 import { CheckoutReturn } from './pages/CheckoutReturn';
 import { IdleLogout } from './components/IdleLogout';
 
@@ -111,6 +112,14 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <MonCompte />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/parametres"
+                    element={
+                      <ProtectedRoute>
+                        <Parametres />
                       </ProtectedRoute>
                     }
                   />

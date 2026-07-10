@@ -411,13 +411,12 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
 
                setSuccessMessage(
                     isSubscription
-                    ? 'Abonnement ajouté au panier avec succès.'
-                    : 'Billet ajouté au panier avec succès.'
+                    ? 'Abonnement ajouté au panier.'
+                    : 'Billet ajouté au panier.'
                 );
 
-                setTimeout(() => {
-                    setSuccessMessage('');
-                }, 2500);
+                // Ferme automatiquement la fenêtre après un bref retour visuel.
+                setTimeout(() => { onClose(); }, 900);
 
             }}>
 
