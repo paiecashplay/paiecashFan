@@ -109,7 +109,7 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   automatiquement** après ajout. Nouvelle page **`/parametres`** (menu compte →
   Paramètres) : **upload photo de profil** (avatar → Supabase Storage via
   `/clubs-crud/upload`, `updateProfile({avatar_url})`), édition nom, email, lien
-  mot de passe.
+  mot de passe. Avatar reflété dans la **navbar** (desktop + mobile).
 - **2026-07-11 (b)** — **Checkout multi-rails** (carte / mixte / BNPL). Le panier
   billetterie propose 4 modes (PCC / Carte / PCC+carte / 3×-4×). `pcc_full` inchangé
   (débit immédiat). Modes carte → PaieCashCoin renvoie une **Stripe Checkout URL** :

@@ -191,8 +191,10 @@ function UserMenu() {
         onClick={() => setDropOpen(v => !v)}
         className="inline-flex items-center gap-2 h-10 pl-1 pr-3 rounded-full border border-emerald-500/30 bg-white/5 backdrop-blur-md hover:border-emerald-500/60 transition-colors"
       >
-        <span className="h-7 w-7 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-400 ring-2 ring-ink-800 grid place-items-center text-[11px] font-black text-white">
-          {initials}
+        <span className="h-7 w-7 overflow-hidden rounded-full bg-gradient-to-br from-emerald-500 to-cyan-400 ring-2 ring-ink-800 grid place-items-center text-[11px] font-black text-white">
+          {profile?.avatar_url
+            ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            : initials}
         </span>
         <span className="text-xs font-bold text-bone-50 max-w-[90px] truncate">
           {profile?.display_name || user.email?.split('@')[0]}
@@ -276,7 +278,7 @@ function DropItem({ icon, label, to, onClose }) {
 
 // ─── Mobile auth button (icon uniquement) ────────────────────
 function MobileAuthButton() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
 
   if (!user) return (
@@ -291,9 +293,11 @@ function MobileAuthButton() {
   return (
     <Link
       to="/mon-compte"
-      className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-emerald-500 to-cyan-400 text-white text-xs font-black"
+      className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-emerald-500 to-cyan-400 text-white text-xs font-black"
     >
-      {(user.email || '?')[0].toUpperCase()}
+      {profile?.avatar_url
+        ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+        : (user.email || '?')[0].toUpperCase()}
     </Link>
   );
 }
