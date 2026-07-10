@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-07-08.
+> Dernière mise à jour : 2026-07-10.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -70,17 +70,24 @@ a tout, le club_admin est **scopé à son `club_id`**.
 - **Fédérations** : hub dynamique en base + repli statique ; import des clubs via API-Football.
 - **Ligue 1 dynamique** : sync API-Football (montées/descentes) → cards d'accueil.
 - **Billetterie** : offres éditables en BO (`metadata.ticketing`, prix **PCC + EUR**),
-  panier localStorage, **checkout → EN COURS** (délégué à PaieCashCoin, voir §7).
+  panier localStorage, **checkout PCC branché** (délégué à PaieCashCoin, voir §7) :
+  prix recalculés serveur, paiement `pcc_full`, création de commande + confirmation.
 
 ## 7. Intégrations externes
 - **API-Football** (v3, clé `apisports`) : import clubs, effectifs, championnats.
 - **Foot Mercato** (scraping) : import palmarès.
 - **PaieCashCoin** (app séparée, Supabase distinct) : **source du wallet PCC**. Wallet
   Crossmint + ledger off-chain `pcc_wallet_transactions` (balance = somme, 1 EUR = 1 PCC).
-  Expose une **API v1** (`x-api-key` + scopes) : `POST /api/v1/pay/execute` (modes
-  `pcc_full|pcc_split|card_full|bnpl`) → **le checkout PaieCashFan délègue le paiement ici**.
+  Expose une **API v1** (`Authorization: Bearer pcc_live_…` + scopes) sur
+  `https://www.paiecashcoin.com/api/v1` : `GET /users/resolve?email=`,
+  `POST /pay/quote`, `POST /pay/execute` (modes `pcc_full|pcc_split|card_full|bnpl`).
+  Le checkout PaieCashFan délègue le paiement ici — **client** :
+  `backend/services/paiecashcoin.js`, **endpoint** : `POST /api/v2/checkout/ticketing`.
   Lien entre les 2 apps par **email** (bonus +5% à la vérification). Repo :
   `C:\Users\valer\OneDrive\Bureau\PAIECASHCOIN\paiecashcoins`.
+  ⚠️ **Limites actuelles (côté PaieCashCoin, à finir)** : `pay/execute` ne renvoie
+  pas d'URL Stripe → seul `pcc_full` aboutit (MVP PCC-only) ; `merchantRef` est
+  seulement stocké → le **club n'est pas encore crédité** (chantier séparé).
 - **Stripe** : recharge wallet (côté PaieCashCoin) + prévu en direct pour les clubs hors
   PaieCashCoin (Stripe Connect, à venir).
 - **Resend** (à activer en prod) : emails transactionnels (notifications, reset password).
@@ -98,6 +105,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-10** — **Checkout PCC de la billetterie branché** (MVP PCC-only).
+  Backend : client `services/paiecashcoin.js` (resolve/quote/execute, Bearer, sans
+  retry sur execute), `services/ticketingPricing.js` (prix recalculés serveur),
+  endpoint `POST /api/v2/checkout/ticketing` (`requireAuth`, regroupe par club,
+  quote → si solde PCC < total renvoie `402 needTopUp`, sinon `execute` en
+  `pcc_full` + crée la commande `status='paid'`, `merchantRef=paiecashfan:<slug>`).
+  Front : bouton « Payer Maintenant » branché (états chargement/succès/recharge/
+  non-connecté), écran de confirmation, vidage du panier ; `clubSlug` injecté dans
+  les items. Env : `PAIECASHCOIN_API_URL/KEY` (backend), `VITE_PAIECASHCOIN_URL`.
 - **2026-07-08 (b)** — Billetterie : ajout du **prix EUR** aux offres (BO + affichage
   public PCC · €), en vue du checkout multi-rails. Exploration de **PaieCashCoin** :
   wallet Crossmint + API v1 `pay/execute` → le checkout sera délégué à PaieCashCoin

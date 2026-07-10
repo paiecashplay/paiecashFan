@@ -1,17 +1,21 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Ticket,
   CalendarDays,
   Check,
+  CheckCircle2,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Minus,
   Plus,
-  Trash2
+  Trash2,
+  Wallet,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -19,8 +23,12 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { useTicketingCart } from '@/hooks/useTicketingCart';
+import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/lib/api';
 import { formatPCC } from '@/data/clubMerchandise';
 import { buildDefaultTicketing } from '@/utils/ticketingPrices';
+
+const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
 
 function QtyButton({ children, onClick, ariaLabel }) {
   return (
@@ -37,9 +45,10 @@ function QtyButton({ children, onClick, ariaLabel }) {
 
 export function ClubBilletterie() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { club, loading } = useClubDetail(slug);
   const [activeTab, setActiveTab] = useState('subscriptions');
-  const { cart, addItem, removeItem } = useTicketingCart();
+  const { cart, addItem, removeItem, clear } = useTicketingCart();
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -229,7 +238,7 @@ export function ClubBilletterie() {
             club={club}
             offer={selectedOffer}
             onClose={() => setSelectedOffer(null)}
-            onAddToCart={(item) => addItem(item)}
+            onAddToCart={(item) => addItem({ ...item, clubSlug: slug })}
         />
        )}
 
@@ -238,6 +247,8 @@ export function ClubBilletterie() {
             cart={cart}
             onClose={() => setIsCartOpen(false)}
             onRemoveItem={(indexToRemove) => removeItem(indexToRemove)}
+            onClearCart={clear}
+            navigate={navigate}
         />
         )}
     </div>
@@ -410,9 +421,105 @@ function TicketingOfferModal({ club, offer, onClose, onAddToCart }) {
 }
 
 
-function TicketingCartModal({ cart, onClose, onRemoveItem }) {
+function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate }) {
+  const { user } = useAuth();
   const total = cart.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
   const totalEur = cart.reduce((sum, item) => sum + Number(item.totalEur || 0), 0);
+
+  // 'idle' | 'paying' | 'success' — plus messages d'erreur / solde insuffisant.
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState('');
+  const [topUp, setTopUp] = useState(null);        // { balance, missing } si solde insuffisant
+  const [confirmation, setConfirmation] = useState(null);
+
+  async function handleCheckout() {
+    setError('');
+    setTopUp(null);
+
+    if (!user) {
+      setError('Connecte-toi pour finaliser ton paiement.');
+      return;
+    }
+
+    // On n'envoie que { clubSlug, offerId, quantity } : le serveur recalcule les prix.
+    const items = cart
+      .filter((it) => it.clubSlug)
+      .map((it) => ({ clubSlug: it.clubSlug, offerId: it.id, quantity: it.quantity }));
+
+    if (!items.length) {
+      setError('Panier invalide, vide-le et rajoute tes billets.');
+      return;
+    }
+
+    setStatus('paying');
+    try {
+      const res = await apiFetch('/api/v2/checkout/ticketing', {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      });
+      setConfirmation(res?.data || null);
+      setStatus('success');
+      onClearCart?.();
+    } catch (err) {
+      // apiFetch remonte le message backend. On détecte le cas "recharge".
+      const msg = err?.message || 'Paiement impossible pour le moment.';
+      if (/insuffisant|wallet|recharge|PCC/i.test(msg)) {
+        setTopUp({ message: msg });
+      } else {
+        setError(msg);
+      }
+      setStatus('idle');
+    }
+  }
+
+  // ── Écran de confirmation après paiement ──────────────────────
+  if (status === 'success') {
+    return (
+      <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="w-full max-w-md rounded-3xl border border-emerald-400/30 bg-ink-950 p-8 text-center shadow-2xl"
+        >
+          <CheckCircle2 className="mx-auto text-emerald-400" size={54} />
+          <h3 className="mt-4 font-display text-2xl font-black uppercase text-bone-50">
+            Paiement confirmé
+          </h3>
+          <p className="mt-3 text-sm text-bone-300">
+            Ton paiement de{' '}
+            <span className="font-bold text-emerald-400">
+              {Number(confirmation?.totalEur || totalEur).toFixed(2).replace('.', ',')} €
+            </span>{' '}
+            en PCC a bien été pris en compte.
+          </p>
+
+          {Array.isArray(confirmation?.orders) && confirmation.orders.length > 0 && (
+            <div className="mt-5 space-y-2 text-left">
+              {confirmation.orders.map((o) => (
+                <div key={o.reference} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-xs font-black text-bone-100">{o.clubName}</p>
+                  <p className="mt-1 text-[11px] text-bone-500">Réf. {o.reference}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-7 flex flex-col gap-2">
+            <Button variant="primary" size="md" onClick={() => navigate?.('/mon-compte')}>
+              Voir mes commandes
+            </Button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs uppercase tracking-[0.18em] font-black text-bone-400 hover:text-bone-100"
+            >
+              Fermer
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4">
@@ -512,10 +619,55 @@ function TicketingCartModal({ cart, onClose, onRemoveItem }) {
               </div>
             </div>
 
+            {error && (
+              <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {topUp && (
+              <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+                <div className="flex items-start gap-2 text-sm text-amber-200">
+                  <Wallet size={16} className="mt-0.5 shrink-0" />
+                  <span>{topUp.message}</span>
+                </div>
+                <a
+                  href={`${PCC_APP_URL}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-ink-900 hover:bg-amber-300 transition"
+                >
+                  <Wallet size={14} />
+                  Recharger mon wallet PCC
+                </a>
+              </div>
+            )}
+
+            {!user && !error && (
+              <p className="mt-4 text-center text-xs text-bone-500">
+                Tu dois être connecté pour payer.
+              </p>
+            )}
+
             <div className="mt-6 flex justify-end">
-              <Button variant="primary" size="md">
-                <ShoppingBag size={15} />
-                  Payer Maintenant
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleCheckout}
+                disabled={status === 'paying'}
+              >
+                {status === 'paying' ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" />
+                    Paiement...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag size={15} />
+                    Payer Maintenant
+                  </>
+                )}
               </Button>
             </div>
           </div>
