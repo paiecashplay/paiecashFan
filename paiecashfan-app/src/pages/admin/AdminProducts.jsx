@@ -102,10 +102,43 @@ export function AdminProducts() {
       <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-3">
-            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+            {Array.from({ length: 6 }).map((_, i) => 
+              <div
+                key={i}
+                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-4"
+              >
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-8 w-24 rounded-lg" /> 
+              </div>
+            )}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 text-center text-sm text-bone-500">Aucun produit trouvé</div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="mb-4 rounded-full bg-white/5 p-4">
+              <Search
+                size={28}
+                className="text-bone-500"
+              />
+            </div>
+
+            <h3 className="text-lg font-bold text-bone-100">
+              Aucun produit trouvé
+            </h3>
+
+            <p className="mt-2 text-sm text-bone-500">
+              Aucun produit ne correspond à votre recherche.
+            </p>
+
+            <button
+              onClick={() => setSearch('')}
+              className="mt-5 rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-bone-200 transition hover:bg-white/10"
+            >
+              Réinitialiser la recherche
+            </button>
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
