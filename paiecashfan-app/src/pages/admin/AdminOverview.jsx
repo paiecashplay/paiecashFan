@@ -52,8 +52,10 @@ export function AdminOverview() {
         <AlertCard loading={loading} icon={<AlertTriangle size={16} />} label="Signalements fraude ouverts"    value={data?.openFraudFlags}            to="/admin/fraud" color="red" />
       </div>
 
-      {/* Treasury */}
-      {!loading && data?.treasury && (
+      {/* Treasury — masqué tant qu'il n'y a pas de données réelles.
+          Le wallet PCC vit désormais sur PaieCashCoin : le treasury Circle
+          historique est à zéro (adresse nulle), inutile d'afficher des zéros. */}
+      {!loading && data?.treasury && hasMeaningfulTreasury(data.treasury) && (
         <div className="rounded-2xl border border-white/10 bg-ink-800/50 p-6">
           <h2 className="font-display font-bold text-bone-100 mb-4 text-sm uppercase tracking-widest">
             Treasury
@@ -70,6 +72,19 @@ export function AdminOverview() {
       )}
     </div>
   );
+}
+
+// Le treasury n'a de sens que s'il porte au moins une valeur numérique > 0
+// (sinon c'est le résidu Circle legacy, tout à zéro → on masque le bloc).
+function hasMeaningfulTreasury(t) {
+  const anyPositive = (v) => {
+    if (typeof v === 'number') return v > 0;
+    if (v && typeof v === 'object') return Object.values(v).some(anyPositive);
+    return false;
+  };
+  return Object.entries(t)
+    .filter(([k]) => !['logs', 'error'].includes(k))
+    .some(([, v]) => anyPositive(v));
 }
 
 // Formate une valeur de treasury : nombre localisé, objet aplati en

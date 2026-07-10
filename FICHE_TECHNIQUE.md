@@ -105,7 +105,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
-- **2026-07-10** — **Checkout PCC de la billetterie branché** (MVP PCC-only).
+- **2026-07-10 (b)** — **Fix commande billetterie + vue Commandes admin**.
+  Bug : `orders.transaction_id` est un **uuid** et `status='paid'` viole
+  `orders_status_check` → la commande n'était jamais écrite (le fan payait sans
+  commande, cards admin Transactions/Volume PCC à 0). Fix checkout : `transaction_id=null`
+  (réf PCC dans `metadata.notes`), statut **`completed`**. Nouveau
+  `GET /api/v2/admin/orders` (filtre statut + pagination, noms club/acheteur) +
+  page **AdminOrders** + entrée menu « Commandes ». Card **Treasury** legacy
+  (Circle, zéros) masquée tant qu'aucune donnée réelle.
+- **2026-07-10 (a)** — **Checkout PCC de la billetterie branché** (MVP PCC-only).
   Backend : client `services/paiecashcoin.js` (resolve/quote/execute, Bearer, sans
   retry sur execute), `services/ticketingPricing.js` (prix recalculés serveur),
   endpoint `POST /api/v2/checkout/ticketing` (`requireAuth`, regroupe par club,

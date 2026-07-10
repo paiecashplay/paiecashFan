@@ -168,6 +168,62 @@ router.get('/overview', async (req, res) => {
   }
 });
 
+// GET /api/v2/admin/orders?status=&page=&limit=
+// Liste des commandes (hors panier) enrichies du nom de club + acheteur.
+router.get('/orders', async (req, res) => {
+  try {
+    const supabase = require('../../../db/supabase');
+    const status = req.query.status;
+    const page  = Math.max(1, parseInt(req.query.page, 10)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 30));
+    const from  = (page - 1) * limit;
+
+    let q = supabase
+      .from('orders')
+      .select('id, user_id, tenant_id, total_pcc, status, created_at, metadata', { count: 'exact' })
+      .neq('status', 'cart');
+    if (status && status !== 'all') q = q.eq('status', status);
+    q = q.order('created_at', { ascending: false }).range(from, from + limit - 1);
+
+    const { data: orders, count, error } = await q;
+    if (error) throw error;
+
+    // Enrichissement : noms de clubs + acheteurs (2 requêtes groupées).
+    const tenantIds = [...new Set((orders || []).map(o => o.tenant_id).filter(Boolean))];
+    const userIds   = [...new Set((orders || []).map(o => o.user_id).filter(Boolean))];
+
+    const [tenantsRes, profilesRes] = await Promise.all([
+      tenantIds.length ? supabase.from('tenants').select('id, name, slug').in('id', tenantIds) : Promise.resolve({ data: [] }),
+      userIds.length   ? supabase.from('profiles').select('id, display_name').in('id', userIds) : Promise.resolve({ data: [] }),
+    ]);
+    const tenantMap  = Object.fromEntries((tenantsRes.data  || []).map(t => [t.id, t]));
+    const profileMap = Object.fromEntries((profilesRes.data || []).map(p => [p.id, p]));
+
+    const safeParse = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || null); } catch { return null; } };
+
+    const rows = (orders || []).map(o => {
+      const notes = safeParse(o.metadata?.notes);
+      return {
+        id: o.id,
+        createdAt: o.created_at,
+        status: o.status,
+        clubName: tenantMap[o.tenant_id]?.name || '—',
+        clubSlug: tenantMap[o.tenant_id]?.slug || null,
+        buyer: profileMap[o.user_id]?.display_name || o.user_id,
+        totalPcc: Number(o.total_pcc || 0),
+        totalEur: Number(o.metadata?.total_eur || 0),
+        items: o.metadata?.items || [],
+        kind: notes?.kind || (Array.isArray(o.metadata?.items) && o.metadata.items.some(i => i.offerId) ? 'ticketing' : 'product'),
+        reference: notes?.pccReference || null,
+      };
+    });
+
+    return ok(res, { orders: rows, total: count ?? 0, page, limit });
+  } catch (err) {
+    return fail(res, 'Orders fetch failed: ' + err.message, 500);
+  }
+});
+
 // GET /api/v2/admin/users
 router.get('/users', async (req, res) => {
   try {

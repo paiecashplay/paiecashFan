@@ -18,6 +18,7 @@ import { AdminOverview } from './pages/admin/AdminOverview';
 import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminClubs } from './pages/admin/AdminClubs';
 import { AdminProducts } from './pages/admin/AdminProducts';
+import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
 import { AdminFederations } from './pages/admin/AdminFederations';
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="clubs/new"           element={<AdminClubEdit />} />
           <Route path="clubs/:id/edit"      element={<AdminClubEdit />} />
           <Route path="products"            element={<AdminProducts />} />
+          <Route path="orders"              element={<AdminOrders />} />
           <Route path="settings"            element={<AdminSettings />} />
         </Route>
 

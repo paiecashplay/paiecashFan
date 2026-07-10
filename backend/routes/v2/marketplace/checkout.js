@@ -141,12 +141,16 @@ router.post('/ticketing', async (req, res) => {
       }
 
       // Commande PaieCashFan (traçabilité, historique fan + club).
+      // NB : `orders.transaction_id` est un uuid (FK ledger interne) → on n'y
+      // met PAS la référence PaieCashCoin (format "PCC-…"), elle est stockée
+      // dans metadata.notes. Statut "completed" (paiement abouti) — "paid"
+      // n'est pas autorisé par la contrainte orders_status_check.
       let orderId = null;
       try {
         const order = await ordersDb.createOrder({
           user_id: authId,
           tenant_id: g.tenant.id,
-          transaction_id: pay.reference,
+          transaction_id: null,
           items: g.orderItems,
           total_pcc: g.totalPcc,
           total_eur: g.totalEur,
@@ -160,7 +164,7 @@ router.post('/ticketing', async (req, res) => {
           }),
         });
         orderId = order.id;
-        await ordersDb.updateOrderStatus(order.id, 'paid');
+        await ordersDb.updateOrderStatus(order.id, 'completed');
       } catch (orderErr) {
         // Le paiement a réussi : on ne bloque pas le fan si la commande locale
         // échoue à s'écrire, mais on le logue pour réconciliation.
