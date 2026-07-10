@@ -7,11 +7,7 @@ import { LiveChat } from '@/components/fanclub/LiveChat';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
-import {
-  mockFans,
-  mockFanPosts,
-  mockComments
-} from '@/data/clubMocks';
+import { useFanFeed } from '@/hooks/useFanFeed';
 
 const mockClub = {
   name: 'Paris Saint-Germain',
@@ -21,61 +17,43 @@ const mockClub = {
 
 export function FanClub() {
   const [mode, setMode] = useState('club');
-
-  const [clubPosts, setClubPosts] = useState(mockFanPosts);
-  const [friendsPosts, setFriendsPosts] = useState([]);
-  const [fanComments, setFanComments] = useState(mockComments);
+  const {
+    fans,
+    posts,
+    comments,
+    loading: feedLoading,
+    error: feedError,
+    isEmpty: feedIsEmpty,
+    reload: reloadFeed,
+    publishPost,
+    likePost,
+    addComment,
+    messages,
+    isChatEmpty,
+    sendMessage,
+    match
+  } = useFanFeed(mockClub.slug, mode);
+  
   const [newPost, setNewPost] = useState('');
-
-  const activePosts = mode === 'club' ? clubPosts : friendsPosts;
-  const setActivePosts = mode === 'club' ? setClubPosts : setFriendsPosts;
 
   const [liveReactions, setLiveReactions] = useState([]);
 
   const [fanPoints, setFanPoints] = useState(0);
 
   function handlePublish() {
-    if (!newPost.trim()) return;
+    const published = publishPost(newPost);
 
-    setActivePosts((prev) => [
-      {
-        id: crypto.randomUUID(),
-        clubSlug: mockClub.slug,
-        authorId: 'current-user',
-        content: newPost.trim(),
-        createdAt: 'Maintenant',
-        likes: 0,
-        comments: 0
-      },
-      ...prev
-    ]);
-
-    setNewPost('');
+    if (published) {
+      setNewPost('');
+    }
   }
 
   function handleLikePost(postId) {
-    setActivePosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? { ...post, likes: post.likes + 1 }
-          : post
-      )
-    );
+    likePost(postId);
   }
 
   function handleAddComment(postId, content) {
-    if (!content.trim()) return;
-
-    setFanComments((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        postId,
-        authorId: 'current-user',
-        content: content.trim(),
-        createdAt: 'Maintenant'
-      }
-    ]);
+    addComment(postId, content);
   }
 
   function handleLiveReaction(emoji) {
@@ -126,7 +104,7 @@ export function FanClub() {
             title="Streaming Fan Club"
             badge="Public"
             description="Regarde le live officiel avec tous les supporters du club."
-            meta={`${mockFans.length} supporters`}
+            meta={feedLoading ? 'Chargement...' : `${fans.length} supporters`}
             color="emerald"
             onClick={() => setMode('club')}
           />
@@ -142,8 +120,8 @@ export function FanClub() {
           />
         </div>
         <LiveMatchBanner
-          club={mockClub}
           mode={mode}
+          match={match}
         />
         <LiveQuickActions
           mode={mode}
@@ -191,14 +169,26 @@ export function FanClub() {
           </div>
           </section>
 
-          <LiveChat mode={mode} club={mockClub} />
+          <LiveChat
+            mode={mode}
+            club={mockClub}
+            messages={messages}
+            loading={feedLoading}
+            error={feedError}
+            isEmpty={isChatEmpty}
+            onRetry={reloadFeed}
+            onSendMessage={sendMessage}
+          />
         </div>
 
           <div className="mt-6">
             <ParticipantsPanel
               mode={mode}
-              fans={mockFans}
+              fans={fans}
               club={mockClub}
+              loading={feedLoading}
+              error={feedError}
+              onRetry={reloadFeed}
             />
           </div>
 
@@ -219,14 +209,18 @@ export function FanClub() {
 
           <ClubFanCommunity
             club={mockClub}
-            fans={mockFans}
-            posts={activePosts}
-            comments={fanComments}
+            fans={fans}
+            posts={posts}
+            comments={comments}
             newPost={newPost}
             setNewPost={setNewPost}
             onPublish={handlePublish}
             onLikePost={handleLikePost}
             onAddComment={handleAddComment}
+            loading={feedLoading}
+            error={feedError}
+            isEmpty={feedIsEmpty}
+            onRetry={reloadFeed}
             mode={mode}
           />
         </div>

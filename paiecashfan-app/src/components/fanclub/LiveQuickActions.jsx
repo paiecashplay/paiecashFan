@@ -1,32 +1,6 @@
 import { Gift, Heart, Share2, UserPlus } from 'lucide-react';
 
 export function LiveQuickActions({ mode = 'club', club, onReact, fanPoints = 0}) {
-  const actions = [
-    {
-      id: 'react',
-      icon: Heart,
-      label: 'Réagir',
-      description: 'Envoie une réaction live'
-    },
-    {
-      id: 'share',
-      icon: Share2,
-      label: 'Partager',
-      description: 'Partager le Fan Club'
-    },
-    {
-      id: 'invite',
-      icon: UserPlus,
-      label: mode === 'club' ? 'Inviter' : 'Inviter mes amis',
-      description: mode === 'club' ? 'Inviter des supporters' : 'Ajouter des amis au salon'
-    },
-    {
-      id: 'rewards',
-      icon: Gift,
-      label: 'Récompenses',
-      description: 'Gagner des Fan Points'
-    }
-  ];
 
     const handleShare = async () => {
                 const shareData = {
@@ -82,7 +56,8 @@ export function LiveQuickActions({ mode = 'club', club, onReact, fanPoints = 0})
             <button
                 key={emoji}
                 onClick={() => onReact?.(emoji)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 transition hover:scale-110"
+                aria-label={`Réagir avec ${emoji}`}
+                className="grid h-10 w-10 place-items-center rounded-full bg-white/10 transition hover:scale-110"
             >
                 {emoji}
             </button>
@@ -92,6 +67,7 @@ export function LiveQuickActions({ mode = 'club', club, onReact, fanPoints = 0})
 
         {/* Partager */}
         <button
+            type="button"
             onClick={handleShare}
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:bg-white/[0.06]"
         >
@@ -106,6 +82,7 @@ export function LiveQuickActions({ mode = 'club', club, onReact, fanPoints = 0})
 
         {/* Inviter */}
         <button
+            type="button"
             onClick={handleInvite}
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:bg-white/[0.06]"
             >
@@ -121,7 +98,9 @@ export function LiveQuickActions({ mode = 'club', club, onReact, fanPoints = 0})
         </button>
 
         {/* Récompenses */}
-        <button className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:bg-white/[0.06]">
+        <button 
+            type="button"
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:bg-white/[0.06]">
             <Gift size={18} className="text-yellow-400" />
             <h3 className="mt-3 text-sm font-black text-bone-50">
                 Récompenses

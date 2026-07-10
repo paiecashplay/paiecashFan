@@ -1,6 +1,6 @@
 import { Radio, Users, Heart, MessageCircle } from 'lucide-react';
 
-export function LiveMatchBanner({ mode }) {
+export function LiveMatchBanner({ mode, match }) {
 
     return (
 
@@ -22,19 +22,19 @@ export function LiveMatchBanner({ mode }) {
 
                     <h2 className="mt-3 text-3xl font-black text-bone-50">
 
-                        Paris Saint-Germain
+                        {match.homeTeam}
 
                         <span className="mx-4 text-bone-500">
-                            2 - 1
+                            {match.homeScore} - {match.awayScore}
                         </span>
 
-                        Marseille
+                        {match.awayTeam}
 
                     </h2>
 
                     <p className="mt-2 text-sm text-bone-400">
 
-                        Ligue 1 • 85'
+                        {match.competition} • {match.minute}'
 
                     </p>
 
@@ -44,19 +44,19 @@ export function LiveMatchBanner({ mode }) {
 
                     <Stat
                         icon={<Users size={18}/>}
-                        value="12 541"
+                        value={match.supporters}
                         label="Supporters"
                     />
 
                     <Stat
                         icon={<MessageCircle size={18}/>}
-                        value="2 154"
+                        value={match.messages}
                         label="Messages"
                     />
 
                     <Stat
                         icon={<Heart size={18}/>}
-                        value="18 521"
+                        value={match.reactions}
                         label="Réactions"
                     />
 

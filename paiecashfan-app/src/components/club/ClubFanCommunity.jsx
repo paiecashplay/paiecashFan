@@ -13,6 +13,12 @@ export function ClubFanCommunity({
   onPublish,
   onLikePost,
   onAddComment,
+
+  loading = false,
+  error = null,
+  isEmpty = false,
+  onRetry,
+
   mode = 'club'
 }) {
   const getAuthor = (authorId) => fans.find((fan) => fan.id === authorId);
@@ -91,9 +97,58 @@ export function ClubFanCommunity({
       </div>
 
       {/* ---------- Publications ---------- */}
+      
       <div className="space-y-4 p-5">
 
-        {posts.map((post, index) => {
+        {/* ---------- Etat de chargement ---------- */}
+        {loading && (
+          <>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="animate-pulse rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-white/10" />
+
+                  <div className="flex-1">
+                    <div className="h-3 w-32 rounded bg-white/10" />
+                    <div className="mt-2 h-2 w-20 rounded bg-white/5" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="h-3 rounded bg-white/10" />
+                  <div className="h-3 w-4/5 rounded bg-white/10" />
+                  <div className="h-3 w-2/3 rounded bg-white/10" />
+                </div>
+              </div>
+            ))}
+          </>
+          )
+        }
+
+        {/* ---------- Etat d'erreur ---------- */}
+        {!loading && error && (
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
+            <h3 className="text-lg font-bold text-red-400">
+              Impossible de charger les publications
+            </h3>
+
+            <p className="mt-2 text-sm text-bone-400">
+              {error}
+            </p>
+
+            <button
+              onClick={onRetry}
+              className="mt-5 rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition hover:bg-red-400"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && posts.map((post, index) => {
 
           const author = getAuthor(post.authorId);
           const postComments = comments.filter((comment) => comment.postId === post.id);
@@ -218,7 +273,7 @@ export function ClubFanCommunity({
 
         })}
 
-        {posts.length === 0 && (
+        {!loading && !error && isEmpty && (
           <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] py-12 text-center">
             <MessageCircle
               size={34}
