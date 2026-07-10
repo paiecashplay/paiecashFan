@@ -30,6 +30,7 @@ import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
 import { MonCompte } from './pages/MonCompte';
+import { CheckoutReturn } from './pages/CheckoutReturn';
 import { IdleLogout } from './components/IdleLogout';
 
 export default function App() {
@@ -95,6 +96,14 @@ export default function App() {
                     }
                   />
                   <Route path="/clubs/:slug/transactions" element={<Transactions />} />
+                  <Route
+                    path="/checkout/success"
+                    element={<ProtectedRoute><CheckoutReturn variant="success" /></ProtectedRoute>}
+                  />
+                  <Route
+                    path="/checkout/cancel"
+                    element={<ProtectedRoute><CheckoutReturn variant="cancel" /></ProtectedRoute>}
+                  />
                   <Route path="/login" element={<Login />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route

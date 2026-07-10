@@ -15,7 +15,10 @@ import {
   Trash2,
   Wallet,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  Layers,
+  CalendarClock
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -29,6 +32,13 @@ import { formatPCC } from '@/data/clubMerchandise';
 import { buildDefaultTicketing } from '@/utils/ticketingPrices';
 
 const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
+
+const PAY_MODES = [
+  { id: 'pcc_full',  label: 'PCC',         icon: Wallet,        cta: 'Payer en PCC',           hint: 'Débit direct de ton solde PCC disponible.' },
+  { id: 'card_full', label: 'Carte',       icon: CreditCard,    cta: 'Payer par carte',        hint: 'Paiement carte sécurisé via Stripe.' },
+  { id: 'pcc_split', label: 'PCC + carte', icon: Layers,        cta: 'Payer (PCC + carte)',    hint: 'Ton solde PCC couvre une partie, la carte le reste.' },
+  { id: 'bnpl',      label: '3× / 4×',     icon: CalendarClock, cta: 'Payer en 3× / 4×',       hint: 'Paiement fractionné (Klarna / Afterpay selon éligibilité).' },
+];
 
 function QtyButton({ children, onClick, ariaLabel }) {
   return (
@@ -431,6 +441,7 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
   const [error, setError] = useState('');
   const [topUp, setTopUp] = useState(null);        // { balance, missing } si solde insuffisant
   const [confirmation, setConfirmation] = useState(null);
+  const [mode, setMode] = useState('pcc_full');    // pcc_full | card_full | pcc_split | bnpl
 
   async function handleCheckout() {
     setError('');
@@ -455,15 +466,23 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
     try {
       const res = await apiFetch('/api/v2/checkout/ticketing', {
         method: 'POST',
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, mode, origin: window.location.origin }),
       });
+
+      // Modes carte/mixte/BNPL → redirection vers Stripe (le panier reste, il
+      // sera vidé au retour "success"). Mode PCC → confirmation immédiate.
+      if (res?.data?.redirect) {
+        window.location.href = res.data.redirect;
+        return;
+      }
+
       setConfirmation(res?.data || null);
       setStatus('success');
       onClearCart?.();
     } catch (err) {
       // apiFetch remonte le message backend. On détecte le cas "recharge".
       const msg = err?.message || 'Paiement impossible pour le moment.';
-      if (/insuffisant|wallet|recharge|PCC/i.test(msg)) {
+      if (/insuffisant|wallet|recharge/i.test(msg)) {
         setTopUp({ message: msg });
       } else {
         setError(msg);
@@ -619,6 +638,34 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
               </div>
             </div>
 
+            {/* Choix du mode de paiement */}
+            <div className="mt-6">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold mb-2">Mode de paiement</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {PAY_MODES.map((m) => {
+                  const Icon = m.icon;
+                  const active = mode === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setMode(m.id)}
+                      className={[
+                        'flex flex-col items-center gap-1.5 rounded-2xl border px-3 py-3 text-[11px] font-bold transition-all',
+                        active
+                          ? 'border-emerald-400/60 bg-emerald-400/10 text-emerald-300'
+                          : 'border-white/10 bg-white/[0.03] text-bone-300 hover:border-white/20',
+                      ].join(' ')}
+                    >
+                      <Icon size={17} className={active ? 'text-emerald-400' : 'text-bone-400'} />
+                      {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[11px] text-bone-500">{PAY_MODES.find((m) => m.id === mode)?.hint}</p>
+            </div>
+
             {error && (
               <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                 <AlertCircle size={16} className="mt-0.5 shrink-0" />
@@ -660,12 +707,12 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
                 {status === 'paying' ? (
                   <>
                     <Loader2 size={15} className="animate-spin" />
-                    Paiement...
+                    {mode === 'pcc_full' ? 'Paiement...' : 'Redirection...'}
                   </>
                 ) : (
                   <>
                     <ShoppingBag size={15} />
-                    Payer Maintenant
+                    {PAY_MODES.find((m) => m.id === mode)?.cta || 'Payer'}
                   </>
                 )}
               </Button>

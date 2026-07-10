@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (b)** — **Checkout multi-rails** (carte / mixte / BNPL). Le panier
+  billetterie propose 4 modes (PCC / Carte / PCC+carte / 3×-4×). `pcc_full` inchangé
+  (débit immédiat). Modes carte → PaieCashCoin renvoie une **Stripe Checkout URL** :
+  on crée une commande `pending`, on redirige, puis les pages **`/checkout/success`
+  & `/checkout/cancel`** réconcilient le statut (`GET /checkout/status` via
+  `/pay/history`, `POST /checkout/cancel`). Endpoint `execute` enrichi
+  (successUrl/cancelUrl/origin/idempotencyKey). Débit carte confirmé par le webhook
+  Stripe côté PaieCashCoin (zéro PCC perdu si abandon).
 - **2026-07-11** — **BO fan enrichi** : **billet numérique QR** imprimable en PDF
   (via `qrcode.react` + impression navigateur, thème clair), onglet **Historique
   PCC** (`GET /me/pcc-history` → PaieCashCoin `/pay/history`). **Solde wallet =

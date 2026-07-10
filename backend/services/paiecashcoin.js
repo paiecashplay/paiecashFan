@@ -74,13 +74,22 @@ async function quote({ userEmail, amountEur, preferredMode }) {
 // POST /pay/execute (scope pay:write) → exécute (débite le PCC).
 // ⚠️ NE PAS retenter en cas de timeout : pas de clé d'idempotence côté API,
 // un retry pourrait double-débiter. Un seul appel, on remonte l'erreur sinon.
-// merchantName (optionnel) : affiché côté payeur (Stripe Checkout, emails,
-// dashboard "Mes paiements", metadata Stripe). On y met le nom du club.
-// { success, transactionId, reference, mode, pccUsed, cardAmountEur, remainingPccBalance }
-async function execute({ userEmail, userAuthId, amountEur, description, merchantRef, merchantName, preferredMode }) {
+// merchantName : affiché côté payeur (Stripe Checkout, emails, dashboard).
+// Modes carte/mixte/BNPL : fournir successUrl/cancelUrl/origin (redirection
+// Stripe) + idempotencyKey (retry safe). Réponse :
+//   - pcc_full → { status:'completed', pccUsed, reference, remainingPccBalance }
+//   - card/mixed/bnpl → { status:'pending_card', reference, pccPlanned,
+//                         cardAmountEur, stripeCheckoutUrl }
+async function execute({
+  userEmail, userAuthId, amountEur, description, merchantRef, merchantName,
+  preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+}) {
   return call('/pay/execute', {
     method: 'POST',
-    body: { userEmail, userAuthId, amountEur, description, merchantRef, merchantName, preferredMode },
+    body: {
+      userEmail, userAuthId, amountEur, description, merchantRef, merchantName,
+      preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+    },
   });
 }
 
