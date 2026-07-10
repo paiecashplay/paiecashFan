@@ -105,6 +105,10 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-10 (c)** — Fix : colonne club = `tenants.name` (pas `club_name`) →
+  la description envoyée à PaieCashCoin était « Billetterie **undefined** », et
+  les offres par défaut « Billet match undefined ». Corrigé dans `checkout.js`
+  (description + résultats) et `ticketingPricing.js` (noms d'offres par défaut).
 - **2026-07-10 (b)** — **Fix commande billetterie + vue Commandes admin**.
   Bug : `orders.transaction_id` est un **uuid** et `status='paid'` viole
   `orders_status_check` → la commande n'était jamais écrite (le fan payait sans

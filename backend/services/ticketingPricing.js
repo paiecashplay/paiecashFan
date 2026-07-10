@@ -48,7 +48,7 @@ function buildDefaultOffers(club) {
 // Renvoie une Map offerId → { id, type, name, price, price_eur } pour un tenant.
 // tenant : ligne Supabase (club_name, slug, id, metadata.ticketing).
 function resolveOffers(tenant) {
-  const club = { slug: tenant?.slug, id: tenant?.id, name: tenant?.club_name };
+  const club = { slug: tenant?.slug, id: tenant?.id, name: tenant?.name };
   const saved = tenant?.metadata?.ticketing;
 
   let flat;

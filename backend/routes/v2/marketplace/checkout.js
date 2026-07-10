@@ -79,7 +79,7 @@ router.post('/ticketing', async (req, res) => {
       }
 
       clubTotalEur = round2(clubTotalEur);
-      if (clubTotalEur <= 0) return fail(res, `Montant invalide pour ${tenant.club_name}.`);
+      if (clubTotalEur <= 0) return fail(res, `Montant invalide pour ${tenant.name}.`);
       grandTotalEur += clubTotalEur;
 
       groups.push({
@@ -117,7 +117,7 @@ router.post('/ticketing', async (req, res) => {
     // ── 4. Exécuter le paiement PCC par club, puis créer la commande
     const results = [];
     for (const g of groups) {
-      const description = `Billetterie ${g.tenant.club_name} — ${g.orderItems.reduce((s, i) => s + i.quantity, 0)} article(s)`;
+      const description = `Billetterie ${g.tenant.name} — ${g.orderItems.reduce((s, i) => s + i.quantity, 0)} article(s)`;
 
       const pay = await pcc.execute({
         userEmail: email,
@@ -173,7 +173,7 @@ router.post('/ticketing', async (req, res) => {
 
       results.push({
         clubSlug: g.tenant.slug,
-        clubName: g.tenant.club_name,
+        clubName: g.tenant.name,
         orderId,
         reference: pay.reference,
         totalEur: g.totalEur,
