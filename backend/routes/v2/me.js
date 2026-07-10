@@ -77,4 +77,33 @@ router.get('/pcc', async (req, res) => {
   }
 });
 
+// GET /api/v2/me/pcc-history — historique des paiements PCC du fan
+// (via PaieCashCoin : resolve email → userId, puis /pay/history).
+router.get('/pcc-history', async (req, res) => {
+  if (!pcc.isConfigured()) return ok(res, { configured: false, transactions: [] });
+  try {
+    const email = req.authUser.email;
+    const resolved = await pcc.resolveUser(email).catch(() => null);
+    if (!resolved?.found || resolved.userId == null) {
+      return ok(res, { configured: true, walletReady: false, transactions: [] });
+    }
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const raw = await pcc.history({ userId: resolved.userId, limit }).catch(() => []);
+    const transactions = (Array.isArray(raw) ? raw : []).map((t) => ({
+      id: t.id,
+      reference: t.reference,
+      description: t.description,
+      mode: t.mode,
+      amountEur: Number(t.total_amount_eur || 0),
+      pccUsed: Number(t.pcc_used || 0),
+      status: t.status,
+      merchantRef: t.merchant_ref || null,
+      createdAt: t.created_at,
+    }));
+    return ok(res, { configured: true, walletReady: !!resolved.walletReady, transactions });
+  } catch (err) {
+    return fail(res, 'PCC history failed: ' + err.message, 500);
+  }
+});
+
 module.exports = router;

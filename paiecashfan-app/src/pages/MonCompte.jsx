@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   Wallet, Ticket, ShoppingBag, ExternalLink, Check, Pencil,
-  Receipt, ShieldCheck, Loader2, ArrowRight
+  Receipt, ShieldCheck, Loader2, ArrowRight, History, QrCode,
+  Download, X
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -18,6 +20,10 @@ const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paieca
 const fmt = (n) => Number(n || 0).toLocaleString('fr-FR');
 const fmtDate = (s) => {
   try { return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }); }
+  catch { return s; }
+};
+const fmtDateTime = (s) => {
+  try { return new Date(s).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
   catch { return s; }
 };
 
@@ -35,8 +41,13 @@ export function MonCompte() {
 
   const [orders, setOrders]   = useState(null);
   const [pcc, setPcc]         = useState(null);
+  const [history, setHistory] = useState(null);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [loadingPcc, setLoadingPcc] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+
+  const [tab, setTab] = useState('orders');       // 'orders' | 'history'
+  const [ticket, setTicket] = useState(null);      // commande billetterie affichée
 
   useEffect(() => {
     apiFetch('/api/v2/me/orders')
@@ -47,6 +58,10 @@ export function MonCompte() {
       .then((j) => setPcc(j.data))
       .catch(() => setPcc(null))
       .finally(() => setLoadingPcc(false));
+    apiFetch('/api/v2/me/pcc-history')
+      .then((j) => setHistory(j.data?.transactions || []))
+      .catch(() => setHistory([]))
+      .finally(() => setLoadingHistory(false));
   }, []);
 
   const initial = (profile?.display_name || user?.email || 'F')[0].toUpperCase();
@@ -75,31 +90,41 @@ export function MonCompte() {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {/* ── Colonne principale : commandes ──────────── */}
+          {/* ── Colonne principale : onglets ────────────── */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center gap-2">
-              <Receipt size={18} className="text-emerald-400" />
-              <h2 className="font-display text-lg font-black uppercase text-bone-100">Mes billets & commandes</h2>
+            <div className="flex gap-2">
+              <TabBtn active={tab === 'orders'} onClick={() => setTab('orders')} icon={<Receipt size={15} />}>
+                Billets & commandes
+              </TabBtn>
+              <TabBtn active={tab === 'history'} onClick={() => setTab('history')} icon={<History size={15} />}>
+                Historique PCC
+              </TabBtn>
             </div>
 
-            {loadingOrders ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
-              </div>
-            ) : !orders?.length ? (
-              <GlassCard className="p-10 text-center">
-                <Ticket className="mx-auto text-bone-600" size={38} />
-                <p className="mt-4 text-sm text-bone-400">Tu n'as pas encore de billet ni de commande.</p>
-                <Link to="/billetterie">
-                  <Button variant="primary" size="md" className="mt-5">
-                    <Ticket size={15} /> Voir la billetterie
-                  </Button>
-                </Link>
-              </GlassCard>
+            {tab === 'orders' ? (
+              loadingOrders ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
+                </div>
+              ) : !orders?.length ? (
+                <GlassCard className="p-10 text-center">
+                  <Ticket className="mx-auto text-bone-600" size={38} />
+                  <p className="mt-4 text-sm text-bone-400">Tu n'as pas encore de billet ni de commande.</p>
+                  <Link to="/billetterie">
+                    <Button variant="primary" size="md" className="mt-5">
+                      <Ticket size={15} /> Voir la billetterie
+                    </Button>
+                  </Link>
+                </GlassCard>
+              ) : (
+                <div className="space-y-3">
+                  {orders.map((o) => (
+                    <OrderCard key={o.id} order={o} onViewTicket={() => setTicket(o)} />
+                  ))}
+                </div>
+              )
             ) : (
-              <div className="space-y-3">
-                {orders.map((o) => <OrderCard key={o.id} order={o} />)}
-              </div>
+              <PccHistory loading={loadingHistory} transactions={history} />
             )}
           </div>
 
@@ -110,13 +135,34 @@ export function MonCompte() {
           </div>
         </div>
       </Container>
+
+      {ticket && (
+        <TicketModal order={ticket} buyer={profile?.display_name || user?.email} onClose={() => setTicket(null)} />
+      )}
     </div>
   );
 }
 
-function OrderCard({ order }) {
+function TabBtn({ active, onClick, icon, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={[
+        'inline-flex items-center gap-2 h-10 px-4 rounded-full text-xs font-black uppercase tracking-wider transition-colors border',
+        active
+          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'
+          : 'bg-white/5 text-bone-400 border-white/10 hover:text-bone-100',
+      ].join(' ')}
+    >
+      {icon}{children}
+    </button>
+  );
+}
+
+function OrderCard({ order, onViewTicket }) {
   const Icon = order.kind === 'ticketing' ? Ticket : ShoppingBag;
   const st = STATUS_LABEL[order.status] || { label: order.status, cls: 'text-bone-400 bg-white/5 border-white/10' };
+  const isTicket = order.kind === 'ticketing' && order.status === 'completed';
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -149,13 +195,145 @@ function OrderCard({ order }) {
             {order.totalEur ? <p className="text-[11px] text-bone-500 tabular-nums">{fmt(order.totalEur)} €</p> : null}
           </div>
         </div>
-        {order.reference && (
-          <p className="mt-3 pt-3 border-t border-white/5 text-[10px] uppercase tracking-widest text-bone-600">
-            Réf. {order.reference}
-          </p>
-        )}
+
+        <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+          {order.reference
+            ? <p className="text-[10px] uppercase tracking-widest text-bone-600 truncate">Réf. {order.reference}</p>
+            : <span />}
+          {isTicket && (
+            <button
+              onClick={onViewTicket}
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-400 hover:bg-emerald-500/20 transition shrink-0"
+            >
+              <QrCode size={12} /> Voir le billet
+            </button>
+          )}
+        </div>
       </GlassCard>
     </motion.div>
+  );
+}
+
+// ── Billet numérique (QR) + impression PDF ─────────────────────
+function TicketModal({ order, buyer, onClose }) {
+  const qrValue = `PCF-TKT:${order.id}:${order.reference || ''}`;
+  const itemsLabel = (order.items || []).map((i) => `${i.quantity > 1 ? `${i.quantity}× ` : ''}${i.name}`).join(' · ');
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4">
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          #ticket-printable, #ticket-printable * { visibility: visible !important; }
+          #ticket-printable { position: fixed; inset: 0; margin: auto; box-shadow: none !important; }
+        }
+      `}</style>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        {/* Billet — thème clair pour un rendu "vrai billet" + impression */}
+        <div id="ticket-printable" className="relative rounded-3xl bg-white text-ink-900 overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-br from-emerald-500 to-cyan-500 px-6 py-5 text-white">
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] opacity-90">Billet numérique · PaieCashFan</p>
+            <h3 className="mt-1 font-display text-2xl font-black uppercase leading-tight">{order.clubName}</h3>
+          </div>
+
+          <div className="px-6 py-5">
+            <p className="text-sm font-bold text-ink-900">{itemsLabel}</p>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p className="uppercase tracking-widest text-ink-400 text-[10px]">Titulaire</p>
+                <p className="mt-0.5 font-semibold text-ink-800 truncate">{buyer}</p>
+              </div>
+              <div>
+                <p className="uppercase tracking-widest text-ink-400 text-[10px]">Date d'achat</p>
+                <p className="mt-0.5 font-semibold text-ink-800">{fmtDate(order.createdAt)}</p>
+              </div>
+              <div>
+                <p className="uppercase tracking-widest text-ink-400 text-[10px]">Montant</p>
+                <p className="mt-0.5 font-semibold text-ink-800">{fmt(order.totalPcc)} PCC</p>
+              </div>
+              <div>
+                <p className="uppercase tracking-widest text-ink-400 text-[10px]">Référence</p>
+                <p className="mt-0.5 font-mono text-[11px] text-ink-700 break-all">{order.reference || order.id.slice(0, 8)}</p>
+              </div>
+            </div>
+
+            {/* Ligne de perforation */}
+            <div className="my-5 flex items-center gap-2">
+              <div className="h-4 w-4 rounded-full bg-black/80 -ml-8" />
+              <div className="flex-1 border-t-2 border-dashed border-ink-200" />
+              <div className="h-4 w-4 rounded-full bg-black/80 -mr-8" />
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="rounded-2xl border border-ink-100 p-3 bg-white">
+                <QRCodeSVG value={qrValue} size={148} level="M" />
+              </div>
+              <p className="mt-3 text-center text-[11px] text-ink-500">
+                Présente ce QR à l'entrée. Billet authentifié via PaieCashCoin.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions (hors impression) */}
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <Button variant="primary" size="md" onClick={() => window.print()}>
+            <Download size={15} /> Télécharger / Imprimer
+          </Button>
+          <button
+            onClick={onClose}
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-bone-300 hover:text-bone-50"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Historique PCC (paiements côté PaieCashCoin) ───────────────
+function PccHistory({ loading, transactions }) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}
+      </div>
+    );
+  }
+  if (!transactions?.length) {
+    return (
+      <GlassCard className="p-10 text-center">
+        <History className="mx-auto text-bone-600" size={38} />
+        <p className="mt-4 text-sm text-bone-400">Aucune transaction PCC pour le moment.</p>
+      </GlassCard>
+    );
+  }
+  return (
+    <GlassCard className="divide-y divide-white/5 overflow-hidden">
+      {transactions.map((t) => {
+        const st = STATUS_LABEL[t.status] || { label: t.status, cls: 'text-bone-400 bg-white/5 border-white/10' };
+        return (
+          <div key={t.id} className="flex items-center justify-between gap-4 px-5 py-4">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-bone-100 truncate">{t.description || 'Paiement PCC'}</p>
+              <p className="mt-0.5 text-[11px] text-bone-500">{fmtDateTime(t.createdAt)} · {t.mode}</p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="font-display text-base font-black text-emerald-400 tabular-nums">−{fmt(t.pccUsed || t.amountEur)} PCC</p>
+              <span className={`mt-1 inline-flex items-center h-5 px-2 rounded-full text-[9px] font-black uppercase tracking-wider border ${st.cls}`}>
+                {st.label}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </GlassCard>
   );
 }
 
@@ -174,7 +352,10 @@ function WalletCard({ loading, pcc }) {
           <p className="mt-4 font-display text-3xl font-black text-emerald-400 tabular-nums">
             {pcc.balance != null ? `${fmt(pcc.balance)} PCC` : '—'}
           </p>
-          <p className="text-xs text-bone-500">Solde disponible sur PaieCashCoin</p>
+          <p className="text-xs text-bone-500">Disponible pour tes achats — hors épargne bloquée.</p>
+          {pcc.balance === 0 && (
+            <p className="mt-2 text-xs text-amber-400">Recharge ton compte courant pour payer en PCC.</p>
+          )}
         </>
       ) : (
         <p className="mt-4 text-sm text-bone-400">

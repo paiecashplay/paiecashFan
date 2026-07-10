@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11** — **BO fan enrichi** : **billet numérique QR** imprimable en PDF
+  (via `qrcode.react` + impression navigateur, thème clair), onglet **Historique
+  PCC** (`GET /me/pcc-history` → PaieCashCoin `/pay/history`). **Solde wallet =
+  disponible réel** : PaieCashCoin a corrigé `currentPccBalance` (= total − épargne
+  bloquée) ; on lit ce champ (via `/pay/quote`), affichage clarifié « hors épargne
+  bloquée ». Impacte aussi le checkout (bloque si le disponible < total).
 - **2026-07-10 (e)** — Checkout : envoi de `merchantName` (nom du club) à
   PaieCashCoin — affiché côté payeur (Stripe Checkout, emails, dashboard, metadata),
   corrige le « undefined » de nom de marchand.

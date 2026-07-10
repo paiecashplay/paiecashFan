@@ -84,4 +84,10 @@ async function execute({ userEmail, userAuthId, amountEur, description, merchant
   });
 }
 
-module.exports = { isConfigured, resolveUser, quote, execute };
+// GET /pay/history?userId=&limit= → historique des paiements PCC du user.
+// L'API attend l'id interne PaieCashCoin (obtenu via resolveUser), pas l'email.
+async function history({ userId, limit = 20 }) {
+  return call(`/pay/history?userId=${encodeURIComponent(userId)}&limit=${limit}`);
+}
+
+module.exports = { isConfigured, resolveUser, quote, execute, history };
