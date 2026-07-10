@@ -29,6 +29,7 @@ import { ClubBilletterie } from './pages/ClubBilletterie';
 import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
+import { MonCompte } from './pages/MonCompte';
 import { IdleLogout } from './components/IdleLogout';
 
 export default function App() {
@@ -100,7 +101,7 @@ export default function App() {
                     path="/mon-compte"
                     element={
                       <ProtectedRoute>
-                        <div className="p-8 text-center text-bone-400">Mon compte — bientôt disponible</div>
+                        <MonCompte />
                       </ProtectedRoute>
                     }
                   />

@@ -125,6 +125,7 @@ router.post('/ticketing', async (req, res) => {
         amountEur: g.totalEur,
         description,
         merchantRef: g.merchantRef,
+        merchantName: g.tenant.name || 'PaieCashFan',
         preferredMode: 'pcc_full',
       });
 

@@ -105,6 +105,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-10 (e)** — Checkout : envoi de `merchantName` (nom du club) à
+  PaieCashCoin — affiché côté payeur (Stripe Checkout, emails, dashboard, metadata),
+  corrige le « undefined » de nom de marchand.
+- **2026-07-10 (d)** — **BO fan (`/mon-compte`)** : dashboard fan avec profil
+  (édition nom + lien reset mdp), card **wallet PCC** (solde live via PaieCashCoin
+  + CTA recharge/création), et **Mes billets & commandes** (statut, club, articles,
+  total, réf). Backend `routes/v2/me.js` (`requireAuth`) : `GET /me/orders`
+  (commandes du fan enrichies) + `GET /me/pcc` (solde sans effet de bord).
+  Backfill de la commande OM orpheline (réf PCC-1783682961460-68F8A4FA).
 - **2026-07-10 (c)** — Fix : colonne club = `tenants.name` (pas `club_name`) →
   la description envoyée à PaieCashCoin était « Billetterie **undefined** », et
   les offres par défaut « Billet match undefined ». Corrigé dans `checkout.js`

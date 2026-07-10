@@ -74,11 +74,13 @@ async function quote({ userEmail, amountEur, preferredMode }) {
 // POST /pay/execute (scope pay:write) → exécute (débite le PCC).
 // ⚠️ NE PAS retenter en cas de timeout : pas de clé d'idempotence côté API,
 // un retry pourrait double-débiter. Un seul appel, on remonte l'erreur sinon.
+// merchantName (optionnel) : affiché côté payeur (Stripe Checkout, emails,
+// dashboard "Mes paiements", metadata Stripe). On y met le nom du club.
 // { success, transactionId, reference, mode, pccUsed, cardAmountEur, remainingPccBalance }
-async function execute({ userEmail, userAuthId, amountEur, description, merchantRef, preferredMode }) {
+async function execute({ userEmail, userAuthId, amountEur, description, merchantRef, merchantName, preferredMode }) {
   return call('/pay/execute', {
     method: 'POST',
-    body: { userEmail, userAuthId, amountEur, description, merchantRef, preferredMode },
+    body: { userEmail, userAuthId, amountEur, description, merchantRef, merchantName, preferredMode },
   });
 }
 
