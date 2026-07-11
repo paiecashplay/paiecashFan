@@ -106,13 +106,14 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
   }
   if (plan.dup.length) console.log(`Doublons neutralisés (league_name=null) : ${plan.dup.length}`);
 
-  // Rattachement fédération (pour les clubs AJOUTÉS)
+  // Rattachement fédération (pour les clubs AJOUTÉS) : federation_id doit
+  // pointer sur federations.id (FK), PAS sur l'id du tenant hub.
   let federationId = null;
   if (FED_SLUG) {
-    const { data: hub } = await supabase.from('tenants').select('id, name').eq('slug', FED_SLUG).eq('is_federation_hub', true).maybeSingle();
-    if (!hub) { console.log(`❌ Hub de fédération introuvable : ${FED_SLUG}`); process.exit(1); }
-    federationId = hub.id;
-    console.log(`Rattachement → ${hub.name} (${federationId})`);
+    const { data: fed } = await supabase.from('federations').select('id, name').eq('slug', FED_SLUG).maybeSingle();
+    if (!fed) { console.log(`❌ Fédération introuvable dans la table federations : ${FED_SLUG}`); process.exit(1); }
+    federationId = fed.id;
+    console.log(`Rattachement → ${fed.name} (${federationId})`);
   }
 
   if (!APPLY) { console.log('\n(DRY-RUN — relance avec --apply pour écrire)\n'); process.exit(0); }
@@ -121,8 +122,9 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
   for (const r of plan.relegate) await supabase.from('tenants').update({ league_name: RELEGATE }).eq('id', r.id);
   for (const t of plan.tag) await supabase.from('tenants').update({ league_name: LABEL, sport: 'football', status: 'active' }).eq('id', t.id);
   for (const d of plan.dup) await supabase.from('tenants').update({ league_name: null }).eq('id', d.id);
+  let inserted = 0, insertErrors = 0;
   for (const a of plan.add.filter((x) => !x.skip)) {
-    await supabase.from('tenants').insert({
+    const { error } = await supabase.from('tenants').insert({
       name: a.name, slug: a.slug, type: 'club', status: 'active',
       country: a.country || null, city: a.city || null,
       league_name: LABEL, logo_url: a.logo || null, founded_year: toIntOrNull(a.founded),
@@ -130,7 +132,9 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
       federation_id: federationId,
       metadata: { api_football_id: a.id },
     });
+    if (error) { insertErrors++; console.error(`   ⚠ insert échoué (${a.name}): ${error.message}`); }
+    else inserted++;
   }
-  console.log(`\n✅ Appliqué — saison ${season} : ${plan.tag.length} tagué(s), ${plan.add.filter((a) => !a.skip).length} ajouté(s), ${plan.relegate.length} rétrogradé(s).\n`);
+  console.log(`\n✅ Appliqué — saison ${season} : ${plan.tag.length} tagué(s), ${inserted} ajouté(s)${insertErrors ? ` / ${insertErrors} échec(s)` : ''}, ${plan.relegate.length} rétrogradé(s).\n`);
   process.exit(0);
 })().catch((e) => { console.error('ERREUR:', e.message); process.exit(1); });

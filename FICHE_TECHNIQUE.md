@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (g)** — Fédérations **Italie & Portugal créées** (table
+  `federations`) + Serie A / Primeira Liga rattachées ; **Premier League
+  ré-importée** correctement (bug : `federation_id` doit pointer sur
+  `federations.id`, pas l'id du tenant hub — l'insert échouait en silence).
+  `sync-league.js` corrigé (`--federationSlug` via table `federations` +
+  contrôle des erreurs d'insert). « Voir tout » actif pour IT/PT.
 - **2026-07-11 (f)** — **Accueil piloté par la base + divisions**. Tagging des
   divisions via `sync-league.js` (Ligue 1/2/National, Bundesliga, La Liga,
   Eredivisie — saison 2026). Onglets **« Football France »** (L1+L2+National) et

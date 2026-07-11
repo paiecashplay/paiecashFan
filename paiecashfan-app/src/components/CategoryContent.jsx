@@ -50,9 +50,9 @@ const FR_LEAGUES = [
 const EU_LEAGUES = [
   { league: 'Premier League', country: 'Angleterre', flag: '🏴', fed: 'federation-anglaise-de-football' },
   { league: 'La Liga',        country: 'Espagne',    flag: '🇪🇸', fed: 'federation-royale-espagnole-de-football' },
-  { league: 'Serie A',        country: 'Italie',     flag: '🇮🇹', fed: null },
+  { league: 'Serie A',        country: 'Italie',     flag: '🇮🇹', fed: 'federation-italienne-de-football' },
   { league: 'Bundesliga',     country: 'Allemagne',  flag: '🇩🇪', fed: 'federation-allemande-de-football' },
-  { league: 'Primeira Liga',  country: 'Portugal',   flag: '🇵🇹', fed: null },
+  { league: 'Primeira Liga',  country: 'Portugal',   flag: '🇵🇹', fed: 'federation-portugaise-de-football' },
   { league: 'Eredivisie',     country: 'Pays-Bas',   flag: '🇳🇱', fed: 'federation-royale-neerlandaise-de-football' },
 ];
 
