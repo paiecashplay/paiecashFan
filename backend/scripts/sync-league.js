@@ -33,6 +33,7 @@ const LEAGUE_RE = new RegExp(LEAGUE.trim().replace(/\s+/g, '\\s*'), 'i');
 const LABEL     = arg('label', LEAGUE);          // league_name à écrire
 const SEASON    = arg('season', null);           // null → plus récente
 const RELEGATE  = arg('relegate', null);         // ex: "Ligue 2" (sinon pas de rétrogradation)
+const FED_SLUG  = arg('federationSlug', null);   // rattache les clubs AJOUTÉS à ce hub de fédération
 const APPLY     = has('apply');
 
 const slugify = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -42,8 +43,10 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
 (async () => {
   console.log(`\n=== Sync ligue — pays=${COUNTRY} ligue~="${LEAGUE}" label="${LABEL}" saison=${SEASON || 'auto'} relegate=${RELEGATE || 'non'} apply=${APPLY} ===\n`);
 
-  // 1. Localiser la ligue sur API-Football
-  const leagues = await api.getLeaguesByCountryCode(COUNTRY);
+  // 1. Localiser la ligue sur API-Football (code 2 lettres OU nom de pays)
+  const leagues = COUNTRY.length === 2
+    ? await api.getLeaguesByCountryCode(COUNTRY)
+    : await api.getLeaguesByCountryName(COUNTRY);
   const lg = leagues.find((l) => l.type === 'League' && LEAGUE_RE.test(l.name));
   if (!lg) { console.log(`❌ Ligue "${LEAGUE}" introuvable pour ${COUNTRY}.`); process.exit(1); }
 
@@ -103,6 +106,15 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
   }
   if (plan.dup.length) console.log(`Doublons neutralisés (league_name=null) : ${plan.dup.length}`);
 
+  // Rattachement fédération (pour les clubs AJOUTÉS)
+  let federationId = null;
+  if (FED_SLUG) {
+    const { data: hub } = await supabase.from('tenants').select('id, name').eq('slug', FED_SLUG).eq('is_federation_hub', true).maybeSingle();
+    if (!hub) { console.log(`❌ Hub de fédération introuvable : ${FED_SLUG}`); process.exit(1); }
+    federationId = hub.id;
+    console.log(`Rattachement → ${hub.name} (${federationId})`);
+  }
+
   if (!APPLY) { console.log('\n(DRY-RUN — relance avec --apply pour écrire)\n'); process.exit(0); }
 
   // 6. Application (non destructive)
@@ -112,9 +124,10 @@ const toIntOrNull = (v) => { const n = parseInt(v, 10); return Number.isFinite(n
   for (const a of plan.add.filter((x) => !x.skip)) {
     await supabase.from('tenants').insert({
       name: a.name, slug: a.slug, type: 'club', status: 'active',
-      country: COUNTRY === 'FR' ? 'France' : (a.country || null), city: a.city || null,
+      country: a.country || null, city: a.city || null,
       league_name: LABEL, logo_url: a.logo || null, founded_year: toIntOrNull(a.founded),
       stadium: a.stadium || null, primary_color: '#10b981', is_federation_hub: false,
+      federation_id: federationId,
       metadata: { api_football_id: a.id },
     });
   }

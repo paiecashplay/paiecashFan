@@ -98,6 +98,20 @@ async function getLeaguesByCountryCode(code) {
   })).filter((l) => l.id);
 }
 
+// GET /leagues?country= — championnats par NOM de pays (ex: England, Italy).
+// Utile quand le code 2 lettres ne matche pas (Angleterre = "England").
+async function getLeaguesByCountryName(name) {
+  const { data } = await client().get('/leagues', { params: { country: name } });
+  check(data);
+  return (data.response || []).map((l) => ({
+    id:          l.league?.id,
+    name:        l.league?.name,
+    type:        l.league?.type,
+    countryName: l.country?.name || null,
+    seasons:     (l.seasons || []).map((s) => ({ year: s.year, current: Boolean(s.current) }))
+  })).filter((l) => l.id);
+}
+
 // GET /teams?league=&season= — équipes d'un championnat pour une saison
 async function getTeamsByLeagueSeason(leagueId, season) {
   const { data } = await client().get('/teams', { params: { league: leagueId, season } });
@@ -118,4 +132,4 @@ async function getSquad(teamId) {
   }));
 }
 
-module.exports = { searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getTeamsByLeagueSeason };
+module.exports = { searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getLeaguesByCountryName, getTeamsByLeagueSeason };

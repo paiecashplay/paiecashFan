@@ -111,7 +111,10 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   **« Football Européen »** désormais **live** (fini le mock), une section par
   division non vide. **« Voir tout »** → page fédération du pays. Pages
   **fédérations regroupées par division** (`league_name` ajouté au endpoint
-  membres). *(Premier League / Serie A / Primeira à importer — clubs absents.)*
+  membres). **Premier League / Serie A / Primeira Liga importées** (top
+  championnats européens complets ; Angleterre rattachée à sa fédération).
+  `sync-league.js` enrichi : pays par **nom** (`--country=England`) +
+  `--federationSlug` (rattachement des clubs ajoutés au hub).
 - **2026-07-11 (e)** — Admin : la confirmation « Sync Ligue 1 » utilise une
   **modale stylée** (plus le `confirm()` natif moche).
 - **2026-07-11 (d)** — Outil **`backend/scripts/sync-league.js`** : sync d'une
