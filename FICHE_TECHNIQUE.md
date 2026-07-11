@@ -105,6 +105,8 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (e)** — Admin : la confirmation « Sync Ligue 1 » utilise une
+  **modale stylée** (plus le `confirm()` natif moche).
 - **2026-07-11 (d)** — Outil **`backend/scripts/sync-league.js`** : sync d'une
   ligue depuis API-Football (généralise `/sync-ligue1`), **dry-run par défaut**,
   saison configurable (`--season`), non destructif (match `api_football_id`,

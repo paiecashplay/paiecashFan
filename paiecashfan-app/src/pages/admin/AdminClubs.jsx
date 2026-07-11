@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown, ChevronLeft, ChevronRight, Trash2, Loader2 } from 'lucide-react';
+import { Search, Check, X, Pause, RefreshCw, Plus, Pencil, Download, ChevronDown, ChevronLeft, ChevronRight, Trash2, Loader2, ShieldCheck } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ImportFromFootball } from '@/components/admin/ImportFromFootball';
@@ -32,11 +32,11 @@ export function AdminClubs() {
   const [page, setPage]   = useState(1);
   const [pendingCount, setPendingCount] = useState(0);
   const [syncingL1, setSyncingL1] = useState(false);
+  const [syncModal, setSyncModal] = useState(false);
 
   const LIMIT = 50;
 
-  async function syncLigue1() {
-    if (!confirm('Synchroniser la Ligue 1 depuis API-Football ?\n\nLes clubs actuels de L1 seront tagués, ceux qui n\'y sont plus passeront en Ligue 2, les promus seront ajoutés. Aucune suppression.')) return;
+  async function doSyncLigue1() {
     setSyncingL1(true);
     try {
       const json = await apiFetch('/api/v2/admin/clubs-crud/sync-ligue1', { method: 'POST' });
@@ -46,6 +46,7 @@ export function AdminClubs() {
       load(1);
     } catch (e) { showToast('Erreur : ' + e.message); }
     setSyncingL1(false);
+    setSyncModal(false);
   }
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
@@ -160,7 +161,7 @@ export function AdminClubs() {
             <RefreshCw size={14} />
           </button>
           <button
-            onClick={syncLigue1}
+            onClick={() => setSyncModal(true)}
             disabled={syncingL1}
             title="Tague les clubs de Ligue 1 (montées/descentes) depuis API-Football"
             className="flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors disabled:opacity-40"
@@ -393,6 +394,60 @@ export function AdminClubs() {
                   className="h-9 px-4 rounded-xl bg-red-500/20 border border-red-500/30 text-sm font-bold text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
                 >
                   Confirmer le rejet
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal synchronisation Ligue 1 */}
+      <AnimatePresence>
+        {syncModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/80 backdrop-blur"
+            onClick={(e) => { if (e.target === e.currentTarget && !syncingL1) setSyncModal(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95 }}
+              className="w-full max-w-md rounded-2xl border border-white/10 bg-ink-800 p-6 shadow-2xl"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <RefreshCw size={18} />
+                </div>
+                <h3 className="font-display text-lg font-black uppercase text-bone-50">Synchroniser la Ligue 1</h3>
+              </div>
+
+              <p className="text-sm text-bone-300">
+                Les clubs actuels de Ligue 1 seront mis à jour depuis <strong className="text-bone-100">API-Football</strong> (saison en cours).
+              </p>
+              <ul className="mt-3 space-y-1.5 text-xs text-bone-400">
+                <li className="flex items-center gap-2"><Check size={13} className="text-emerald-400 shrink-0" /> Clubs actuels tagués « Ligue 1 »</li>
+                <li className="flex items-center gap-2"><Check size={13} className="text-emerald-400 shrink-0" /> Sortants rétrogradés en « Ligue 2 »</li>
+                <li className="flex items-center gap-2"><Check size={13} className="text-emerald-400 shrink-0" /> Promus ajoutés automatiquement</li>
+                <li className="flex items-center gap-2"><ShieldCheck size={13} className="text-emerald-400 shrink-0" /> Aucune suppression · données saisies préservées</li>
+              </ul>
+
+              <div className="mt-6 flex gap-3 justify-end">
+                <button
+                  onClick={() => setSyncModal(false)}
+                  disabled={syncingL1}
+                  className="h-9 px-4 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-50 transition-colors disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={doSyncLigue1}
+                  disabled={syncingL1}
+                  className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition-colors disabled:opacity-50"
+                >
+                  {syncingL1 ? <><Loader2 size={14} className="animate-spin" /> Synchronisation…</> : <><RefreshCw size={14} /> Synchroniser</>}
                 </button>
               </div>
             </motion.div>
