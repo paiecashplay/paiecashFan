@@ -54,7 +54,7 @@ router.get('/:slugOrId', async (req, res) => {
         .from('tenants')
         .select(`
           id, slug, name, short_code, city, logo_url, primary_color,
-          stadium, stadium_image_url, founded_year, status
+          stadium, stadium_image_url, founded_year, status, league_name
         `)
         .eq('federation_id', federation.id)
         .not('is_federation_hub', 'is', true)

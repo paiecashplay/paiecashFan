@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (f)** — **Accueil piloté par la base + divisions**. Tagging des
+  divisions via `sync-league.js` (Ligue 1/2/National, Bundesliga, La Liga,
+  Eredivisie — saison 2026). Onglets **« Football France »** (L1+L2+National) et
+  **« Football Européen »** désormais **live** (fini le mock), une section par
+  division non vide. **« Voir tout »** → page fédération du pays. Pages
+  **fédérations regroupées par division** (`league_name` ajouté au endpoint
+  membres). *(Premier League / Serie A / Primeira à importer — clubs absents.)*
 - **2026-07-11 (e)** — Admin : la confirmation « Sync Ligue 1 » utilise une
   **modale stylée** (plus le `confirm()` natif moche).
 - **2026-07-11 (d)** — Outil **`backend/scripts/sync-league.js`** : sync d'une

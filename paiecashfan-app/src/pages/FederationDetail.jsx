@@ -129,8 +129,29 @@ function DynamicFederationView({ federation, members }) {
     founded:      m.founded_year,
     logo:         m.logo_url,
     primaryColor: m.primary_color || color,
-    countryFlag:  federation.flag_emoji || ''
+    countryFlag:  federation.flag_emoji || '',
+    league:       m.league_name || null,
   }));
+
+  // Regroupement par division (Ligue 1/2, Bundesliga/2.Bundesliga…) pour la
+  // lisibilité. Les divisions taguées d'abord (plus grosse en tête), les clubs
+  // sans division dans « Autres clubs » en fin.
+  const groups = useMemo(() => {
+    const map = new Map();
+    for (const c of clubs) {
+      const key = c.league || '__autres__';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(c);
+    }
+    const named = [...map.entries()]
+      .filter(([k]) => k !== '__autres__')
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([name, list]) => ({ name, list }));
+    const autres = map.get('__autres__');
+    if (autres?.length) named.push({ name: `Autres clubs · ${federation.name}`, list: autres });
+    return named;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members]);
 
   const heroImg = federation.stadium_image_url || '/images/futuristic_stadium_hero.png';
 
@@ -209,12 +230,15 @@ function DynamicFederationView({ federation, members }) {
       {/* Contenu sous le hero : voie réservée à gauche (md→2xl) pour le rail. */}
       <div className="md:pl-24 2xl:pl-0">
         {clubs.length > 0 ? (
-          <FederationClubsGrid
-            clubs={clubs}
-            federationColor={color}
-            leagueName={`Clubs · ${federation.name}`}
-            cardBackground={federation.stadium_image_url}
-          />
+          groups.map((g) => (
+            <FederationClubsGrid
+              key={g.name}
+              clubs={g.list}
+              federationColor={color}
+              leagueName={g.name}
+              cardBackground={federation.stadium_image_url}
+            />
+          ))
         ) : (
           <Container className="py-20 text-center text-sm text-bone-400">
             Aucun club rattaché à cette fédération pour le moment.

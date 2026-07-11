@@ -6,7 +6,7 @@ import { LeagueSection } from './LeagueSection';
 import { FederationCard } from './FederationCard';
 import { EventCard } from './EventCard';
 import { DataSourceBadge } from './DataSourceBadge';
-import { ligue1, championsEurope, otherSports, events } from '@/data/leagues';
+import { ligue1, otherSports, events } from '@/data/leagues';
 import { federations as fallbackFederations, normalizeFederation } from '@/data/federations';
 import { useApi } from '@/hooks/useApi';
 import { apiFetch } from '@/lib/api';
@@ -25,12 +25,8 @@ export function CategoryContent({ active }) {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-          {active === 'fr'          && <Ligue1Live />}
-          {active === 'eu'          && (
-            <div className="space-y-16">
-              {championsEurope.map((l) => <LeagueSection key={l.id} league={l} />)}
-            </div>
-          )}
+          {active === 'fr'          && <LeaguesLive leagues={FR_LEAGUES} fallback={ligue1} />}
+          {active === 'eu'          && <LeaguesLive leagues={EU_LEAGUES} />}
           {active === 'others'      && (
             <div className="space-y-16">
               {otherSports.map((l) => <LeagueSection key={l.id} league={l} />)}
@@ -44,52 +40,72 @@ export function CategoryContent({ active }) {
   );
 }
 
-// Section Ligue 1 connectée à la base : les clubs sont tagués league_name =
-// 'Ligue 1' via la synchro API-Football du BO (montées/descentes gérées là).
-// Repli sur les données statiques si l'API ne répond pas ou ne renvoie rien
-// (évite une section vide / page blanche).
-function Ligue1Live() {
-  const [clubs, setClubs] = useState(null); // null = en cours, [] = vide
-  const [isLive, setIsLive] = useState(false);
+// ─── Ligues affichées (clubs tagués league_name via la synchro BO) ──────────
+// `fed` = slug du hub de fédération du pays → bouton « Voir tout ».
+const FR_LEAGUES = [
+  { league: 'Ligue 1',  country: 'France', flag: '🇫🇷', fed: 'federation-francaise-de-football' },
+  { league: 'Ligue 2',  country: 'France', flag: '🇫🇷', fed: 'federation-francaise-de-football' },
+  { league: 'National', country: 'France', flag: '🇫🇷', fed: 'federation-francaise-de-football' },
+];
+const EU_LEAGUES = [
+  { league: 'Premier League', country: 'Angleterre', flag: '🏴', fed: 'federation-anglaise-de-football' },
+  { league: 'La Liga',        country: 'Espagne',    flag: '🇪🇸', fed: 'federation-royale-espagnole-de-football' },
+  { league: 'Serie A',        country: 'Italie',     flag: '🇮🇹', fed: null },
+  { league: 'Bundesliga',     country: 'Allemagne',  flag: '🇩🇪', fed: 'federation-allemande-de-football' },
+  { league: 'Primeira Liga',  country: 'Portugal',   flag: '🇵🇹', fed: null },
+  { league: 'Eredivisie',     country: 'Pays-Bas',   flag: '🇳🇱', fed: 'federation-royale-neerlandaise-de-football' },
+];
+
+// Charge en parallèle les clubs de chaque ligue (tagués en base) et rend une
+// section par ligue non vide. Repli statique optionnel si rien ne remonte.
+function LeaguesLive({ leagues, fallback }) {
+  const [sections, setSections] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch('/api/v2/marketplace/clubs?league=' + encodeURIComponent('Ligue 1') + '&limit=40')
-      .then((json) => {
-        if (cancelled) return;
-        const list = (json?.data?.clubs || []).map((c) => ({
-          id: c.id,
-          slug: c.slug,
-          name: c.name,
-          city: c.city || '',
-          logo: c.logo_url || '',
-          primaryColor: c.primary_color || '#10b981',
-        }));
-        setClubs(list);
-        setIsLive(list.length > 0);
+    Promise.all(
+      leagues.map(async (cfg) => {
+        try {
+          const json = await apiFetch(`/api/v2/marketplace/clubs?league=${encodeURIComponent(cfg.league)}&limit=24`);
+          const clubs = (json?.data?.clubs || []).map((c) => ({
+            id: c.id, slug: c.slug, name: c.name,
+            city: c.city || '', logo: c.logo_url || '', primaryColor: c.primary_color || '#10b981',
+          }));
+          return { cfg, clubs };
+        } catch { return { cfg, clubs: [] }; }
       })
-      .catch(() => { if (!cancelled) { setClubs([]); setIsLive(false); } });
+    ).then((res) => { if (!cancelled) setSections(res); });
     return () => { cancelled = true; };
-  }, []);
+  }, [leagues]);
 
-  if (clubs === null) return <Ligue1Skeleton />;
+  if (sections === null) return <LeaguesSkeleton />;
 
-  // Repli statique si la base ne renvoie aucun club tagué Ligue 1.
-  const league = clubs.length > 0
-    ? { id: 'ligue-1', name: 'Ligue 1', country: 'France', flag: '🇫🇷', clubs }
-    : ligue1;
+  const nonEmpty = sections.filter((s) => s.clubs.length > 0);
+  if (!nonEmpty.length) {
+    if (fallback) return <LeagueSection league={fallback} />;
+    return <p className="text-center text-sm text-bone-400 py-16">Championnats bientôt disponibles.</p>;
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <DataSourceBadge isLive={isLive} />
-      </div>
-      <LeagueSection league={league} />
+    <div className="space-y-16">
+      {nonEmpty.map(({ cfg, clubs }) => (
+        <LeagueSection
+          key={cfg.league}
+          league={{
+            id: cfg.league,
+            name: cfg.league,
+            country: cfg.country,
+            flag: cfg.flag,
+            clubs,
+            to: cfg.fed ? `/federations/${cfg.fed}` : null,
+          }}
+        />
+      ))}
     </div>
   );
 }
 
-function Ligue1Skeleton() {
+function LeaguesSkeleton() {
   return (
     <section className="space-y-6">
       <Skeleton className="h-9 w-48" />

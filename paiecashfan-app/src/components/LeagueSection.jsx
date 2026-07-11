@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ClubCard } from './ClubCard';
 
 // Une "section ligue" = un titre (avec flag + nom) suivi de la grille de clubs.
@@ -26,13 +27,15 @@ export function LeagueSection({ league }) {
             </div>
           </div>
         </div>
-        <a
-          href={`#${league.id}`}
-          className="hidden md:inline-flex items-center gap-1 text-xs text-bone-300 hover:text-cyan-400 font-semibold uppercase tracking-[0.14em] transition-colors"
-        >
-          Voir tout
-          <ChevronRight size={14} />
-        </a>
+        {league.to && (
+          <Link
+            to={league.to}
+            className="inline-flex items-center gap-1 text-xs text-bone-300 hover:text-cyan-400 font-semibold uppercase tracking-[0.14em] transition-colors whitespace-nowrap"
+          >
+            Voir tout
+            <ChevronRight size={14} />
+          </Link>
+        )}
       </motion.header>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
