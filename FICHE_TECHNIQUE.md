@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (d)** — Outil **`backend/scripts/sync-league.js`** : sync d'une
+  ligue depuis API-Football (généralise `/sync-ligue1`), **dry-run par défaut**,
+  saison configurable (`--season`), non destructif (match `api_football_id`,
+  préserve les données saisies), rétrogradation optionnelle. Prérequis : clé
+  API-Football payante (`API_FOOTBALL_KEY` sur Railway + local). La saison est
+  auto-détectée (plus récente) — plan payant → saison courante (2026 = 18 clubs L1).
 - **2026-07-11 (c)** — UX : la fenêtre « Ajouter au panier » se **ferme
   automatiquement** après ajout. Nouvelle page **`/parametres`** (menu compte →
   Paramètres) : **upload photo de profil** (avatar → Supabase Storage via
