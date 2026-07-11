@@ -105,6 +105,9 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (h)** — Pages fédérations : divisions triées par **ordre
+  hiérarchique** (D1 → D2 → D3, ex. Ligue 1 → Ligue 2 → National) au lieu du
+  nombre de clubs.
 - **2026-07-11 (g)** — Fédérations **Italie & Portugal créées** (table
   `federations`) + Serie A / Primeira Liga rattachées ; **Premier League
   ré-importée** correctement (bug : `federation_id` doit pointer sur

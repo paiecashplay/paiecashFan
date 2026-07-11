@@ -116,6 +116,19 @@ function FedLoading() {
 
 // ── Vue dynamique d'une fédération nationale (depuis la base) ────────
 // Hero (logo/nom/pays) + grille des clubs membres (FederationClubsGrid).
+// Ordre hiérarchique des divisions (D1 → D2 → D3) pour l'affichage par pays.
+// Rang inconnu = 50 (après les divisions connues, avant « Autres clubs »).
+const DIVISION_RANK = {
+  'Ligue 1': 1, 'Ligue 2': 2, 'National': 3, 'National 2': 4,
+  'Premier League': 1, 'Championship': 2, 'League One': 3, 'League Two': 4,
+  'La Liga': 1, 'Segunda División': 2, 'La Liga 2': 2,
+  'Serie A': 1, 'Serie B': 2, 'Serie C': 3,
+  'Bundesliga': 1, '2. Bundesliga': 2, '3. Liga': 3,
+  'Primeira Liga': 1, 'Liga Portugal 2': 2,
+  'Eredivisie': 1, 'Eerste Divisie': 2,
+};
+const divisionRank = (name) => DIVISION_RANK[name] ?? 50;
+
 function DynamicFederationView({ federation, members }) {
   const reduce = useReducedMotion();
   const color = federation.primary_color || '#10b981';
@@ -145,7 +158,7 @@ function DynamicFederationView({ federation, members }) {
     }
     const named = [...map.entries()]
       .filter(([k]) => k !== '__autres__')
-      .sort((a, b) => b[1].length - a[1].length)
+      .sort((a, b) => (divisionRank(a[0]) - divisionRank(b[0])) || (b[1].length - a[1].length))
       .map(([name, list]) => ({ name, list }));
     const autres = map.get('__autres__');
     if (autres?.length) named.push({ name: `Autres clubs · ${federation.name}`, list: autres });
