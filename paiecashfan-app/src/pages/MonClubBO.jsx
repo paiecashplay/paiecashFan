@@ -85,7 +85,19 @@ export function MonClubBO() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 size={26} className="text-emerald-400 animate-spin" /></div>
+          <div className="space-y-6 animate-pulse">
+            <div className="h-10 w-56 rounded-xl bg-white/10" />
+
+            <div className="h-12 w-full rounded-2xl bg-white/5" />
+
+            <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+              <div className="h-5 w-40 rounded bg-white/10" />
+              <div className="h-10 rounded-xl bg-white/5" />
+              <div className="h-10 rounded-xl bg-white/5" />
+              <div className="h-10 rounded-xl bg-white/5" />
+              <div className="h-10 w-36 rounded-xl bg-white/10" />
+            </div>
+          </div>
         ) : (
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>

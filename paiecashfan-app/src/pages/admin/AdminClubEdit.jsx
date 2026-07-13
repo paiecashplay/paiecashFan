@@ -77,11 +77,24 @@ export function AdminClubEdit() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[50vh]">
-      <Loader2 size={28} className="text-emerald-400 animate-spin" />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="h-10 w-64 rounded-xl bg-white/10" />
+
+        <div className="h-12 w-full rounded-xl bg-white/5" />
+
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-14 rounded-xl bg-white/5"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -481,8 +494,22 @@ export function PlayersTab({ tenantId, showToast }) {
       {loading ? <SkeletonRows n={5} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {players.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun joueur. Ajoutez-en un.</p>
+            <div className="py-16 text-center">
+              <Users
+                  size={40}
+                  className="mx-auto mb-4 text-bone-600"
+              />
+
+              <h3 className="text-lg font-bold text-bone-200">
+                  Aucun joueur
+              </h3>
+
+              <p className="mt-2 text-sm text-bone-500">
+                  Commence par ajouter un joueur à ton effectif.
+              </p>
+          </div>
           ) : filtered.length === 0 ? (
+            
             <p className="py-12 text-center text-sm text-bone-500">Aucun joueur pour « {search} ».</p>
           ) : (
             <table className="w-full text-sm">
@@ -724,7 +751,20 @@ export function TrophiesTab({ tenantId, showToast }) {
       {loading ? <SkeletonRows n={4} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {trophies.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun trophée. Ajoutez-en un.</p>
+            <div className="py-16 text-center">
+              <Trophy
+                size={40}
+                className="mx-auto mb-4 text-bone-600"
+              />
+
+              <h3 className="text-lg font-bold text-bone-200">
+                Aucun trophée
+              </h3>
+
+              <p className="mt-2 text-sm text-bone-500">
+                Commence par ajouter un trophée au palmarès du club.
+              </p>
+            </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -881,7 +921,20 @@ export function ProductsTab({ tenantId, showToast }) {
       {loading ? <SkeletonRows n={4} /> : (
         <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
           {products.length === 0 ? (
-            <p className="py-12 text-center text-sm text-bone-500">Aucun produit. Ajoutez-en un.</p>
+            <div className="py-16 text-center">
+              <ShoppingBag
+                  size={40}
+                  className="mx-auto mb-4 text-bone-600"
+              />
+
+              <h3 className="text-lg font-bold text-bone-200">
+                  Aucun produit
+              </h3>
+
+              <p className="mt-2 text-sm text-bone-500">
+                  Commence par ajouter un produit à ta boutique.
+              </p>
+            </div>
           ) : filtered.length === 0 ? (
             <p className="py-12 text-center text-sm text-bone-500">Aucun produit pour « {search} ».</p>
           ) : (
