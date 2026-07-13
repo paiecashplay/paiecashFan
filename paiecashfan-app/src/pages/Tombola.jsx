@@ -82,7 +82,7 @@ export function Tombola() {
         </div>
 
         <Container className="relative">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-center min-h-[520px] md:min-h-[620px] py-14">
+          <div className="lg:max-w-xl min-h-[520px] md:min-h-[620px] flex flex-col justify-center py-14">
             <div>
               <Badge variant="emerald">🎁 Tombola</Badge>
               <h1 className="mt-6 font-display text-5xl md:text-7xl font-black uppercase tracking-tight text-bone-50 leading-[0.95]">
@@ -98,13 +98,13 @@ export function Tombola() {
                 <HeroFeature icon={Sparkles} title="Transparent" text="Tirage aléatoire" />
               </div>
             </div>
-
-            {featured && (
-              <div className="hidden lg:flex justify-center items-end pb-8">
-                <NextDrawBox campaign={featured} />
-              </div>
-            )}
           </div>
+
+          {featured && (
+            <div className="hidden lg:block absolute right-4 xl:right-8 bottom-8 z-10">
+              <NextDrawBox campaign={featured} />
+            </div>
+          )}
         </Container>
       </section>
 
@@ -242,11 +242,11 @@ function FeaturedDraw({ campaign, onBuy }) {
   return (
     <GlassCard variant="strong" className="mt-6 p-6 md:p-8 overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(245,158,11,0.12),transparent_40%)]" />
-      <div className="relative grid gap-6 md:grid-cols-[150px_1fr_190px] md:items-center">
-        <div className="rounded-2xl border border-gold-400/40 bg-gold-400/10 p-3 h-36 grid place-items-center overflow-hidden">
+      <div className="relative grid gap-6 md:grid-cols-[240px_1fr_190px] md:items-center">
+        <div className="rounded-2xl border border-gold-400/40 bg-gold-400/10 p-4 h-60 grid place-items-center overflow-hidden">
           {campaign.imageUrl
-            ? <img src={campaign.imageUrl} alt="" className="max-h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-            : <Gift size={54} className="text-gold-400" />}
+            ? <img src={campaign.imageUrl} alt="" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+            : <Gift size={72} className="text-gold-400" />}
         </div>
 
         <div>
@@ -254,8 +254,8 @@ function FeaturedDraw({ campaign, onBuy }) {
             <p className="text-[10px] uppercase tracking-[0.28em] text-emerald-400 font-black">Tirage en cours</p>
             {campaign.clubName && <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-bone-300 font-bold">{campaign.clubName}</span>}
           </div>
-          <h2 className="mt-3 font-display text-2xl md:text-3xl font-black text-bone-50">{campaign.prizeLabel || campaign.title}</h2>
-          {campaign.description && <p className="mt-2 text-sm text-bone-400 max-w-md">{campaign.description}</p>}
+          <h2 className="mt-3 font-display text-3xl md:text-4xl font-black text-bone-50">{campaign.prizeLabel || campaign.title}</h2>
+          {campaign.description && <p className="mt-3 text-base text-bone-400 max-w-md">{campaign.description}</p>}
           <div className="mt-6">
             <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">Fin du tirage dans</p>
             <div className="flex gap-2 flex-wrap">
