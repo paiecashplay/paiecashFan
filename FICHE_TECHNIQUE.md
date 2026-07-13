@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (aa)** — **Fix image des cards Sport Bingo + 6 visuels**. La card
+  masquait l'image (`opacity-70` sous dégradé sombre → image de stade invisible).
+  Corrigé : image pleine + dégradé bas pour lisibilité + voile haut pour les
+  badges. 5 visuels d'édition convertis en webp (ligue-champions, can, copa,
+  classicos-weekend, derbies-europeen ; ~2,2 Mo → ~140-230 Ko). Édition de test
+  rebranchée sur `/images/gaming/ligue-champions.webp`.
 - **2026-07-13 (z)** — **Tombola « Comment ça marche » refaite (maquette)**.
   4 étapes en badges circulaires numérotés reliés par des flèches (Choisis /
   Achète / Tirage / Reçois) + card promo « Plus tu joues, plus tu gagnes » avec

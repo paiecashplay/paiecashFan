@@ -213,9 +213,11 @@ function EditionCard({ ed, now, draft }) {
       {/* Fond */}
       <div className="absolute inset-0">
         {ed.cover_url
-          ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover opacity-70 group-hover:opacity-80 group-hover:scale-[1.03] transition-all duration-500" />
+          ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
           : <div className={`h-full w-full bg-gradient-to-b ${meta.fallback}`} />}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/70 to-ink-950/20" />
+        {/* Dégradé bas (lisibilité du texte) + léger voile haut (badges) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/5" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink-950/70 to-transparent" />
       </div>
 
       {/* Contenu */}
