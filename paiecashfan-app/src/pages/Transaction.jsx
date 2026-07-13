@@ -50,7 +50,7 @@ export function Transactions() {
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   return (
-    <div className="relative py-12">
+    <div className="relative py-8 sm:py-12">
       <Container>
         <Link
             to="/clubs"
@@ -60,7 +60,7 @@ export function Transactions() {
             Retour au club
           </Link>
 
-        <div className="flex items-center gap-4 mb-10">
+        <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center">
           <div className="grid h-16 w-16 place-items-center rounded-3xl bg-emerald-400/10 border border-emerald-400/20">
             <ReceiptText
               className="text-emerald-400"
@@ -69,7 +69,7 @@ export function Transactions() {
           </div>
 
           <div>
-            <h1 className="font-display text-4xl font-black text-bone-50 uppercase">
+            <h1 className="font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl">
               Transactions
             </h1>
 
@@ -80,9 +80,9 @@ export function Transactions() {
         </div>
 
 
-        <Container className="relative pt-12 md:pt-16 pb-6">
-            <WalletSection wallet={mockWallet} />
-        </Container>
+        <div className="relative pb-6 pt-8 md:pt-12">
+          <WalletSection wallet={mockWallet} />
+        </div>
 
         {/* Stats */}
 
@@ -99,7 +99,7 @@ export function Transactions() {
                 size={24}
               />
 
-              <span className="font-display text-4xl font-black text-emerald-400">
+              <span className="break-words font-display text-2xl font-black text-emerald-400 sm:text-4xl">
                 +{totalIn.toFixed(2)} PCC
               </span>
             </div>
@@ -116,7 +116,7 @@ export function Transactions() {
                 size={24}
               />
 
-              <span className="font-display text-4xl font-black text-red-400">
+              <span className="break-words font-display text-2xl font-black text-red-400 sm:text-4xl">
                 -{totalOut.toFixed(2)} PCC
               </span>
             </div>
@@ -157,9 +157,9 @@ export function Transactions() {
               >
                 <GlassCard className="p-5">
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
 
                       <motion.div
                         animate={{
@@ -186,7 +186,7 @@ export function Transactions() {
                     </div>
 
                     <div
-                      className={`font-display text-2xl font-black ${
+                      className={`shrink-0 font-display text-xl font-black sm:text-2xl ${
                         transaction.direction === 'in'
                           ? 'text-emerald-400'
                           : 'text-red-400'
@@ -256,10 +256,10 @@ function WalletCard({ icon, accentColor, label, amount, sub }) {
         <div className="text-sm font-semibold text-bone-200">{label}</div>
       </div>
 
-      <div className="mt-4 font-display text-3xl md:text-4xl font-black text-bone-50 tabular-nums">
+      <div className="mt-4 break-words font-display text-2xl font-black text-bone-50 tabular-nums sm:text-3xl md:text-4xl">
         {amount}
       </div>
-      <div className="mt-1 text-xs text-bone-400 font-mono">{sub}</div>
+      <div className="mt-1 break-all text-xs text-bone-400 font-mono">{sub}</div>
     </motion.div>
   );
 }

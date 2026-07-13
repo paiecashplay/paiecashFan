@@ -40,16 +40,16 @@ export function AdminApplications() {
   useEffect(() => { load(); }, [filter]); // eslint-disable-line
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="max-w-5xl space-y-6 px-4 sm:px-0">
       <div>
-        <h1 className="font-display text-2xl font-black text-bone-50">Candidatures</h1>
+        <h1 className="font-display text-xl sm:text-2xl font-black text-bone-50">Candidatures</h1>
         <p className="text-sm text-bone-400 mt-1">Représentants de club à vérifier</p>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 overflow-x-auto pb-2 sm:flex-wrap">
         {FILTERS.map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={cn('px-3 py-1.5 rounded-lg text-xs font-bold border transition-all',
+            className={cn('min-h-10 shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all',
               filter === f ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                 : 'text-bone-400 border-white/10 hover:border-white/20 hover:text-bone-200')}>
             {f === 'all' ? 'Toutes' : STATUS_META[f]?.label || f}
@@ -63,45 +63,47 @@ export function AdminApplications() {
         ) : apps.length === 0 ? (
           <div className="py-16 text-center text-sm text-bone-500">Aucune candidature</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
-                <th className="text-left px-5 py-3 font-semibold">Candidat</th>
-                <th className="text-left px-5 py-3 font-semibold">Club</th>
-                <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Docs</th>
-                <th className="text-left px-5 py-3 font-semibold">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              {apps.map((a) => {
-                const meta = STATUS_META[a.status] || STATUS_META.draft;
-                return (
-                  <tr key={a.id} onClick={() => setOpenId(a.id)}
-                    className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors cursor-pointer">
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500/30 to-cyan-500/30 grid place-items-center text-[11px] font-black text-bone-100 shrink-0">
-                          {(a.applicant_name || a.applicant_email || '?')[0]?.toUpperCase()}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-bone-100 truncate">{a.applicant_name || '—'}</p>
-                          <p className="text-[10px] text-bone-500 truncate">{a.applicant_email}</p>
+          <div className="overflow-x-auto">
+            <table className="min-w-[720px] w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
+                  <th className="text-left px-5 py-3 font-semibold">Candidat</th>
+                  <th className="text-left px-5 py-3 font-semibold">Club</th>
+                  <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Docs</th>
+                  <th className="text-left px-5 py-3 font-semibold">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                {apps.map((a) => {
+                  const meta = STATUS_META[a.status] || STATUS_META.draft;
+                  return (
+                    <tr key={a.id} onClick={() => setOpenId(a.id)}
+                      className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors cursor-pointer">
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                          <span className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500/30 to-cyan-500/30 grid place-items-center text-[11px] font-black text-bone-100 shrink-0">
+                            {(a.applicant_name || a.applicant_email || '?')[0]?.toUpperCase()}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-bone-100 truncate">{a.applicant_name || '—'}</p>
+                            <p className="text-[10px] text-bone-500 truncate">{a.applicant_email}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <p className="text-bone-100">{a.club_name || a.tenant?.name || '—'}</p>
-                      <p className="text-[10px] text-bone-500">{a.claim_type === 'existing' ? 'existant' : 'nouveau'}</p>
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-bone-400 hidden md:table-cell">{(a.documents || []).length} fichier(s)</td>
-                    <td className="px-5 py-3.5">
-                      <span className={cn('inline-flex px-2.5 py-1 rounded-lg border text-[11px] font-bold', meta.color)}>{meta.label}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <p className="text-bone-100">{a.club_name || a.tenant?.name || '—'}</p>
+                        <p className="text-[10px] text-bone-500">{a.claim_type === 'existing' ? 'existant' : 'nouveau'}</p>
+                      </td>
+                      <td className="px-5 py-3.5 text-xs text-bone-400 hidden md:table-cell">{(a.documents || []).length} fichier(s)</td>
+                      <td className="px-5 py-3.5">
+                        <span className={cn('inline-flex px-2.5 py-1 rounded-lg border text-[11px] font-bold', meta.color)}>{meta.label}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
@@ -115,7 +117,7 @@ export function AdminApplications() {
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
-            className="fixed bottom-6 right-6 px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-semibold text-emerald-400 shadow-lg">
+            className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-semibold text-emerald-400 shadow-lg">
             ✓ {toast}
           </motion.div>
         )}
@@ -159,12 +161,12 @@ function ApplicationModal({ id, onClose, onReviewed }) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/80 backdrop-blur"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <motion.div initial={{ scale: 0.96, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96 }}
-        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-ink-800 p-6 shadow-2xl">
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-ink-800 p-4 sm:p-6 shadow-2xl">
         {loading || !app ? (
           <div className="py-16 grid place-items-center"><Loader2 size={26} className="text-emerald-400 animate-spin" /></div>
         ) : (
           <>
-            <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h3 className="font-display text-xl font-black text-bone-50">{app.club_name || app.tenant?.name}</h3>
                 <p className="text-xs text-bone-400 mt-0.5">{app.claim_type === 'existing' ? 'Club existant revendiqué' : 'Nouveau club (brouillon)'}</p>
@@ -182,7 +184,7 @@ function ApplicationModal({ id, onClose, onReviewed }) {
             <div className="space-y-2 mb-5">
               {(app.documents || []).length === 0 && <p className="text-xs text-bone-500">Aucun document.</p>}
               {(app.documents || []).map((d) => (
-                <div key={d.path} className="flex items-center gap-2 rounded-lg border border-white/10 bg-ink-900/40 px-3 py-2">
+                <div key={d.path} className="flex flex-col gap-3 rounded-lg border border-white/10 bg-ink-900/40 px-3 py-2 sm:flex-row sm:items-center">
                   <FileText size={14} className="text-emerald-400 shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-semibold text-bone-100 truncate">{DOC_LABEL[d.type] || d.type}</div>
@@ -204,17 +206,17 @@ function ApplicationModal({ id, onClose, onReviewed }) {
               placeholder="Optionnel pour validation, requis pour refus / demande d'infos"
               className="w-full rounded-xl border border-white/10 bg-ink-900/60 px-3 py-2 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40 resize-none mb-4" />
 
-            <div className="flex flex-wrap gap-2 justify-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
               <button onClick={() => act('request-info', 'Informations demandées')} disabled={!!busy}
-                className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl border border-violet-500/30 bg-violet-500/10 text-xs font-bold text-violet-400 hover:bg-violet-500/20 transition-colors disabled:opacity-40">
+                className="inline-flex items-center gap-1.5 min-h-10 w-full sm:w-auto px-4 rounded-xl border border-violet-500/30 bg-violet-500/10 text-xs font-bold text-violet-400 hover:bg-violet-500/20 transition-colors disabled:opacity-40">
                 {busy === 'request-info' ? <Loader2 size={13} className="animate-spin" /> : <MessageSquare size={13} />} Demander infos
               </button>
               <button onClick={() => act('reject', 'Candidature refusée')} disabled={!!busy}
-                className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl border border-red-500/30 bg-red-500/10 text-xs font-bold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40">
+                className="inline-flex items-center gap-1.5 min-h-10 w-full sm:w-auto px-4 rounded-xl border border-red-500/30 bg-red-500/10 text-xs font-bold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40">
                 {busy === 'reject' ? <Loader2 size={13} className="animate-spin" /> : <X size={13} />} Refuser
               </button>
               <button onClick={() => act('approve', 'Candidature validée ✅')} disabled={!!busy}
-                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-xl bg-gradient-hero text-xs font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
+                className="inline-flex items-center gap-1.5 min-h-10 w-full sm:w-auto px-5 rounded-xl bg-gradient-hero text-xs font-bold text-white hover:opacity-90 transition-all disabled:opacity-50">
                 {busy === 'approve' ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />} Valider
               </button>
             </div>
@@ -227,10 +229,17 @@ function ApplicationModal({ id, onClose, onReviewed }) {
 
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center gap-2 text-bone-300">
-      <Icon size={13} className="text-bone-500 shrink-0" />
-      <span className="text-bone-500 text-xs">{label} :</span>
-      <span className="text-bone-100 truncate">{value}</span>
+    <div className="flex flex-col gap-1 text-bone-300 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-2 shrink-0">
+        <Icon size={13} className="text-bone-500" />
+        <span className="text-xs text-bone-500">
+          {label} :
+        </span>
+      </div>
+
+      <span className="break-all text-bone-100">
+        {value}
+      </span>
     </div>
   );
 }

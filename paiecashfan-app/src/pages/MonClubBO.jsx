@@ -47,17 +47,17 @@ export function MonClubBO() {
   if (profile?.role !== 'club_admin' || !clubId) return <Navigate to="/mon-club" replace />;
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] py-10">
-      <Container className="max-w-4xl">
+    <div className="relative min-h-[calc(100vh-80px)] py-8 sm:py-10">
+      <Container className="max-w-4xl px-4 sm:px-6">
         <Link to="/" className="inline-flex items-center gap-2 text-xs text-bone-400 hover:text-bone-100 mb-6 transition-colors">
           <ArrowLeft size={14} /> Retour au site
         </Link>
 
-        <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            {club?.logo_url && <img src={club.logo_url} alt="" className="h-12 w-12 rounded-xl object-contain bg-white/5 border border-white/10" />}
+            {club?.logo_url && <img src={club.logo_url} alt="" className="h-12 w-12 sm:h-12 sm:w-12 rounded-xl object-contain bg-white/5 border border-white/10" />}
             <div>
-              <h1 className="font-display text-2xl font-black text-bone-50">{club?.name || 'Mon club'}</h1>
+              <h1 className="font-display text-xl sm:text-2xl font-black text-bone-50 break-words">{club?.name || 'Mon club'}</h1>
               <p className="text-xs text-bone-400 mt-0.5">
                 {club?.status === 'active'
                   ? <span className="text-emerald-400 font-semibold">● En ligne</span>
@@ -67,17 +67,17 @@ export function MonClubBO() {
           </div>
           {club?.status === 'active' && club?.slug && (
             <a href={`/clubs/${club.slug}`} target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 h-9 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors">
+              className="inline-flex min-h-10 w-full sm:w-auto items-center justify-center gap-2 px-4 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors">
               <ExternalLink size={13} /> Voir ma page
             </a>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 rounded-xl border border-white/8 bg-ink-800/40 p-1 w-fit mb-6 overflow-x-auto">
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-white/8 bg-ink-800/40 p-1 pb-2 w-full sm:w-fit mb-6 scrollbar-hide">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
+              className={cn('flex min-h-10 shrink-0 items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
                 tab === id ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'text-bone-400 hover:text-bone-200')}>
               <Icon size={13} /> {label}
             </button>
@@ -113,7 +113,7 @@ export function MonClubBO() {
         <AnimatePresence>
           {toast && (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
-              className={cn('fixed bottom-6 right-6 flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold shadow-xl',
+              className={cn('fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold shadow-xl',
                 toast.ok ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-red-500/15 border-red-500/30 text-red-400')}>
               {toast.ok ? <Check size={14} /> : <X size={14} />} {toast.msg}
             </motion.div>
@@ -168,7 +168,7 @@ function ClubInfoForm({ club, onSaved }) {
         <Field label="Président"><input value={form.president} onChange={set('president')} className={inp} /></Field>
         <Field label="Devise"><input value={form.motto} onChange={set('motto')} placeholder="Ex : Ici c'est Paris" className={inp} /></Field>
         <Field label="Couleur principale">
-          <div className="flex gap-3 items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(form.primary_color) ? form.primary_color : '#10b981'} onChange={set('primary_color')} className="h-11 w-14 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
             <input value={form.primary_color} onChange={set('primary_color')} className={cn(inp, 'flex-1')} />
           </div>
@@ -186,14 +186,14 @@ function ClubInfoForm({ club, onSaved }) {
       </div>
 
       <button onClick={save} disabled={saving || uploading || !form.name}
-        className="flex items-center gap-2 h-11 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
+        className="flex min-h-11 w-full sm:w-auto items-center justify-center gap-2 px-6 rounded-xl bg-gradient-hero text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
         {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />} Sauvegarder
       </button>
     </div>
   );
 }
 
-const inp = 'w-full h-10 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
+const inp = 'w-full min-h-11 px-3 rounded-xl border border-white/10 bg-ink-900/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40';
 function Field({ label, children }) {
   return <div><label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>{children}</div>;
 }
@@ -201,13 +201,13 @@ function UploadField({ label, preview, square, inputRef, onPick, uploading, onUr
   return (
     <div>
       <label className="block text-[11px] font-semibold text-bone-400 mb-1.5 uppercase tracking-wider">{label}</label>
-      <div className="flex gap-3 items-start">
-        {preview && <img src={preview} alt="" className={cn('object-cover bg-white/5 border border-white/10 shrink-0', square ? 'h-14 w-14 rounded-xl object-contain' : 'h-14 w-20 rounded-xl')} />}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        {preview && <img src={preview} alt="" className={cn('object-cover bg-white/5 border border-white/10 mx-auto sm:mx-0 shrink-0', square ? 'h-16 w-16 rounded-xl object-contain' : 'h-14 w-20 rounded-xl')} />}
         <div className="flex-1 space-y-2">
           <input value={value} onChange={onUrl} placeholder="https://… ou upload" className={inp} />
           <input type="file" accept="image/*" ref={inputRef} onChange={(e) => onPick(e.target.files?.[0])} className="hidden" />
           <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
-            className="flex items-center gap-2 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
+            className="flex min-h-10 items-center gap-2 text-xs text-bone-400 hover:text-emerald-400 transition-colors">
             <Upload size={13} /> {uploading ? 'Upload…' : 'Uploader'}
           </button>
         </div>
