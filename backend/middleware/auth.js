@@ -34,6 +34,31 @@ async function requireAuth(req, res, next) {
   }
 }
 
+// Auth optionnelle : attache req.authUser si un token valide est fourni,
+// sinon continue en anonyme (req.authUser reste undefined). Pour les routes
+// consultables par tous mais enrichies quand l'utilisateur est connecté.
+async function optionalAuth(req, res, next) {
+  try {
+    const h = req.headers.authorization || '';
+    const token = h.startsWith('Bearer ') ? h.slice(7) : null;
+    if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles').select('role, club_id, display_name').eq('id', user.id).single();
+        req.authUser = {
+          id: user.id,
+          email: user.email,
+          role: profile?.role || 'fan',
+          club_id: profile?.club_id || null,
+          display_name: profile?.display_name || null,
+        };
+      }
+    }
+  } catch { /* token invalide → on reste anonyme */ }
+  next();
+}
+
 // Restreint à certains rôles (ex: requireRole('super_admin')).
 function requireRole(...roles) {
   return (req, res, next) => {
@@ -43,4 +68,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { requireAuth, requireRole };
+module.exports = { requireAuth, optionalAuth, requireRole };

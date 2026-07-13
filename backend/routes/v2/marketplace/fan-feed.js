@@ -5,11 +5,10 @@
 // ═══════════════════════════════════════════════════════════════
 
 const express = require('express');
-const { requireAuth } = require('../../../middleware/auth');
+const { requireAuth, optionalAuth } = require('../../../middleware/auth');
 const fanFeed = require('../../../db/fanFeed');
 
 const router = express.Router();
-router.use(requireAuth);
 
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: null, error: msg });
@@ -25,10 +24,11 @@ async function withTenant(req, res, next) {
   next();
 }
 
-// GET /api/v2/clubs/:slug/fan-feed
-router.get('/:slug/fan-feed', withTenant, async (req, res) => {
+// GET /api/v2/clubs/:slug/fan-feed — public (consultable sans connexion).
+// Si l'utilisateur est connecté (optionalAuth), on renvoie aussi likedByMe.
+router.get('/:slug/fan-feed', optionalAuth, withTenant, async (req, res) => {
   try {
-    const data = await fanFeed.getFeed(req.tenant.id, req.authUser.id);
+    const data = await fanFeed.getFeed(req.tenant.id, req.authUser?.id || null);
     return ok(res, data);
   } catch (err) {
     return fail(res, 'Chargement du fan club impossible : ' + err.message, 500);
@@ -36,7 +36,7 @@ router.get('/:slug/fan-feed', withTenant, async (req, res) => {
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/posts  { content }
-router.post('/:slug/fan-feed/posts', withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/posts', requireAuth, withTenant, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
@@ -49,7 +49,7 @@ router.post('/:slug/fan-feed/posts', withTenant, async (req, res) => {
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/posts/:postId/comments  { content }
-router.post('/:slug/fan-feed/posts/:postId/comments', withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le commentaire est vide.');
   if (content.length > MAX) return fail(res, 'Commentaire trop long.');
@@ -62,7 +62,7 @@ router.post('/:slug/fan-feed/posts/:postId/comments', withTenant, async (req, re
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/posts/:postId/like  → toggle
-router.post('/:slug/fan-feed/posts/:postId/like', withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/posts/:postId/like', requireAuth, withTenant, async (req, res) => {
   try {
     const result = await fanFeed.toggleLike(req.params.postId, req.authUser.id);
     return ok(res, result);
@@ -72,7 +72,7 @@ router.post('/:slug/fan-feed/posts/:postId/like', withTenant, async (req, res) =
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/messages  { content }
-router.post('/:slug/fan-feed/messages', withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/messages', requireAuth, withTenant, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');

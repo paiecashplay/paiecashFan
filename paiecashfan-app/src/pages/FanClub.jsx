@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import {  Video, Users, Radio} from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import {  Video, Users, Radio, LogIn} from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 import { Container } from '@/components/ui/Container';
 import { ClubFanCommunity } from '@/components/club/ClubFanCommunity';
@@ -26,6 +27,7 @@ export function FanClub() {
     logo: dbClub?.logo || dbClub?.logo_url || null,
   };
 
+  const { user } = useAuth();
   const [mode, setMode] = useState('club');
   const {
     fans,
@@ -106,6 +108,20 @@ export function FanClub() {
             </p>
           </div>
         </header>
+
+        {!user && (
+          <div className="mt-4 flex flex-col items-start justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4 sm:flex-row sm:items-center">
+            <p className="text-sm text-bone-200">
+              <span className="font-bold text-emerald-400">Connecte-toi</span> pour publier, commenter et discuter avec les supporters.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300 transition"
+            >
+              <LogIn size={14} /> Se connecter
+            </Link>
+          </div>
+        )}
 
         <div className="mt-6 grid gap-3 md:mt-8 md:grid-cols-2">
           <StreamingModeCard

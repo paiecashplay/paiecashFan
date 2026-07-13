@@ -91,6 +91,7 @@ export function useFanFeed(clubId, mode = 'club') {
   // Mode friends → local uniquement.
 
   const publishPost = useCallback((content) => {
+    if (!user) return false;
     const c = content?.trim();
     if (!c) return false;
 
@@ -108,6 +109,7 @@ export function useFanFeed(clubId, mode = 'club') {
   }, [clubId, mode, me.id, ensureMeInFans, loadFeed]);
 
   const likePost = useCallback((postId) => {
+    if (!user) return;
     const toggle = (list) => list.map((p) => p.id === postId
       ? { ...p, likedByMe: !p.likedByMe, likes: Number(p.likes || 0) + (p.likedByMe ? -1 : 1) }
       : p);
@@ -122,6 +124,7 @@ export function useFanFeed(clubId, mode = 'club') {
   }, [clubId, mode, loadFeed]);
 
   const addComment = useCallback((postId, content) => {
+    if (!user) return false;
     const c = content?.trim();
     if (!c) return false;
 
@@ -142,6 +145,7 @@ export function useFanFeed(clubId, mode = 'club') {
   }, [clubId, mode, me.id, ensureMeInFans, loadFeed]);
 
   const sendMessage = useCallback((content) => {
+    if (!user) return false;
     const c = content?.trim();
     if (!c) return false;
 

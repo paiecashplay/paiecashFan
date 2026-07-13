@@ -14,6 +14,7 @@ import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC, formatEuro} from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
+import { ClubCommunitySection } from '@/components/club/ClubCommunitySection';
 import { SideDock } from '@/components/SideDock';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { useCart } from '@/hooks/useCart';
@@ -163,7 +164,10 @@ export function ClubDetail() {
             cardBackground={club.cardBackground || club.stadiumImage}
           />
         ) : (
-          <MerchandiseSection club={club} apiProducts={products} />
+          <>
+            <MerchandiseSection club={club} apiProducts={products} />
+            <ClubCommunitySection clubSlug={slug} club={club} primaryColor={club.primaryColor} />
+          </>
         )}
       </div>
 

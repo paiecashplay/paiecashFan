@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (m)** — Fan Club : **feed consultable sans connexion** (GET public
+  via `optionalAuth`, écritures `requireAuth`) + CTA « Se connecter » propre pour
+  les visiteurs (fini l'erreur 404/401 au chargement quand déconnecté). **Section
+  « Communauté »** (`ClubCommunitySection`) intégrée directement dans la page de
+  chaque club (fil des supporters persisté par club).
 - **2026-07-11 (l)** — **Fan Club dynamique par club** : nouvelle route
   `/clubs/:slug/fan-club` (FanClub lit le `slug` → vrai club via `useClubDetail`),
   action **« Fan Club »** ajoutée au SideDock de chaque club. `/fan-club` (navbar)
