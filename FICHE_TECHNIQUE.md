@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-13 (y)** — **Édition des jeux publiés (bingo + tombola)**. BO bingo :
+  bouton **Modifier** par édition → panneau d'édition des paramètres (titre,
+  sous-titre, badge, description, coût, récompense, **image de fond** avec upload).
+  BO tombola (`TombolaManager`) : bouton **Modifier** par campagne → recharge le
+  formulaire (mode PUT) pour changer lot, prix, date, **image**, etc. + Annuler.
 - **2026-07-13 (x)** — **Sport Bingo — Refonte front + BO complet**.
   **Front** `/tombola/sport-bingo` refait (maquette) : en-tête (crédits, Règles,
   Classement), **cards d'édition** avec image de fond (`cover_url`), badge de

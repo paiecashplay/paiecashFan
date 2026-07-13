@@ -158,6 +158,10 @@ function EditionManage({ edition, showToast, onChanged }) {
   const [modal, setModal] = useState(null);   // { type: 'preview'|'simulate'|'cards', data }
   const [modalBusy, setModalBusy] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [edit, setEdit] = useState(null);     // formulaire d'édition
+  const [saving, setSaving] = useState(false);
+  const { uploadImage, uploading } = useImageUpload();
 
   const load = () => apiFetch(`/api/v2/bingo/admin/editions/${editionId}`).then((j) => setData(j.data)).catch(() => {});
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [editionId]);
@@ -204,6 +208,32 @@ function EditionManage({ edition, showToast, onChanged }) {
     catch (e) { showToast(e.message); }
     setPublishing(false);
   }
+  function toggleEdit() {
+    if (!editOpen) setEdit({
+      title: edition.title || '', badge: edition.badge || '', subtitle: edition.theme?.subtitle || '',
+      description: edition.description || '', costCredits: edition.cost_credits ?? 0, rewardPoints: edition.reward_points ?? 0,
+      coverUrl: edition.cover_url || '',
+    });
+    setEditOpen((v) => !v);
+  }
+  async function pickEditCover(e) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try { const url = await uploadImage(file, 'bingo'); setEdit((f) => ({ ...f, coverUrl: url })); showToast('Image ajoutée'); }
+    catch (err) { showToast('Upload : ' + err.message); }
+  }
+  async function saveEdit() {
+    if (!edit.title.trim()) { showToast('Titre requis'); return; }
+    setSaving(true);
+    try {
+      await apiFetch(`/api/v2/bingo/admin/editions/${editionId}`, { method: 'PUT', body: JSON.stringify({
+        title: edit.title, badge: edit.badge || null, description: edit.description || null,
+        costCredits: Number(edit.costCredits) || 0, rewardPoints: Number(edit.rewardPoints) || 0,
+        coverUrl: edit.coverUrl || null, theme: { ...(edition.theme || {}), subtitle: edit.subtitle || '' },
+      }) });
+      showToast('Édition mise à jour'); setEditOpen(false); onChanged?.();
+    } catch (e) { showToast('Erreur : ' + e.message); }
+    setSaving(false);
+  }
   async function openModal(type) {
     setModal({ type, data: null }); setModalBusy(true);
     try {
@@ -229,10 +259,39 @@ function EditionManage({ edition, showToast, onChanged }) {
             {publishing ? <Loader2 size={13} className="animate-spin" /> : <Rocket size={13} />} Publier
           </button>
         )}
+        <ToolBtn icon={Pencil} onClick={toggleEdit}>Modifier</ToolBtn>
         <ToolBtn icon={Eye} onClick={() => openModal('preview')} disabled={count < needed}>Prévisualiser la grille</ToolBtn>
         <ToolBtn icon={FlaskConical} onClick={() => openModal('simulate')}>Simuler la validation</ToolBtn>
         <ToolBtn icon={Users} onClick={() => openModal('cards')}>Cartes joueurs</ToolBtn>
       </div>
+
+      {/* Panneau d'édition des paramètres */}
+      {editOpen && edit && (
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4 grid gap-3 md:grid-cols-2">
+          <L label="Titre *"><input className={input} value={edit.title} onChange={(e) => setEdit({ ...edit, title: e.target.value })} /></L>
+          <L label="Sous-titre (carte)"><input className={input} value={edit.subtitle} onChange={(e) => setEdit({ ...edit, subtitle: e.target.value })} placeholder="Le meilleur de l'Europe" /></L>
+          <L label="Badge"><input className={input} value={edit.badge} onChange={(e) => setEdit({ ...edit, badge: e.target.value })} /></L>
+          <L label="Description"><input className={input} value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} /></L>
+          <L label="Coût (crédits)"><input type="number" min="0" className={input} value={edit.costCredits} onChange={(e) => setEdit({ ...edit, costCredits: e.target.value })} /></L>
+          <L label="Récompense (points)"><input type="number" min="0" className={input} value={edit.rewardPoints} onChange={(e) => setEdit({ ...edit, rewardPoints: e.target.value })} /></L>
+          <L label="Image de fond (carte)">
+            <div className="flex items-center gap-2">
+              <label className="inline-flex items-center gap-1.5 h-10 px-3 rounded-xl border border-white/10 bg-white/5 text-sm text-bone-200 hover:text-emerald-400 cursor-pointer shrink-0">
+                {uploading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Choisir
+                <input type="file" accept="image/*" className="hidden" onChange={pickEditCover} />
+              </label>
+              <input className={input} value={edit.coverUrl} onChange={(e) => setEdit({ ...edit, coverUrl: e.target.value })} placeholder="…ou colle une URL" />
+            </div>
+          </L>
+          <div className="md:col-span-2 flex items-center gap-3">
+            {edit.coverUrl && <img src={edit.coverUrl} alt="" className="h-14 w-24 rounded-lg object-cover border border-white/10" />}
+            <button onClick={saveEdit} disabled={saving} className="inline-flex items-center gap-1.5 h-10 px-5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50">
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Pencil size={14} />} Enregistrer
+            </button>
+            <button onClick={() => setEditOpen(false)} className="h-10 px-4 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-100">Annuler</button>
+          </div>
+        </div>
+      )}
 
       {/* En-tête d'état */}
       <div className="flex items-center justify-between gap-3 flex-wrap">

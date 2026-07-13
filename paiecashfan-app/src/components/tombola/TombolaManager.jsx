@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Gift, Plus, Trophy, Trash2, Loader2, Upload } from 'lucide-react';
+import { Gift, Plus, Trophy, Trash2, Loader2, Upload, Pencil, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -19,6 +19,8 @@ const STATUS_STYLE = {
 const fmt = (n) => Number(n || 0).toLocaleString('fr-FR');
 const fmtDate = (s) => { try { return new Date(s).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return s; } };
 const BLANK = { title: '', prizeLabel: '', description: '', ticketPricePcc: '', ticketsTotal: '', endsAt: '', imageUrl: '' };
+// ISO → valeur pour <input type="datetime-local"> (heure locale).
+const toLocalInput = (iso) => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return ''; const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
 
 export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = 'Crée et gère les tombolas (tirage auto à la date de fin).' }) {
   const [campaigns, setCampaigns] = useState(null);
@@ -26,10 +28,22 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
   const [form, setForm] = useState(BLANK);
   const [creating, setCreating] = useState(false);
   const [acting, setActing] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const { uploadImage, uploading } = useImageUpload();
   const fileRef = useRef(null);
+  const formRef = useRef(null);
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(''), 3000); };
+
+  function startEdit(c) {
+    setEditingId(c.id);
+    setForm({
+      title: c.title || '', prizeLabel: c.prizeLabel || '', description: c.description || '',
+      ticketPricePcc: c.ticketPricePcc ?? '', ticketsTotal: c.ticketsTotal ?? '', endsAt: toLocalInput(c.endsAt), imageUrl: c.imageUrl || '',
+    });
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function cancelEdit() { setEditingId(null); setForm(BLANK); }
 
   async function onPickImage(e) {
     const file = e.target.files?.[0];
@@ -45,23 +59,22 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
     .then((j) => setCampaigns(j.data?.campaigns || [])).catch(() => setCampaigns([]));
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [clubId]);
 
-  async function create() {
+  async function submit() {
     if (!form.title.trim() || !form.endsAt) { showToast('Titre et date de fin requis'); return; }
     setCreating(true);
     try {
-      await apiFetch('/api/v2/tombola', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: form.title.trim(),
-          prizeLabel: form.prizeLabel.trim() || null,
-          description: form.description.trim() || null,
-          ticketPricePcc: Number(form.ticketPricePcc) || 0,
-          ticketsTotal: form.ticketsTotal === '' ? null : Number(form.ticketsTotal),
-          endsAt: new Date(form.endsAt).toISOString(),
-          imageUrl: form.imageUrl.trim() || null,
-        }),
+      const body = JSON.stringify({
+        title: form.title.trim(),
+        prizeLabel: form.prizeLabel.trim() || null,
+        description: form.description.trim() || null,
+        ticketPricePcc: Number(form.ticketPricePcc) || 0,
+        ticketsTotal: form.ticketsTotal === '' ? null : Number(form.ticketsTotal),
+        endsAt: new Date(form.endsAt).toISOString(),
+        imageUrl: form.imageUrl.trim() || null,
       });
-      setForm(BLANK); showToast('Tombola créée'); load();
+      if (editingId) { await apiFetch(`/api/v2/tombola/${editingId}`, { method: 'PUT', body }); showToast('Tombola mise à jour'); }
+      else { await apiFetch('/api/v2/tombola', { method: 'POST', body }); showToast('Tombola créée'); }
+      setForm(BLANK); setEditingId(null); load();
     } catch (e) { showToast('Erreur : ' + e.message); }
     setCreating(false);
   }
@@ -91,8 +104,10 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
         <p className="text-sm text-bone-400 mt-1">{subtitle}</p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-ink-800/40 p-6">
-        <h2 className="flex items-center gap-2 font-display font-black text-bone-100 text-sm uppercase tracking-widest"><Plus size={15} /> Nouvelle tombola</h2>
+      <div ref={formRef} className={`rounded-2xl border bg-ink-800/40 p-6 ${editingId ? 'border-emerald-500/40' : 'border-white/10'}`}>
+        <h2 className="flex items-center gap-2 font-display font-black text-bone-100 text-sm uppercase tracking-widest">
+          {editingId ? <><Pencil size={15} /> Modifier la tombola</> : <><Plus size={15} /> Nouvelle tombola</>}
+        </h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <L label="Titre *"><input className={input} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Tombola de la saison" /></L>
           <L label="Lot"><input className={input} value={form.prizeLabel} onChange={(e) => setForm({ ...form, prizeLabel: e.target.value })} placeholder="Maillot signé + 500 PCC" /></L>
@@ -113,9 +128,12 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
           </L>
           <div className="md:col-span-2"><L label="Description"><textarea rows={2} className={input.replace('h-10', 'py-2 min-h-[2.5rem]')} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></L></div>
         </div>
-        <button onClick={create} disabled={creating} className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50">
-          {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Créer la tombola
-        </button>
+        <div className="mt-4 flex items-center gap-3">
+          <button onClick={submit} disabled={creating} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50">
+            {creating ? <Loader2 size={14} className="animate-spin" /> : editingId ? <Pencil size={14} /> : <Plus size={14} />} {editingId ? 'Enregistrer les modifications' : 'Créer la tombola'}
+          </button>
+          {editingId && <button onClick={cancelEdit} className="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl border border-white/10 text-sm text-bone-300 hover:text-bone-100"><X size={14} /> Annuler</button>}
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -140,6 +158,11 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              {c.status !== 'drawn' && (
+                <button onClick={() => startEdit(c)} className="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-400/30 transition">
+                  <Pencil size={13} /> Modifier
+                </button>
+              )}
               {c.status === 'active' && (
                 <button onClick={() => draw(c.id)} disabled={acting === c.id} className="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl border border-gold-400/30 bg-gold-400/10 text-xs font-bold text-gold-400 hover:bg-gold-400/20 transition disabled:opacity-50">
                   {acting === c.id ? <Loader2 size={13} className="animate-spin" /> : <Trophy size={13} />} Tirer
