@@ -12,7 +12,7 @@ import {
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
 import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
-import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC } from '@/data/clubMerchandise';
+import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC, formatEuro} from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { SideDock } from '@/components/SideDock';
 import { useClubDetail } from '@/hooks/useClubDetail';
@@ -1137,6 +1137,18 @@ function PlayerCard({ player, index, primaryColor, hidePosition = false }) {
   );
 }
 
+// ── MERCHANDISE UTILITIES ───────────────────────────────────────────
+function getProductPccPrice(product) {
+  return Number(product.pccPrice ?? product.pricePcc ?? product.price ?? 0);
+}
+
+// Convertit le prix en euro (float) pour l'affichage, en priorisant
+function getProductEuroPrice(product) {
+  return Number(product.eurPrice ?? product.priceEuro ?? product.price ?? 0);
+}
+
+
+
 // ── MERCHANDISE (boutique du club) ───────────────────────────────────
 // Section style marketplace as-nancy-lorraine avec une modale de
 // sélection (taille + quantité) à l'ajout au panier.
@@ -1156,6 +1168,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
           category: p.category_slug || 'autre',
           price:    p.eur_price || 0,
           pccPrice: p.pcc_price || 0,
+          eurPrice: p.eur_price || 0,                             // prix en euro pour l'affichage (float)
           image:    cover,                                       // vignette de la card
           images:   imgs.length ? imgs : (cover ? [cover] : []), // slider de la modale
           sizes:    p.sizes || [],
@@ -1328,6 +1341,13 @@ function MerchandiseSection({ club, apiProducts = [] }) {
 // total + bouton checkout. Apparaît sous la grille produits dès qu'un
 // article est ajouté.
 function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, persisted, onRemove, onQtyChange }) {
+  const totalEuro = cart.reduce((sum, item) => {
+    const product = products.find((p) => p.id === item.product_id);
+    if (!product) return sum;
+
+    return sum + getProductEuroPrice(product) * item.quantity;
+  }, 0);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -1336,12 +1356,12 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
       className="mt-10 rounded-2xl border bg-white/[0.04] backdrop-blur-md overflow-hidden"
       style={{ borderColor: `${primaryColor}55` }}
     >
-      {/* Header */}
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between gap-3 flex-wrap">
         <div className="text-[10px] uppercase tracking-[0.22em] text-bone-200 font-bold inline-flex items-center gap-2">
           <ShoppingBag size={14} style={{ color: primaryColor }} />
           Votre panier · {totalItems} {totalItems > 1 ? 'articles' : 'article'}
         </div>
+
         {persisted ? (
           <span className="text-[9px] uppercase tracking-[0.18em] text-emerald-400/80 font-bold inline-flex items-center gap-1">
             <Check size={10} /> Sauvegardé
@@ -1353,15 +1373,16 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
         )}
       </div>
 
-      {/* Items */}
       <ul className="divide-y divide-white/5">
         {cart.map((item) => {
           const product = products.find((p) => p.id === item.product_id);
           if (!product) return null;
-          const lineTotal = Number(item.total_pcc ?? item.quantity * item.unit_price_pcc);
+
+          const lineTotalPcc = Number(item.total_pcc ?? item.quantity * item.unit_price_pcc);
+          const lineTotalEuro = getProductEuroPrice(product) * item.quantity;
+
           return (
             <li key={item.id} className="px-5 py-4 flex items-center gap-4">
-              {/* Mini photo */}
               <span
                 className="shrink-0 grid h-12 w-12 place-items-center rounded-lg overflow-hidden"
                 style={{ background: `${primaryColor}15`, border: `1px solid ${primaryColor}40` }}
@@ -1379,22 +1400,28 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
                 )}
               </span>
 
-              {/* Nom + taille */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-bone-50 truncate">{product.name}</div>
+                <div className="text-sm font-bold text-bone-50 truncate">
+                  {product.name}
+                </div>
+
                 <div className="mt-0.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-bone-400 font-bold">
                   {item.size && (
                     <span className="px-1.5 py-0.5 rounded bg-white/5 text-bone-200 font-mono">
                       {item.size}
                     </span>
                   )}
+
                   <span className="font-mono">
                     {formatPCC(item.unit_price_pcc)} PCC × {item.quantity}
+                  </span>
+
+                  <span className="font-mono normal-case text-bone-500">
+                    · {formatEuro(lineTotalEuro)}
                   </span>
                 </div>
               </div>
 
-              {/* Quantité (- / +) */}
               <div className="hidden sm:inline-flex items-center gap-1 rounded-full border border-white/10 bg-ink-900/50 p-1">
                 <QtyButton
                   onClick={() => onQtyChange(item.id, Math.max(1, item.quantity - 1))}
@@ -1402,9 +1429,11 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
                 >
                   <Minus size={12} strokeWidth={3} />
                 </QtyButton>
+
                 <span className="min-w-[1.5rem] text-center text-xs font-mono font-bold text-bone-50 tabular-nums">
                   {item.quantity}
                 </span>
+
                 <QtyButton
                   onClick={() => onQtyChange(item.id, item.quantity + 1)}
                   ariaLabel="Augmenter la quantité"
@@ -1413,14 +1442,18 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
                 </QtyButton>
               </div>
 
-              {/* Total ligne + supprimer */}
               <div className="text-right shrink-0">
                 <div
                   className="font-display text-base font-black tabular-nums"
                   style={{ color: primaryColor }}
                 >
-                  {formatPCC(lineTotal)}
+                  {formatPCC(lineTotalPcc)} PCC
                 </div>
+
+                <div className="text-xs text-bone-400">
+                  {formatEuro(lineTotalEuro)}
+                </div>
+
                 <button
                   onClick={() => onRemove(item.id)}
                   className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-bone-400 hover:text-rose-400 font-bold transition-colors"
@@ -1433,19 +1466,24 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
         })}
       </ul>
 
-      {/* Footer : total + CTA */}
       <div className="px-5 py-4 border-t border-white/5 flex items-center justify-between gap-4 bg-white/[0.02]">
         <div>
           <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
             Total à payer
           </div>
+
           <div
             className="font-display text-2xl md:text-3xl font-black tabular-nums"
             style={{ color: primaryColor }}
           >
             {formatPCC(totalPrice)} PCC
           </div>
+
+          <div className="mt-1 text-sm text-bone-400">
+            {formatEuro(totalEuro)}
+          </div>
         </div>
+
         <button
           className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105"
           style={{ background: primaryColor }}
@@ -1513,13 +1551,17 @@ function ProductCard({ product, index, primaryColor, inCart, onOpen }) {
       <div className="p-4 md:p-5 flex items-center justify-between gap-3 border-t border-white/5">
         <div className="flex-1 min-w-0">
           <div className="text-sm font-bold text-bone-50 truncate">{product.name}</div>
-          <div
-            className="mt-0.5 text-[11px] font-mono tabular-nums"
-            style={{ color: primaryColor }}
-          >
-            <span className="font-bold">{formatPCC(product.price)}</span>
-            <span className="ml-1 opacity-70">PCC</span>
-          </div>
+          <div className="mt-0.5 text-[11px] font-mono tabular-nums">
+            <span className="font-bold" style={{ color: primaryColor }}>
+              {formatPCC(getProductPccPrice(product))} PCC
+            </span>
+
+            <span className="mx-1 text-bone-500">·</span>
+
+            <span className="text-bone-300">
+              {formatEuro(getProductEuroPrice(product))}
+            </span>
+         </div>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onOpen(); }}
@@ -1566,7 +1608,10 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
     };
   }, [onClose, images.length]);
 
-  const lineTotal = qty * product.price;
+  const unitPccPrice = getProductPccPrice(product);       // remplace const lineTotal = qty * product.price; prix unitaire en PCC pour le calcul du total
+  const unitEuroPrice = getProductEuroPrice(product);    // prix unitaire en Euro pour l'affichage
+  const lineTotalPcc = qty * unitPccPrice;               // total ligne en PCC
+  const lineTotalEuro = qty * unitEuroPrice;             // total ligne en Euro
   const requiresSize = product.sizes && product.sizes.length > 0;
   const canAdd = !requiresSize || !!size;
 
@@ -1576,7 +1621,7 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
       productId: product.id,
       size: requiresSize ? size : null,
       qty,
-      unitPrice: product.price
+      unitPrice: unitPccPrice    // remplace unitPrice: product.price
     });
   };
 
@@ -1660,15 +1705,16 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
               {product.name}
             </h3>
             <div className="mt-3 inline-flex items-baseline gap-1.5">
-              <span
+              <div
                 className="font-display text-3xl md:text-4xl font-black tabular-nums"
                 style={{ color: primaryColor }}
               >
-                {formatPCC(product.price)}
-              </span>
-              <span className="text-xs font-mono uppercase tracking-[0.18em] text-bone-400 font-bold">
-                PCC
-              </span>
+                {formatPCC(unitPccPrice)} PCC
+              </div>
+
+              <div className="mt-1 text-sm font-bold text-bone-300">
+                 . {formatEuro(unitEuroPrice)}
+              </div>
             </div>
 
             {product.description && (
@@ -1734,7 +1780,13 @@ function ProductDetailModal({ product, primaryColor, onClose, onAdd }) {
                   className="font-display text-2xl md:text-3xl font-black tabular-nums"
                   style={{ color: primaryColor }}
                 >
-                  {formatPCC(lineTotal)} PCC
+                  <span className="block">
+                    {formatPCC(lineTotalPcc)} PCC
+                  </span>
+
+                  <span className="block text-sm text-bone-400">
+                    {formatEuro(lineTotalEuro)}
+                  </span>
                 </span>
               </div>
               <button
