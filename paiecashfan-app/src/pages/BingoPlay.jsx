@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Grid3x3, Loader2, Lock, Check, Coins, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Grid3x3, Loader2, Lock, Check, Coins, AlertCircle, CheckCircle2, Clock, ShieldAlert } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +22,7 @@ export function BingoPlay() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);    // création carte / soumission
   const [savingCell, setSavingCell] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const load = () => apiFetch(`/api/v2/bingo/${slug}`).then((j) => setData(j.data)).catch((e) => setError(e.message));
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [slug]);
@@ -53,8 +54,8 @@ export function BingoPlay() {
 
   async function submit() {
     setBusy(true); setError('');
-    try { await apiFetch(`/api/v2/bingo/card/${card.id}/submit`, { method: 'POST' }); await load(); }
-    catch (e) { setError(e.message); }
+    try { await apiFetch(`/api/v2/bingo/card/${card.id}/submit`, { method: 'POST' }); setConfirmOpen(false); await load(); }
+    catch (e) { setError(e.message); setConfirmOpen(false); }
     setBusy(false);
   }
 
@@ -116,9 +117,10 @@ export function BingoPlay() {
             </div>
 
             {isDraft && (
-              <div className="mt-6 flex justify-end">
-                <Button variant="gold" size="md" onClick={submit} disabled={busy || filled < totalCells}>
-                  {busy ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />} Valider ma grille
+              <div className="mt-6 flex items-center justify-end gap-3">
+                {filled < totalCells && <p className="text-xs text-bone-500">Complète les {totalCells - filled} case(s) restante(s)</p>}
+                <Button variant="gold" size="md" onClick={() => setConfirmOpen(true)} disabled={busy || filled < totalCells}>
+                  <Check size={15} /> Valider ma grille
                 </Button>
               </div>
             )}
@@ -142,6 +144,67 @@ export function BingoPlay() {
           </>
         )}
       </Container>
+
+      <AnimatePresence>
+        {confirmOpen && card && (
+          <ConfirmSubmit edition={ed} card={card} busy={busy} onCancel={() => setConfirmOpen(false)} onConfirm={submit} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Modal de confirmation (validation irréversible) ──────────
+function ConfirmSubmit({ edition, card, busy, onCancel, onConfirm }) {
+  const [accepted, setAccepted] = useState(false);
+  const fmt = (s) => { try { return new Date(s).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return s; } };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4">
+      <motion.div initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
+        className="w-full max-w-md rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
+        <div className="flex items-start gap-3">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gold-400/10 border border-gold-400/30 text-gold-400"><ShieldAlert size={20} /></div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-gold-400 font-black">Validation définitive</p>
+            <h3 className="mt-1 font-display text-xl font-black uppercase text-bone-50">Valider ma grille ?</h3>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm text-bone-400">
+          Une fois validée, ta grille est <b className="text-bone-200">verrouillée</b> : tu ne pourras plus modifier tes pronostics.
+          Les points seront calculés à la clôture de l'édition.
+        </p>
+
+        <div className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm">
+          <Row label="Édition" value={edition.title} />
+          <Row label="Grille" value={({ express: '3×3', standard: '5×5', expert: '6×6' })[card.format] || '5×5'} />
+          <Row label="Coût" value={`${edition.cost_credits} crédits`} icon={Coins} />
+          {edition.locks_at && <Row label="Verrouillage" value={fmt(edition.locks_at)} icon={Clock} />}
+        </div>
+
+        <label className="mt-5 flex items-start gap-3 cursor-pointer select-none">
+          <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-white/5 accent-emerald-500" />
+          <span className="text-xs text-bone-300">J'ai vérifié mes pronostics et j'accepte que ma grille soit validée de façon définitive.</span>
+        </label>
+
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="ghost" size="md" onClick={onCancel} disabled={busy}>Annuler</Button>
+          <Button variant="gold" size="md" onClick={onConfirm} disabled={!accepted || busy}>
+            {busy ? <><Loader2 size={15} className="animate-spin" /> Validation…</> : <><Check size={15} /> Valider définitivement</>}
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function Row({ label, value, icon: Icon }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">{label}</span>
+      <span className="inline-flex items-center gap-1.5 font-bold text-bone-100">{Icon && <Icon size={13} className="text-emerald-400" />}{value}</span>
     </div>
   );
 }

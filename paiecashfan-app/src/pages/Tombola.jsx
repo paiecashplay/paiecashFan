@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Ticket, Gift, Check, X, Users, ShieldCheck, Trophy, Sparkles,
-  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3
+  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3, ArrowRight
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -162,7 +162,12 @@ export function Tombola() {
       {/* ── SPORT BINGO (jouable) ────────────────────────── */}
       {playableBingo.length > 0 && (
         <Container className="relative py-12">
-          <SectionTitle icon={Grid3x3}>Sport Bingo</SectionTitle>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <SectionTitle icon={Grid3x3}>Sport Bingo</SectionTitle>
+            <Link to="/tombola/sport-bingo" className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300">
+              Voir tout <ArrowRight size={15} />
+            </Link>
+          </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {playableBingo.map((ed) => (
               <Link key={ed.id} to={`/bingo/${ed.slug}`}>

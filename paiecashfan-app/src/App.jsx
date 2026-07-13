@@ -22,6 +22,7 @@ import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminTombola } from './pages/admin/AdminTombola';
 import { AdminBingo } from './pages/admin/AdminBingo';
 import { BingoPlay } from './pages/BingoPlay';
+import { SportBingo } from './pages/SportBingo';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
 import { AdminFederations } from './pages/admin/AdminFederations';
@@ -86,6 +87,7 @@ export default function App() {
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
                   <Route path="/clubs/:slug/fan-club" element={<FanClub />} />
+                  <Route path="/tombola/sport-bingo" element={<SportBingo />} />
                   <Route path="/bingo/:slug" element={<BingoPlay />} />
                   <Route
                     path="/mon-club"

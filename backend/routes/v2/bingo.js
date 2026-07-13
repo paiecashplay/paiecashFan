@@ -57,6 +57,12 @@ router.get('/me/credits', requireAuth, async (req, res) => {
   catch (err) { return fail(res, err.message, 500); }
 });
 
+// Mes cartes (toutes éditions confondues).
+router.get('/me/cards', requireAuth, async (req, res) => {
+  try { return ok(res, { cards: await bingo.listMyCards(req.authUser.id) }); }
+  catch (err) { return fail(res, err.message, 500); }
+});
+
 // Portefeuille virtuel (Fan Credits) + historique (ledger).
 router.get('/me/wallet', requireAuth, async (req, res) => {
   try {

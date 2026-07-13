@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-13 (u)** — **Sport Bingo — Phase 3 UI (bloc 1)**. Page dédiée
+  `/tombola/sport-bingo` : hero, **éditions à jouer** (vedette + grille),
+  **Mes cartes** (toutes éditions, statut + score + figures), **Classement**
+  (podium, avatars, « Toi »), **Comment jouer**, **Jeu responsable**. Endpoint
+  `GET /me/cards`. Section Sport Bingo de la page Tombola → lien « Voir tout ».
+  Grille jouable : **modal de confirmation irréversible** avant validation
+  (règles + coût + verrouillage + case d'acceptation).
 - **2026-07-11 (t)** — **Sport Bingo — Phase 2b : moteur de scoring**.
   `bingoEngine.detectFigures` (lignes/colonnes/diagonales/coins/carré/croix/X/
   double-triple ligne/BINGO). `services/bingoScoring.js` : à la clôture, note les

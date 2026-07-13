@@ -118,6 +118,20 @@ async function getPicks(cardId) {
   return data || [];
 }
 
+// Toutes les cartes d'un joueur (toutes éditions), enrichies des infos d'édition
+// nécessaires à l'affichage « Mes cartes ».
+async function listMyCards(userId) {
+  const { data: cards } = await supabase.from('bingo_cards')
+    .select('id, edition_id, status, points_total, figures_won, format, created_at, submitted_at')
+    .eq('user_id', userId).order('created_at', { ascending: false });
+  if (!cards?.length) return [];
+  const edIds = [...new Set(cards.map((c) => c.edition_id))];
+  const { data: eds } = await supabase.from('bingo_editions')
+    .select('id, slug, title, cover_url, badge, status, ends_at, locks_at, cost_credits').in('id', edIds);
+  const byId = Object.fromEntries((eds || []).map((e) => [e.id, e]));
+  return cards.map((c) => ({ ...c, edition: byId[c.edition_id] || null }));
+}
+
 // Crée la carte du joueur (débit crédits + génération layout déterministe +
 // initialisation des picks). Idempotent : renvoie la carte existante sinon.
 async function createCard(edition, userId) {
@@ -180,5 +194,5 @@ module.exports = {
   listMatches, addMatch, updateMatch, deleteMatch,
   listEvents, addEvent, updateEvent, deleteEvent,
   ensureCredits,
-  getCard, getPicks, createCard, savePicks, submitCard,
+  getCard, getPicks, listMyCards, createCard, savePicks, submitCard,
 };
