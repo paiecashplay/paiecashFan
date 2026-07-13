@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-13 (z)** — **Tombola « Comment ça marche » refaite (maquette)**.
+  4 étapes en badges circulaires numérotés reliés par des flèches (Choisis /
+  Achète / Tirage / Reçois) + card promo « Plus tu joues, plus tu gagnes » avec
+  image cadeau 3D (`cadeau.webp`, 4 Ko) et bouton « Voir les lots » (ancre
+  #tombolas). Steps centrés verticalement, card compacte.
 - **2026-07-13 (y)** — **Édition des jeux publiés (bingo + tombola)**. BO bingo :
   bouton **Modifier** par édition → panneau d'édition des paramètres (titre,
   sous-titre, badge, description, coût, récompense, **image de fond** avec upload).

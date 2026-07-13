@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Ticket, Gift, Check, X, Users, ShieldCheck, Trophy, Sparkles,
-  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3, ArrowRight
+  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3, ArrowRight, Target
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -26,10 +26,16 @@ const UPCOMING_GAMES = [
 ];
 
 const STEPS = [
-  { n: 1, icon: Gift, title: 'Choisis une tombola', text: 'Parcours les tombolas en cours et leurs lots.' },
-  { n: 2, icon: Wallet, title: 'Achète des tickets en PCC', text: 'Plus tu as de tickets, plus tu as de chances.' },
-  { n: 3, icon: Trophy, title: 'Tirage automatique', text: 'À la date de fin, un gagnant est tiré au sort.' },
+  { icon: Ticket, color: 'violet',  title: 'Choisis une tombola', text: 'Parcours les tombolas en cours et leurs lots.' },
+  { icon: Wallet, color: 'emerald', title: 'Achète des tickets',   text: 'Plus tu as de tickets, plus tu as de chances.' },
+  { icon: Target, color: 'gold',    title: 'Tirage automatique',   text: 'À la date de fin, un gagnant est tiré au sort.' },
+  { icon: Gift,   color: 'emerald', title: 'Reçois ton lot',       text: 'Les gagnants sont contactés et leurs lots envoyés.' },
 ];
+const STEP_COLORS = {
+  violet:  { ring: 'border-violet-500/40 bg-violet-500/10 text-violet-300', num: 'bg-violet-500' },
+  emerald: { ring: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300', num: 'bg-emerald-500' },
+  gold:    { ring: 'border-gold-400/40 bg-gold-400/10 text-gold-400', num: 'bg-gold-400' },
+};
 
 function getTimeLeft(targetDate) {
   const diff = new Date(targetDate).getTime() - Date.now();
@@ -109,7 +115,7 @@ export function Tombola() {
       </section>
 
       {/* ── TOMBOLAS EN COURS ────────────────────────────── */}
-      <Container className="relative pb-8">
+      <Container id="tombolas" className="relative pb-8 scroll-mt-24">
         <SectionTitle icon={Ticket}>Tombolas en cours</SectionTitle>
 
         {campaigns === null ? (
@@ -136,19 +142,40 @@ export function Tombola() {
       {/* ── COMMENT ÇA MARCHE ────────────────────────────── */}
       <Container className="relative py-12">
         <SectionTitle icon={Sparkles}>Comment ça marche</SectionTitle>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {STEPS.map((s) => (
-            <GlassCard key={s.n} className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                  <s.icon size={18} />
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_280px] items-center">
+          {/* Process en étapes */}
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
+            {STEPS.map((s, i) => {
+              const c = STEP_COLORS[s.color] || STEP_COLORS.emerald;
+              return (
+                <div key={i} className="contents">
+                  <div className="flex-1 min-w-0 text-center px-1">
+                    <div className={`relative mx-auto grid h-16 w-16 place-items-center rounded-full border ${c.ring}`}>
+                      <s.icon size={26} />
+                      <span className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 grid h-5 w-5 place-items-center rounded-full text-[11px] font-black text-ink-900 ${c.num}`}>{i + 1}</span>
+                    </div>
+                    <h3 className="mt-4 font-display text-sm font-black text-bone-50">{s.title}</h3>
+                    <p className="mt-1 text-xs text-bone-500 max-w-[16rem] mx-auto">{s.text}</p>
+                  </div>
+                  {i < STEPS.length - 1 && <ArrowRight size={20} className="hidden sm:block self-center mt-4 shrink-0 text-bone-600" />}
                 </div>
-                <span className="text-2xl font-display font-black text-bone-700">{s.n}</span>
-              </div>
-              <h3 className="mt-4 font-display text-lg font-black text-bone-50">{s.title}</h3>
-              <p className="mt-1 text-sm text-bone-400">{s.text}</p>
-            </GlassCard>
-          ))}
+              );
+            })}
+          </div>
+
+          {/* Card promo « Plus tu joues » */}
+          <div className="relative overflow-hidden rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/[0.12] via-ink-900 to-ink-900 p-5 flex flex-col sm:flex-row lg:flex-col items-center text-center sm:text-left lg:text-center gap-3 justify-center">
+            <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-violet-500/20 blur-2xl" />
+            <img src="/images/gaming/cadeau.webp" alt="" className="relative h-16 w-auto shrink-0 drop-shadow-[0_10px_30px_rgba(139,92,246,0.5)]"
+              onError={(e) => { e.currentTarget.src = '/images/gaming/cadeau.png'; }} />
+            <div className="relative">
+              <p className="font-display text-sm font-black uppercase tracking-wide text-bone-50 leading-tight">Plus tu joues,<br />plus tu gagnes !</p>
+              <p className="mt-1.5 text-[11px] text-bone-400">Des nouveaux lots chaque semaine pour les fans.</p>
+              <a href="#tombolas" className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-wider text-bone-100 hover:bg-white/15 transition">
+                Voir les lots <ArrowRight size={13} />
+              </a>
+            </div>
+          </div>
         </div>
       </Container>
 
