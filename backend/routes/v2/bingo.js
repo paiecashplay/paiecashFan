@@ -8,6 +8,8 @@
 const express = require('express');
 const { requireAuth, optionalAuth, requireRole } = require('../../middleware/auth');
 const bingo = require('../../db/bingo');
+const wallet = require('../../db/wallet');
+const { getFootballProvider } = require('../../services/footballProvider');
 const supabase = require('../../db/supabase');
 
 const router = express.Router();
@@ -42,8 +44,19 @@ router.get('/:slug', optionalAuth, async (req, res) => {
 
 // ── Joueur ───────────────────────────────────────────────────
 router.get('/me/credits', requireAuth, async (req, res) => {
-  try { const c = await bingo.ensureCredits(req.authUser.id); return ok(res, { balance: c.balance }); }
+  try { return ok(res, { balance: await wallet.getBalance(req.authUser.id) }); }
   catch (err) { return fail(res, err.message, 500); }
+});
+
+// Portefeuille virtuel (Fan Credits) + historique (ledger).
+router.get('/me/wallet', requireAuth, async (req, res) => {
+  try {
+    const [balance, transactions] = await Promise.all([
+      wallet.getBalance(req.authUser.id),
+      wallet.listTransactions(req.authUser.id, 30),
+    ]);
+    return ok(res, { balance, transactions });
+  } catch (err) { return fail(res, err.message, 500); }
 });
 
 // Démarre (ou récupère) ma carte pour une édition.
@@ -146,6 +159,16 @@ router.put('/admin/events/:eid', async (req, res) => {
 });
 router.delete('/admin/events/:eid', async (req, res) => {
   try { await bingo.deleteEvent(req.params.eid); return ok(res, { deleted: true }); }
+  catch (err) { return fail(res, err.message, 500); }
+});
+
+// Données foot (via le provider abstrait — mock au MVP) pour l'import de matchs.
+router.get('/admin/football/competitions', async (req, res) => {
+  try { return ok(res, { competitions: await getFootballProvider().getCompetitions() }); }
+  catch (err) { return fail(res, err.message, 500); }
+});
+router.get('/admin/football/fixtures', async (req, res) => {
+  try { return ok(res, { fixtures: await getFootballProvider().getFixtures({ competition: req.query.competition }) }); }
   catch (err) { return fail(res, err.message, 500); }
 });
 

@@ -5,8 +5,9 @@
 
 const supabase = require('./supabase');
 const engine = require('../services/bingoEngine');
+const wallet = require('./wallet');
 
-const START_CREDITS = 500;
+const START_CREDITS = wallet.START_BALANCE;
 
 // ─── Éditions ────────────────────────────────────────────────
 async function listEditions({ statuses } = {}) {
@@ -101,18 +102,10 @@ async function updateEvent(id, updates) {
 }
 async function deleteEvent(id) { const { error } = await supabase.from('bingo_events').delete().eq('id', id); if (error) throw new Error(error.message); return true; }
 
-// ─── Crédits virtuels ────────────────────────────────────────
+// ─── Crédits virtuels (délégués au portefeuille + ledger) ────
 async function ensureCredits(userId) {
-  const { data } = await supabase.from('bingo_credits').select('*').eq('user_id', userId).maybeSingle();
-  if (data) return data;
-  const { data: created } = await supabase.from('bingo_credits').insert({ user_id: userId, balance: START_CREDITS }).select('*').single();
-  return created;
-}
-async function debitCredits(userId, amount) {
-  const c = await ensureCredits(userId);
-  if (c.balance < amount) return { ok: false, balance: c.balance };
-  const { data } = await supabase.from('bingo_credits').update({ balance: c.balance - amount, updated_at: new Date().toISOString() }).eq('user_id', userId).select('*').single();
-  return { ok: true, balance: data.balance };
+  const w = await wallet.ensureWallet(userId);
+  return { balance: w.balance };
 }
 
 // ─── Cartes (grilles) ────────────────────────────────────────
@@ -135,17 +128,22 @@ async function createCard(edition, userId) {
   const seed = engine.generateSeed();
   const layout = engine.buildLayout(events.map((e) => e.id), edition.format, seed); // throw si pas assez d'événements
 
-  // Débit des crédits (coût de l'édition)
+  // Vérif du solde AVANT création (évite une carte orpheline non payée)
   const cost = edition.cost_credits || 0;
   if (cost > 0) {
-    const d = await debitCredits(userId, cost);
-    if (!d.ok) { const e = new Error('Crédits insuffisants.'); e.code = 'NO_CREDITS'; e.balance = d.balance; throw e; }
+    const bal = await wallet.getBalance(userId);
+    if (bal < cost) { const e = new Error('Crédits insuffisants.'); e.code = 'NO_CREDITS'; e.balance = bal; throw e; }
   }
 
   const { data: card, error } = await supabase.from('bingo_cards').insert({
     edition_id: edition.id, user_id: userId, seed, format: edition.format, layout, status: 'draft',
   }).select('*').single();
   if (error) throw new Error(error.message);
+
+  // Débit via le ledger (idempotent : idempotency_key = entry:<cardId>)
+  if (cost > 0) {
+    await wallet.record({ userId, amount: -cost, type: 'bingo_entry', referenceType: 'bingo_card', referenceId: card.id, idempotencyKey: `entry:${card.id}` });
+  }
 
   // Picks initiaux (une ligne par case)
   const picks = layout.map((c) => ({ card_id: card.id, event_id: c.eventId, cell_index: c.cell, state: c.free ? 'free' : 'not_selected', chosen_option: null }));
@@ -181,6 +179,6 @@ module.exports = {
   listEditions, getEditionBySlug, getEditionById, createEdition, updateEdition, deleteEdition,
   listMatches, addMatch, updateMatch, deleteMatch,
   listEvents, addEvent, updateEvent, deleteEvent,
-  ensureCredits, debitCredits,
+  ensureCredits,
   getCard, getPicks, createCard, savePicks, submitCard,
 };

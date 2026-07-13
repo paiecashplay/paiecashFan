@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (s)** — **Sport Bingo — Phase 2a** (données + fondations). Migration
+  `bingo-phase2.sql` : **portefeuille virtuel + ledger immuable** (`virtual_wallets`,
+  `virtual_wallet_transactions` avec `idempotency_key`, remplace `bingo_credits`),
+  `bingo_patterns`(+seed 10 figures)/`bingo_edition_patterns`, `bingo_card_wins`,
+  `bingo_leaderboards`, `bingo_result_audit_logs`, `feature_flags`(+seed),
+  `profiles.birth_date` (18+). `db/wallet.js` (ledger idempotent), abstraction
+  **`services/footballProvider.js`** (MockFootballDataProvider, clés serveur).
+  Débit d'entrée Bingo branché sur le ledger. RLS deny-all (autorisation backend).
 - **2026-07-11 (r)** — **PaieCash Sport Bingo — Phase 1 backend** (fondation).
   Migration `backend/migrations/bingo.sql` (éditions/matchs/événements/cartes/
   picks/scoring_log/crédits — à exécuter dans Supabase). Moteur
