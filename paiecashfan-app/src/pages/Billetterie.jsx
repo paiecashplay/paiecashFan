@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Ticket,
@@ -14,6 +14,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { allClubs } from '@/data/clubsRegistry';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '@/lib/api';
 import { formatPCC } from '@/data/clubMerchandise';
 import { getAutoTicketingPrices } from '@/utils/ticketingPrices';
 
@@ -80,17 +81,40 @@ export function Billetterie() {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
-  const clubs = useMemo(() => {
+  // Repli statique (si l'API échoue) — slugs du registry.
+  const staticClubs = useMemo(() => {
     return allClubs()
-        .filter((club) => club.country === 'France' && club.league === 'Ligue 1' && club.sport === 'football')
-        .map((club) => club.ticketing || generateTicketingForClub(club));
-    }, []);
+      .filter((club) => club.country === 'France' && club.league === 'Ligue 1' && club.sport === 'football')
+      .map((club) => club.ticketing || generateTicketingForClub(club));
+  }, []);
+
+  // Source de vérité : la BASE (vrais slugs → checkout OK). null = en cours.
+  const [clubs, setClubs] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    apiFetch(`/api/v2/marketplace/clubs?league=${encodeURIComponent('Ligue 1')}&limit=40`)
+      .then((json) => {
+        if (!alive) return;
+        const list = (json?.data?.clubs || []).map((c) => generateTicketingForClub({
+          slug: c.slug,
+          name: c.name,
+          city: c.city || '',
+          logo: c.logo_url || '',
+          primaryColor: c.primary_color || '#10b981',
+        }));
+        setClubs(list.length ? list : staticClubs);
+      })
+      .catch(() => { if (alive) setClubs(staticClubs); });
+    return () => { alive = false; };
+  }, [staticClubs]);
 
   const filteredClubs = useMemo(() => {
-    return clubs.filter((club) =>
+    return (clubs || []).filter((club) =>
       club.clubName.toLowerCase().includes(search.toLowerCase())
     );
   }, [clubs, search]);
+
+  const loadingClubs = clubs === null;
 
   const tabs = [
     { id: 'subscriptions', label: 'Abonnements', icon: CalendarDays },
@@ -163,6 +187,9 @@ export function Billetterie() {
       </Container>
 
       <Container className="relative pb-24">
+        {loadingClubs && (
+          <p className="py-16 text-center text-sm text-bone-400">Chargement des clubs…</p>
+        )}
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filteredClubs.map((club, index) => {
             const offers = club[activeTab] || [];

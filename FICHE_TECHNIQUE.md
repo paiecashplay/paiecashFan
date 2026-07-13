@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (o)** — Fix « Club introuvable » au checkout (mismatch de slug
+  registry statique vs base). **A** : hub **billetterie piloté par la base**
+  (`/marketplace/clubs?league=` → vrais slugs). **B** : résolveur tolérant
+  `getTenantBySlugFlexible` (retrait préfixe/suffixe : `ogc-nice`→`nice`,
+  `rc-lens`→`lens`…) utilisé par le checkout ET le fan feed.
 - **2026-07-11 (n)** — Page club : **fin des données mock du hub fan**. Wallet
   **confidentiel** (masqué si non connecté, sinon solde réel via `/me/pcc`, et
   seulement si solde > 0). « Fans en ligne » → **supporters réels** du fan feed

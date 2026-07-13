@@ -65,7 +65,7 @@ async function buildGroups(items, res) {
   const groups = [];
   let grandTotalEur = 0;
   for (const [slug, lines] of Object.entries(bySlug)) {
-    const tenant = await tenantsDb.getTenantBySlug(slug);
+    const tenant = await tenantsDb.getTenantBySlugFlexible(slug);
     if (!tenant) { fail(res, `Club introuvable : ${slug}`, 404); return null; }
 
     const offers = resolveOffers(tenant);

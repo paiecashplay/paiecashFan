@@ -5,10 +5,11 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('./supabase');
+const { getTenantBySlugFlexible } = require('./tenants');
 
 async function resolveTenantId(slug) {
-  const { data } = await supabase.from('tenants').select('id, name').eq('slug', slug).maybeSingle();
-  return data || null;
+  const t = await getTenantBySlugFlexible(slug);
+  return t ? { id: t.id, name: t.name } : null;
 }
 
 // Récupère les profils (auteurs) pour un ensemble d'ids.

@@ -51,6 +51,32 @@ async function getTenantBySlug(slug) {
   return tenant;
 }
 
+// Résolution tolérante d'un club par slug (filet de sécurité checkout) :
+// si le slug exact n'existe pas (ex. slug "officiel" du registry statique
+// 'ogc-nice' vs slug importé 'nice'), on essaie les variantes par retrait de
+// préfixe puis de suffixe — MAIS uniquement des correspondances EXACTES sur
+// tenants.slug (aucun risque de matcher le mauvais club).
+async function getTenantBySlugFlexible(slug) {
+  if (!slug) return null;
+  let t = await getTenantBySlug(slug);
+  if (t) return t;
+
+  const parts = String(slug).split('-').filter(Boolean);
+  if (parts.length < 2) return null;
+
+  // Retrait du/des préfixe(s) : 'ogc-nice' → 'nice', 'losc-lille' → 'lille'
+  for (let i = 1; i < parts.length; i++) {
+    t = await getTenantBySlug(parts.slice(i).join('-'));
+    if (t) return t;
+  }
+  // Retrait du/des suffixe(s) : 'toulouse-fc' → 'toulouse'
+  for (let i = parts.length - 1; i >= 1; i--) {
+    t = await getTenantBySlug(parts.slice(0, i).join('-'));
+    if (t) return t;
+  }
+  return null;
+}
+
 async function getAllTenants(filters = {}) {
   let query = supabase.from('tenants').select('*');
 
@@ -121,6 +147,7 @@ module.exports = {
   createTenant,
   getTenantById,
   getTenantBySlug,
+  getTenantBySlugFlexible,
   getAllTenants,
   updateTenant,
   approveTenant,
