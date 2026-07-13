@@ -73,18 +73,28 @@ export function Tombola() {
       {/* ── HERO ─────────────────────────────────────────── */}
       <section className="relative py-14 md:py-20">
         <Container>
-          <Badge variant="emerald">🎁 Tombola</Badge>
-          <h1 className="mt-6 font-display text-5xl md:text-7xl font-black uppercase tracking-tight text-bone-50 leading-[0.95]">
-            Joue. Gagne.<br /><span className="text-gradient-hero">Vibre avec ton club.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-bone-300 text-base md:text-lg">
-            Achète des tickets avec tes PCC et tente de remporter des lots fan exclusifs.
-            Tirage au sort automatique à la fin de chaque tombola.
-          </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-3 max-w-2xl">
-            <HeroFeature icon={Users} title="100% Fan" text="Pour les vrais supporters" />
-            <HeroFeature icon={ShieldCheck} title="Sécurisé" text="Paiement PCC encadré" />
-            <HeroFeature icon={Sparkles} title="Transparent" text="Tirage aléatoire" />
+          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <Badge variant="emerald">🎁 Tombola</Badge>
+              <h1 className="mt-6 font-display text-5xl md:text-7xl font-black uppercase tracking-tight text-bone-50 leading-[0.95]">
+                Joue. Gagne.<br /><span className="text-gradient-hero">Vibre avec ton club.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-bone-300 text-base md:text-lg">
+                Achète des tickets avec tes PCC et tente de remporter des lots fan exclusifs.
+                Tirage au sort automatique à la fin de chaque tombola.
+              </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3 max-w-2xl">
+                <HeroFeature icon={Users} title="100% Fan" text="Pour les vrais supporters" />
+                <HeroFeature icon={ShieldCheck} title="Sécurisé" text="Paiement PCC encadré" />
+                <HeroFeature icon={Sparkles} title="Transparent" text="Tirage aléatoire" />
+              </div>
+            </div>
+
+            <div className="relative hidden lg:block w-[380px]">
+              <img src="/images/gaming/hero-tombola.webp" alt="" className="w-full drop-shadow-[0_20px_50px_rgba(16,185,129,0.25)]"
+                onError={(e) => { e.currentTarget.src = '/images/gaming/hero-tombola.png'; }} />
+              {featured && <NextDrawBox campaign={featured} />}
+            </div>
           </div>
         </Container>
       </section>
@@ -370,6 +380,26 @@ function BuyModal({ campaign, onClose, onDone }) {
           </>
         )}
       </motion.div>
+    </div>
+  );
+}
+
+// ── Encart « prochain tirage » (hero) ────────────────────────
+function NextDrawBox({ campaign }) {
+  const [t, setT] = useState(() => getTimeLeft(campaign.endsAt));
+  useEffect(() => { const i = setInterval(() => setT(getTimeLeft(campaign.endsAt)), 1000); return () => clearInterval(i); }, [campaign.endsAt]);
+  return (
+    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[300px] rounded-2xl border border-emerald-400/25 bg-ink-950/90 backdrop-blur px-5 py-4 text-center shadow-2xl">
+      <p className="text-[10px] uppercase tracking-[0.28em] text-emerald-400 font-black">Prochain tirage</p>
+      <div className="mt-2 flex justify-center gap-2">
+        {[['J', t.d], ['H', t.h], ['M', t.m], ['S', t.s]].map(([l, v]) => (
+          <div key={l} className="min-w-[3rem]">
+            <div className="font-display text-2xl font-black text-bone-50 tabular-nums">{v}</div>
+            <div className="text-[8px] uppercase tracking-[0.18em] text-bone-500 font-bold">{l === 'J' ? 'Jours' : l === 'H' ? 'Heures' : l === 'M' ? 'Minutes' : 'Secondes'}</div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] text-bone-400">Ne manque pas ta chance !</p>
     </div>
   );
 }

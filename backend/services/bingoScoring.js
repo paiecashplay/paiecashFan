@@ -30,6 +30,50 @@ async function resolvePatternPoints(editionId) {
   return map;
 }
 
+// Note une carte (pur, sans écriture) : renvoie { correct, codes, total, wins }.
+function gradeCard(picks, evById, size, pointsByCode) {
+  const correct = new Array(size * size).fill(false);
+  const graded = [];
+  for (const p of picks || []) {
+    if (p.state === 'free') { correct[p.cell_index] = true; graded.push({ cell: p.cell_index, state: 'free' }); continue; }
+    const ev = p.event_id ? evById[p.event_id] : null;
+    let isCorrect = null, state = p.state;
+    if (ev && ev.validation_status === 'void') { state = 'void'; }
+    else if (ev && ev.official_answer) { isCorrect = p.chosen_option === ev.official_answer; state = isCorrect ? 'correct' : 'incorrect'; }
+    if (isCorrect === true) correct[p.cell_index] = true;
+    graded.push({ cell: p.cell_index, state, isCorrect });
+  }
+  const { codes } = engine.detectFigures(correct, size);
+  let total = 0; const wins = [];
+  for (const code of codes) { const pt = pointsByCode[code]; if (!pt) continue; total += pt.points; wins.push({ pattern_id: pt.id, code, points: pt.points }); }
+  return { correct, codes, total, wins, graded };
+}
+
+// Simulation (dry-run) : calcule ce que donnerait la clôture SANS rien écrire.
+async function simulateEdition(editionId) {
+  const edition = await supabase.from('bingo_editions').select('*').eq('id', editionId).maybeSingle().then((r) => r.data);
+  if (!edition) throw new Error('Édition introuvable.');
+  const size = GRID[edition.format] || 5;
+  const { data: events } = await supabase.from('bingo_events').select('id, official_answer, validation_status').eq('edition_id', editionId);
+  const evById = Object.fromEntries((events || []).map((e) => [e.id, e]));
+  const withResult = (events || []).filter((e) => e.official_answer).length;
+  const pointsByCode = await resolvePatternPoints(editionId);
+  const { data: cards } = await supabase.from('bingo_cards').select('*').eq('edition_id', editionId).in('status', ['submitted', 'scored']);
+
+  const ids = [...new Set((cards || []).map((c) => c.user_id))];
+  const { data: profs } = ids.length ? await supabase.from('profiles').select('id, display_name').in('id', ids) : { data: [] };
+  const pmap = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+
+  const results = [];
+  for (const card of cards || []) {
+    const { data: picks } = await supabase.from('bingo_card_picks').select('*').eq('card_id', card.id).order('cell_index');
+    const g = gradeCard(picks, evById, size, pointsByCode);
+    results.push({ cardId: card.id, player: pmap[card.user_id]?.display_name || 'Supporter', points: g.total, figures: g.codes });
+  }
+  results.sort((a, b) => b.points - a.points);
+  return { events: events?.length || 0, withResult, cards: results.length, results };
+}
+
 // Clôture + scoring d'une édition. Idempotent : chaque passe = nouvelle
 // calculation_version ; le score de la carte = total de CETTE version.
 async function settleEdition(editionId) {
@@ -121,4 +165,4 @@ async function getLeaderboard(period = 'all_time', limit = 20) {
   }));
 }
 
-module.exports = { settleEdition, rebuildLeaderboard, getLeaderboard };
+module.exports = { settleEdition, simulateEdition, rebuildLeaderboard, getLeaderboard };

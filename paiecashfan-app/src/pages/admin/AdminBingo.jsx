@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight, ClipboardPaste, Calendar } from 'lucide-react';
+import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight, ClipboardPaste, Calendar, Eye, FlaskConical, Users, Rocket, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 const STATUS = ['draft', 'scheduled', 'open', 'locked', 'live', 'calculating', 'completed', 'cancelled'];
 const FORMATS = { express: '3×3 (9)', standard: '5×5 (24)', expert: '6×6 (36)' };
@@ -13,20 +14,27 @@ export function AdminBingo() {
   const [editions, setEditions] = useState(null);
   const [toast, setToast] = useState('');
   const [openId, setOpenId] = useState(null);
-  const [form, setForm] = useState({ title: '', slug: '', format: 'standard', costCredits: 0, rewardPoints: 100, status: 'open', badge: '', description: '' });
+  const [form, setForm] = useState({ title: '', slug: '', format: 'standard', costCredits: 0, rewardPoints: 100, status: 'open', badge: '', description: '', coverUrl: '', subtitle: '' });
   const [creating, setCreating] = useState(false);
+  const { uploadImage, uploading } = useImageUpload();
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(''), 3000); };
   const load = () => apiFetch('/api/v2/bingo/admin/editions').then((j) => setEditions(j.data?.editions || [])).catch(() => setEditions([]));
   useEffect(() => { load(); }, []);
+
+  async function pickCover(e) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try { const url = await uploadImage(file, 'bingo'); setForm((f) => ({ ...f, coverUrl: url })); showToast('Image ajoutée'); }
+    catch (err) { showToast('Upload : ' + err.message); }
+  }
 
   async function create() {
     const slug = form.slug.trim() || slugify(form.title);
     if (!form.title.trim() || !slug) { showToast('Titre requis'); return; }
     setCreating(true);
     try {
-      await apiFetch('/api/v2/bingo/admin/editions', { method: 'POST', body: JSON.stringify({ ...form, slug, costCredits: Number(form.costCredits) || 0, rewardPoints: Number(form.rewardPoints) || 0 }) });
-      setForm({ title: '', slug: '', format: 'standard', costCredits: 0, rewardPoints: 100, status: 'open', badge: '', description: '' });
+      await apiFetch('/api/v2/bingo/admin/editions', { method: 'POST', body: JSON.stringify({ ...form, slug, costCredits: Number(form.costCredits) || 0, rewardPoints: Number(form.rewardPoints) || 0, theme: { subtitle: form.subtitle || '' } }) });
+      setForm({ title: '', slug: '', format: 'standard', costCredits: 0, rewardPoints: 100, status: 'open', badge: '', description: '', coverUrl: '', subtitle: '' });
       showToast('Édition créée'); load();
     } catch (e) { showToast('Erreur : ' + e.message); }
     setCreating(false);
@@ -54,7 +62,19 @@ export function AdminBingo() {
           <L label="Coût (crédits)"><input type="number" min="0" className={input} value={form.costCredits} onChange={(e) => setForm({ ...form, costCredits: e.target.value })} /></L>
           <L label="Récompense (points)"><input type="number" min="0" className={input} value={form.rewardPoints} onChange={(e) => setForm({ ...form, rewardPoints: e.target.value })} /></L>
           <L label="Badge"><input className={input} value={form.badge} onChange={(e) => setForm({ ...form, badge: e.target.value })} placeholder="Édition prestige" /></L>
+          <L label="Sous-titre (carte)"><input className={input} value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} placeholder="Le meilleur de l'Europe" /></L>
           <L label="Description"><input className={input} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></L>
+          <L label="Image de fond (carte)">
+            <div className="flex items-center gap-2">
+              <label className="inline-flex items-center gap-1.5 h-10 px-3 rounded-xl border border-white/10 bg-white/5 text-sm text-bone-200 hover:text-emerald-400 cursor-pointer shrink-0">
+                {uploading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Choisir
+                <input type="file" accept="image/*" className="hidden" onChange={pickCover} />
+              </label>
+              {form.coverUrl
+                ? <img src={form.coverUrl} alt="" className="h-10 w-16 rounded-lg object-cover border border-white/10" />
+                : <input className={input} value={form.coverUrl} onChange={(e) => setForm({ ...form, coverUrl: e.target.value })} placeholder="…ou colle une URL" />}
+            </div>
+          </L>
         </div>
         <button onClick={create} disabled={creating} className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50">
           {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Créer l'édition
@@ -84,7 +104,7 @@ export function AdminBingo() {
                   <button onClick={() => del(ed.id)} className="grid h-8 w-8 place-items-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 size={13} /></button>
                 </div>
               </div>
-              {openId === ed.id && <EditionManage editionId={ed.id} format={ed.format} showToast={showToast} />}
+              {openId === ed.id && <EditionManage edition={ed} showToast={showToast} onChanged={load} />}
             </div>
           ))}
       </div>
@@ -126,13 +146,18 @@ function parseBulkMatches(text) {
 }
 
 // Panneau de gestion d'une édition : liste unifiée matchs/événements + saisie.
-function EditionManage({ editionId, format, showToast }) {
+function EditionManage({ edition, showToast, onChanged }) {
+  const editionId = edition.id;
+  const format = edition.format;
   const [data, setData] = useState(null);
   const [row, setRow] = useState({ home: '', away: '', competition: '', kickoffAt: '' });
   const [busy, setBusy] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState('');
   const [importing, setImporting] = useState(false);
+  const [modal, setModal] = useState(null);   // { type: 'preview'|'simulate'|'cards', data }
+  const [modalBusy, setModalBusy] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const load = () => apiFetch(`/api/v2/bingo/admin/editions/${editionId}`).then((j) => setData(j.data)).catch(() => {});
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [editionId]);
@@ -173,6 +198,22 @@ function EditionManage({ editionId, format, showToast }) {
     catch (e) { showToast(e.message); }
   }
 
+  async function publish() {
+    setPublishing(true);
+    try { await apiFetch(`/api/v2/bingo/admin/editions/${editionId}`, { method: 'PUT', body: JSON.stringify({ status: 'open' }) }); showToast('Édition publiée'); onChanged?.(); }
+    catch (e) { showToast(e.message); }
+    setPublishing(false);
+  }
+  async function openModal(type) {
+    setModal({ type, data: null }); setModalBusy(true);
+    try {
+      if (type === 'preview') { const j = await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/preview`); setModal({ type, data: j.data }); }
+      if (type === 'simulate') { const j = await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/simulate`, { method: 'POST' }); setModal({ type, data: j.data }); }
+      if (type === 'cards') { const j = await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/cards`); setModal({ type, data: j.data?.cards || [] }); }
+    } catch (e) { showToast(e.message); setModal(null); }
+    setModalBusy(false);
+  }
+
   if (!data) return <div className="p-4 border-t border-white/5"><Skeleton className="h-10 w-full" /></div>;
   const needed = NEEDED[format];
   const count = data.events.length;
@@ -181,6 +222,18 @@ function EditionManage({ editionId, format, showToast }) {
 
   return (
     <div className="border-t border-white/5 p-4 bg-black/20 space-y-4">
+      {/* Barre d'actions de l'édition */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {edition.status !== 'open' && (
+          <button onClick={publish} disabled={publishing} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/15 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-50">
+            {publishing ? <Loader2 size={13} className="animate-spin" /> : <Rocket size={13} />} Publier
+          </button>
+        )}
+        <ToolBtn icon={Eye} onClick={() => openModal('preview')} disabled={count < needed}>Prévisualiser la grille</ToolBtn>
+        <ToolBtn icon={FlaskConical} onClick={() => openModal('simulate')}>Simuler la validation</ToolBtn>
+        <ToolBtn icon={Users} onClick={() => openModal('cards')}>Cartes joueurs</ToolBtn>
+      </div>
+
       {/* En-tête d'état */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h4 className="text-xs font-black uppercase tracking-widest text-bone-300">
@@ -191,6 +244,8 @@ function EditionManage({ editionId, format, showToast }) {
           <button onClick={() => setBulkOpen((v) => !v)} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 font-bold text-emerald-400 hover:bg-emerald-500/20"><ClipboardPaste size={13} /> Import en masse</button>
         </div>
       </div>
+
+      {modal && <BingoModal modal={modal} busy={modalBusy} format={format} onClose={() => setModal(null)} onReload={() => openModal(modal.type)} />}
 
       {/* Import en masse (collage) */}
       {bulkOpen && (
@@ -251,6 +306,98 @@ function EditionManage({ editionId, format, showToast }) {
           {busy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />} Ajouter le match
         </button>
         <p className="mt-2 text-[10px] text-bone-500">Un match crée automatiquement son événement <b>1/N/2</b>. Les boutons 1/N/2 de la liste servent à saisir le <b>résultat officiel</b> (1 = domicile, N = nul, 2 = extérieur).</p>
+      </div>
+    </div>
+  );
+}
+
+function ToolBtn({ icon: Icon, onClick, disabled, children }) {
+  return (
+    <button onClick={onClick} disabled={disabled} title={disabled ? 'Complète la grille d\'abord' : ''}
+      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-white/10 bg-white/5 text-[11px] font-bold text-bone-200 hover:text-emerald-400 hover:border-emerald-400/30 disabled:opacity-40 disabled:cursor-not-allowed">
+      <Icon size={13} /> {children}
+    </button>
+  );
+}
+
+const FIG_LABELS = {
+  LINE_HORIZONTAL: 'Ligne', LINE_VERTICAL: 'Colonne', DIAGONAL: 'Diagonale', FOUR_CORNERS: '4 coins',
+  DOUBLE_LINE: 'Double ligne', TRIPLE_LINE: 'Triple ligne', SQUARE_2X2: 'Carré', CROSS: 'Croix', X_SHAPE: 'X', FULL_CARD: 'BINGO',
+};
+const STATUS_CARD = { draft: 'À compléter', submitted: 'Validée', scored: 'Notée' };
+
+// Modale unique pour prévisualisation / simulation / cartes joueurs.
+function BingoModal({ modal, busy, format, onClose, onReload }) {
+  const title = { preview: 'Prévisualisation de la grille', simulate: 'Simulation de la validation', cards: 'Cartes des joueurs' }[modal.type];
+  const size = NEEDED[format] === 9 ? 3 : NEEDED[format] === 36 ? 6 : 5;
+
+  return (
+    <div className="fixed inset-0 z-[60] grid place-items-center bg-black/75 p-4" onClick={onClose}>
+      <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-ink-900 p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-display text-lg font-black text-bone-50">{title}</h3>
+          <div className="flex items-center gap-2">
+            {modal.type === 'simulate' && <button onClick={onReload} className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300">↻ Recalculer</button>}
+            <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-bone-400 hover:text-bone-100"><X size={15} /></button>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          {busy || !modal.data ? (
+            <div className="py-12 grid place-items-center"><Loader2 size={22} className="animate-spin text-bone-500" /></div>
+          ) : modal.type === 'preview' ? (
+            <div>
+              <p className="text-xs text-bone-500 mb-3">Exemple de grille générée pour ce format (l'ordre change à chaque carte).</p>
+              <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${size}, minmax(0,1fr))` }}>
+                {modal.data.cells.map((c) => (
+                  <div key={c.cell} className={`rounded-lg border p-2 min-h-[64px] text-[9px] leading-tight flex items-center justify-center text-center ${c.free ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-400 font-black' : 'border-white/10 bg-white/[0.03] text-bone-300'}`}>
+                    {c.free ? 'FREE' : c.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : modal.type === 'simulate' ? (
+            <div>
+              <div className="flex gap-4 text-xs text-bone-400 mb-3">
+                <span><b className="text-bone-100">{modal.data.withResult}</b>/{modal.data.events} résultats saisis</span>
+                <span><b className="text-bone-100">{modal.data.cards}</b> carte(s)</span>
+              </div>
+              {modal.data.withResult < modal.data.events && <p className="mb-3 text-[11px] text-amber-400">⚠ Tous les résultats ne sont pas encore saisis : les scores simulés sont partiels.</p>}
+              {modal.data.results.length === 0 ? <p className="text-sm text-bone-500 py-6 text-center">Aucune carte validée à simuler.</p> : (
+                <div className="space-y-1.5">
+                  {modal.data.results.map((r, i) => (
+                    <div key={r.cardId} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-3 py-2">
+                      <span className="w-6 text-center font-display font-black text-bone-500">{i + 1}</span>
+                      <span className="flex-1 min-w-0 truncate text-sm text-bone-200">{r.player}</span>
+                      <div className="hidden sm:flex flex-wrap gap-1 justify-end max-w-[55%]">
+                        {r.figures.map((f) => <span key={f} className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[9px] font-bold text-bone-400">{FIG_LABELS[f] || f}</span>)}
+                      </div>
+                      <span className="font-display text-base font-black text-emerald-400 tabular-nums shrink-0">{r.points} pts</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-[10px] text-bone-500">Simulation à blanc : aucune donnée n'est écrite. Utilise « Clôturer » pour valider définitivement.</p>
+            </div>
+          ) : (
+            <div>
+              {modal.data.length === 0 ? <p className="text-sm text-bone-500 py-6 text-center">Aucune carte pour cette édition.</p> : (
+                <div className="space-y-1.5">
+                  {modal.data.map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-3 py-2">
+                      <div className="h-8 w-8 shrink-0 rounded-full bg-white/10 overflow-hidden grid place-items-center">
+                        {c.avatar ? <img src={c.avatar} alt="" className="h-full w-full object-cover" /> : <span className="text-[11px] font-black text-bone-400">{(c.player || '?').charAt(0).toUpperCase()}</span>}
+                      </div>
+                      <span className="flex-1 min-w-0 truncate text-sm text-bone-200">{c.player}</span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] uppercase tracking-widest font-bold text-bone-400">{STATUS_CARD[c.status] || c.status}</span>
+                      {c.status === 'scored' && <span className="font-display text-base font-black text-emerald-400 tabular-nums shrink-0">{c.points_total} pts</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

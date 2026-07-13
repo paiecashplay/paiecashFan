@@ -105,6 +105,41 @@ async function updateEvent(id, updates) {
 }
 async function deleteEvent(id) { const { error } = await supabase.from('bingo_events').delete().eq('id', id); if (error) throw new Error(error.message); return true; }
 
+// Nombre de cartes (joueurs) par édition — pour l'affichage front.
+async function countCardsByEdition(editionIds) {
+  if (!editionIds?.length) return {};
+  const { data } = await supabase.from('bingo_cards').select('edition_id').in('edition_id', editionIds);
+  const map = {};
+  (data || []).forEach((c) => { map[c.edition_id] = (map[c.edition_id] || 0) + 1; });
+  return map;
+}
+
+// Toutes les cartes d'une édition, enrichies du profil joueur (BO).
+async function listEditionCards(editionId) {
+  const { data: cards } = await supabase.from('bingo_cards')
+    .select('id, user_id, status, points_total, figures_won, created_at, submitted_at, calculation_version')
+    .eq('edition_id', editionId).order('points_total', { ascending: false, nullsFirst: false });
+  if (!cards?.length) return [];
+  const ids = [...new Set(cards.map((c) => c.user_id))];
+  const { data: profs } = await supabase.from('profiles').select('id, display_name, avatar_url').in('id', ids);
+  const pmap = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+  return cards.map((c) => ({ ...c, player: pmap[c.user_id]?.display_name || 'Supporter', avatar: pmap[c.user_id]?.avatar_url || null }));
+}
+
+// Prévisualise une grille type (sans créer de carte) : layout + libellés.
+async function previewLayout(editionId) {
+  const edition = await getEditionById(editionId);
+  if (!edition) throw new Error('Édition introuvable.');
+  const events = await listEvents(editionId);
+  const seed = engine.generateSeed();
+  const layout = engine.buildLayout(events.map((e) => e.id), edition.format, seed); // throw NOT_ENOUGH_EVENTS
+  const evById = Object.fromEntries(events.map((e) => [e.id, e]));
+  return {
+    format: edition.format,
+    cells: layout.map((c) => ({ cell: c.cell, free: c.free, label: c.eventId ? (evById[c.eventId]?.label || '—') : null })),
+  };
+}
+
 // ─── Match + événement en une fois (UX admin unifiée) ────────
 // Crée le match ET son événement MATCH_RESULT (1/N/2). Si `officialAnswer`
 // est fourni (1/N/2), le résultat officiel est renseigné directement.
@@ -233,6 +268,7 @@ module.exports = {
   listMatches, addMatch, updateMatch, deleteMatch,
   listEvents, addEvent, updateEvent, deleteEvent,
   addMatchWithEvent, bulkAddMatches, deleteEventWithMatch,
+  countCardsByEdition, listEditionCards, previewLayout,
   ensureCredits,
   getCard, getPicks, listMyCards, createCard, savePicks, submitCard,
 };

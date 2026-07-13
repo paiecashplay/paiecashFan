@@ -105,6 +105,18 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-13 (x)** — **Sport Bingo — Refonte front + BO complet**.
+  **Front** `/tombola/sport-bingo` refait (maquette) : en-tête (crédits, Règles,
+  Classement), **cards d'édition** avec image de fond (`cover_url`), badge de
+  statut (EN DIRECT/OUVERTE/À VENIR), **nb réel de joueurs**, compte à rebours
+  live + barre, gain max, CTA contextuel (Continuer/Jouer/Voir détails), section
+  « Comment jouer » (5 étapes) + promo classement. Hero page **Tombola** avec
+  image webp + encart « prochain tirage ». **BO** : barre d'actions par édition —
+  **Publier**, **Prévisualiser la grille**, **Simuler la validation** (dry-run, 0
+  écriture), **Cartes joueurs**. Formulaire édition : **upload image de fond** +
+  sous-titre. Endpoints `GET /admin/…/preview`, `POST /admin/…/simulate`,
+  `GET /admin/…/cards`, `GET /me/credits`; liste publique enrichie du `players`.
+  Image `hero-tombola.png` → **webp** (1,85 Mo → 122 Ko).
 - **2026-07-13 (v)** — **Sport Bingo — Admin : saisie unifiée & import en masse**.
   Fusion matchs/événements (1 match crée son événement 1/N/2). Liste unique avec
   coup d'envoi + boutons résultat 1/N/2 (re-clic = efface). **Import en masse par

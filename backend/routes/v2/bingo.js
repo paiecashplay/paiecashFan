@@ -23,7 +23,8 @@ const PUBLIC_STATUSES = ['scheduled', 'open', 'live', 'locked', 'calculating', '
 router.get('/', async (req, res) => {
   try {
     const editions = await bingo.listEditions({ statuses: PUBLIC_STATUSES });
-    return ok(res, { editions });
+    const counts = await bingo.countCardsByEdition(editions.map((e) => e.id));
+    return ok(res, { editions: editions.map((e) => ({ ...e, players: counts[e.id] || 0 })) });
   } catch (err) { return fail(res, 'Chargement impossible : ' + err.message, 500); }
 });
 
@@ -204,6 +205,27 @@ router.delete('/admin/events/:eid', async (req, res) => {
 router.post('/admin/editions/:id/settle', async (req, res) => {
   try { return ok(res, await scoring.settleEdition(req.params.id)); }
   catch (err) { return fail(res, 'Scoring impossible : ' + err.message, 500); }
+});
+
+// Simulation (dry-run) : ce que donnerait la clôture, sans rien écrire.
+router.post('/admin/editions/:id/simulate', async (req, res) => {
+  try { return ok(res, await scoring.simulateEdition(req.params.id)); }
+  catch (err) { return fail(res, 'Simulation impossible : ' + err.message, 500); }
+});
+
+// Prévisualisation d'une grille type.
+router.get('/admin/editions/:id/preview', async (req, res) => {
+  try { return ok(res, await bingo.previewLayout(req.params.id)); }
+  catch (err) {
+    if (err.code === 'NOT_ENOUGH_EVENTS') return fail(res, err.message, 409);
+    return fail(res, err.message, 500);
+  }
+});
+
+// Cartes des joueurs d'une édition.
+router.get('/admin/editions/:id/cards', async (req, res) => {
+  try { return ok(res, { cards: await bingo.listEditionCards(req.params.id) }); }
+  catch (err) { return fail(res, err.message, 500); }
 });
 
 // Données foot (via le provider abstrait — mock au MVP) pour l'import de matchs.
