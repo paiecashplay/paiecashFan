@@ -9,6 +9,7 @@ const express = require('express');
 const { requireAuth, optionalAuth, requireRole } = require('../../middleware/auth');
 const bingo = require('../../db/bingo');
 const wallet = require('../../db/wallet');
+const scoring = require('../../services/bingoScoring');
 const { getFootballProvider } = require('../../services/footballProvider');
 const supabase = require('../../db/supabase');
 
@@ -24,6 +25,14 @@ router.get('/', async (req, res) => {
     const editions = await bingo.listEditions({ statuses: PUBLIC_STATUSES });
     return ok(res, { editions });
   } catch (err) { return fail(res, 'Chargement impossible : ' + err.message, 500); }
+});
+
+// Classement (public)
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const period = ['weekly', 'monthly', 'all_time'].includes(req.query.period) ? req.query.period : 'all_time';
+    return ok(res, { period, entries: await scoring.getLeaderboard(period, 20) });
+  } catch (err) { return fail(res, err.message, 500); }
 });
 
 router.get('/:slug', optionalAuth, async (req, res) => {
@@ -160,6 +169,12 @@ router.put('/admin/events/:eid', async (req, res) => {
 router.delete('/admin/events/:eid', async (req, res) => {
   try { await bingo.deleteEvent(req.params.eid); return ok(res, { deleted: true }); }
   catch (err) { return fail(res, err.message, 500); }
+});
+
+// Clôture + calcul des points d'une édition (idempotent).
+router.post('/admin/editions/:id/settle', async (req, res) => {
+  try { return ok(res, await scoring.settleEdition(req.params.id)); }
+  catch (err) { return fail(res, 'Scoring impossible : ' + err.message, 500); }
 });
 
 // Données foot (via le provider abstrait — mock au MVP) pour l'import de matchs.

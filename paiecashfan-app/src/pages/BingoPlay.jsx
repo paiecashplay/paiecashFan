@@ -9,6 +9,11 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 
 const GRID = { express: 3, standard: 5, expert: 6 };
+const FIGURE_LABELS = {
+  LINE_HORIZONTAL: 'Ligne', LINE_VERTICAL: 'Colonne', DIAGONAL: 'Diagonale', FOUR_CORNERS: '4 coins',
+  DOUBLE_LINE: 'Double ligne', TRIPLE_LINE: 'Triple ligne', SQUARE_2X2: 'Carré', CROSS: 'Croix',
+  X_SHAPE: 'X', FULL_CARD: 'BINGO 🎉',
+};
 
 export function BingoPlay() {
   const { slug } = useParams();
@@ -117,7 +122,19 @@ export function BingoPlay() {
                 </Button>
               </div>
             )}
-            {!isDraft && (
+            {card.status === 'scored' ? (
+              <div className="mt-6 rounded-2xl border border-gold-400/30 bg-gold-400/[0.08] p-5 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Ton score</p>
+                <p className="mt-1 font-display text-4xl font-black text-gold-400">{card.points_total} pts</p>
+                {Array.isArray(card.figures_won) && card.figures_won.length > 0 && (
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    {card.figures_won.map((f) => (
+                      <span key={f} className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[11px] font-bold text-bone-200">{FIGURE_LABELS[f] || f}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : !isDraft && (
               <div className="mt-6 flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] px-4 py-3 text-sm text-emerald-200">
                 <CheckCircle2 size={16} /> Ta grille est enregistrée. Les points seront calculés à la clôture de l'édition.
               </div>

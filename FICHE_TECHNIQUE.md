@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (t)** — **Sport Bingo — Phase 2b : moteur de scoring**.
+  `bingoEngine.detectFigures` (lignes/colonnes/diagonales/coins/carré/croix/X/
+  double-triple ligne/BINGO). `services/bingoScoring.js` : à la clôture, note les
+  cases (correct/incorrect/void), détecte les figures, attribue les points
+  **idempotents** (`calculation_version` + `bingo_card_wins`), journalise l'audit,
+  reconstruit le **classement** (all-time). Routes `POST /admin/editions/:id/settle`
+  + `GET /leaderboard`. Admin : bouton **« Clôturer & calculer »**. Grille jouable :
+  affichage **score + figures gagnantes**. Testé (grille full → 4550 pts, idempotent).
 - **2026-07-11 (s)** — **Sport Bingo — Phase 2a** (données + fondations). Migration
   `bingo-phase2.sql` : **portefeuille virtuel + ledger immuable** (`virtual_wallets`,
   `virtual_wallet_transactions` avec `idempotency_key`, remplace `bingo_credits`),

@@ -33,6 +33,7 @@ export function AdminBingo() {
   }
 
   async function setStatus(id, status) { try { await apiFetch(`/api/v2/bingo/admin/editions/${id}`, { method: 'PUT', body: JSON.stringify({ status }) }); load(); } catch (e) { showToast(e.message); } }
+  async function settle(id) { if (!confirm('Clôturer et calculer les points ? (les résultats officiels 1/N/2 doivent être saisis)')) return; try { const j = await apiFetch(`/api/v2/bingo/admin/editions/${id}/settle`, { method: 'POST' }); showToast(`Calculé : ${j.data?.scored ?? 0} grille(s) notée(s)`); load(); } catch (e) { showToast('Erreur : ' + e.message); } }
   async function del(id) { if (!confirm('Supprimer cette édition ? (matchs, événements et grilles associés seront supprimés)')) return; try { await apiFetch(`/api/v2/bingo/admin/editions/${id}`, { method: 'DELETE' }); showToast('Supprimée'); load(); } catch (e) { showToast(e.message); } }
 
   return (
@@ -76,6 +77,9 @@ export function AdminBingo() {
                   </div>
                 </button>
                 <div className="flex items-center gap-2 shrink-0">
+                  {ed.status !== 'completed' && (
+                    <button onClick={() => settle(ed.id)} title="Clôturer & calculer les points" className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-gold-400/30 bg-gold-400/10 text-[11px] font-bold text-gold-400 hover:bg-gold-400/20"><Trophy size={13} /> Clôturer</button>
+                  )}
                   <select value={ed.status} onChange={(e) => setStatus(ed.id, e.target.value)} className="h-8 rounded-lg border border-white/10 bg-white/5 px-2 text-[11px] text-bone-200">{STATUS.map((s) => <option key={s} value={s}>{s}</option>)}</select>
                   <button onClick={() => del(ed.id)} className="grid h-8 w-8 place-items-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 size={13} /></button>
                 </div>
