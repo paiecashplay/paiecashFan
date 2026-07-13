@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {  Video, Users, Radio} from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -8,14 +9,23 @@ import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
+import { useClubDetail } from '@/hooks/useClubDetail';
 
-const mockClub = {
-  name: 'Paris Saint-Germain',
-  slug: 'paris-saint-germain',
-  primaryColor: '#004170'
-};
+// Club par défaut quand on arrive sur /fan-club sans slug.
+const DEFAULT_SLUG = 'paris-saint-germain';
 
 export function FanClub() {
+  const { slug: routeSlug } = useParams();
+  const slug = routeSlug || DEFAULT_SLUG;
+  const { club: dbClub } = useClubDetail(slug);
+
+  const club = {
+    slug,
+    name: dbClub?.name || 'Fan Club',
+    primaryColor: dbClub?.primaryColor || dbClub?.primary_color || '#004170',
+    logo: dbClub?.logo || dbClub?.logo_url || null,
+  };
+
   const [mode, setMode] = useState('club');
   const {
     fans,
@@ -32,7 +42,7 @@ export function FanClub() {
     isChatEmpty,
     sendMessage,
     match
-  } = useFanFeed(mockClub.slug, mode);
+  } = useFanFeed(slug, mode);
   
   const [newPost, setNewPost] = useState('');
 
@@ -78,7 +88,7 @@ export function FanClub() {
         <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-6 md:p-8">
           <div
             className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full blur-3xl opacity-30"
-            style={{ background: mockClub.primaryColor }}
+            style={{ background: club.primaryColor }}
           />
 
           <div className="relative">
@@ -88,7 +98,7 @@ export function FanClub() {
             </div>
 
             <h1 className="mt-5 break-words font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl md:text-6xl">
-              {mockClub.name}
+              {club.name}
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm md:text-base text-bone-400">
@@ -125,7 +135,7 @@ export function FanClub() {
         />
         <LiveQuickActions
           mode={mode}
-          club={mockClub}
+          club={club}
           onReact={handleLiveReaction}
           fanPoints={fanPoints}
         />
@@ -171,7 +181,7 @@ export function FanClub() {
 
           <LiveChat
             mode={mode}
-            club={mockClub}
+            club={club}
             messages={messages}
             loading={feedLoading}
             error={feedError}
@@ -185,7 +195,7 @@ export function FanClub() {
             <ParticipantsPanel
               mode={mode}
               fans={fans}
-              club={mockClub}
+              club={club}
               loading={feedLoading}
               error={feedError}
               onRetry={reloadFeed}
@@ -208,7 +218,7 @@ export function FanClub() {
           </div>
 
           <ClubFanCommunity
-            club={mockClub}
+            club={club}
             fans={fans}
             posts={posts}
             comments={comments}

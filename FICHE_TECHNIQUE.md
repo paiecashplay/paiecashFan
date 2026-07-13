@@ -105,6 +105,10 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (l)** — **Fan Club dynamique par club** : nouvelle route
+  `/clubs/:slug/fan-club` (FanClub lit le `slug` → vrai club via `useClubDetail`),
+  action **« Fan Club »** ajoutée au SideDock de chaque club. `/fan-club` (navbar)
+  garde PSG par défaut. Feed persisté par club (`tenant_id`).
 - **2026-07-11 (k)** — **Fan Club branché au backend** (mode « club » persisté).
   Tables `fan_posts` / `fan_comments` / `fan_post_likes` / `fan_messages`
   (migration `backend/migrations/fan-club.sql` à exécuter dans Supabase — pas de

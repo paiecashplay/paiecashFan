@@ -7,7 +7,7 @@ import {
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -711,9 +711,16 @@ function SideActions({ primaryColor,  isFederationHub = false, clubSlug  }) {
     onClick: () => navigate(`/clubs/${clubSlug}/billetterie`)
   };
 
+  const fanClubAction = {
+    key: 'fanclub',
+    icon: Radio,
+    label: 'Fan Club',
+    onClick: () => navigate(`/clubs/${clubSlug}/fan-club`)
+  };
+
   const actions = [
     shopAction,
-    ...(!isFederationHub ? [ticketingAction] : []),
+    ...(!isFederationHub ? [ticketingAction, fanClubAction] : []),
     { key: 'play', icon: Trophy, label: 'Palmarès', onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices, label: 'Effectif', onClick: () => scrollTo('squad') },
     { key: 'like', icon: Heart, label: 'J\'aime' },

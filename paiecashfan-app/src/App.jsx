@@ -80,6 +80,7 @@ export default function App() {
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
+                  <Route path="/clubs/:slug/fan-club" element={<FanClub />} />
                   <Route
                     path="/mon-club"
                     element={
