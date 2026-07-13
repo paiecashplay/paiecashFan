@@ -105,6 +105,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (r)** — **PaieCash Sport Bingo — Phase 1 backend** (fondation).
+  Migration `backend/migrations/bingo.sql` (éditions/matchs/événements/cartes/
+  picks/scoring_log/crédits — à exécuter dans Supabase). Moteur
+  `services/bingoEngine.js` : génération de carte **déterministe côté serveur**
+  (seed → layout, FREE au centre en 5×5). `db/bingo.js` + routes `/api/v2/bingo`
+  (public éditions/détail, joueur créer-carte/picks/soumettre, admin CRUD
+  éditions/matchs/événements). MVP : type `MATCH_RESULT`, **crédits virtuels 500**
+  (aucun argent réel). Reste : UI admin + grille jouable (front) + moteur de
+  scoring/figures (Phase 2).
 - **2026-07-11 (q)** — **Tombola — backend** (branchement en cours). Tables
   `tombola_campaigns` / `tombola_tickets` (migration `backend/migrations/tombola.sql`
   à exécuter dans Supabase). API `/api/v2/tombola` : liste/détail (public),
