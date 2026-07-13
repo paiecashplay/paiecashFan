@@ -20,6 +20,8 @@ import { AdminClubs } from './pages/admin/AdminClubs';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminTombola } from './pages/admin/AdminTombola';
+import { AdminBingo } from './pages/admin/AdminBingo';
+import { BingoPlay } from './pages/BingoPlay';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminClubEdit } from './pages/admin/AdminClubEdit';
 import { AdminFederations } from './pages/admin/AdminFederations';
@@ -63,6 +65,7 @@ export default function App() {
           <Route path="products"            element={<AdminProducts />} />
           <Route path="orders"              element={<AdminOrders />} />
           <Route path="tombola"             element={<AdminTombola />} />
+          <Route path="bingo"               element={<AdminBingo />} />
           <Route path="settings"            element={<AdminSettings />} />
         </Route>
 
@@ -83,6 +86,7 @@ export default function App() {
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
                   <Route path="/clubs/:slug/fan-club" element={<FanClub />} />
+                  <Route path="/bingo/:slug" element={<BingoPlay />} />
                   <Route
                     path="/mon-club"
                     element={

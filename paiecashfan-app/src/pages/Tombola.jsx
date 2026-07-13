@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Ticket, Gift, Check, X, Users, ShieldCheck, Trophy, Sparkles,
-  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus
+  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -47,6 +47,7 @@ const fmtDate = (s) => { try { return new Date(s).toLocaleDateString('fr-FR', { 
 
 export function Tombola() {
   const [campaigns, setCampaigns] = useState(null);
+  const [bingoEditions, setBingoEditions] = useState([]);
   const [buying, setBuying] = useState(null); // campagne en cours d'achat (modale)
 
   const load = () => {
@@ -54,7 +55,12 @@ export function Tombola() {
       .then((j) => setCampaigns(j.data?.campaigns || []))
       .catch(() => setCampaigns([]));
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    apiFetch('/api/v2/bingo').then((j) => setBingoEditions(j.data?.editions || [])).catch(() => {});
+  }, []);
+
+  const playableBingo = useMemo(() => bingoEditions.filter((e) => ['open', 'scheduled', 'live'].includes(e.status)), [bingoEditions]);
 
   const active = useMemo(() => (campaigns || []).filter((c) => c.status === 'active'), [campaigns]);
   const past = useMemo(() => (campaigns || []).filter((c) => c.status === 'drawn'), [campaigns]);
@@ -148,6 +154,31 @@ export function Tombola() {
                   <p className="font-bold text-emerald-400">{c.winnerName || '—'}</p>
                 </div>
               </GlassCard>
+            ))}
+          </div>
+        </Container>
+      )}
+
+      {/* ── SPORT BINGO (jouable) ────────────────────────── */}
+      {playableBingo.length > 0 && (
+        <Container className="relative py-12">
+          <SectionTitle icon={Grid3x3}>Sport Bingo</SectionTitle>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {playableBingo.map((ed) => (
+              <Link key={ed.id} to={`/bingo/${ed.slug}`}>
+                <GlassCard className="p-5 h-full hover:border-emerald-400/40 transition-all border border-white/10">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0"><Grid3x3 size={20} /></div>
+                    {ed.badge && <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-bone-400 font-bold">{ed.badge}</span>}
+                  </div>
+                  <h3 className="mt-4 font-display text-lg font-black text-bone-50">{ed.title}</h3>
+                  {ed.description && <p className="mt-1 text-xs text-bone-500 line-clamp-2">{ed.description}</p>}
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Grille {({ express: '3×3', standard: '5×5', expert: '6×6' })[ed.format] || '5×5'}</span>
+                    <span className="text-xs font-black text-emerald-400">{ed.cost_credits} crédits</span>
+                  </div>
+                </GlassCard>
+              </Link>
             ))}
           </div>
         </Container>

@@ -2,7 +2,7 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Users, Shield, ShoppingBag,
-  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe, FileCheck, Receipt, Gift
+  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe, FileCheck, Receipt, Gift, Grid3x3
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
@@ -16,6 +16,7 @@ const sideNav = [
   { to: '/admin/products',   label: 'Produits',        icon: ShoppingBag },
   { to: '/admin/orders',     label: 'Commandes',       icon: Receipt },
   { to: '/admin/tombola',    label: 'Tombolas',        icon: Gift },
+  { to: '/admin/bingo',      label: 'Sport Bingo',     icon: Grid3x3 },
   { to: '/admin/settings',   label: 'Paramètres',      icon: Settings },
 ];
 

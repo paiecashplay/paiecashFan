@@ -113,7 +113,10 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   (public éditions/détail, joueur créer-carte/picks/soumettre, admin CRUD
   éditions/matchs/événements). MVP : type `MATCH_RESULT`, **crédits virtuels 500**
   (aucun argent réel). Reste : UI admin + grille jouable (front) + moteur de
-  scoring/figures (Phase 2).
+  scoring/figures (Phase 2). **Front livré** : admin `/admin/bingo` (éditions +
+  matchs + événements + saisie résultat 1/N/2), **grille jouable `/bingo/:slug`**
+  (sélection 1/N/2 par case, auto-save, soumission verrouillée, états visuels),
+  intégrée à la page **Tombola → section « Sport Bingo »** (éditions jouables).
 - **2026-07-11 (q)** — **Tombola — backend** (branchement en cours). Tables
   `tombola_campaigns` / `tombola_tickets` (migration `backend/migrations/tombola.sql`
   à exécuter dans Supabase). API `/api/v2/tombola` : liste/détail (public),
