@@ -140,7 +140,10 @@ router.post('/admin/editions', async (req, res) => {
     if (!req.body?.slug || !req.body?.title) return fail(res, 'slug et title requis.');
     const edition = await bingo.createEdition({ ...req.body, createdBy: req.authUser.id });
     return ok(res, { edition });
-  } catch (err) { return fail(res, err.message, 500); }
+  } catch (err) {
+    if (err.code === 'DUPLICATE_SLUG') return fail(res, err.message, 409);
+    return fail(res, err.message, 500);
+  }
 });
 router.put('/admin/editions/:id', async (req, res) => {
   try { return ok(res, { edition: await bingo.updateEdition(req.params.id, req.body || {}) }); }

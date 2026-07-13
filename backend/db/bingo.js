@@ -34,7 +34,10 @@ async function createEdition(d) {
     cost_credits: parseInt(d.costCredits, 10) || 0, reward_points: parseInt(d.rewardPoints, 10) || 0,
     figures_config: d.figuresConfig || {}, status: d.status || 'draft', created_by: d.createdBy || null,
   }).select('*').single();
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.code === '23505') { const e = new Error(`Le slug « ${d.slug} » est déjà utilisé. Choisis-en un autre.`); e.code = 'DUPLICATE_SLUG'; throw e; }
+    throw new Error(error.message);
+  }
   return data;
 }
 async function updateEdition(id, updates) {
