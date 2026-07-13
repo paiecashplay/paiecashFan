@@ -203,7 +203,26 @@ async function listMyCards(userId) {
   const { data: eds } = await supabase.from('bingo_editions')
     .select('id, slug, title, cover_url, badge, status, ends_at, locks_at, cost_credits').in('id', edIds);
   const byId = Object.fromEntries((eds || []).map((e) => [e.id, e]));
-  return cards.map((c) => ({ ...c, edition: byId[c.edition_id] || null }));
+
+  // Rang du joueur dans chaque édition où il a une carte notée.
+  const scoredEdIds = [...new Set(cards.filter((c) => c.status === 'scored').map((c) => c.edition_id))];
+  const pointsByEd = {};
+  if (scoredEdIds.length) {
+    const { data: allScored } = await supabase.from('bingo_cards')
+      .select('edition_id, points_total').eq('status', 'scored').in('edition_id', scoredEdIds);
+    (allScored || []).forEach((c) => { (pointsByEd[c.edition_id] ||= []).push(Number(c.points_total || 0)); });
+  }
+
+  return cards.map((c) => {
+    let rank = null, participants = null;
+    if (c.status === 'scored' && pointsByEd[c.edition_id]) {
+      const pts = pointsByEd[c.edition_id];
+      const mine = Number(c.points_total || 0);
+      rank = 1 + pts.filter((p) => p > mine).length;
+      participants = pts.length;
+    }
+    return { ...c, edition: byId[c.edition_id] || null, rank, participants };
+  });
 }
 
 // Crée la carte du joueur (débit crédits + génération layout déterministe +

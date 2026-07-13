@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ad)** — **Espace compte : onglet « Mes grilles »**. `/mon-compte`
+  liste les bulletins Sport Bingo du fan (récap grilles/points/BINGO, statut
+  gagnée/en attente/à compléter/sans gain, figures, **date de jeu**, **rang
+  obtenu #X/Y** par édition calculé backend, lien vers la grille). `listMyCards`
+  enrichi du rang + participants.
 - **2026-07-14 (ac)** — **Card bingo premium partagée + navbar « Jeux »**. Card
   refondue (320×520, Bebas Neue, overlay exact, glow/emoji par compétition,
   countdown coloré 2h/6h, barre, hover Netflix + bordure lumineuse animée, pulse

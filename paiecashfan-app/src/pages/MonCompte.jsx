@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import {
   Wallet, Ticket, ShoppingBag, ExternalLink, Check, Pencil,
   Receipt, ShieldCheck, Loader2, ArrowRight, History, QrCode,
-  Download, X
+  Download, X, Grid3x3, Trophy, Clock
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -42,11 +42,13 @@ export function MonCompte() {
   const [orders, setOrders]   = useState(null);
   const [pcc, setPcc]         = useState(null);
   const [history, setHistory] = useState(null);
+  const [bingoCards, setBingoCards] = useState(null);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [loadingPcc, setLoadingPcc] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [loadingBingo, setLoadingBingo] = useState(true);
 
-  const [tab, setTab] = useState('orders');       // 'orders' | 'history'
+  const [tab, setTab] = useState('orders');       // 'orders' | 'history' | 'bingo'
   const [ticket, setTicket] = useState(null);      // commande billetterie affichée
 
   useEffect(() => {
@@ -62,6 +64,10 @@ export function MonCompte() {
       .then((j) => setHistory(j.data?.transactions || []))
       .catch(() => setHistory([]))
       .finally(() => setLoadingHistory(false));
+    apiFetch('/api/v2/bingo/me/cards')
+      .then((j) => setBingoCards(j.data?.cards || []))
+      .catch(() => setBingoCards([]))
+      .finally(() => setLoadingBingo(false));
   }, []);
 
   const initial = (profile?.display_name || user?.email || 'F')[0].toUpperCase();
@@ -96,12 +102,17 @@ export function MonCompte() {
               <TabBtn active={tab === 'orders'} onClick={() => setTab('orders')} icon={<Receipt size={15} />}>
                 Billets & commandes
               </TabBtn>
+              <TabBtn active={tab === 'bingo'} onClick={() => setTab('bingo')} icon={<Grid3x3 size={15} />}>
+                Mes grilles
+              </TabBtn>
               <TabBtn active={tab === 'history'} onClick={() => setTab('history')} icon={<History size={15} />}>
                 Historique PCC
               </TabBtn>
             </div>
 
-            {tab === 'orders' ? (
+            {tab === 'bingo' ? (
+              <BingoCards loading={loadingBingo} cards={bingoCards} />
+            ) : tab === 'orders' ? (
               loadingOrders ? (
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
@@ -334,6 +345,101 @@ function PccHistory({ loading, transactions }) {
         );
       })}
     </GlassCard>
+  );
+}
+
+// ── Mes grilles Sport Bingo ──────────────────────────────────
+const bingoDate = (s) => { try { return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return ''; } };
+const BINGO_FMT = { express: '3×3', standard: '5×5', expert: '6×6' };
+const BINGO_FIGS = {
+  LINE_HORIZONTAL: 'Ligne', LINE_VERTICAL: 'Colonne', DIAGONAL: 'Diagonale', FOUR_CORNERS: '4 coins',
+  DOUBLE_LINE: 'Double ligne', TRIPLE_LINE: 'Triple ligne', SQUARE_2X2: 'Carré', CROSS: 'Croix', X_SHAPE: 'X', FULL_CARD: 'BINGO 🎉',
+};
+
+function bingoStatus(card) {
+  if (card.status === 'draft') return { label: 'À compléter', cls: 'text-cyan-300 border-cyan-400/30 bg-cyan-400/10' };
+  if (card.status === 'submitted') return { label: 'En attente', cls: 'text-gold-400 border-gold-400/30 bg-gold-400/10' };
+  if (card.status === 'scored') return (card.points_total > 0)
+    ? { label: 'Gagnée', cls: 'text-emerald-300 border-emerald-400/30 bg-emerald-400/10' }
+    : { label: 'Sans gain', cls: 'text-bone-400 border-white/10 bg-white/5' };
+  return { label: card.status, cls: 'text-bone-400 border-white/10 bg-white/5' };
+}
+
+function BingoCards({ loading, cards }) {
+  if (loading) return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}</div>;
+  if (!cards?.length) return (
+    <GlassCard className="p-10 text-center">
+      <Grid3x3 className="mx-auto text-bone-600" size={38} />
+      <p className="mt-4 text-sm text-bone-400">Tu n'as pas encore joué de grille Sport Bingo.</p>
+      <Link to="/tombola/sport-bingo"><Button variant="primary" size="md" className="mt-5"><Grid3x3 size={15} /> Découvrir le Sport Bingo</Button></Link>
+    </GlassCard>
+  );
+
+  const totalPoints = cards.filter((c) => c.status === 'scored').reduce((s, c) => s + Number(c.points_total || 0), 0);
+  const bingos = cards.filter((c) => Array.isArray(c.figures_won) && c.figures_won.includes('FULL_CARD')).length;
+
+  return (
+    <div className="space-y-3">
+      {/* Récap */}
+      <div className="grid grid-cols-3 gap-3">
+        <MiniStat label="Grilles jouées" value={cards.length} />
+        <MiniStat label="Points cumulés" value={totalPoints} accent="text-emerald-400" />
+        <MiniStat label="BINGO" value={bingos} accent="text-gold-400" />
+      </div>
+
+      {cards.map((c) => {
+        const st = bingoStatus(c);
+        const ed = c.edition;
+        return (
+          <GlassCard key={c.id} className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-display text-base font-black text-bone-50 truncate">{ed?.title || 'Édition'}</p>
+                <p className="mt-0.5 text-xs text-bone-500">
+                  Grille {BINGO_FMT[c.format] || '5×5'} · N° {String(c.id).slice(0, 8)}
+                  {(c.submitted_at || c.created_at) && <> · Jouée le {bingoDate(c.submitted_at || c.created_at)}</>}
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <span className={`rounded-full border px-2.5 py-1 text-[9px] uppercase tracking-widest font-bold ${st.cls}`}>{st.label}</span>
+                {c.status === 'scored' && c.rank && (
+                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${c.rank === 1 ? 'text-gold-400 border-gold-400/40 bg-gold-400/10' : 'text-bone-200 border-white/15 bg-white/5'}`}>
+                    <Trophy size={10} /> #{c.rank}<span className="text-bone-500 font-bold">/{c.participants}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {c.status === 'scored' && (
+              <div className="mt-3 flex items-end justify-between gap-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.isArray(c.figures_won) && c.figures_won.length > 0
+                    ? c.figures_won.map((f) => <span key={f} className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-bone-300">{BINGO_FIGS[f] || f}</span>)
+                    : <span className="text-[11px] text-bone-500">Aucune figure complétée</span>}
+                </div>
+                <span className="inline-flex items-center gap-1 font-display text-lg font-black text-gold-400 shrink-0"><Trophy size={14} /> {c.points_total} pts</span>
+              </div>
+            )}
+            {c.status === 'submitted' && <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-gold-400"><Clock size={12} /> Points calculés à la clôture de l'édition.</p>}
+
+            {ed?.slug && (
+              <Link to={`/bingo/${ed.slug}`} className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
+                Voir ma grille <ArrowRight size={13} />
+              </Link>
+            )}
+          </GlassCard>
+        );
+      })}
+    </div>
+  );
+}
+
+function MiniStat({ label, value, accent = 'text-bone-50' }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-center">
+      <p className={`font-display text-2xl font-black tabular-nums ${accent}`}>{value}</p>
+      <p className="mt-0.5 text-[9px] uppercase tracking-widest text-bone-500 font-bold">{label}</p>
+    </div>
   );
 }
 
