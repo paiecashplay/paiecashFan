@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ab)** — **6 éditions Sport Bingo seedées (maquette)**. Script
+  `scripts/seed-bingo-editions.js` (idempotent) : Champions (live, 500), Premier
+  League (open, 300), CAN (open, 400), Copa (à venir, 450), Classicos (à venir,
+  3×3, 250), Derbies (à venir, 300) — avec sous-titres, badges, difficultés,
+  images webp locales, compte à rebours et 24 matchs (9 en express) pour être
+  jouables. Visuel `premier-league.webp` ajouté.
 - **2026-07-14 (aa)** — **Fix image des cards Sport Bingo + 6 visuels**. La card
   masquait l'image (`opacity-70` sous dégradé sombre → image de stade invisible).
   Corrigé : image pleine + dégradé bas pour lisibilité + voile haut pour les
