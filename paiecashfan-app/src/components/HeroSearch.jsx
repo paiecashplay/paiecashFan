@@ -7,9 +7,11 @@ import { cn } from '@/lib/cn';
 import { apiFetch } from '@/lib/api';
 import { ligue1, championsEurope } from '@/data/leagues';
 import { federations } from '@/data/federations';
-import { slugify } from '@/lib/slugify';
 
-// Index plat de tous les items cherchables (clubs + ligues + fédérations)
+// Index statique COMPLÉMENTAIRE (suggestions ligues + confédérations).
+// Les CLUBS ne viennent plus du statique (slugs divergents de la base) : la
+// recherche des clubs passe uniquement par l'API (/marketplace/search), qui
+// renvoie les vrais slugs de la base. Le statique ne sert qu'au repli offline.
 function buildSearchIndex() {
   const items = [];
   [ligue1, ...championsEurope].forEach((league) => {
@@ -19,17 +21,6 @@ function buildSearchIndex() {
       label: league.name,
       sub: league.country,
       flag: league.flag
-    });
-    league.clubs.forEach((c) => {
-      items.push({
-        type: 'club',
-        id: `club-${c.id}`,
-        slug: slugify(c.name),
-        label: c.name,
-        sub: `${c.city} · ${league.name}`,
-        color: c.primaryColor,
-        logo: c.logo
-      });
     });
   });
   federations.forEach((f) => {

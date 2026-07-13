@@ -105,6 +105,11 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (p)** — Nettoyage statique : la **recherche d'accueil** (HeroSearch)
+  ne génère plus de clubs depuis le registry statique (slugs divergents) — les
+  clubs viennent uniquement de l'**API `/marketplace/search`** (vrais slugs). Le
+  registry statique ne sert plus que de **repli** (useClubDetail, hub billetterie,
+  membres de fédération). Plus aucune navigation club ne produit de slug statique.
 - **2026-07-11 (o)** — Fix « Club introuvable » au checkout (mismatch de slug
   registry statique vs base). **A** : hub **billetterie piloté par la base**
   (`/marketplace/clubs?league=` → vrais slugs). **B** : résolveur tolérant
