@@ -71,9 +71,18 @@ export function Tombola() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.18),transparent_32%),radial-gradient(circle_at_85%_12%,rgba(245,158,11,0.15),transparent_35%)]" />
 
       {/* ── HERO ─────────────────────────────────────────── */}
-      <section className="relative py-14 md:py-20">
-        <Container>
-          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+      <section className="relative overflow-hidden">
+        {/* Image de fond plein hero (côté droit) */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[64%]">
+          <img src="/images/gaming/hero-tombola.webp" alt="" className="h-full w-full object-cover object-center"
+            onError={(e) => { e.currentTarget.src = '/images/gaming/hero-tombola.png'; }} />
+          {/* Fondus pour la lisibilité du texte */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink-900 via-ink-900/85 to-ink-900/30 lg:via-ink-900/60 lg:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-900 via-transparent to-transparent" />
+        </div>
+
+        <Container className="relative">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center min-h-[480px] md:min-h-[560px] py-14">
             <div>
               <Badge variant="emerald">🎁 Tombola</Badge>
               <h1 className="mt-6 font-display text-5xl md:text-7xl font-black uppercase tracking-tight text-bone-50 leading-[0.95]">
@@ -90,11 +99,11 @@ export function Tombola() {
               </div>
             </div>
 
-            <div className="relative hidden lg:block w-[380px]">
-              <img src="/images/gaming/hero-tombola.webp" alt="" className="w-full drop-shadow-[0_20px_50px_rgba(16,185,129,0.25)]"
-                onError={(e) => { e.currentTarget.src = '/images/gaming/hero-tombola.png'; }} />
-              {featured && <NextDrawBox campaign={featured} />}
-            </div>
+            {featured && (
+              <div className="hidden lg:flex justify-center items-end pb-4">
+                <NextDrawBox campaign={featured} />
+              </div>
+            )}
           </div>
         </Container>
       </section>
@@ -389,7 +398,7 @@ function NextDrawBox({ campaign }) {
   const [t, setT] = useState(() => getTimeLeft(campaign.endsAt));
   useEffect(() => { const i = setInterval(() => setT(getTimeLeft(campaign.endsAt)), 1000); return () => clearInterval(i); }, [campaign.endsAt]);
   return (
-    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[300px] rounded-2xl border border-emerald-400/25 bg-ink-950/90 backdrop-blur px-5 py-4 text-center shadow-2xl">
+    <div className="w-[320px] rounded-2xl border border-emerald-400/25 bg-ink-950/85 backdrop-blur px-5 py-4 text-center shadow-2xl">
       <p className="text-[10px] uppercase tracking-[0.28em] text-emerald-400 font-black">Prochain tirage</p>
       <div className="mt-2 flex justify-center gap-2">
         {[['J', t.d], ['H', t.h], ['M', t.m], ['S', t.s]].map(([l, v]) => (
