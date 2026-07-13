@@ -111,7 +111,9 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   `POST /:id/buy` (achat tickets, **paiement PCC** via PaieCashCoin), création
   plateforme (super_admin) **ou club** (club_admin sur son club), gestion, tirage
   manuel. **Cron de tirage auto** à `ends_at` (`jobs/tombolaDraw.js`, toutes les
-  5 min). Reste : UI admin de création + rewire du front (mock → API).
+  5 min). **Front `Tombola.jsx` réécrit DB-driven** (tirages en cours + achat PCC
+  réel + tirages passés avec gagnant ; grille de jeux = showcase « bientôt »).
+  **Admin `/admin/tombola`** : créer/gérer les tombolas + tirage manuel.
 - **2026-07-11 (p)** — Nettoyage statique : la **recherche d'accueil** (HeroSearch)
   ne génère plus de clubs depuis le registry statique (slugs divergents) — les
   clubs viennent uniquement de l'**API `/marketplace/search`** (vrais slugs). Le

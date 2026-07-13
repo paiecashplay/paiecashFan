@@ -23,7 +23,13 @@ async function enrich(c) {
     const { data } = await supabase.from('tenants').select('name, slug, logo_url').eq('id', c.tenant_id).maybeSingle();
     club = data || null;
   }
+  let winnerName = null;
+  if (c.winner_user_id) {
+    const { data } = await supabase.from('profiles').select('display_name').eq('id', c.winner_user_id).maybeSingle();
+    winnerName = data?.display_name || 'Supporter';
+  }
   return {
+    winnerName,
     id: c.id,
     tenantId: c.tenant_id,
     clubName: club?.name || null,
