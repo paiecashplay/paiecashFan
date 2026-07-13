@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Gift, Plus, Trophy, Trash2, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Gift, Plus, Trophy, Trash2, Loader2, Upload } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 // Gestionnaire de tombolas réutilisable.
 // - Sans clubId : vue plateforme (super_admin) → liste toutes les tombolas.
@@ -25,8 +26,21 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
   const [form, setForm] = useState(BLANK);
   const [creating, setCreating] = useState(false);
   const [acting, setActing] = useState(null);
+  const { uploadImage, uploading } = useImageUpload();
+  const fileRef = useRef(null);
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(''), 3000); };
+
+  async function onPickImage(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast('Choisis un fichier image.'); return; }
+    try {
+      const url = await uploadImage(file, 'tombola');
+      if (url) setForm((f) => ({ ...f, imageUrl: url }));
+    } catch (err) { showToast('Upload échoué : ' + err.message); }
+  }
   const load = () => apiFetch(`/api/v2/tombola${clubId ? `?clubId=${clubId}` : ''}`)
     .then((j) => setCampaigns(j.data?.campaigns || [])).catch(() => setCampaigns([]));
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [clubId]);
@@ -85,7 +99,18 @@ export function TombolaManager({ clubId = null, title = 'Tombolas', subtitle = '
           <L label="Prix du ticket (PCC)"><input type="number" min="0" className={input} value={form.ticketPricePcc} onChange={(e) => setForm({ ...form, ticketPricePcc: e.target.value })} /></L>
           <L label="Nb de tickets max (vide = illimité)"><input type="number" min="1" className={input} value={form.ticketsTotal} onChange={(e) => setForm({ ...form, ticketsTotal: e.target.value })} /></L>
           <L label="Date de fin *"><input type="datetime-local" className={input} value={form.endsAt} onChange={(e) => setForm({ ...form, endsAt: e.target.value })} /></L>
-          <L label="Image (URL)"><input className={input} value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://…" /></L>
+          <L label="Image du lot">
+            <div className="flex items-start gap-3">
+              {form.imageUrl && <img src={form.imageUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover bg-white/5 border border-white/10" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+              <div className="flex-1 space-y-2">
+                <input className={input} value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://… ou upload" />
+                <input type="file" accept="image/*" ref={fileRef} onChange={onPickImage} className="hidden" />
+                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 text-xs text-bone-400 hover:text-emerald-400 transition disabled:opacity-50">
+                  <Upload size={13} /> {uploading ? 'Upload…' : 'Uploader une image'}
+                </button>
+              </div>
+            </div>
+          </L>
           <div className="md:col-span-2"><L label="Description"><textarea rows={2} className={input.replace('h-10', 'py-2 min-h-[2.5rem]')} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></L></div>
         </div>
         <button onClick={create} disabled={creating} className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50">
