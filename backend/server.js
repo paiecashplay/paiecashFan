@@ -122,6 +122,7 @@ const v2MarketProducts = require('./routes/v2/marketplace/products');
 const v2MarketOrders = require('./routes/v2/marketplace/orders');
 const v2MarketCheckout = require('./routes/v2/marketplace/checkout');
 const v2FanFeed = require('./routes/v2/marketplace/fan-feed');
+const v2Tombola = require('./routes/v2/tombola');
 const v2MarketSearch = require('./routes/v2/marketplace/search');
 const v2Onboarding = require('./routes/v2/onboarding');
 const v2Me = require('./routes/v2/me');
@@ -148,6 +149,7 @@ app.use('/api/v2/marketplace/products', v2MarketProducts);
 app.use('/api/v2/marketplace/orders', v2MarketOrders);
 app.use('/api/v2/checkout', v2MarketCheckout);
 app.use('/api/v2/clubs', v2FanFeed);
+app.use('/api/v2/tombola', v2Tombola);
 app.use('/api/v2/marketplace/search', v2MarketSearch);
 app.use('/api/v2/onboarding', v2Onboarding);
 app.use('/api/v2/me', v2Me);
@@ -208,6 +210,10 @@ const server = httpServer.listen(PORT, () => {
   cron.schedule('*/5 * * * *', () => {
     autoSettleFinishedGames();
   });
+
+  // Tombola : tirage automatique des campagnes arrivées à échéance (toutes les 5 min)
+  const { runTombolaDraws } = require('./jobs/tombolaDraw');
+  cron.schedule('*/5 * * * *', () => { runTombolaDraws(); });
 });
 
 server.on('error', (err) => {

@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (q)** — **Tombola — backend** (branchement en cours). Tables
+  `tombola_campaigns` / `tombola_tickets` (migration `backend/migrations/tombola.sql`
+  à exécuter dans Supabase). API `/api/v2/tombola` : liste/détail (public),
+  `POST /:id/buy` (achat tickets, **paiement PCC** via PaieCashCoin), création
+  plateforme (super_admin) **ou club** (club_admin sur son club), gestion, tirage
+  manuel. **Cron de tirage auto** à `ends_at` (`jobs/tombolaDraw.js`, toutes les
+  5 min). Reste : UI admin de création + rewire du front (mock → API).
 - **2026-07-11 (p)** — Nettoyage statique : la **recherche d'accueil** (HeroSearch)
   ne génère plus de clubs depuis le registry statique (slugs divergents) — les
   clubs viennent uniquement de l'**API `/marketplace/search`** (vrais slugs). Le
