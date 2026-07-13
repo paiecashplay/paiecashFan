@@ -102,6 +102,42 @@ async function updateEvent(id, updates) {
 }
 async function deleteEvent(id) { const { error } = await supabase.from('bingo_events').delete().eq('id', id); if (error) throw new Error(error.message); return true; }
 
+// ─── Match + événement en une fois (UX admin unifiée) ────────
+// Crée le match ET son événement MATCH_RESULT (1/N/2). Si `officialAnswer`
+// est fourni (1/N/2), le résultat officiel est renseigné directement.
+async function addMatchWithEvent(editionId, d, order) {
+  const match = await addMatch(editionId, {
+    home: d.home, away: d.away, competition: d.competition || null, kickoffAt: d.kickoffAt || null, displayOrder: order,
+  });
+  const label = (d.label || '').trim() || `${d.home} - ${d.away}`;
+  const event = await addEvent(editionId, {
+    matchId: match.id, type: 'MATCH_RESULT', label, options: ['1', 'N', '2'], displayOrder: order,
+  });
+  const ans = String(d.officialAnswer || '').toUpperCase();
+  if (['1', 'N', '2'].includes(ans)) await updateEvent(event.id, { officialAnswer: ans, validationStatus: 'settled' });
+  return { match, event };
+}
+
+// Import en masse : chaque entrée = { home, away, competition?, officialAnswer? }.
+async function bulkAddMatches(editionId, rows) {
+  const start = (await listMatches(editionId)).length;
+  let created = 0;
+  for (const r of rows || []) {
+    if (!r?.home?.trim() || !r?.away?.trim()) continue;
+    await addMatchWithEvent(editionId, r, start + created);
+    created++;
+  }
+  return { created };
+}
+
+// Supprime un événement et, s'il est lié à un match, le match associé.
+async function deleteEventWithMatch(eventId) {
+  const { data: ev } = await supabase.from('bingo_events').select('match_id').eq('id', eventId).maybeSingle();
+  await deleteEvent(eventId);
+  if (ev?.match_id) await supabase.from('bingo_matches').delete().eq('id', ev.match_id);
+  return true;
+}
+
 // ─── Crédits virtuels (délégués au portefeuille + ledger) ────
 async function ensureCredits(userId) {
   const w = await wallet.ensureWallet(userId);
@@ -193,6 +229,7 @@ module.exports = {
   listEditions, getEditionBySlug, getEditionById, createEdition, updateEdition, deleteEdition,
   listMatches, addMatch, updateMatch, deleteMatch,
   listEvents, addEvent, updateEvent, deleteEvent,
+  addMatchWithEvent, bulkAddMatches, deleteEventWithMatch,
   ensureCredits,
   getCard, getPicks, listMyCards, createCard, savePicks, submitCard,
 };

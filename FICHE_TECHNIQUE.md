@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-13 (v)** — **Sport Bingo — Admin : saisie unifiée & import en masse**.
+  Fusion matchs/événements (1 match crée son événement 1/N/2). Liste unique avec
+  coup d'envoi + boutons résultat 1/N/2 (re-clic = efface). **Import en masse par
+  collage** (tableau Excel/Markdown, « A ; B ; 1 », « A vs B ») avec colonne
+  résultat optionnelle + aperçu du nb détecté. Saisie rapide (Entrée pour ajouter)
+  + coup d'envoi optionnel. Endpoints `POST /match-event`, `POST /matches/bulk`,
+  `DELETE /events/:id/with-match`.
 - **2026-07-13 (u)** — **Sport Bingo — Phase 3 UI (bloc 1)**. Page dédiée
   `/tombola/sport-bingo` : hero, **éditions à jouer** (vedette + grille),
   **Mes cartes** (toutes éditions, statut + score + figures), **Classement**

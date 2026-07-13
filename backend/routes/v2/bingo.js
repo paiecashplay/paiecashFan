@@ -168,6 +168,26 @@ router.post('/admin/editions/:id/events', async (req, res) => {
   try { return ok(res, { event: await bingo.addEvent(req.params.id, req.body || {}) }); }
   catch (err) { return fail(res, err.message, 500); }
 });
+
+// Match + événement 1/N/2 en une fois (saisie unifiée).
+router.post('/admin/editions/:id/match-event', async (req, res) => {
+  try {
+    const order = (await bingo.listMatches(req.params.id)).length;
+    return ok(res, await bingo.addMatchWithEvent(req.params.id, req.body || {}, order));
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// Import en masse de matchs (+ leurs événements, résultats optionnels).
+router.post('/admin/editions/:id/matches/bulk', async (req, res) => {
+  try { return ok(res, await bingo.bulkAddMatches(req.params.id, req.body?.matches || [])); }
+  catch (err) { return fail(res, err.message, 500); }
+});
+
+// Supprime un événement + son match associé.
+router.delete('/admin/events/:eid/with-match', async (req, res) => {
+  try { await bingo.deleteEventWithMatch(req.params.eid); return ok(res, { deleted: true }); }
+  catch (err) { return fail(res, err.message, 500); }
+});
 router.put('/admin/events/:eid', async (req, res) => {
   try { return ok(res, { event: await bingo.updateEvent(req.params.eid, req.body || {}) }); }
   catch (err) { return fail(res, err.message, 500); }

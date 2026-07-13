@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight, ClipboardPaste, Calendar } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 
@@ -94,81 +94,163 @@ export function AdminBingo() {
   );
 }
 
-// Panneau de gestion d'une édition : matchs + événements.
+// Parse un collage libre en lignes de matchs. Accepte : tableau markdown (|),
+// tabulation, point-virgule, « Domicile vs Extérieur », « Domicile - Extérieur ».
+// Colonne résultat (1/N/2) optionnelle. Ignore en-têtes et lignes de séparation.
+function parseBulkMatches(text) {
+  const RESULT = new Set(['1', 'N', '2']);
+  const rows = [];
+  for (const raw of (text || '').split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    let cells;
+    if (line.includes('|')) cells = line.split('|');
+    else if (line.includes('\t')) cells = line.split('\t');
+    else if (line.includes(';')) cells = line.split(';');
+    else if (/\svs?\s/i.test(line)) cells = line.split(/\s+vs?\s+/i);
+    else cells = line.split(/\s+[-–]\s+/);
+    cells = cells.map((c) => c.trim()).filter((c) => c !== '');
+    if (!cells.length) continue;
+    if (cells.every((c) => /^[-:]+$/.test(c))) continue;                       // séparateur markdown
+    const low = cells.map((c) => c.toLowerCase());
+    if (low.some((c) => /domicile|ext[eé]rieur|r[eé]sultat|[eé]quipe/.test(c))) continue; // en-tête
+    if (/^n[°o]?$/i.test(cells[0])) continue;
+    if (/^\d+$/.test(cells[0]) && cells.length > 2) cells = cells.slice(1);     // colonne N°
+    if (cells.length < 2) continue;
+    const home = cells[0], away = cells[1];
+    let officialAnswer = null;
+    if (cells.length >= 3) { const r = cells[2].toUpperCase(); if (RESULT.has(r)) officialAnswer = r; }
+    if (home && away) rows.push({ home, away, officialAnswer });
+  }
+  return rows;
+}
+
+// Panneau de gestion d'une édition : liste unifiée matchs/événements + saisie.
 function EditionManage({ editionId, format, showToast }) {
   const [data, setData] = useState(null);
-  const [mForm, setMForm] = useState({ home: '', away: '', competition: '' });
-  const [eForm, setEForm] = useState({ label: '', matchId: '' });
+  const [row, setRow] = useState({ home: '', away: '', competition: '', kickoffAt: '' });
+  const [busy, setBusy] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkText, setBulkText] = useState('');
+  const [importing, setImporting] = useState(false);
 
   const load = () => apiFetch(`/api/v2/bingo/admin/editions/${editionId}`).then((j) => setData(j.data)).catch(() => {});
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [editionId]);
 
-  async function addMatch() {
-    if (!mForm.home.trim() || !mForm.away.trim()) { showToast('Domicile et extérieur requis'); return; }
-    try { await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/matches`, { method: 'POST', body: JSON.stringify({ ...mForm, displayOrder: (data?.matches?.length || 0) }) }); setMForm({ home: '', away: '', competition: '' }); load(); }
+  const parsed = useMemo(() => parseBulkMatches(bulkText), [bulkText]);
+
+  // Événements affichés = source de vérité ; on joint le match pour le coup d'envoi.
+  const matchById = useMemo(() => Object.fromEntries((data?.matches || []).map((m) => [m.id, m])), [data]);
+
+  async function addRow() {
+    if (!row.home.trim() || !row.away.trim()) { showToast('Domicile et extérieur requis'); return; }
+    setBusy(true);
+    try {
+      await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/match-event`, { method: 'POST', body: JSON.stringify(row) });
+      setRow({ home: '', away: '', competition: '', kickoffAt: '' }); load();
+    } catch (e) { showToast(e.message); }
+    setBusy(false);
+  }
+  async function importBulk() {
+    if (!parsed.length) { showToast('Rien à importer'); return; }
+    setImporting(true);
+    try {
+      const j = await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/matches/bulk`, { method: 'POST', body: JSON.stringify({ matches: parsed }) });
+      showToast(`${j.data?.created ?? 0} match(s) importé(s)`); setBulkText(''); setBulkOpen(false); load();
+    } catch (e) { showToast(e.message); }
+    setImporting(false);
+  }
+  async function delRow(ev) {
+    try {
+      if (ev.match_id) await apiFetch(`/api/v2/bingo/admin/events/${ev.id}/with-match`, { method: 'DELETE' });
+      else await apiFetch(`/api/v2/bingo/admin/events/${ev.id}`, { method: 'DELETE' });
+      load();
+    } catch (e) { showToast(e.message); }
+  }
+  async function setResult(ev, answer) {
+    const next = ev.official_answer === answer ? null : answer;   // re-cliquer = effacer
+    try { await apiFetch(`/api/v2/bingo/admin/events/${ev.id}`, { method: 'PUT', body: JSON.stringify({ officialAnswer: next, validationStatus: next ? 'settled' : 'pending' }) }); load(); }
     catch (e) { showToast(e.message); }
   }
-  async function delMatch(id) { try { await apiFetch(`/api/v2/bingo/admin/matches/${id}`, { method: 'DELETE' }); load(); } catch (e) { showToast(e.message); } }
-  async function addEvent() {
-    const m = data?.matches?.find((x) => x.id === eForm.matchId);
-    const label = eForm.label.trim() || (m ? `${m.home} - ${m.away}` : '');
-    if (!label) { showToast('Libellé ou match requis'); return; }
-    try { await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/events`, { method: 'POST', body: JSON.stringify({ label, matchId: eForm.matchId || null, options: ['1', 'N', '2'], displayOrder: (data?.events?.length || 0) }) }); setEForm({ label: '', matchId: '' }); load(); }
-    catch (e) { showToast(e.message); }
-  }
-  async function delEvent(id) { try { await apiFetch(`/api/v2/bingo/admin/events/${id}`, { method: 'DELETE' }); load(); } catch (e) { showToast(e.message); } }
-  // Saisie du résultat officiel d'un événement (Phase 1 : renseigne official_answer + settled)
-  async function setResult(ev, answer) { try { await apiFetch(`/api/v2/bingo/admin/events/${ev.id}`, { method: 'PUT', body: JSON.stringify({ officialAnswer: answer, validationStatus: 'settled' }) }); load(); } catch (e) { showToast(e.message); } }
 
   if (!data) return <div className="p-4 border-t border-white/5"><Skeleton className="h-10 w-full" /></div>;
-  const needed = { express: 9, standard: 24, expert: 36 }[format];
+  const needed = NEEDED[format];
+  const count = data.events.length;
+  const withResults = data.events.filter((e) => e.official_answer).length;
+  const fmtKick = (s) => { if (!s) return null; try { return new Date(s).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return null; } };
 
   return (
-    <div className="border-t border-white/5 p-4 grid gap-6 md:grid-cols-2 bg-black/20">
-      {/* Matchs */}
-      <div>
-        <h4 className="text-xs font-black uppercase tracking-widest text-bone-300">Matchs ({data.matches.length})</h4>
-        <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
-          {data.matches.map((m) => (
-            <div key={m.id} className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
-              <span className="text-bone-200 truncate">{m.home} <span className="text-bone-500">vs</span> {m.away}</span>
-              <button onClick={() => delMatch(m.id)} className="text-bone-500 hover:text-red-400"><Trash2 size={12} /></button>
-            </div>
-          ))}
+    <div className="border-t border-white/5 p-4 bg-black/20 space-y-4">
+      {/* En-tête d'état */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h4 className="text-xs font-black uppercase tracking-widest text-bone-300">
+          Matchs & événements — <span className={count >= needed ? 'text-emerald-400' : 'text-amber-400'}>{count}/{needed} {count >= needed ? '✓ prêt' : '(insuffisant)'}</span>
+        </h4>
+        <div className="flex items-center gap-3 text-[11px] text-bone-500">
+          {withResults > 0 && <span>{withResults}/{count} résultats saisis</span>}
+          <button onClick={() => setBulkOpen((v) => !v)} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 font-bold text-emerald-400 hover:bg-emerald-500/20"><ClipboardPaste size={13} /> Import en masse</button>
         </div>
-        <div className="mt-2 grid grid-cols-2 gap-1.5">
-          <input className={input + ' h-9'} placeholder="Domicile" value={mForm.home} onChange={(e) => setMForm({ ...mForm, home: e.target.value })} />
-          <input className={input + ' h-9'} placeholder="Extérieur" value={mForm.away} onChange={(e) => setMForm({ ...mForm, away: e.target.value })} />
-          <input className={input + ' h-9 col-span-2'} placeholder="Compétition (optionnel)" value={mForm.competition} onChange={(e) => setMForm({ ...mForm, competition: e.target.value })} />
-        </div>
-        <button onClick={addMatch} className="mt-2 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-bone-200 hover:text-emerald-400"><Plus size={12} /> Ajouter le match</button>
       </div>
 
-      {/* Événements */}
-      <div>
-        <h4 className="text-xs font-black uppercase tracking-widest text-bone-300">Événements — {data.events.length}/{needed} <span className={data.events.length >= needed ? 'text-emerald-400' : 'text-amber-400'}>{data.events.length >= needed ? '✓ prêt' : '(insuffisant)'}</span></h4>
-        <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
-          {data.events.map((ev) => (
-            <div key={ev.id} className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
-              <span className="text-bone-200 truncate flex-1">{ev.label}</span>
+      {/* Import en masse (collage) */}
+      {bulkOpen && (
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3 space-y-2">
+          <p className="text-[11px] text-bone-400">
+            Colle une ligne par match. Formats acceptés : <code className="text-bone-300">Domicile ; Extérieur ; 1</code>,
+            <code className="text-bone-300"> Domicile vs Extérieur</code>, ou un tableau collé depuis Excel/Markdown.
+            La <b>3ᵉ colonne (1/N/2)</b> est optionnelle et pré-remplit le résultat officiel.
+          </p>
+          <textarea
+            className="w-full h-40 rounded-xl border border-white/10 bg-ink-900/60 p-3 text-xs font-mono text-bone-100 outline-none focus:border-emerald-400/60"
+            placeholder={'Paris FC ; Madrid United ; 1\nLondon City ; Milan Stars ; N\nMunich Eagles ; Lisbon Lions ; 2'}
+            value={bulkText} onChange={(e) => setBulkText(e.target.value)}
+          />
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[11px] text-bone-400"><b className={parsed.length ? 'text-emerald-400' : 'text-bone-500'}>{parsed.length}</b> match(s) détecté(s){parsed.filter((p) => p.officialAnswer).length ? ` · ${parsed.filter((p) => p.officialAnswer).length} avec résultat` : ''}</span>
+            <button onClick={importBulk} disabled={importing || !parsed.length} className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-xs font-bold text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50">
+              {importing ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />} Importer {parsed.length || ''}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Liste unifiée */}
+      <div className="space-y-1.5 max-h-72 overflow-y-auto">
+        {data.events.length === 0 && <p className="text-xs text-bone-500 py-2">Aucun match. Ajoute-les ci-dessous ou via l'import en masse.</p>}
+        {data.events.map((ev, i) => {
+          const m = ev.match_id ? matchById[ev.match_id] : null;
+          const kick = fmtKick(m?.kickoff_at);
+          return (
+            <div key={ev.id} className="flex items-center gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
+              <span className="w-5 shrink-0 text-right font-mono text-bone-600">{i + 1}</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-bone-200 truncate block">{ev.label}</span>
+                {kick && <span className="inline-flex items-center gap-1 text-[10px] text-bone-500"><Calendar size={9} /> {kick}</span>}
+              </div>
               <div className="flex items-center gap-1 shrink-0">
                 {['1', 'N', '2'].map((o) => (
-                  <button key={o} onClick={() => setResult(ev, o)} className={`h-6 w-6 rounded text-[10px] font-bold ${ev.official_answer === o ? 'bg-emerald-500 text-ink-900' : 'bg-white/5 text-bone-400 hover:bg-white/10'}`}>{o}</button>
+                  <button key={o} onClick={() => setResult(ev, o)} title={o === '1' ? 'Victoire domicile' : o === 'N' ? 'Match nul' : 'Victoire extérieur'}
+                    className={`h-6 w-6 rounded text-[10px] font-bold ${ev.official_answer === o ? 'bg-emerald-500 text-ink-900' : 'bg-white/5 text-bone-400 hover:bg-white/10'}`}>{o}</button>
                 ))}
-                <button onClick={() => delEvent(ev.id)} className="text-bone-500 hover:text-red-400 ml-1"><Trash2 size={12} /></button>
+                <button onClick={() => delRow(ev)} className="text-bone-500 hover:text-red-400 ml-1"><Trash2 size={12} /></button>
               </div>
             </div>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Saisie rapide (une ligne = un match + son événement 1/N/2) */}
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+        <div className="grid gap-1.5 sm:grid-cols-2">
+          <input className={input + ' h-9'} placeholder="Équipe à domicile" value={row.home} onChange={(e) => setRow({ ...row, home: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && addRow()} />
+          <input className={input + ' h-9'} placeholder="Équipe à l'extérieur" value={row.away} onChange={(e) => setRow({ ...row, away: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && addRow()} />
+          <input className={input + ' h-9'} placeholder="Compétition (optionnel)" value={row.competition} onChange={(e) => setRow({ ...row, competition: e.target.value })} />
+          <input type="datetime-local" className={input + ' h-9'} value={row.kickoffAt} onChange={(e) => setRow({ ...row, kickoffAt: e.target.value })} />
         </div>
-        <div className="mt-2 grid gap-1.5">
-          <select className={input + ' h-9'} value={eForm.matchId} onChange={(e) => setEForm({ ...eForm, matchId: e.target.value, label: '' })}>
-            <option value="">— libellé libre —</option>
-            {data.matches.map((m) => <option key={m.id} value={m.id}>{m.home} vs {m.away}</option>)}
-          </select>
-          <input className={input + ' h-9'} placeholder="Libellé (si pas de match)" value={eForm.label} onChange={(e) => setEForm({ ...eForm, label: e.target.value })} />
-        </div>
-        <button onClick={addEvent} className="mt-2 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-bone-200 hover:text-emerald-400"><Plus size={12} /> Ajouter l'événement</button>
-        <p className="mt-2 text-[10px] text-bone-500">Les boutons 1/N/2 servent à saisir le <b>résultat officiel</b> (pour le calcul des points en Phase 2).</p>
+        <button onClick={addRow} disabled={busy} className="mt-2 inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-xs font-bold text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50">
+          {busy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />} Ajouter le match
+        </button>
+        <p className="mt-2 text-[10px] text-bone-500">Un match crée automatiquement son événement <b>1/N/2</b>. Les boutons 1/N/2 de la liste servent à saisir le <b>résultat officiel</b> (1 = domicile, N = nul, 2 = extérieur).</p>
       </div>
     </div>
   );
