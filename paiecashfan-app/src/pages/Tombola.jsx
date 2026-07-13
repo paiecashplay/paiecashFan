@@ -216,19 +216,26 @@ export function Tombola() {
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {playableBingo.map((ed) => (
-              <Link key={ed.id} to={`/bingo/${ed.slug}`}>
-                <GlassCard className="p-5 h-full hover:border-emerald-400/40 transition-all border border-white/10">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0"><Grid3x3 size={20} /></div>
-                    {ed.badge && <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-bone-400 font-bold">{ed.badge}</span>}
+              <Link key={ed.id} to={`/bingo/${ed.slug}`} className="group relative block rounded-2xl border border-white/10 overflow-hidden bg-ink-950 hover:border-emerald-400/50 transition-all min-h-[210px]">
+                <div className="absolute inset-0">
+                  {ed.cover_url
+                    ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+                    : <div className="h-full w-full bg-gradient-to-b from-emerald-950 via-ink-950 to-ink-950" />}
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/5" />
+                  <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-ink-950/60 to-transparent" />
+                </div>
+                <div className="relative flex flex-col justify-end min-h-[210px] p-5">
+                  <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
+                    <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 backdrop-blur-sm"><Grid3x3 size={18} /></div>
+                    {ed.badge && <span className="rounded-full bg-black/40 border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-bone-200 font-bold backdrop-blur-sm">{ed.badge}</span>}
                   </div>
-                  <h3 className="mt-4 font-display text-lg font-black text-bone-50">{ed.title}</h3>
-                  {ed.description && <p className="mt-1 text-xs text-bone-500 line-clamp-2">{ed.description}</p>}
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Grille {({ express: '3×3', standard: '5×5', expert: '6×6' })[ed.format] || '5×5'}</span>
+                  <h3 className="font-display text-xl font-black text-bone-50 drop-shadow uppercase leading-tight">{ed.title}</h3>
+                  {ed.theme?.subtitle && <p className="mt-1 text-xs text-bone-300">{ed.theme.subtitle}</p>}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-widest text-bone-300 font-bold">Grille {({ express: '3×3', standard: '5×5', expert: '6×6' })[ed.format] || '5×5'}</span>
                     <span className="text-xs font-black text-emerald-400">{ed.cost_credits} crédits</span>
                   </div>
-                </GlassCard>
+                </div>
               </Link>
             ))}
           </div>
