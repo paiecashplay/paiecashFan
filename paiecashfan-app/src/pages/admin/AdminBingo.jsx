@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight, ClipboardPaste, Calendar, Eye, FlaskConical, Users, Rocket, X } from 'lucide-react';
+import { Grid3x3, Plus, Trophy, Trash2, Loader2, ChevronDown, ChevronRight, ClipboardPaste, Calendar, Eye, FlaskConical, Users, Rocket, X, Pencil } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useImageUpload } from '@/hooks/useImageUpload';
