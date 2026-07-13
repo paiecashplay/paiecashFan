@@ -10,7 +10,8 @@ import { cn } from '@/lib/cn';
 const nav = [
   { label: 'Accueil',   to: '/' },
   { label: 'Boutique',  to: '/boutique' },
-  { label: 'Tombola',   to: '/tombola' },
+  { label: 'Tombola',   to: '/tombola', end: true },
+  { label: 'Sport Bingo', to: '/tombola/sport-bingo' },
   { label: 'Fan club',  to: '/fan-club' },
   { label: 'Billetterie', to: '/billetterie' }
 ];
@@ -55,7 +56,7 @@ export function Navbar() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === '/'}
+              end={item.to === '/' || item.end}
               className={({ isActive }) => cn(
                 'relative px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] rounded-full transition-colors',
                 isActive ? 'text-ink-900' : 'text-bone-300 hover:text-bone-50'
@@ -126,7 +127,7 @@ export function Navbar() {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  end={item.to === '/'}
+                  end={item.to === '/' || item.end}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) => cn(
                     'py-3 px-2 text-sm uppercase tracking-[0.14em] font-semibold border-b border-white/5 last:border-0',
