@@ -105,6 +105,12 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (j)** — Intégration branches stagiaire (revue + merge) :
+  **boutique club en PCC + EUR** (helper `formatEuro`, prix double sur cards/
+  modale/panier ; corrige un bug latent PCC/EUR) et **passe responsive mobile**
+  (MonClub, MonClubBO, Transaction, AdminApplications, FanClub, LiveMatchBanner).
+  Conflit `LiveMatchBanner` résolu = layout responsive **+** données du hook
+  `useFanFeed` (prop `match`, avec repli).
 - **2026-07-11 (i)** — Intégration branches stagiaire (revue + merge) :
   **états vides/chargement du BO harmonisés** (skeletons + empty states
   AdminProducts / AdminClubEdit / MonClubBO) et **hook `useFanFeed`** (Fan Club :
