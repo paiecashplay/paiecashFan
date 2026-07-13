@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (k)** — **Fan Club branché au backend** (mode « club » persisté).
+  Tables `fan_posts` / `fan_comments` / `fan_post_likes` / `fan_messages`
+  (migration `backend/migrations/fan-club.sql` à exécuter dans Supabase — pas de
+  `DATABASE_URL` côté serveur). API `/api/v2/clubs/:slug/fan-feed` (`requireAuth`)
+  : GET feed + POST posts/commentaires/like(toggle)/messages. Hook `useFanFeed`
+  rebranché (optimiste + réconciliation, même forme de sortie → composants
+  inchangés). Mode « friends » reste local (pas de système d'amis).
 - **2026-07-11 (j)** — Intégration branches stagiaire (revue + merge) :
   **boutique club en PCC + EUR** (helper `formatEuro`, prix double sur cards/
   modale/panier ; corrige un bug latent PCC/EUR) et **passe responsive mobile**
