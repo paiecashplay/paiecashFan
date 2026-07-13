@@ -114,6 +114,9 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   5 min). **Front `Tombola.jsx` réécrit DB-driven** (tirages en cours + achat PCC
   réel + tirages passés avec gagnant ; grille de jeux = showcase « bientôt »).
   **Admin `/admin/tombola`** : créer/gérer les tombolas + tirage manuel.
+  Composant réutilisable `TombolaManager` (plateforme vs club) → onglet
+  **Tombola dans le BO club** (`MonClubBO`) ; le club_admin peut créer/tirer
+  ses propres tombolas (tirage autorisé au propriétaire).
 - **2026-07-11 (p)** — Nettoyage statique : la **recherche d'accueil** (HeroSearch)
   ne génère plus de clubs depuis le registry statique (slugs divergents) — les
   clubs viennent uniquement de l'**API `/marketplace/search`** (vrais slugs). Le

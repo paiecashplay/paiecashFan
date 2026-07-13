@@ -7,13 +7,14 @@ import { Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Info, Users, Trophy, ShoppingBag, Ticket, Upload, Save,
-  Loader2, Check, X, ExternalLink
+  Loader2, Check, X, ExternalLink, Gift
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { PlayersTab, TrophiesTab, ProductsTab, TicketingTab } from '@/pages/admin/AdminClubEdit';
+import { TombolaManager } from '@/components/tombola/TombolaManager';
 import { cn } from '@/lib/cn';
 
 const TABS = [
@@ -22,6 +23,7 @@ const TABS = [
   { id: 'trophies',  label: 'Palmarès',    icon: Trophy },
   { id: 'products',  label: 'Boutique',    icon: ShoppingBag },
   { id: 'ticketing', label: 'Billetterie', icon: Ticket },
+  { id: 'tombola',   label: 'Tombola',     icon: Gift },
 ];
 
 export function MonClubBO() {
@@ -106,6 +108,7 @@ export function MonClubBO() {
               {tab === 'trophies'  && <TrophiesTab  tenantId={clubId} showToast={showToast} />}
               {tab === 'products'  && <ProductsTab  tenantId={clubId} showToast={showToast} />}
               {tab === 'ticketing' && <TicketingTab tenantId={clubId} club={club} showToast={showToast} />}
+              {tab === 'tombola'   && <TombolaManager clubId={clubId} title="Tombolas du club" subtitle="Lance une tombola pour tes supporters (tirage auto à la date de fin)." />}
             </motion.div>
           </AnimatePresence>
         )}

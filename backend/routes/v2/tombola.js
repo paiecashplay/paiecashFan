@@ -150,9 +150,8 @@ router.delete('/:id', requireAuth, ownsCampaign, async (req, res) => {
   } catch (err) { return fail(res, 'Suppression impossible : ' + err.message, 500); }
 });
 
-// Tirage manuel (super_admin uniquement).
-router.post('/:id/draw', requireAuth, async (req, res) => {
-  if (req.authUser.role !== 'super_admin') return fail(res, 'Accès refusé.', 403);
+// Tirage manuel (super_admin ou club_admin propriétaire).
+router.post('/:id/draw', requireAuth, ownsCampaign, async (req, res) => {
   try {
     const result = await tombola.drawWinner(req.params.id);
     return ok(res, result);
