@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('./supabase');
+const { createNotification } = require('./notifications');
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
@@ -150,6 +151,14 @@ async function drawWinner(campaignId) {
     status: 'drawn', winner_user_id: pick.user_id, winner_ticket_id: pick.id,
     drawn_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   }).eq('id', campaignId).eq('status', 'active'); // garde-fou idempotent
+
+  // Notifie le gagnant (best-effort, non bloquant).
+  const lot = raw.prize_label || raw.title;
+  await createNotification({
+    user_id: pick.user_id, type: 'tombola_win', title: `🎉 Tu as gagné : ${lot} !`,
+    message: `Félicitations ! Ton ticket a été tiré au sort pour « ${lot} ». On te recontacte pour la remise du lot.`,
+    metadata: { campaignId, link: '/tombola' },
+  }).catch(() => {});
 
   return { drawn: true, winnerUserId: pick.user_id, ticketId: pick.id };
 }

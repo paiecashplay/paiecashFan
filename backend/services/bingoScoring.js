@@ -8,6 +8,7 @@
 
 const supabase = require('../db/supabase');
 const engine = require('./bingoEngine');
+const { createNotification } = require('../db/notifications');
 
 const GRID = { express: 3, standard: 5, expert: 6 };
 
@@ -74,6 +75,26 @@ async function simulateEdition(editionId) {
   return { events: events?.length || 0, withResult, cards: results.length, results };
 }
 
+// Notifie chaque joueur : score + rang dans l'édition. Best-effort.
+async function notifyResults(edition, results) {
+  if (!results?.length) return;
+  const ranked = [...results].sort((a, b) => b.points - a.points);
+  const total = ranked.length;
+  for (let i = 0; i < ranked.length; i++) {
+    const r = ranked[i];
+    const rank = 1 + ranked.filter((x) => x.points > r.points).length;
+    const won = r.points > 0;
+    const title = won ? `🎯 ${r.points} pts sur ${edition.title} !` : `Résultats : ${edition.title}`;
+    const message = won
+      ? `Tu es #${rank}/${total} sur cette édition. Va voir ta grille et tes figures gagnantes !`
+      : `Les résultats sont tombés. Pas de gain cette fois — retente ta chance sur la prochaine édition !`;
+    await createNotification({
+      user_id: r.userId, type: 'bingo_result', title, message,
+      metadata: { editionId: edition.id, slug: edition.slug, cardId: r.cardId, points: r.points, rank, participants: total, link: `/bingo/${edition.slug}` },
+    }).catch(() => {});
+  }
+}
+
 // Clôture + scoring d'une édition. Idempotent : chaque passe = nouvelle
 // calculation_version ; le score de la carte = total de CETTE version.
 async function settleEdition(editionId) {
@@ -87,6 +108,7 @@ async function settleEdition(editionId) {
 
   const { data: cards } = await supabase.from('bingo_cards').select('*').eq('edition_id', editionId).in('status', ['submitted', 'scored']);
   let scored = 0;
+  const results = [];   // { userId, cardId, points, figures } → notifications après tri
 
   for (const card of cards || []) {
     const { data: picks } = await supabase.from('bingo_card_picks').select('*').eq('card_id', card.id).order('cell_index');
@@ -121,12 +143,16 @@ async function settleEdition(editionId) {
     }).eq('id', card.id);
 
     await audit({ edition_id: editionId, card_id: card.id, action: 'score_card', new_value: { points: total, figures: codes }, calculation_version: version });
+    results.push({ userId: card.user_id, cardId: card.id, points: total, figures: codes });
     scored++;
   }
 
   await supabase.from('bingo_editions').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', editionId);
   await rebuildLeaderboard();
   await audit({ edition_id: editionId, action: 'settle_edition', new_value: { cards: scored } });
+
+  // Notifie chaque joueur de son résultat + rang (best-effort, non bloquant).
+  await notifyResults(edition, results);
 
   return { scored };
 }

@@ -106,4 +106,44 @@ router.get('/pcc-history', async (req, res) => {
   }
 });
 
+// ── Notifications ────────────────────────────────────────────
+// GET /api/v2/me/notifications — liste (50 dernières) + nb non lus.
+router.get('/notifications', async (req, res) => {
+  try {
+    const { data: items } = await supabase.from('notifications')
+      .select('id, type, title, message, metadata, is_read, created_at')
+      .eq('user_id', req.authUser.id).order('created_at', { ascending: false }).limit(50);
+    const unread = (items || []).filter((n) => !n.is_read).length;
+    return ok(res, { notifications: items || [], unread });
+  } catch (err) { return fail(res, 'Notifications failed: ' + err.message, 500); }
+});
+
+// GET /api/v2/me/notifications/unread-count — pastille (léger).
+router.get('/notifications/unread-count', async (req, res) => {
+  try {
+    const { count } = await supabase.from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', req.authUser.id).eq('is_read', false);
+    return ok(res, { unread: count || 0 });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// POST /api/v2/me/notifications/:id/read — marque lue (ownership).
+router.post('/notifications/:id/read', async (req, res) => {
+  try {
+    await supabase.from('notifications').update({ is_read: true })
+      .eq('id', req.params.id).eq('user_id', req.authUser.id);
+    return ok(res, { read: true });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// POST /api/v2/me/notifications/read-all — tout marquer lu.
+router.post('/notifications/read-all', async (req, res) => {
+  try {
+    await supabase.from('notifications').update({ is_read: true })
+      .eq('user_id', req.authUser.id).eq('is_read', false);
+    return ok(res, { read: true });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
 module.exports = router;

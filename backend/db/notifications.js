@@ -5,17 +5,16 @@
 const supabase = require('./supabase');
 
 async function createNotification(data) {
-  const { data: notif, error } = await supabase
-    .from('notifications')
-    .insert({
-      user_id: data.user_id || null,
-      tenant_id: data.tenant_id || null,
-      type: data.type,
-      title: data.title,
-      message: data.message,
-      metadata: data.metadata || {}
-    })
-    .select().single();
+  // La table notifications n'a pas de colonne tenant_id → on ne l'insère pas
+  // (sinon l'insert échoue : "Could not find the 'tenant_id' column").
+  const row = {
+    user_id: data.user_id || null,
+    type: data.type,
+    title: data.title,
+    message: data.message,
+    metadata: data.metadata || {},
+  };
+  const { data: notif, error } = await supabase.from('notifications').insert(row).select().single();
   if (error) throw new Error(`createNotification: ${error.message}`);
   return notif;
 }

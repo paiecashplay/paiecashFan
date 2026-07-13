@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
+import { LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
+import { NotificationBell } from './NotificationBell';
 
 const nav = [
   { label: 'Accueil',   to: '/' },
@@ -82,10 +83,7 @@ export function Navbar() {
           <IconButton aria-label="Recherche" className="hidden md:inline-flex">
             <Search size={16} />
           </IconButton>
-          <IconButton aria-label="Notifications">
-            <Bell size={16} />
-            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-glow-emerald" />
-          </IconButton>
+          <NotificationBell />
           <IconButton aria-label="Panier" className="hidden md:inline-flex">
             <ShoppingBag size={16} />
           </IconButton>

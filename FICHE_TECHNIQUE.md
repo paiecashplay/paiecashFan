@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ae)** — **Notifications (Phase A) + harmonisation « Comment jouer »**.
+  Fix majeur : `createNotification` insérait `tenant_id` (colonne inexistante) →
+  tous les inserts échouaient en silence ; retiré. Routes app `GET /me/notifications`
+  (+ `unread-count`, `POST /:id/read`, `read-all`). **Cloche 🔔 branchée**
+  (`NotificationBell`) : pastille non-lus (poll 60s), panneau, marque-lu + navigation.
+  Émission : **clôture bingo** (score + rang par joueur), **tirage tombola**
+  (gagnant). Section « Comment jouer » du hub bingo alignée sur la page Jeux
+  (badges circulaires + flèches + card promo).
 - **2026-07-14 (ad)** — **Espace compte : onglet « Mes grilles »**. `/mon-compte`
   liste les bulletins Sport Bingo du fan (récap grilles/points/BINGO, statut
   gagnée/en attente/à compléter/sans gain, figures, **date de jeu**, **rang
