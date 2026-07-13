@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ac)** — **Card bingo premium partagée + navbar « Jeux »**. Card
+  refondue (320×520, Bebas Neue, overlay exact, glow/emoji par compétition,
+  countdown coloré 2h/6h, barre, hover Netflix + bordure lumineuse animée, pulse
+  EN DIRECT) extraite en composant partagé `components/bingo/EditionCard.jsx`,
+  réutilisée sur `/tombola/sport-bingo` **et** la section de `/tombola` (3 en
+  aperçu + « Voir tout »). Navbar : entrée « Sport Bingo » retirée, **« Tombola »
+  → « Jeux »**. Fix : éditions **`live`** jouables (création de grille) tant que
+  non verrouillées (`locks_at`).
 - **2026-07-14 (ab)** — **6 éditions Sport Bingo seedées (maquette)**. Script
   `scripts/seed-bingo-editions.js` (idempotent) : Champions (live, 500), Premier
   League (open, 300), CAN (open, 400), Copa (à venir, 450), Classicos (à venir,

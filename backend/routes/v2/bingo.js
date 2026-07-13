@@ -80,7 +80,8 @@ router.post('/:slug/card', requireAuth, async (req, res) => {
   try {
     const edition = await bingo.getEditionBySlug(req.params.slug);
     if (!edition) return fail(res, 'Édition introuvable.', 404);
-    if (!['open', 'scheduled'].includes(edition.status)) return fail(res, 'Cette édition n\'accepte pas (ou plus) de nouvelles grilles.', 409);
+    // open / scheduled / live sont jouables tant que ce n'est pas verrouillé.
+    if (!['open', 'scheduled', 'live'].includes(edition.status)) return fail(res, 'Cette édition n\'accepte pas (ou plus) de nouvelles grilles.', 409);
     if (edition.locks_at && new Date(edition.locks_at) <= new Date()) return fail(res, 'Les grilles sont verrouillées.', 409);
 
     const { card, picks, created } = await bingo.createCard(edition, req.authUser.id);

@@ -69,6 +69,7 @@ export default {
       fontFamily: {
         sans:      ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
         display:   ['"Barlow Condensed"', '"Space Grotesk"', '"Inter"', 'system-ui', 'sans-serif'],
+        poster:    ['"Bebas Neue"', '"Barlow Condensed"', 'system-ui', 'sans-serif'],
         condensed: ['"Barlow Condensed"', 'system-ui', 'sans-serif'],
         body:      ['"Barlow"', '"Inter"', 'system-ui', 'sans-serif'],
         mono:      ['"DM Mono"', '"JetBrains Mono"', 'ui-monospace', 'monospace']

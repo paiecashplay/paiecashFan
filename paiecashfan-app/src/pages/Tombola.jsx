@@ -12,6 +12,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
+import { EditionCard } from '@/components/bingo/EditionCard';
 
 const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
 
@@ -55,6 +56,7 @@ export function Tombola() {
   const [campaigns, setCampaigns] = useState(null);
   const [bingoEditions, setBingoEditions] = useState([]);
   const [buying, setBuying] = useState(null); // campagne en cours d'achat (modale)
+  const [now, setNow] = useState(() => Date.parse(new Date().toISOString()));
 
   const load = () => {
     apiFetch('/api/v2/tombola')
@@ -65,6 +67,7 @@ export function Tombola() {
     load();
     apiFetch('/api/v2/bingo').then((j) => setBingoEditions(j.data?.editions || [])).catch(() => {});
   }, []);
+  useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
 
   const playableBingo = useMemo(() => bingoEditions.filter((e) => ['open', 'scheduled', 'live'].includes(e.status)), [bingoEditions]);
 
@@ -214,29 +217,9 @@ export function Tombola() {
               Voir tout <ArrowRight size={15} />
             </Link>
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {playableBingo.map((ed) => (
-              <Link key={ed.id} to={`/bingo/${ed.slug}`} className="group relative block rounded-2xl border border-white/10 overflow-hidden bg-ink-950 hover:border-emerald-400/50 transition-all min-h-[210px]">
-                <div className="absolute inset-0">
-                  {ed.cover_url
-                    ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
-                    : <div className="h-full w-full bg-gradient-to-b from-emerald-950 via-ink-950 to-ink-950" />}
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/5" />
-                  <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-ink-950/60 to-transparent" />
-                </div>
-                <div className="relative flex flex-col justify-end min-h-[210px] p-5">
-                  <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
-                    <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 backdrop-blur-sm"><Grid3x3 size={18} /></div>
-                    {ed.badge && <span className="rounded-full bg-black/40 border border-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-bone-200 font-bold backdrop-blur-sm">{ed.badge}</span>}
-                  </div>
-                  <h3 className="font-display text-xl font-black text-bone-50 drop-shadow uppercase leading-tight">{ed.title}</h3>
-                  {ed.theme?.subtitle && <p className="mt-1 text-xs text-bone-300">{ed.theme.subtitle}</p>}
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-widest text-bone-300 font-bold">Grille {({ express: '3×3', standard: '5×5', expert: '6×6' })[ed.format] || '5×5'}</span>
-                    <span className="text-xs font-black text-emerald-400">{ed.cost_credits} crédits</span>
-                  </div>
-                </div>
-              </Link>
+          <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
+            {playableBingo.slice(0, 3).map((ed) => (
+              <EditionCard key={ed.id} ed={ed} now={now} />
             ))}
           </div>
         </Container>

@@ -21,6 +21,32 @@
   }
 }
 
+/* ── Card Sport Bingo : glow par compétition + balayage lumineux ── */
+@keyframes bingo-sweep { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+@keyframes bingo-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(1.25); } }
+.bingo-card {
+  position: relative;
+  transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+  box-shadow: 0 12px 34px -14px rgba(0,0,0,.75), 0 0 0 1px color-mix(in srgb, var(--glow, #34d399) 22%, transparent);
+}
+.bingo-card::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: linear-gradient(120deg, var(--glow, #34d399), transparent 32%, transparent 68%, var(--glow2, var(--glow, #34d399)));
+  background-size: 220% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  opacity: .5; pointer-events: none; transition: opacity .35s ease; z-index: 2;
+}
+.bingo-card:hover {
+  transform: scale(1.04);
+  box-shadow: 0 26px 60px -16px color-mix(in srgb, var(--glow, #34d399) 55%, transparent), 0 0 42px -12px var(--glow, #34d399);
+}
+.bingo-card:hover::before { opacity: 1; animation: bingo-sweep 2.2s linear infinite; }
+.bingo-card.is-live::before { opacity: .8; animation: bingo-sweep 2.6s linear infinite; }
+.bingo-live-dot { animation: bingo-pulse 1.4s ease-in-out infinite; }
+
 @layer components {
   /* Backdrop scène "futur tech" — spotlight emerald + grille faint */
   .tech-backdrop {

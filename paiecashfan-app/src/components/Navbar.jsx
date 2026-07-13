@@ -10,8 +10,7 @@ import { cn } from '@/lib/cn';
 const nav = [
   { label: 'Accueil',   to: '/' },
   { label: 'Boutique',  to: '/boutique' },
-  { label: 'Tombola',   to: '/tombola', end: true },
-  { label: 'Sport Bingo', to: '/tombola/sport-bingo' },
+  { label: 'Jeux',      to: '/tombola' },
   { label: 'Fan club',  to: '/fan-club' },
   { label: 'Billetterie', to: '/billetterie' }
 ];

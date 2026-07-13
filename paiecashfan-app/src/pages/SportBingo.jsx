@@ -1,43 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Grid3x3, Trophy, HelpCircle, Coins, Plus, Users, Star, BarChart3, Clock,
+  Grid3x3, Trophy, HelpCircle, Coins, Plus, Star,
   Pencil, Lock, Timer, Gift, ArrowRight, CheckCircle2, HeartHandshake, Crown, Medal,
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
+import { EditionCard, FMT } from '@/components/bingo/EditionCard';
 
-const FMT = { express: '3×3', standard: '5×5', expert: '6×6' };
-const MATCHES = { express: 9, standard: 24, expert: 36 };
 const FIGURE_LABELS = {
   LINE_HORIZONTAL: 'Ligne', LINE_VERTICAL: 'Colonne', DIAGONAL: 'Diagonale', FOUR_CORNERS: '4 coins',
   DOUBLE_LINE: 'Double ligne', TRIPLE_LINE: 'Triple ligne', SQUARE_2X2: 'Carré', CROSS: 'Croix', X_SHAPE: 'X', FULL_CARD: 'BINGO 🎉',
 };
-
-// Statut → présentation (badge, accent, dégradé de secours).
-const STATUS_META = {
-  live:      { label: 'EN DIRECT', badge: 'bg-red-500 text-white', ring: 'border-red-500/50 hover:border-red-500/80', accent: 'text-red-400', bar: 'bg-red-500', glow: 'shadow-[0_0_50px_-12px_rgba(239,68,68,0.5)]', fallback: 'from-red-950 via-ink-950 to-ink-950' },
-  open:      { label: 'OUVERTE',  badge: 'bg-emerald-500 text-ink-900', ring: 'border-emerald-500/40 hover:border-emerald-400/70', accent: 'text-emerald-400', bar: 'bg-emerald-400', glow: 'shadow-[0_0_50px_-14px_rgba(16,185,129,0.5)]', fallback: 'from-emerald-950 via-ink-950 to-ink-950' },
-  scheduled: { label: 'À VENIR',  badge: 'bg-gold-400 text-ink-900', ring: 'border-gold-400/40 hover:border-gold-400/70', accent: 'text-gold-400', bar: 'bg-gold-400', glow: '', fallback: 'from-amber-950 via-ink-950 to-ink-950' },
-};
-const metaOf = (s) => STATUS_META[s] || STATUS_META.open;
-
-const pad = (n) => String(n).padStart(2, '0');
-function fmtCountdown(target, now) {
-  const diff = new Date(target).getTime() - now;
-  if (diff <= 0) return null;
-  const d = Math.floor(diff / 86400000), h = Math.floor((diff / 3600000) % 24), m = Math.floor((diff / 60000) % 60), s = Math.floor((diff / 1000) % 60);
-  if (d > 0) return `${d}j ${pad(h)}h ${pad(m)}m`;
-  return `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
-}
-function progressPct(startAt, target, now) {
-  const end = new Date(target).getTime();
-  const start = startAt ? new Date(startAt).getTime() : end - 7 * 86400000;
-  if (!(end > start)) return 100;
-  return Math.max(2, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
-}
 
 const HOW = [
   { icon: Grid3x3, title: 'Choisis une édition', text: 'Sélectionne ton thème favori.' },
@@ -116,8 +92,8 @@ export function SportBingo() {
         </div>
 
         {editions === null ? (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-[380px] rounded-2xl bg-white/5 animate-pulse" />)}
+          <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-[520px] w-[320px] max-w-full rounded-[22px] bg-white/5 animate-pulse" />)}
           </div>
         ) : playable.length === 0 ? (
           <GlassCard className="mt-6 p-12 text-center">
@@ -125,7 +101,7 @@ export function SportBingo() {
             <p className="mt-4 text-sm text-bone-400">Aucune édition ouverte pour le moment. Reviens bientôt !</p>
           </GlassCard>
         ) : (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
             {playable.map((ed) => <EditionCard key={ed.id} ed={ed} now={now} draft={draftByEdition[ed.id]} />)}
           </div>
         )}
@@ -192,74 +168,6 @@ export function SportBingo() {
         </GlassCard>
       </Container>
     </div>
-  );
-}
-
-// ── Carte d'édition (maquette) ───────────────────────────────
-function EditionCard({ ed, now, draft }) {
-  const meta = metaOf(ed.status);
-  const isUpcoming = ed.status === 'scheduled';
-  const target = isUpcoming ? (ed.starts_at || ed.locks_at) : (ed.locks_at || ed.ends_at);
-  const cd = target ? fmtCountdown(target, now) : null;
-  const pct = target ? progressPct(ed.starts_at, target, now) : 100;
-  const subtitle = ed.theme?.subtitle || ed.badge || null;
-  const cta = draft ? 'Continuer ma grille' : (isUpcoming ? 'Voir détails' : 'Jouer');
-  const ctaCls = draft ? (ed.status === 'live' ? 'bg-red-500 text-white hover:bg-red-400' : 'bg-emerald-500 text-ink-900 hover:bg-emerald-400')
-    : isUpcoming ? 'border border-gold-400/50 text-gold-300 hover:bg-gold-400/10'
-    : 'bg-emerald-500 text-ink-900 hover:bg-emerald-400';
-
-  return (
-    <Link to={`/bingo/${ed.slug}`} className={`group relative flex flex-col rounded-2xl border overflow-hidden bg-ink-950 transition-all ${meta.ring} ${meta.glow}`} style={{ minHeight: 380 }}>
-      {/* Fond */}
-      <div className="absolute inset-0">
-        {ed.cover_url
-          ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
-          : <div className={`h-full w-full bg-gradient-to-b ${meta.fallback}`} />}
-        {/* Dégradé bas (lisibilité du texte) + léger voile haut (badges) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/5" />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink-950/70 to-transparent" />
-      </div>
-
-      {/* Contenu */}
-      <div className="relative flex flex-col flex-1 p-4">
-        <div className="flex items-start justify-between">
-          <span className={`rounded-md px-2 py-1 text-[10px] font-black uppercase tracking-wider ${meta.badge}`}>{meta.label}</span>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-bone-200"><span className="tabular-nums">{ed.players ?? 0}</span> <Users size={13} className="text-bone-400" /></span>
-        </div>
-
-        <div className="mt-auto pt-6 text-center">
-          <h3 className="font-display text-2xl font-black uppercase leading-[0.95] text-bone-50 drop-shadow">{ed.title}</h3>
-          {subtitle && <p className="mt-1.5 text-xs text-bone-300">{subtitle}</p>}
-        </div>
-
-        <div className="mt-4 flex items-center justify-center gap-3 text-[11px] font-bold text-bone-300">
-          <span className="inline-flex items-center gap-1"><Grid3x3 size={12} /> {FMT[ed.format] || '5×5'}</span>
-          <span className="text-bone-600">·</span>
-          <span>{MATCHES[ed.format] || 24} matchs</span>
-          <span className="text-bone-600">·</span>
-          <span className="inline-flex items-center gap-1"><BarChart3 size={12} /> {(ed.difficulty || 'standard').replace(/^./, (c) => c.toUpperCase())}</span>
-        </div>
-
-        {/* Compte à rebours */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-bone-400">{isUpcoming ? 'Débute dans' : 'Clôture dans'}</span>
-            <span className={`inline-flex items-center gap-1 font-black tabular-nums ${meta.accent}`}><Clock size={11} /> {cd || '—'}</span>
-          </div>
-          <div className="mt-1.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
-            <div className={`h-full rounded-full ${meta.bar}`} style={{ width: `${pct}%` }} />
-          </div>
-        </div>
-
-        {/* Gain max */}
-        <div className="mt-3 flex items-center justify-between text-xs">
-          <span className="text-bone-400">Gain max</span>
-          <span className="inline-flex items-center gap-1 font-black text-bone-100"><Star size={12} className="text-gold-400" /> {ed.reward_points || 0} pts</span>
-        </div>
-
-        <div className={`mt-4 w-full rounded-xl py-2.5 text-center text-sm font-black uppercase tracking-wide transition ${ctaCls}`}>{cta}</div>
-      </div>
-    </Link>
   );
 }
 
