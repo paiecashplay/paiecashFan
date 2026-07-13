@@ -105,6 +105,10 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-11 (n)** — Page club : **fin des données mock du hub fan**. Wallet
+  **confidentiel** (masqué si non connecté, sinon solde réel via `/me/pcc`, et
+  seulement si solde > 0). « Fans en ligne » → **supporters réels** du fan feed
+  (masqué si vide). Section « Transactions temps réel » (mock) **retirée**.
 - **2026-07-11 (m)** — Fan Club : **feed consultable sans connexion** (GET public
   via `optionalAuth`, écritures `requireAuth`) + CTA « Se connecter » propre pour
   les visiteurs (fini l'erreur 404/401 au chargement quand déconnecté). **Section

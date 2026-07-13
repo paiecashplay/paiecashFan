@@ -17,6 +17,9 @@ import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { ClubCommunitySection } from '@/components/club/ClubCommunitySection';
 import { SideDock } from '@/components/SideDock';
 import { useClubDetail } from '@/hooks/useClubDetail';
+import { useFanFeed } from '@/hooks/useFanFeed';
+import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/lib/api';
 import { useCart } from '@/hooks/useCart';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
@@ -121,20 +124,11 @@ export function ClubDetail() {
           SideDock (md→2xl) afin qu'aucune card ne soit masquée. À partir de
           2xl la gouttière est assez large → plus besoin de décaler. */}
       <div className="md:pl-24 2xl:pl-0">
-        {/* ═══ WALLET (2 cards Compte Bancaire + Wallet Crypto) ═══════ */}
-        <Container className="relative pt-12 md:pt-16 pb-6">
-          <WalletSection wallet={mockWallet} primaryColor={club.primaryColor} />
-        </Container>
+        {/* ═══ WALLET — confidentiel : uniquement si connecté ET solde réel ═ */}
+        <FanWalletSection primaryColor={club.primaryColor} />
 
-        {/* ═══ FANS STORIES (avatars carrousel) ═══════════════════════ */}
-        <Container className="relative pt-6 pb-6">
-          <FansStorySection fans={mockFans} club={club} />
-        </Container>
-
-        {/* ═══ TRANSACTIONS LIVE ═══════════════════════════════════════ */}
-        <Container className="relative pt-6 pb-12">
-          <TransactionsLiveSection items={mockTransactions} club={club} />
-        </Container>
+        {/* ═══ SUPPORTERS ACTIFS (réels, depuis le fan feed du club) ═══ */}
+        <ClubFansLive clubSlug={slug} club={club} />
 
         {/* ═══ TROPHY CABINET ═══════════════════════════════════════════ */}
         {trophyList.length > 0 && (
@@ -518,24 +512,41 @@ function CountUp({ value, reduce = false }) {
 }
 
 // ── WALLET ───────────────────────────────────────────────────────────
-function WalletSection({ wallet, primaryColor }) {
+// Wallet du fan — information CONFIDENTIELLE : affichée uniquement si le fan
+// est connecté ET a un solde disponible réel (via /api/v2/me/pcc). Rien n'est
+// montré aux visiteurs non connectés.
+function FanWalletSection() {
+  const { user } = useAuth();
+  const [pcc, setPcc] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setPcc(null); setLoaded(true); return; }
+    let alive = true;
+    setLoaded(false);
+    apiFetch('/api/v2/me/pcc')
+      .then((j) => { if (alive) setPcc(j.data); })
+      .catch(() => { if (alive) setPcc(null); })
+      .finally(() => { if (alive) setLoaded(true); });
+    return () => { alive = false; };
+  }, [user]);
+
+  // Confidentiel : rien si non connecté, pas encore chargé, ou sans solde.
+  if (!user || !loaded) return null;
+  if (!pcc?.walletReady || !pcc?.balance) return null;
+
   return (
-    <div className="grid gap-3 md:gap-4 md:grid-cols-2">
-      <WalletCard
-        icon={<CreditCard size={18} />}
-        accentColor="#10b981"
-        label={wallet.bank.label}
-        amount={fmtAmount(wallet.bank.balance, wallet.bank.currency)}
-        sub={wallet.bank.note}
-      />
-      <WalletCard
-        icon={<Wallet size={18} />}
-        accentColor="#a78bfa"
-        label={wallet.crypto.label}
-        amount={fmtAmount(wallet.crypto.balance, 'EUR')}
-        sub={`${wallet.crypto.currency} · ${wallet.crypto.address}`}
-      />
-    </div>
+    <Container className="relative pt-12 md:pt-16 pb-6">
+      <div className="grid gap-3 md:gap-4">
+        <WalletCard
+          icon={<Wallet size={18} />}
+          accentColor="#10b981"
+          label="Compte courant"
+          amount={fmtAmount(pcc.balance, 'EUR')}
+          sub="Solde disponible pour tes achats · hors épargne bloquée"
+        />
+      </div>
+    </Container>
   );
 }
 
@@ -569,21 +580,30 @@ function WalletCard({ icon, accentColor, label, amount, sub }) {
   );
 }
 
-// ── FANS STORIES ─────────────────────────────────────────────────────
+// ── SUPPORTERS ACTIFS ────────────────────────────────────────────────
+// Alimenté par le fan feed réel du club (auteurs de posts / commentaires /
+// messages). Masqué s'il n'y a encore personne.
+function ClubFansLive({ clubSlug, club }) {
+  const { fans, loading } = useFanFeed(clubSlug, 'club');
+  if (loading || !fans?.length) return null;
+  return (
+    <Container className="relative pt-6 pb-6">
+      <FansStorySection fans={fans} club={club} />
+    </Container>
+  );
+}
+
 function FansStorySection({ fans, club }) {
-  const count = onlineCount(fans);
+  if (!fans?.length) return null;
+  const count = fans.length;
   return (
     <div>
       <div className="flex items-center justify-between mb-4 px-1">
         <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-bone-300">
-          Fans en ligne
+          Supporters actifs
         </h2>
         <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-emerald-400 font-bold">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          </span>
-          {count} en ligne
+          {count} supporter{count > 1 ? 's' : ''}
         </span>
       </div>
 
