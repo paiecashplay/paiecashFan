@@ -284,11 +284,12 @@ function SectionHead({ icon: Icon, glow, children }) {
 function HeroCover({ ed, comp, cd, size, avail }) {
   const subtitle = ed.theme?.subtitle || ed.badge || '';
   const diff = (ed.difficulty || 'standard').replace(/^./, (c) => c.toUpperCase());
+  const heroImg = ed.theme?.hero || ed.cover_url;   // image dédiée à la page de jeu
   return (
     <div className="relative rounded-3xl overflow-hidden border border-white/10 min-h-[300px]" style={{ boxShadow: `0 0 70px -24px ${comp.glow}88` }}>
       <div className="absolute inset-0">
-        {ed.cover_url
-          ? <img src={ed.cover_url} alt="" className="h-full w-full object-cover" />
+        {heroImg
+          ? <img src={heroImg} alt="" className="h-full w-full object-cover" />
           : <div className="h-full w-full" style={{ background: `radial-gradient(circle at 50% 30%, ${comp.glow}55, #0a0e14 72%)` }} />}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,.1) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.9) 100%)' }} />
       </div>
