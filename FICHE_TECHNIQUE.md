@@ -105,6 +105,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (af)** — **Sport Bingo — Bloc 2 : remplissage mobile**. Grille
+  devenue aperçu tappable ; **bottom-sheet** de saisie (glisse du bas sur mobile,
+  centré desktop) : match « Domicile VS Extérieur », **3 grandes options** 1/N/2
+  avec libellés (Victoire {équipe}/Nul), **auto-avance** vers la case vide
+  suivante, navigation ◀▶ + « Case X/N », **Réinitialiser**, enregistrement auto.
+  Barre de progression + bouton **« Compléter ma grille »**. Modal de validation
+  irréversible conservée.
 - **2026-07-14 (ae)** — **Notifications (Phase A) + harmonisation « Comment jouer »**.
   Fix majeur : `createNotification` insérait `tenant_id` (colonne inexistante) →
   tous les inserts échouaient en silence ; retiré. Routes app `GET /me/notifications`
