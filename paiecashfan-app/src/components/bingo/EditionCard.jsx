@@ -1,18 +1,14 @@
 import { Link } from 'react-router-dom';
 import { Users, Clock, Star } from 'lucide-react';
+import { AVAIL_BADGE, countdownFor, editionCta } from '@/lib/bingoAvailability';
 
 // Card d'édition Sport Bingo (320×520, identité par compétition).
 // Partagée entre la page hub /tombola/sport-bingo et la section de /tombola.
+// Le badge, le compte à rebours et le CTA sont pilotés par `ed.availability`
+// (calculée par le SERVEUR) + la carte éventuelle du joueur.
 
 export const FMT = { express: '3×3', standard: '5×5', expert: '6×6' };
 export const MATCHES = { express: 9, standard: 24, expert: 36 };
-
-// Statut → badge haut-gauche.
-const STATUS_BADGE = {
-  live:      { label: 'EN DIRECT', cls: 'bg-red-500 text-white' },
-  open:      { label: 'OUVERTE',  cls: 'bg-emerald-500 text-ink-900' },
-  scheduled: { label: 'À VENIR',  cls: 'bg-gold-400 text-ink-900' },
-};
 
 // Identité visuelle par compétition : couleur de halo + emoji du sous-titre.
 export function compFor(slug = '', title = '') {
@@ -42,22 +38,32 @@ function progressPct(startAt, target, now) {
   return Math.max(2, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
 }
 
-export function EditionCard({ ed, now, draft }) {
-  const badge = STATUS_BADGE[ed.status] || STATUS_BADGE.open;
+export function EditionCard({ ed, now, card }) {
+  const availability = ed.availability || 'playable';
+  const badge = AVAIL_BADGE[availability] || AVAIL_BADGE.playable;
   const comp = compFor(ed.slug, ed.title);
-  const isUpcoming = ed.status === 'scheduled';
-  const isLive = ed.status === 'live';
-  const target = isUpcoming ? (ed.starts_at || ed.locks_at) : (ed.locks_at || ed.ends_at);
-  const cd = target ? fmtCountdown(target, now) : null;
-  const pct = target ? progressPct(ed.starts_at, target, now) : 100;
+  const isLive = availability === 'live';
+  const cta = editionCta(availability, card?.status, ed.slug);
+
+  const cdDef = countdownFor(availability);
+  const target = cdDef ? ed[cdDef.field] : null;
+  const cdText = target ? fmtCountdown(target, now) : null;
+  const pct = target ? progressPct(availability === 'playable' ? ed.starts_at : null, target, now) : 100;
   const msLeft = target ? new Date(target).getTime() - now : Infinity;
-  const cdColor = isUpcoming ? '#F2B705' : msLeft < H2 ? '#E53935' : msLeft < H6 ? '#F2B705' : '#00D26A';
+  const cdColor = availability === 'upcoming' ? '#F2B705' : msLeft < H2 ? '#E53935' : msLeft < H6 ? '#F2B705' : '#00D26A';
+
+  // Ligne d'état pour les cas sans rebours.
+  const stateLine = { locked: 'Inscriptions closes', live: 'Matchs en cours', calculating: 'Calcul des résultats', completed: 'Édition terminée' }[availability];
+
   const subtitle = ed.theme?.subtitle || ed.badge || '';
-  const cta = draft ? 'Continuer ma grille' : (isUpcoming ? 'Voir détails' : 'Jouer');
   const style = { height: 520, borderRadius: 22, '--glow': comp.glow, '--glow2': comp.glow2 || comp.glow };
+  const ctaStyle = cta?.kind === 'primary' ? { backgroundColor: comp.glow, color: '#07101a' }
+    : cta?.kind === 'outline' ? { border: `1.5px solid ${comp.glow}`, color: '#fff' }
+    : cta?.kind === 'disabled' ? { border: '1.5px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.55)' }
+    : { border: '1.5px solid rgba(255,255,255,0.2)', color: '#fff' }; // ghost
 
   return (
-    <Link to={`/bingo/${ed.slug}`} className={`bingo-card group block w-[320px] max-w-full overflow-hidden bg-[#0a0e14] ${isLive ? 'is-live' : ''}`} style={style}>
+    <Link to={cta?.to || `/bingo/${ed.slug}`} className={`bingo-card group block w-[320px] max-w-full overflow-hidden bg-[#0a0e14] ${isLive ? 'is-live' : ''}`} style={style}>
       {/* Image hero (70 % de la hauteur) */}
       <div className="absolute inset-x-0 top-0 h-[70%] overflow-hidden" style={{ borderRadius: '22px 22px 0 0' }}>
         {ed.cover_url
@@ -73,7 +79,7 @@ export function EditionCard({ ed, now, draft }) {
         {/* Haut : badge + joueurs */}
         <div className="flex items-start justify-between">
           <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${badge.cls}`}>
-            {isLive && <span className="bingo-live-dot inline-block h-1.5 w-1.5 rounded-full bg-white" />}{badge.label}
+            {badge.pulse && <span className="bingo-live-dot inline-block h-1.5 w-1.5 rounded-full bg-white" />}{badge.label}
           </span>
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70"><Users size={12} /> {ed.players ?? 0}</span>
         </div>
@@ -91,16 +97,20 @@ export function EditionCard({ ed, now, draft }) {
 
         <div className="my-3 h-px bg-white/12" />
 
-        {/* Compte à rebours + barre */}
-        <div>
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-white/60">{isUpcoming ? 'Débute dans' : 'Clôture dans'}</span>
-            <span className="inline-flex items-center gap-1 font-black tabular-nums" style={{ color: cdColor }}><Clock size={11} /> {cd || '—'}</span>
+        {/* Compte à rebours + barre — ou ligne d'état */}
+        {cdDef ? (
+          <div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-white/60">{cdDef.label}</span>
+              <span className="inline-flex items-center gap-1 font-black tabular-nums" style={{ color: cdColor }}><Clock size={11} /> {cdText || '—'}</span>
+            </div>
+            <div className="mt-1.5 h-2 rounded-full bg-white/12 overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: cdColor }} />
+            </div>
           </div>
-          <div className="mt-1.5 h-2 rounded-full bg-white/12 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: cdColor }} />
-          </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-1.5 text-xs font-bold text-white/70"><Clock size={12} /> {stateLine}</div>
+        )}
 
         {/* Gain max */}
         <div className="mt-3 flex items-center justify-between">
@@ -108,11 +118,12 @@ export function EditionCard({ ed, now, draft }) {
           <span className="inline-flex items-center gap-1 font-display text-xl font-black text-white"><Star size={15} className="text-gold-400" /> {ed.reward_points || 0} pts</span>
         </div>
 
-        {/* Bouton pleine largeur */}
-        <div className="mt-4 w-full rounded-xl py-3 text-center text-sm font-black uppercase tracking-wider transition group-hover:brightness-110"
-          style={isUpcoming ? { border: `1.5px solid ${comp.glow}`, color: '#fff' } : { backgroundColor: comp.glow, color: '#07101a' }}>
-          {cta}
-        </div>
+        {/* CTA pleine largeur — rendu uniquement si une action existe */}
+        {cta && (
+          <div className={`mt-4 w-full rounded-xl py-3 text-center text-sm font-black uppercase tracking-wider transition ${cta.kind === 'disabled' ? '' : 'group-hover:brightness-110'}`} style={ctaStyle}>
+            {cta.label}
+          </div>
+        )}
       </div>
     </Link>
   );

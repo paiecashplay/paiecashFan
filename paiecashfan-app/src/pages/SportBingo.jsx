@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Grid3x3, Trophy, HelpCircle, Coins, Plus, Star,
+  Grid3x3, Trophy, HelpCircle, Coins, Plus, Star, Clock,
   Pencil, Lock, Timer, Sparkles, ArrowRight, CheckCircle2, HeartHandshake, Crown, Medal,
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
@@ -47,12 +47,12 @@ export function SportBingo() {
   }, [user]);
   useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
 
-  const playable = useMemo(() => (editions || []).filter((e) => ['open', 'scheduled', 'live'].includes(e.status)), [editions]);
-  const draftByEdition = useMemo(() => {
-    const m = {};
-    myCards.forEach((c) => { if (c.edition_id && (c.status === 'draft' || c.status === 'submitted')) m[c.edition_id] = c.status; });
-    return m;
-  }, [myCards]);
+  // La carte du joueur par édition (pour le CTA contextuel).
+  const cardByEd = useMemo(() => Object.fromEntries(myCards.map((c) => [c.edition_id, c])), [myCards]);
+  // Groupes basés sur l'availability calculée par le SERVEUR.
+  const playable = useMemo(() => (editions || []).filter((e) => e.availability === 'playable'), [editions]);
+  const upcoming = useMemo(() => (editions || []).filter((e) => e.availability === 'upcoming'), [editions]);
+  const myActive = useMemo(() => (editions || []).filter((e) => ['locked', 'live', 'calculating'].includes(e.availability) && cardByEd[e.id]), [editions, cardByEd]);
 
   return (
     <div className="relative overflow-hidden">
@@ -87,37 +87,53 @@ export function SportBingo() {
           </div>
         </div>
 
-        {/* ── Éditions en cours ───────────────────────────── */}
-        <div className="mt-12 flex items-end justify-between gap-4">
+        {/* ── SECTION 1 — Jouer maintenant (playable) ─────── */}
+        <div id="jouer" className="mt-12 flex items-end justify-between gap-4 scroll-mt-24">
           <div>
-            <h2 className="flex items-center gap-2 font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50"><Star size={18} className="text-emerald-400" /> Éditions en cours</h2>
-            <p className="mt-1 text-sm text-bone-400">Choisis une édition et complète ta grille avant la clôture.</p>
+            <h2 className="flex items-center gap-2 font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50"><Star size={18} className="text-emerald-400" /> Jouer maintenant</h2>
+            <p className="mt-1 text-sm text-bone-400">Complète ta grille avant la clôture.</p>
           </div>
-          <a href="#classement" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300">Voir toutes <ArrowRight size={15} /></a>
+          <Link to="/tombola/resultats" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-bone-400 hover:text-emerald-400"><Trophy size={14} /> Résultats</Link>
         </div>
 
         {editions === null ? (
           <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-[520px] w-[320px] max-w-full rounded-[22px] bg-white/5 animate-pulse" />)}
+            {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-[520px] w-[320px] max-w-full rounded-[22px] bg-white/5 animate-pulse" />)}
           </div>
         ) : playable.length === 0 ? (
-          <GlassCard className="mt-6 p-12 text-center">
-            <Grid3x3 className="mx-auto text-bone-600" size={44} />
-            <p className="mt-4 text-sm text-bone-400">Aucune édition ouverte pour le moment. Reviens bientôt !</p>
-          </GlassCard>
+          <EmptyPlayable hasUpcoming={upcoming.length > 0} loggedIn={!!user} />
         ) : (
           <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
-            {playable.map((ed) => <EditionCard key={ed.id} ed={ed} now={now} draft={draftByEdition[ed.id]} />)}
+            {playable.map((ed) => <EditionCard key={ed.id} ed={ed} now={now} card={cardByEd[ed.id]} />)}
           </div>
         )}
 
-        {/* ── Mes cartes ──────────────────────────────────── */}
-        {user && myCards.length > 0 && (
+        {/* ── SECTION 3 — Mes grilles en cours (locked/live/calculating avec carte) ── */}
+        {user && myActive.length > 0 && (
           <div className="mt-16">
-            <h2 className="flex items-center gap-2 font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50"><Coins size={18} className="text-emerald-400" /> Mes cartes</h2>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {myCards.map((c) => <MyCard key={c.id} card={c} />)}
+            <h2 className="flex items-center gap-2 font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50"><Coins size={18} className="text-emerald-400" /> Mes grilles en cours</h2>
+            <p className="mt-1 text-sm text-bone-400">Éditions clôturées ou en direct sur lesquelles tu as une grille.</p>
+            <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
+              {myActive.map((ed) => <EditionCard key={ed.id} ed={ed} now={now} card={cardByEd[ed.id]} />)}
             </div>
+          </div>
+        )}
+
+        {/* ── SECTION 2 — À venir (upcoming) ──────────────── */}
+        {upcoming.length > 0 && (
+          <div id="a-venir" className="mt-16 scroll-mt-24">
+            <h2 className="flex items-center gap-2 font-display text-xl md:text-2xl font-black uppercase tracking-tight text-bone-50"><Clock size={18} className="text-gold-400" /> À venir</h2>
+            <p className="mt-1 text-sm text-bone-400">Prépare-toi : ces éditions ouvriront bientôt.</p>
+            <div className="mt-6 grid gap-6 justify-items-center sm:grid-cols-2 lg:grid-cols-3">
+              {upcoming.map((ed) => <EditionCard key={ed.id} ed={ed} now={now} card={cardByEd[ed.id]} />)}
+            </div>
+          </div>
+        )}
+
+        {/* Lien vers l'historique complet des grilles */}
+        {user && myCards.length > 0 && (
+          <div className="mt-8 text-center">
+            <Link to="/mon-compte" className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300">Voir toutes mes grilles <ArrowRight size={15} /></Link>
           </div>
         )}
 
@@ -186,6 +202,21 @@ export function SportBingo() {
         </GlassCard>
       </Container>
     </div>
+  );
+}
+
+// ── État vide premium (aucune édition jouable) ───────────────
+function EmptyPlayable({ hasUpcoming, loggedIn }) {
+  return (
+    <GlassCard className="mt-6 p-10 md:p-12 text-center">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><Grid3x3 size={30} /></div>
+      <h3 className="mt-5 font-display text-2xl font-black uppercase text-bone-50">Aucune édition ouverte pour le moment</h3>
+      <p className="mt-3 text-sm text-bone-400 max-w-md mx-auto">De nouvelles grilles arrivent bientôt. Consulte les prochaines éditions ou reviens plus tard.</p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        {hasUpcoming && <a href="#a-venir" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-black uppercase tracking-wide text-ink-900 hover:bg-emerald-400 transition"><Clock size={15} /> Voir les prochaines éditions</a>}
+        {loggedIn && <Link to="/mon-compte" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm font-black uppercase tracking-wide text-bone-100 hover:bg-white/5 transition"><Coins size={15} /> Voir mes grilles</Link>}
+      </div>
+    </GlassCard>
   );
 }
 

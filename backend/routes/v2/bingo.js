@@ -11,21 +11,49 @@ const bingo = require('../../db/bingo');
 const wallet = require('../../db/wallet');
 const scoring = require('../../services/bingoScoring');
 const { getFootballProvider } = require('../../services/footballProvider');
+const { getEditionAvailability, isVisibleOnMain } = require('../../services/bingoAvailability');
 const supabase = require('../../db/supabase');
+
+// Messages joueur par raison de refus de participation.
+const PARTICIPATION_MESSAGES = {
+  NOT_AUTHENTICATED: 'Connecte-toi pour jouer.',
+  NOT_FOUND: 'Édition introuvable.',
+  EDITION_CANCELLED: 'Cette édition a été annulée.',
+  NOT_STARTED: 'Cette édition n\'est pas encore ouverte.',
+  REGISTRATION_CLOSED: 'Les inscriptions sont closes pour cette édition.',
+  NOT_OPEN: 'Cette édition n\'accepte pas (ou plus) de nouvelles grilles.',
+  MAX_CARDS_REACHED: 'Le nombre maximal de grilles est atteint.',
+  INSUFFICIENT_CREDITS: 'Crédits insuffisants.',
+};
+const PARTICIPATION_STATUS = { NOT_AUTHENTICATED: 401, NOT_FOUND: 404, INSUFFICIENT_CREDITS: 402 };
 
 const router = express.Router();
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400, extra = {}) => res.status(s).json({ success: false, data: null, error: msg, ...extra });
 
-const PUBLIC_STATUSES = ['scheduled', 'open', 'live', 'locked', 'calculating', 'completed'];
+// Statuts susceptibles d'apparaître sur la page principale (hors draft/completed/
+// cancelled). L'availability finale filtre encore selon les dates serveur.
+const MAIN_STATUSES = ['scheduled', 'open', 'locked', 'live', 'calculating'];
 
 // ── Public ───────────────────────────────────────────────────
+// Liste pour la page principale : availability calculée (heure serveur),
+// draft/completed/cancelled exclus. Le front groupe en sections.
 router.get('/', async (req, res) => {
   try {
-    const editions = await bingo.listEditions({ statuses: PUBLIC_STATUSES });
+    const now = new Date();
+    const editions = await bingo.listEditions({ statuses: MAIN_STATUSES });
     const counts = await bingo.countCardsByEdition(editions.map((e) => e.id));
-    return ok(res, { editions: editions.map((e) => ({ ...e, players: counts[e.id] || 0 })) });
+    const withAvail = editions
+      .map((e) => ({ ...e, players: counts[e.id] || 0, availability: getEditionAvailability(e, now) }))
+      .filter((e) => isVisibleOnMain(e.availability));
+    return ok(res, { editions: withAvail });
   } catch (err) { return fail(res, 'Chargement impossible : ' + err.message, 500); }
+});
+
+// Éditions terminées (page Résultats / archives).
+router.get('/results', async (req, res) => {
+  try { return ok(res, { editions: await bingo.listResults(30) }); }
+  catch (err) { return fail(res, err.message, 500); }
 });
 
 // Classement (public)
@@ -48,7 +76,7 @@ router.get('/:slug', optionalAuth, async (req, res) => {
       if (card) picks = await bingo.getPicks(card.id);
       credits = (await bingo.ensureCredits(req.authUser.id)).balance;
     }
-    return ok(res, { edition, matches, events, card, picks, credits });
+    return ok(res, { edition: { ...edition, availability: getEditionAvailability(edition) }, matches, events, card, picks, credits });
   } catch (err) { return fail(res, 'Chargement impossible : ' + err.message, 500); }
 });
 
@@ -75,14 +103,21 @@ router.get('/me/wallet', requireAuth, async (req, res) => {
   } catch (err) { return fail(res, err.message, 500); }
 });
 
-// Démarre (ou récupère) ma carte pour une édition.
+// Démarre (ou récupère) ma carte pour une édition. Garde serveur centralisée.
 router.post('/:slug/card', requireAuth, async (req, res) => {
   try {
     const edition = await bingo.getEditionBySlug(req.params.slug);
     if (!edition) return fail(res, 'Édition introuvable.', 404);
-    // open / scheduled / live sont jouables tant que ce n'est pas verrouillé.
-    if (!['open', 'scheduled', 'live'].includes(edition.status)) return fail(res, 'Cette édition n\'accepte pas (ou plus) de nouvelles grilles.', 409);
-    if (edition.locks_at && new Date(edition.locks_at) <= new Date()) return fail(res, 'Les grilles sont verrouillées.', 409);
+
+    // Si le joueur a déjà une carte, il peut toujours la récupérer (consultation).
+    const existing = await bingo.getCard(edition.id, req.authUser.id);
+    if (!existing) {
+      const check = await bingo.canParticipateInEdition(req.authUser.id, edition.id);
+      if (!check.allowed) {
+        const extra = check.reason === 'INSUFFICIENT_CREDITS' ? { balance: check.balance } : {};
+        return fail(res, PARTICIPATION_MESSAGES[check.reason] || 'Participation impossible.', PARTICIPATION_STATUS[check.reason] || 409, extra);
+      }
+    }
 
     const { card, picks, created } = await bingo.createCard(edition, req.authUser.id);
     return ok(res, { card, picks, created });
@@ -101,7 +136,15 @@ async function ownCard(req, res, next) {
   next();
 }
 
-router.put('/card/:id/picks', requireAuth, ownCard, async (req, res) => {
+// Refuse toute modification si l'édition n'est plus jouable (guardrail dates serveur).
+async function requirePlayableEdition(req, res, next) {
+  const edition = await bingo.getEditionById(req.card.edition_id);
+  const avail = getEditionAvailability(edition);
+  if (avail !== 'playable') return fail(res, 'Les grilles sont verrouillées : cette édition n\'accepte plus de modification.', 409);
+  next();
+}
+
+router.put('/card/:id/picks', requireAuth, ownCard, requirePlayableEdition, async (req, res) => {
   try {
     const picks = await bingo.savePicks(req.card, req.body?.selections || []);
     return ok(res, { picks });
@@ -111,7 +154,7 @@ router.put('/card/:id/picks', requireAuth, ownCard, async (req, res) => {
   }
 });
 
-router.post('/card/:id/submit', requireAuth, ownCard, async (req, res) => {
+router.post('/card/:id/submit', requireAuth, ownCard, requirePlayableEdition, async (req, res) => {
   try {
     const card = await bingo.submitCard(req.card);
     return ok(res, { card });

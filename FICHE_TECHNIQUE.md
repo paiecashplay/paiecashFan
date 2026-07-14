@@ -105,6 +105,20 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ag)** — **Sport Bingo — Cycle de vie & disponibilité (statut = métier)**.
+  Helper serveur unique `services/bingoAvailability.getEditionAvailability(edition, now)`
+  (heure SERVEUR ; `starts_at`=ouverture, `locks_at`=clôture) → draft/upcoming/
+  playable/locked/live/calculating/completed/cancelled. Garde `canParticipateInEdition`
+  (raisons structurées) appliquée à **create/picks/submit** (participation impossible
+  après clôture, même en accès URL direct). `GET /` renvoie `availability` et exclut
+  draft/completed/cancelled ; nouveau `GET /results`. **Jobs auto** : `bingoSync`
+  (scheduled→open, open→locked par dates) + `bingoAutoSettle` (notation auto dès que
+  TOUS les résultats officiels sont saisis → completed + scoring + notif ; override BO
+  conservé). Front : helper unique `lib/bingoAvailability` (badge/CTA — bouton « Jouer »
+  rendu **uniquement** si playable), `EditionCard` piloté par availability, **3 sections**
+  (Jouer maintenant / À venir / Mes grilles en cours) + état vide premium, page
+  **/tombola/resultats** (avec ton score). Tests `tests/bingoAvailability.test.js` (18/18).
+  Migration `migrations/bingo-indexes.sql` (à exécuter). Fix retour → page Sport Bingo.
 - **2026-07-14 (af)** — **Sport Bingo — Bloc 2 : remplissage mobile**. Grille
   devenue aperçu tappable ; **bottom-sheet** de saisie (glisse du bas sur mobile,
   centré desktop) : match « Domicile VS Extérieur », **3 grandes options** 1/N/2

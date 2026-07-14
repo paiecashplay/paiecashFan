@@ -101,7 +101,7 @@ export function BingoPlay() {
     <div className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.14),transparent_40%)]" />
       <Container className="relative py-12 md:py-16 max-w-3xl">
-        <Link to="/tombola" className="inline-flex items-center gap-2 text-sm text-bone-400 hover:text-bone-100"><ArrowLeft size={16} /> Retour aux jeux</Link>
+        <Link to="/tombola/sport-bingo" className="inline-flex items-center gap-2 text-sm text-bone-400 hover:text-bone-100"><ArrowLeft size={16} /> Retour au Sport Bingo</Link>
 
         <div className="mt-6 flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -119,16 +119,22 @@ export function BingoPlay() {
 
         {error && <div className="mt-4 flex items-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><AlertCircle size={16} /> {error}</div>}
 
-        {/* Pas de carte → intro / jouer */}
+        {/* Pas de carte → intro / jouer (selon l'availability serveur) */}
         {!card ? (
           <GlassCard className="mt-8 p-8 text-center">
             <Grid3x3 className="mx-auto text-emerald-400" size={44} />
             <h2 className="mt-4 font-display text-xl font-black uppercase text-bone-50">Grille {size}×{size}</h2>
             <p className="mt-2 text-sm text-bone-400">Pronostique le résultat (1 · N · 2) de chaque match. Complète des lignes, colonnes, diagonales… pour marquer des points.</p>
-            <p className="mt-4 text-sm text-bone-300">Coût : <b className="text-emerald-400">{ed.cost_credits} crédits</b></p>
-            {!user
-              ? <Link to="/login"><Button variant="primary" size="md" className="mt-6">Se connecter pour jouer</Button></Link>
-              : <Button variant="primary" size="md" className="mt-6" onClick={startCard} disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Grid3x3 size={15} />} Jouer ({ed.cost_credits} crédits)</Button>}
+            {!user ? (
+              <Link to="/login"><Button variant="primary" size="md" className="mt-6">Se connecter pour jouer</Button></Link>
+            ) : ed.availability === 'playable' ? (
+              <>
+                <p className="mt-4 text-sm text-bone-300">Coût : <b className="text-emerald-400">{ed.cost_credits} crédits</b></p>
+                <Button variant="primary" size="md" className="mt-6" onClick={startCard} disabled={busy}>{busy ? <Loader2 size={15} className="animate-spin" /> : <Grid3x3 size={15} />} Jouer ({ed.cost_credits} crédits)</Button>
+              </>
+            ) : (
+              <UnavailableNotice availability={ed.availability} />
+            )}
           </GlassCard>
         ) : (
           <>
@@ -266,6 +272,25 @@ function ConfirmSubmit({ edition, card, busy, onCancel, onConfirm }) {
           </Button>
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+// Message quand l'édition n'est pas jouable (accès direct à une URL).
+function UnavailableNotice({ availability }) {
+  const map = {
+    upcoming: { text: 'Cette édition n\'est pas encore ouverte. Reviens à l\'ouverture des inscriptions !', to: '/tombola/sport-bingo', cta: 'Voir les jeux' },
+    locked: { text: 'Les inscriptions sont closes pour cette édition.', to: '/tombola/sport-bingo', cta: 'Voir les jeux' },
+    live: { text: 'Les matchs ont commencé : les inscriptions sont closes.', to: '/tombola/sport-bingo', cta: 'Voir les jeux' },
+    calculating: { text: 'Les résultats sont en cours de calcul.', to: '/tombola/resultats', cta: 'Voir les résultats' },
+    completed: { text: 'Cette édition est terminée.', to: '/tombola/resultats', cta: 'Voir les résultats' },
+    cancelled: { text: 'Cette édition a été annulée.', to: '/tombola/sport-bingo', cta: 'Voir les jeux' },
+  };
+  const m = map[availability] || map.completed;
+  return (
+    <div className="mt-6">
+      <p className="text-sm text-bone-300">{m.text}</p>
+      <Link to={m.to}><Button variant="primary" size="md" className="mt-5">{m.cta}</Button></Link>
     </div>
   );
 }

@@ -216,6 +216,13 @@ const server = httpServer.listen(PORT, () => {
   // Tombola : tirage automatique des campagnes arrivées à échéance (toutes les 5 min)
   const { runTombolaDraws } = require('./jobs/tombolaDraw');
   cron.schedule('*/5 * * * *', () => { runTombolaDraws(); });
+
+  // Sport Bingo : sync des statuts d'édition selon l'heure serveur (chaque minute)
+  const { runBingoSync, runBingoAutoSettle } = require('./jobs/bingoSync');
+  runBingoSync();
+  cron.schedule('* * * * *', () => { runBingoSync(); });
+  // Notation/clôture auto dès que tous les résultats sont saisis (toutes les 2 min)
+  cron.schedule('*/2 * * * *', () => { runBingoAutoSettle(); });
 });
 
 server.on('error', (err) => {

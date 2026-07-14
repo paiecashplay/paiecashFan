@@ -6,6 +6,7 @@
 const supabase = require('./supabase');
 const engine = require('../services/bingoEngine');
 const wallet = require('./wallet');
+const { getEditionAvailability } = require('../services/bingoAvailability');
 
 const START_CREDITS = wallet.START_BALANCE;
 
@@ -126,6 +127,33 @@ async function listEditionCards(editionId) {
   return cards.map((c) => ({ ...c, player: pmap[c.user_id]?.display_name || 'Supporter', avatar: pmap[c.user_id]?.avatar_url || null }));
 }
 
+// Éditions terminées (page Résultats / archives) + stats.
+async function listResults(limit = 30) {
+  const { data: eds } = await supabase.from('bingo_editions')
+    .select('id, slug, title, cover_url, badge, theme, format, difficulty, reward_points, ends_at, status')
+    .eq('status', 'completed').order('ends_at', { ascending: false, nullsFirst: false }).limit(limit);
+  if (!eds?.length) return [];
+  const ids = eds.map((e) => e.id);
+  const { data: cards } = await supabase.from('bingo_cards').select('edition_id, user_id, points_total').in('edition_id', ids).eq('status', 'scored');
+  const byEd = {};
+  (cards || []).forEach((c) => { (byEd[c.edition_id] ||= []).push(c); });
+  // profils des meilleurs
+  const topUserIds = new Set();
+  Object.values(byEd).forEach((list) => list.slice().sort((a, b) => b.points_total - a.points_total).slice(0, 3).forEach((c) => topUserIds.add(c.user_id)));
+  const { data: profs } = topUserIds.size ? await supabase.from('profiles').select('id, display_name, avatar_url').in('id', [...topUserIds]) : { data: [] };
+  const pmap = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+
+  return eds.map((e) => {
+    const list = (byEd[e.id] || []).slice().sort((a, b) => b.points_total - a.points_total);
+    return {
+      ...e,
+      participants: list.length,
+      maxPoints: list.length ? list[0].points_total : 0,
+      top: list.slice(0, 3).map((c, i) => ({ rank: i + 1, points: c.points_total, name: pmap[c.user_id]?.display_name || 'Supporter', avatar: pmap[c.user_id]?.avatar_url || null })),
+    };
+  });
+}
+
 // Prévisualise une grille type (sans créer de carte) : layout + libellés.
 async function previewLayout(editionId) {
   const edition = await getEditionById(editionId);
@@ -180,6 +208,38 @@ async function deleteEventWithMatch(eventId) {
 async function ensureCredits(userId) {
   const w = await wallet.ensureWallet(userId);
   return { balance: w.balance };
+}
+
+// ─── Garde serveur : participation autorisée ? ───────────────
+// Vérifie auth + existence + état PLAYABLE (statut open + dates serveur) +
+// quota de cartes + solde. Renvoie { allowed, reason, edition?, balance? }.
+// L'heure de référence est TOUJOURS l'heure serveur (jamais le navigateur).
+async function canParticipateInEdition(userId, editionId, now = new Date()) {
+  if (!userId) return { allowed: false, reason: 'NOT_AUTHENTICATED' };
+  const edition = await getEditionById(editionId);
+  if (!edition) return { allowed: false, reason: 'NOT_FOUND' };
+  if (edition.status === 'cancelled') return { allowed: false, reason: 'EDITION_CANCELLED' };
+
+  const availability = getEditionAvailability(edition, now);
+  if (availability === 'upcoming') return { allowed: false, reason: 'NOT_STARTED', edition };
+  if (availability === 'locked') return { allowed: false, reason: 'REGISTRATION_CLOSED', edition };
+  if (availability !== 'playable') return { allowed: false, reason: 'NOT_OPEN', edition };
+
+  // Quota de cartes (si défini).
+  if (edition.cards_available != null) {
+    const counts = await countCardsByEdition([editionId]);
+    if ((counts[editionId] || 0) >= edition.cards_available) return { allowed: false, reason: 'MAX_CARDS_REACHED', edition };
+  }
+  // Solde (si coût > 0) — ignoré si le joueur a déjà une carte (pas de re-débit).
+  const cost = edition.cost_credits || 0;
+  if (cost > 0) {
+    const existing = await getCard(editionId, userId);
+    if (!existing) {
+      const balance = await wallet.getBalance(userId);
+      if (balance < cost) return { allowed: false, reason: 'INSUFFICIENT_CREDITS', edition, balance };
+    }
+  }
+  return { allowed: true, edition, availability };
 }
 
 // ─── Cartes (grilles) ────────────────────────────────────────
@@ -287,7 +347,8 @@ module.exports = {
   listMatches, addMatch, updateMatch, deleteMatch,
   listEvents, addEvent, updateEvent, deleteEvent,
   addMatchWithEvent, bulkAddMatches, deleteEventWithMatch,
-  countCardsByEdition, listEditionCards, previewLayout,
+  countCardsByEdition, listEditionCards, previewLayout, listResults,
+  canParticipateInEdition,
   ensureCredits,
   getCard, getPicks, listMyCards, createCard, savePicks, submitCard,
 };

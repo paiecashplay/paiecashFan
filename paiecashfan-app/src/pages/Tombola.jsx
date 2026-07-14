@@ -69,7 +69,7 @@ export function Tombola() {
   }, []);
   useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
 
-  const playableBingo = useMemo(() => bingoEditions.filter((e) => ['open', 'scheduled', 'live'].includes(e.status)), [bingoEditions]);
+  const playableBingo = useMemo(() => bingoEditions.filter((e) => e.availability === 'playable'), [bingoEditions]);
 
   const active = useMemo(() => (campaigns || []).filter((c) => c.status === 'active'), [campaigns]);
   const past = useMemo(() => (campaigns || []).filter((c) => c.status === 'drawn'), [campaigns]);
