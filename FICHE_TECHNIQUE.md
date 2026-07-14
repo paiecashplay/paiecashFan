@@ -105,6 +105,17 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-14 (ah)** — **Sport Bingo — Page « Jouer » premium (maquette)**. `BingoPlay`
+  refait, thémé par compétition : hero cover (image + titre + chips + rebours),
+  panneau **À propos**, **Comment ça marche** (identique à la page Jeux), onglets
+  **Grille ↔ Calendrier synchronisés**. **Grille premium** : cards de match
+  (drapeaux + **codes FIFA**, 1/N/2 inline, case FREE, états correct/incorrect) +
+  **sidebar** (progression, points max, comment remplir, légende, **bonus combo**
+  visuel, valider). **Calendrier** groupé (groupe/journée) avec drapeaux/heure.
+  « Compléter ma grille » : desktop → défile vers la grille, mobile → sheet guidé.
+  BO : champs **logo/drapeau + groupe** par match ; `home_logo`/`away_logo` +
+  `group_label` (migration `bingo-match-group.sql`). Édition CAN peuplée (24
+  matchs africains + drapeaux flagcdn, cover `can-card.webp`).
 - **2026-07-14 (ag)** — **Sport Bingo — Cycle de vie & disponibilité (statut = métier)**.
   Helper serveur unique `services/bingoAvailability.getEditionAvailability(edition, now)`
   (heure SERVEUR ; `starts_at`=ouverture, `locks_at`=clôture) → draft/upcoming/

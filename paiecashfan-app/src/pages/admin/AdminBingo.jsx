@@ -150,7 +150,7 @@ function EditionManage({ edition, showToast, onChanged }) {
   const editionId = edition.id;
   const format = edition.format;
   const [data, setData] = useState(null);
-  const [row, setRow] = useState({ home: '', away: '', competition: '', kickoffAt: '' });
+  const [row, setRow] = useState({ home: '', away: '', competition: '', kickoffAt: '', groupLabel: '', homeLogo: '', awayLogo: '' });
   const [busy, setBusy] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState('');
@@ -176,7 +176,7 @@ function EditionManage({ edition, showToast, onChanged }) {
     setBusy(true);
     try {
       await apiFetch(`/api/v2/bingo/admin/editions/${editionId}/match-event`, { method: 'POST', body: JSON.stringify(row) });
-      setRow({ home: '', away: '', competition: '', kickoffAt: '' }); load();
+      setRow({ home: '', away: '', competition: '', kickoffAt: '', groupLabel: '', homeLogo: '', awayLogo: '' }); load();
     } catch (e) { showToast(e.message); }
     setBusy(false);
   }
@@ -360,6 +360,11 @@ function EditionManage({ edition, showToast, onChanged }) {
           <input className={input + ' h-9'} placeholder="Équipe à l'extérieur" value={row.away} onChange={(e) => setRow({ ...row, away: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && addRow()} />
           <input className={input + ' h-9'} placeholder="Compétition (optionnel)" value={row.competition} onChange={(e) => setRow({ ...row, competition: e.target.value })} />
           <input type="datetime-local" className={input + ' h-9'} value={row.kickoffAt} onChange={(e) => setRow({ ...row, kickoffAt: e.target.value })} />
+          <input className={input + ' h-9'} placeholder="Groupe / journée (ex. Groupe A · J1)" value={row.groupLabel} onChange={(e) => setRow({ ...row, groupLabel: e.target.value })} />
+          <div className="grid grid-cols-2 gap-1.5">
+            <input className={input + ' h-9'} placeholder="Logo/drapeau domicile (URL)" value={row.homeLogo} onChange={(e) => setRow({ ...row, homeLogo: e.target.value })} />
+            <input className={input + ' h-9'} placeholder="Logo/drapeau extérieur (URL)" value={row.awayLogo} onChange={(e) => setRow({ ...row, awayLogo: e.target.value })} />
+          </div>
         </div>
         <button onClick={addRow} disabled={busy} className="mt-2 inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-xs font-bold text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50">
           {busy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />} Ajouter le match

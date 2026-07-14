@@ -64,16 +64,22 @@ async function listMatches(editionId) {
   return data || [];
 }
 async function addMatch(editionId, d) {
-  const { data, error } = await supabase.from('bingo_matches').insert({
+  const row = {
     edition_id: editionId, home: d.home, away: d.away, competition: d.competition || null,
     kickoff_at: d.kickoffAt || null, display_order: d.displayOrder ?? 0,
-  }).select('*').single();
+    home_logo: d.homeLogo || null, away_logo: d.awayLogo || null,
+  };
+  // group_label = colonne récente (migration bingo-match-group.sql) : on ne
+  // l'inclut que si renseignée, pour ne pas casser l'insert avant migration.
+  if (d.groupLabel) row.group_label = d.groupLabel;
+  const { data, error } = await supabase.from('bingo_matches').insert(row).select('*').single();
   if (error) throw new Error(error.message);
   return data;
 }
 async function updateMatch(id, updates) {
   const map = { home: 'home', away: 'away', competition: 'competition', kickoffAt: 'kickoff_at', status: 'status',
-    minute: 'minute', homeScore: 'home_score', awayScore: 'away_score', displayOrder: 'display_order' };
+    minute: 'minute', homeScore: 'home_score', awayScore: 'away_score', displayOrder: 'display_order',
+    homeLogo: 'home_logo', awayLogo: 'away_logo', groupLabel: 'group_label' };
   const patch = { updated_at: new Date().toISOString() };
   for (const [k, col] of Object.entries(map)) if (updates[k] !== undefined) patch[col] = updates[k];
   const { data, error } = await supabase.from('bingo_matches').update(patch).eq('id', id).select('*').single();
@@ -174,6 +180,7 @@ async function previewLayout(editionId) {
 async function addMatchWithEvent(editionId, d, order) {
   const match = await addMatch(editionId, {
     home: d.home, away: d.away, competition: d.competition || null, kickoffAt: d.kickoffAt || null, displayOrder: order,
+    homeLogo: d.homeLogo || null, awayLogo: d.awayLogo || null, groupLabel: d.groupLabel || null,
   });
   const label = (d.label || '').trim() || `${d.home} - ${d.away}`;
   const event = await addEvent(editionId, {
