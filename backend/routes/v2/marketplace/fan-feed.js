@@ -10,6 +10,7 @@ const fanFeed = require('../../../db/fanFeed');
 const mod = require('../../../db/chatModeration');
 const favorites = require('../../../db/favorites');
 const { requireClubModerator } = require('../../../middleware/clubModerator');
+const supabase = require('../../../db/supabase');
 
 const router = express.Router();
 
@@ -205,14 +206,43 @@ router.post('/:slug/moderation/cases/:id/decision', requireAuth, withTenant, req
       caseId: req.params.id,
       decision: req.body?.decision,
       reason: req.body?.reason || null,
+      sanction: req.body?.sanction || null,       // types globaux refusés pour un club_admin
       actorId: req.authUser.id,
       actorType: req.moderatorType,               // club_admin | super_admin
     });
     return ok(res, result);
   } catch (err) {
-    if (err.code === 'BAD_DECISION') return fail(res, err.message, 400);
+    if (['BAD_DECISION', 'BAD_TYPE', 'BAD_PERMANENT', 'DURATION_REQUIRED', 'NEEDS_HUMAN'].includes(err.code)) return fail(res, err.message, 400);
+    if (err.code === 'FORBIDDEN_TYPE') return fail(res, err.message, 403);
     if (err.code === 'ALREADY_CLOSED') return fail(res, err.message, 409);
     return fail(res, 'Décision impossible : ' + err.message, 500);
+  }
+});
+
+// GET /api/v2/clubs/:slug/moderation/config — sanctions permises au modérateur.
+router.get('/:slug/moderation/config', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  return ok(res, {
+    sanctionTypes: mod.allowedSanctionsFor(req.moderatorType),
+    permanentAllowed: mod.PERMANENT_ALLOWED,
+    decisions: mod.CASE_DECISIONS,
+    labels: mod.SANCTION_LABEL,
+    moderatorType: req.moderatorType,
+  });
+});
+
+// POST /api/v2/clubs/:slug/moderation/sanctions/:id/revoke — lève une sanction du salon.
+router.post('/:slug/moderation/sanctions/:id/revoke', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    // Un club_admin ne lève que les sanctions de SON salon.
+    const { data: s } = await supabase.from('chat_sanctions').select('id, tenant_id, scope').eq('id', req.params.id).maybeSingle();
+    if (!s) return fail(res, 'Sanction introuvable.', 404);
+    if (req.moderatorType !== 'super_admin' && (s.scope === 'global' || s.tenant_id !== req.tenant.id)) {
+      return fail(res, 'Cette sanction ne concerne pas ton salon.', 403);
+    }
+    return ok(res, await mod.revokeSanction({ sanctionId: req.params.id, actorId: req.authUser.id, actorType: req.moderatorType }));
+  } catch (err) {
+    if (err.code === 'ALREADY_REVOKED') return fail(res, err.message, 409);
+    return fail(res, 'Révocation impossible : ' + err.message, 500);
   }
 });
 

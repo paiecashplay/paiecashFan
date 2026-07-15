@@ -218,6 +218,86 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     assert.ok(cases.every((c) => c.tenant_id === club.id));
   });
 
+  // ══════════════ LOT 3 — Avertissements & suspensions ══════════════
+  console.log('\nAutorisation des sanctions');
+  await t('un club_admin ne peut PAS bannir globalement', async () => {
+    const allowed = mod.allowedSanctionsFor('club_admin');
+    assert.equal(allowed.includes('global_chat_ban'), false);
+    assert.equal(allowed.includes('account_review'), false);
+    assert.ok(allowed.includes('room_ban'), 'il peut exclure de SON salon');
+  });
+  await t('le super_admin peut tout prononcer', async () => {
+    assert.equal(mod.allowedSanctionsFor('super_admin').length, mod.SANCTION_TYPES.length);
+  });
+  await t('club_admin tentant un ban global → refusé', async () => {
+    await assert.rejects(
+      () => mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'global_chat_ban', isPermanent: true, issuedBy: fan.id, actorType: 'club_admin' }),
+      (e) => e.code === 'FORBIDDEN_TYPE'
+    );
+  });
+
+  console.log('\n🔒 Garde-fous des sanctions');
+  await t('l\'IA ne peut pas prononcer une exclusion définitive', async () => {
+    await assert.rejects(
+      () => mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'room_ban', isPermanent: true, issuedBy: null, actorType: 'ai' }),
+      (e) => e.code === 'NEEDS_HUMAN'
+    );
+  });
+  await t('une suspension sans durée est refusée (pas de permanent déguisé)', async () => {
+    await assert.rejects(
+      () => mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'room_suspension', issuedBy: fan.id, actorType: 'super_admin' }),
+      (e) => e.code === 'DURATION_REQUIRED'
+    );
+  });
+  await t('un avertissement ne peut pas être « définitif »', async () => {
+    await assert.rejects(
+      () => mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'warning', isPermanent: true, issuedBy: fan.id, actorType: 'super_admin' }),
+      (e) => e.code === 'BAD_PERMANENT'
+    );
+  });
+
+  console.log('\nÉmission & révocation');
+  const { data: msg3 } = await supabase.from('fan_messages')
+    .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] message de modération' }).select('id').single();
+  const case3 = await mod.upsertCaseForMessage({ tenantId: club.id, messageId: msg3.id, targetUserId: fan.id, source: 'manual' });
+
+  await t('décision + suspension : le supporter ne peut plus écrire', async () => {
+    const r = await mod.decideCase({
+      caseId: case3, decision: 'remove_message', reason: 'Propos insultants',
+      actorId: fan.id, actorType: 'super_admin',
+      sanction: { type: 'room_suspension', durationHours: 24 },
+    });
+    assert.ok(r.sanction?.id);
+    const s = await mod.getActiveSanction(fan.id, club.id);
+    assert.equal(s?.type, 'room_suspension');
+  });
+  await t('la sanction est notifiée au supporter', async () => {
+    const { data: n } = await supabase.from('notifications').select('type, title')
+      .eq('user_id', fan.id).eq('type', 'chat_sanction').order('created_at', { ascending: false }).limit(1);
+    assert.ok(n?.length, 'notification de sanction manquante');
+  });
+  await t('l\'audit trace la sanction', async () => {
+    const { data: logs } = await supabase.from('chat_moderation_audit_logs').select('action').eq('case_id', case3);
+    assert.ok(logs.some((l) => l.action === 'sanction:room_suspension'));
+  });
+  await t('révoquer la sanction débloque le supporter', async () => {
+    const { data: s } = await supabase.from('chat_sanctions').select('id').eq('user_id', fan.id).is('revoked_at', null).limit(1).maybeSingle();
+    await mod.revokeSanction({ sanctionId: s.id, actorId: fan.id, actorType: 'super_admin' });
+    assert.equal(await mod.getActiveSanction(fan.id, club.id), null);
+  });
+  await t('une sanction déjà levée ne peut pas être re-levée', async () => {
+    const { data: s } = await supabase.from('chat_sanctions').select('id').eq('user_id', fan.id).not('revoked_at', 'is', null).limit(1).maybeSingle();
+    await assert.rejects(() => mod.revokeSanction({ sanctionId: s.id, actorId: fan.id, actorType: 'super_admin' }), (e) => e.code === 'ALREADY_REVOKED');
+  });
+  await t('« mes sanctions » liste l\'historique avec l\'état actif', async () => {
+    const list = await mod.listMySanctions(fan.id);
+    assert.ok(list.length >= 1);
+    assert.equal(list.every((s) => typeof s.isActive === 'boolean'), true);
+  });
+
+  await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', case3);
+  await supabase.from('chat_moderation_cases').delete().eq('id', case3);
+  await supabase.from('notifications').delete().eq('user_id', fan.id).in('type', ['chat_sanction', 'chat_sanction_revoked']);
   await supabase.from('chat_reports').delete().eq('message_id', msg2.id);
   await supabase.from('chat_moderation_cases').delete().eq('message_id', msg2.id);
   await cleanup();

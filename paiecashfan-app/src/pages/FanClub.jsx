@@ -10,6 +10,7 @@ import { ClubFanCommunity } from '@/components/club/ClubFanCommunity';
 import { LiveChat } from '@/components/fanclub/LiveChat';
 import { CharterEntryModal } from '@/components/fanclub/CharterEntryModal';
 import { ReportMessageModal } from '@/components/fanclub/ReportMessageModal';
+import { ActiveSanctionBanner } from '@/components/fanclub/ActiveSanctionBanner';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
@@ -183,6 +184,11 @@ export function FanClub() {
             </p>
           </div>
         </header>
+
+        {/* Sanction active → bandeau en tête du salon */}
+        {mode === 'club' && access?.activeSanction && (
+          <div className="mt-4"><ActiveSanctionBanner sanction={access.activeSanction} /></div>
+        )}
 
         {!user && (
           <div className="mt-4 flex flex-col items-start justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4 sm:flex-row sm:items-center">

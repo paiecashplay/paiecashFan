@@ -9,6 +9,7 @@ const { requireAuth } = require('../../middleware/auth');
 const supabase = require('../../db/supabase');
 const pcc = require('../../services/paiecashcoin');
 const favorites_db = require('../../db/favorites');
+const chatMod = require('../../db/chatModeration');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -129,6 +130,15 @@ router.put('/favorites/:tenantId/primary', async (req, res) => {
     if (err.code === 'NOT_FAVORITE') return fail(res, err.message, 409);
     return fail(res, err.message, 500);
   }
+});
+
+// ── Mes sanctions de chat ────────────────────────────────────
+// GET /api/v2/me/chat-sanctions — sanctions actives + passées du fan.
+router.get('/chat-sanctions', async (req, res) => {
+  try {
+    const sanctions = await chatMod.listMySanctions(req.authUser.id);
+    return ok(res, { sanctions, active: sanctions.filter((s) => s.isActive) });
+  } catch (err) { return fail(res, 'Sanctions : ' + err.message, 500); }
 });
 
 // ── Notifications ────────────────────────────────────────────

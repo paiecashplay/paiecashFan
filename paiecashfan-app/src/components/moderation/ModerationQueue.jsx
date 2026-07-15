@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ShieldAlert, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History } from 'lucide-react';
+import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 
@@ -130,17 +130,31 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
+  const [config, setConfig] = useState(null);
+  const [sanction, setSanction] = useState({ type: '', durationHours: 24, isPermanent: false });
 
   useEffect(() => {
     apiFetch(`${basePath}/cases/${caseId}`).then((j) => setC(j.data?.case || null)).catch(() => setC(null));
+    apiFetch(`${basePath}/config`).then((j) => setConfig(j.data || null)).catch(() => setConfig(null));
   }, [basePath, caseId]);
 
   async function decide(decision, label) {
     setBusy(decision); setError('');
     try {
-      await apiFetch(`${basePath}/cases/${caseId}/decision`, { method: 'POST', body: JSON.stringify({ decision, reason }) });
-      onDecided(label);
+      const body = { decision, reason };
+      if (sanction.type) body.sanction = { type: sanction.type, durationHours: sanction.isPermanent ? null : Number(sanction.durationHours), isPermanent: sanction.isPermanent };
+      await apiFetch(`${basePath}/cases/${caseId}/decision`, { method: 'POST', body: JSON.stringify(body) });
+      onDecided(sanction.type ? `${label} + sanction appliquée` : label);
     } catch (e) { setError(e?.message || 'Décision impossible.'); }
+    setBusy('');
+  }
+
+  async function revoke(sanctionId) {
+    setBusy('revoke-' + sanctionId); setError('');
+    try {
+      await apiFetch(`${basePath}/sanctions/${sanctionId}/revoke`, { method: 'POST' });
+      onDecided('Sanction levée');
+    } catch (e) { setError(e?.message || 'Révocation impossible.'); }
     setBusy('');
   }
 
@@ -209,6 +223,30 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
                   <p className="mt-1 font-display text-lg font-black text-bone-100">{c.sanctions?.length || 0}</p>
                 </div>
               </div>
+              {c.sanctions?.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  {c.sanctions.map((s) => {
+                    const active = !s.revoked_at && (s.is_permanent || !s.ends_at || new Date(s.ends_at) > new Date());
+                    return (
+                      <div key={s.id} className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
+                        <div className="min-w-0">
+                          <span className={`font-bold ${active ? 'text-red-300' : 'text-bone-500'}`}>{config?.labels?.[s.sanction_type] || s.sanction_type}</span>
+                          <span className="ml-2 text-[10px] text-bone-500">
+                            {s.is_permanent ? 'définitive' : s.ends_at ? `jusqu'au ${fmt(s.ends_at)}` : ''}
+                            {s.revoked_at && ' · levée'}
+                          </span>
+                        </div>
+                        {active && (
+                          <button onClick={() => revoke(s.id)} disabled={busy === 'revoke-' + s.id}
+                            className="shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:text-emerald-300 disabled:opacity-50">
+                            {busy === 'revoke-' + s.id ? <Loader2 size={11} className="animate-spin" /> : <ShieldOff size={11} />} Lever
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </Section>
 
             {/* Audit */}
@@ -229,15 +267,50 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
             {['open', 'in_review'].includes(c.status) ? (
               <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                 <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Décision</p>
-                <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Motif (visible dans l'audit)"
+                <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Motif (notifié au supporter + audit)"
                   className="mt-2 w-full h-9 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-xs text-bone-100 outline-none focus:border-emerald-400/60" />
+
+                {/* Sanction optionnelle */}
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                  <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Sanction (optionnelle)</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <button onClick={() => setSanction((s) => ({ ...s, type: '' }))}
+                      className={`rounded-full border px-3 py-1 text-[11px] font-bold transition ${!sanction.type ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-white/10 text-bone-400 hover:text-bone-200'}`}>Aucune</button>
+                    {(config?.sanctionTypes || []).map((tp) => (
+                      <button key={tp} onClick={() => setSanction((s) => ({ ...s, type: tp, isPermanent: false }))}
+                        className={`rounded-full border px-3 py-1 text-[11px] font-bold transition ${sanction.type === tp ? 'border-red-500/50 bg-red-500/15 text-red-300' : 'border-white/10 text-bone-400 hover:text-bone-200'}`}>
+                        {config?.labels?.[tp] || tp}
+                      </button>
+                    ))}
+                  </div>
+
+                  {sanction.type && !['warning', 'account_review'].includes(sanction.type) && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Durée</span>
+                      {[['1', '1 h'], ['24', '24 h'], ['168', '7 j'], ['720', '30 j']].map(([h, l]) => (
+                        <button key={h} onClick={() => setSanction((s) => ({ ...s, durationHours: h, isPermanent: false }))}
+                          className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold transition ${!sanction.isPermanent && String(sanction.durationHours) === h ? 'border-gold-400/40 bg-gold-400/10 text-gold-400' : 'border-white/10 text-bone-400 hover:text-bone-200'}`}>{l}</button>
+                      ))}
+                      {(config?.permanentAllowed || []).includes(sanction.type) && (
+                        <button onClick={() => setSanction((s) => ({ ...s, isPermanent: !s.isPermanent }))}
+                          className={`rounded-lg border px-2.5 py-1 text-[11px] font-black transition ${sanction.isPermanent ? 'border-red-500/60 bg-red-500/20 text-red-300' : 'border-white/10 text-bone-400 hover:text-red-300'}`}>
+                          Définitive
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {sanction.isPermanent && (
+                    <p className="mt-2 inline-flex items-start gap-1.5 text-[10px] text-red-300"><ShieldAlert size={11} className="mt-0.5 shrink-0" /> Exclusion définitive — confirmée par toi (jamais par l'IA).</p>
+                  )}
+                </div>
+
                 {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Btn onClick={() => decide('dismiss', 'Dossier classé sans suite')} busy={busy === 'dismiss'} icon={Check} tone="ghost">Classer sans suite</Btn>
                   <Btn onClick={() => decide('hide_message', 'Message masqué')} busy={busy === 'hide_message'} icon={EyeOff} tone="gold">Masquer le message</Btn>
                   <Btn onClick={() => decide('remove_message', 'Message retiré')} busy={busy === 'remove_message'} icon={Trash2} tone="red">Retirer le message</Btn>
                 </div>
-                <p className="mt-3 text-[10px] text-bone-500">Les avertissements et suspensions arriveront au lot suivant. Un message retiré n'est jamais supprimé physiquement.</p>
+                <p className="mt-3 text-[10px] text-bone-500">Un message retiré n'est jamais supprimé physiquement. Le supporter est notifié de toute sanction.</p>
               </div>
             ) : (
               <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-3 text-xs text-emerald-200">

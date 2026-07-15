@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('./supabase');
+const { createNotification } = require('./notifications');
 
 // Version de la charte : incrémenter la date force une nouvelle acceptation.
 const CHARTER_VERSION = '2026-07-15';
@@ -230,11 +231,121 @@ async function getCase(caseId) {
   };
 }
 
-// Décisions du lot 2 (les sanctions arrivent au lot 3).
+// ── Sanctions (lot 3) ────────────────────────────────────────
+const SANCTION_TYPES = ['warning', 'mute', 'room_suspension', 'room_ban', 'global_chat_ban', 'account_review'];
+// Portée plateforme → super_admin uniquement (un club_admin ne bannit pas de TOUS
+// les salons, ni ne déclenche l'examen d'un compte).
+const GLOBAL_TYPES = ['global_chat_ban', 'account_review'];
+// Seules ces sanctions peuvent être définitives (et toujours par un humain).
+const PERMANENT_ALLOWED = ['room_ban', 'global_chat_ban'];
+
+function allowedSanctionsFor(moderatorType) {
+  return moderatorType === 'super_admin' ? SANCTION_TYPES : SANCTION_TYPES.filter((t) => !GLOBAL_TYPES.includes(t));
+}
+
+const SANCTION_LABEL = {
+  warning: 'Avertissement', mute: 'Lecture seule', room_suspension: 'Suspension du salon',
+  room_ban: 'Exclusion du salon', global_chat_ban: 'Exclusion de tous les salons', account_review: 'Compte en cours d\'examen',
+};
+
+// Émet une sanction. `issuedBy` = l'humain qui décide (NULL = système/IA).
+async function issueSanction({ userId, tenantId = null, caseId = null, type, durationHours = null, isPermanent = false, reasonCode = null, reasonText = null, issuedBy = null, actorType = 'system' }) {
+  if (!SANCTION_TYPES.includes(type)) { const e = new Error('Type de sanction invalide.'); e.code = 'BAD_TYPE'; throw e; }
+  if (!allowedSanctionsFor(actorType).includes(type)) {
+    const e = new Error('Seul un super administrateur peut prononcer cette sanction.'); e.code = 'FORBIDDEN_TYPE'; throw e;
+  }
+  if (isPermanent && !PERMANENT_ALLOWED.includes(type)) { const e = new Error('Cette sanction ne peut pas être définitive.'); e.code = 'BAD_PERMANENT'; throw e; }
+  // 🔒 Une exclusion définitive exige TOUJOURS un humain (double garde : ici + CHECK en base).
+  if (isPermanent && !issuedBy) { const e = new Error('Une exclusion définitive doit être confirmée par un humain.'); e.code = 'NEEDS_HUMAN'; throw e; }
+  // 🔒 Une sanction bloquante non définitive DOIT avoir une durée, sinon elle
+  // n'expirerait jamais → ce serait une exclusion permanente déguisée.
+  if (WRITE_BLOCKING.includes(type) && !isPermanent && !durationHours) {
+    const e = new Error('Une durée est requise (ou marque la sanction comme définitive).'); e.code = 'DURATION_REQUIRED'; throw e;
+  }
+
+  const scope = GLOBAL_TYPES.includes(type) ? 'global' : 'room';
+  const endsAt = isPermanent ? null : (durationHours ? new Date(Date.now() + durationHours * 3600 * 1000).toISOString() : null);
+
+  const { data, error } = await supabase.from('chat_sanctions').insert({
+    user_id: userId, tenant_id: scope === 'global' ? null : tenantId, case_id: caseId,
+    sanction_type: type, scope, ends_at: endsAt, is_permanent: isPermanent,
+    reason_code: reasonCode, reason_text: reasonText, issued_by: issuedBy,
+  }).select('*').single();
+  if (error) throw new Error(error.message);
+
+  await audit({ caseId, actorType, actorId: issuedBy, action: 'sanction:' + type,
+    newValue: { sanctionId: data.id, type, scope, endsAt, isPermanent, reasonCode } });
+  await notifySanction(data, tenantId).catch(() => {});
+  return data;
+}
+
+// Lève une sanction (révocation) + notifie.
+async function revokeSanction({ sanctionId, actorId, actorType }) {
+  const { data: s } = await supabase.from('chat_sanctions').select('*').eq('id', sanctionId).maybeSingle();
+  if (!s) { const e = new Error('Sanction introuvable.'); e.code = 'NOT_FOUND'; throw e; }
+  if (s.revoked_at) { const e = new Error('Sanction déjà levée.'); e.code = 'ALREADY_REVOKED'; throw e; }
+
+  const now = new Date().toISOString();
+  await supabase.from('chat_sanctions').update({ revoked_at: now, revoked_by: actorId }).eq('id', sanctionId);
+  await audit({ caseId: s.case_id, actorType, actorId, action: 'sanction_revoked',
+    previousValue: { type: s.sanction_type }, newValue: { sanctionId } });
+  await createNotification({
+    user_id: s.user_id, type: 'chat_sanction_revoked',
+    title: '✅ Sanction levée',
+    message: `Ta sanction « ${SANCTION_LABEL[s.sanction_type] || s.sanction_type} » a été levée. Tu peux de nouveau participer.`,
+    metadata: { sanctionId, caseId: s.case_id },
+  }).catch(() => {});
+  return { id: sanctionId, revoked: true };
+}
+
+// Notifie le supporter sanctionné.
+async function notifySanction(s, tenantId) {
+  let clubName = null;
+  if (s.tenant_id || tenantId) {
+    const { data: c } = await supabase.from('tenants').select('name').eq('id', s.tenant_id || tenantId).maybeSingle();
+    clubName = c?.name || null;
+  }
+  const where = s.scope === 'global' ? 'tous les salons' : `le salon${clubName ? ` de ${clubName}` : ''}`;
+  const until = s.ends_at ? ` jusqu'au ${new Date(s.ends_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : (s.is_permanent ? ' de façon définitive' : '');
+  const map = {
+    warning: { title: '⚠️ Avertissement', message: `Un de tes messages a enfreint la charte${clubName ? ` du salon de ${clubName}` : ''}. Merci de respecter les règles.` },
+    mute: { title: '🔇 Lecture seule', message: `Tu ne peux plus publier dans ${where}${until}.` },
+    room_suspension: { title: '⏸️ Suspension', message: `Tu es suspendu de ${where}${until}.` },
+    room_ban: { title: '🚫 Exclusion', message: `Tu es exclu de ${where}${until}.` },
+    global_chat_ban: { title: '🚫 Exclusion des salons', message: `Tu es exclu de ${where}${until}.` },
+    account_review: { title: '🔎 Compte en cours d\'examen', message: 'Ton compte fait l\'objet d\'un examen par notre équipe.' },
+  };
+  const m = map[s.sanction_type];
+  if (!m) return;
+  await createNotification({
+    user_id: s.user_id, type: 'chat_sanction', title: m.title,
+    message: m.message + (s.reason_text ? ` Motif : ${s.reason_text}` : ''),
+    metadata: { sanctionId: s.id, caseId: s.case_id, type: s.sanction_type, endsAt: s.ends_at, isPermanent: s.is_permanent, canAppeal: true },
+  });
+}
+
+// Mes sanctions (actives + passées) — pour /me/chat-sanctions.
+async function listMySanctions(userId) {
+  const { data } = await supabase.from('chat_sanctions')
+    .select('id, tenant_id, case_id, sanction_type, scope, starts_at, ends_at, is_permanent, reason_text, revoked_at, created_at')
+    .eq('user_id', userId).order('created_at', { ascending: false }).limit(50);
+  const ids = [...new Set((data || []).map((s) => s.tenant_id).filter(Boolean))];
+  const { data: clubs } = ids.length ? await supabase.from('tenants').select('id, name, slug').in('id', ids) : { data: [] };
+  const byId = Object.fromEntries((clubs || []).map((c) => [c.id, c]));
+  const now = Date.now();
+  return (data || []).map((s) => ({
+    ...s,
+    label: SANCTION_LABEL[s.sanction_type] || s.sanction_type,
+    club: s.tenant_id ? byId[s.tenant_id] || null : null,
+    isActive: !s.revoked_at && (s.is_permanent || !s.ends_at || new Date(s.ends_at).getTime() > now),
+  }));
+}
+
+// Décisions sur un dossier (une sanction peut y être jointe).
 const CASE_DECISIONS = ['dismiss', 'hide_message', 'remove_message'];
 
-// Statue sur un dossier + applique l'action au message + audite.
-async function decideCase({ caseId, decision, reason = null, actorId, actorType }) {
+// Statue sur un dossier + applique l'action au message (+ sanction) + audite.
+async function decideCase({ caseId, decision, reason = null, actorId, actorType, sanction = null }) {
   if (!CASE_DECISIONS.includes(decision)) { const e = new Error('Décision invalide.'); e.code = 'BAD_DECISION'; throw e; }
   const { data: c } = await supabase.from('chat_moderation_cases').select('*').eq('id', caseId).maybeSingle();
   if (!c) { const e = new Error('Dossier introuvable.'); e.code = 'NOT_FOUND'; throw e; }
@@ -253,6 +364,20 @@ async function decideCase({ caseId, decision, reason = null, actorId, actorType 
     await supabase.from('fan_messages').update(patch).eq('id', c.message_id);
   }
 
+  // Sanction éventuelle (émise AVANT la clôture pour que l'audit la rattache).
+  let issued = null;
+  if (sanction?.type) {
+    issued = await issueSanction({
+      userId: c.target_user_id, tenantId: c.tenant_id, caseId,
+      type: sanction.type,
+      durationHours: sanction.durationHours ? Number(sanction.durationHours) : null,
+      isPermanent: !!sanction.isPermanent,
+      reasonCode: sanction.reasonCode || null,
+      reasonText: reason || sanction.reasonText || null,
+      issuedBy: actorId, actorType,
+    });
+  }
+
   const newStatus = decision === 'dismiss' ? 'dismissed' : 'resolved';
   await supabase.from('chat_moderation_cases').update({
     status: newStatus, decision, decision_reason: reason, resolved_at: now, resolved_by: actorId,
@@ -267,15 +392,17 @@ async function decideCase({ caseId, decision, reason = null, actorId, actorType 
   await audit({
     caseId, actorType, actorId, action: 'decision:' + decision,
     previousValue: { caseStatus: c.status, messageStatus: previousMsgStatus },
-    newValue: { caseStatus: newStatus, decision, reason },
+    newValue: { caseStatus: newStatus, decision, reason, sanctionId: issued?.id || null },
   });
 
-  return { id: caseId, status: newStatus, decision };
+  return { id: caseId, status: newStatus, decision, sanction: issued ? { id: issued.id, type: issued.sanction_type } : null };
 }
 
 module.exports = {
   CHARTER_VERSION, REPORT_REASONS, WRITE_BLOCKING, CASE_DECISIONS,
+  SANCTION_TYPES, GLOBAL_TYPES, PERMANENT_ALLOWED, SANCTION_LABEL, allowedSanctionsFor,
   getMembership, needsCharter, acceptCharter,
   getActiveSanction, createReport, countReports, getMessage,
   audit, upsertCaseForMessage, listCases, getCase, decideCase,
+  issueSanction, revokeSanction, listMySanctions,
 };

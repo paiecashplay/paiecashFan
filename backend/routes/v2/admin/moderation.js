@@ -50,22 +50,48 @@ router.get('/cases/:id', async (req, res) => {
   } catch (err) { return fail(res, err.message, 500); }
 });
 
-// POST /api/v2/admin/moderation/cases/:id/decision  { decision, reason }
+// POST /api/v2/admin/moderation/cases/:id/decision
+// { decision, reason, sanction?: { type, durationHours, isPermanent, reasonCode } }
 router.post('/cases/:id/decision', async (req, res) => {
   try {
     const result = await mod.decideCase({
       caseId: req.params.id,
       decision: req.body?.decision,
       reason: req.body?.reason || null,
+      sanction: req.body?.sanction || null,
       actorId: req.authUser.id,
       actorType: 'super_admin',
     });
     return ok(res, result);
   } catch (err) {
-    if (err.code === 'BAD_DECISION') return fail(res, err.message, 400);
+    if (['BAD_DECISION', 'BAD_TYPE', 'BAD_PERMANENT', 'DURATION_REQUIRED', 'NEEDS_HUMAN'].includes(err.code)) return fail(res, err.message, 400);
+    if (err.code === 'FORBIDDEN_TYPE') return fail(res, err.message, 403);
     if (err.code === 'NOT_FOUND') return fail(res, err.message, 404);
     if (err.code === 'ALREADY_CLOSED') return fail(res, err.message, 409);
     return fail(res, 'Décision impossible : ' + err.message, 500);
+  }
+});
+
+// GET /api/v2/admin/moderation/config — types de sanctions autorisés + motifs.
+router.get('/config', async (req, res) => {
+  return ok(res, {
+    charterVersion: mod.CHARTER_VERSION,
+    reportReasons: mod.REPORT_REASONS,
+    decisions: mod.CASE_DECISIONS,
+    sanctionTypes: mod.allowedSanctionsFor('super_admin'),
+    permanentAllowed: mod.PERMANENT_ALLOWED,
+    labels: mod.SANCTION_LABEL,
+  });
+});
+
+// POST /api/v2/admin/moderation/sanctions/:id/revoke — lève une sanction.
+router.post('/sanctions/:id/revoke', async (req, res) => {
+  try {
+    return ok(res, await mod.revokeSanction({ sanctionId: req.params.id, actorId: req.authUser.id, actorType: 'super_admin' }));
+  } catch (err) {
+    if (err.code === 'NOT_FOUND') return fail(res, err.message, 404);
+    if (err.code === 'ALREADY_REVOKED') return fail(res, err.message, 409);
+    return fail(res, 'Révocation impossible : ' + err.message, 500);
   }
 });
 

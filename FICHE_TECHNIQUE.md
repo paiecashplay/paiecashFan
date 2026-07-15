@@ -105,6 +105,21 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (al)** — **Modération Fan Club — Lot 3 (sanctions)**. `issueSanction`
+  / `revokeSanction` / `listMySanctions` ; `decideCase` accepte une sanction jointe.
+  Types : warning · mute · room_suspension · room_ban · global_chat_ban ·
+  account_review. 🔒 **Garde-fous** : `global_chat_ban`/`account_review` réservés au
+  **super_admin** (un club_admin ne bannit pas de tous les salons) ; **permanent
+  interdit à l'IA** (`NEEDS_HUMAN` + CHECK base) ; permanent limité à room_ban/
+  global_chat_ban ; **durée obligatoire** pour toute sanction bloquante non
+  définitive (sinon « permanent déguisé »). **Notification** au sanctionné (+ à la
+  levée) et **audit** (`sanction:*`, `sanction_revoked`). Routes : décision avec
+  `sanction`, `POST /admin/moderation/sanctions/:id/revoke`,
+  `POST /clubs/:slug/moderation/sanctions/:id/revoke` (borné au salon),
+  `GET /admin|clubs/.../moderation/config`, `GET /me/chat-sanctions`. Front :
+  sélecteur de sanction (type + durée 1h/24h/7j/30j + « définitive » si permis),
+  liste des sanctions **révocables** dans le dossier, `ActiveSanctionBanner` en
+  tête du salon. Tests **43/43**.
 - **2026-07-15 (ak)** — **Modération Fan Club — Lot 2 (back-office)**. Signalement
   → **dossier** (`upsertCaseForMessage`, dédup via index unique 1 dossier ouvert/
   message, `reports_count`, priorité `high` dès 3 signalements). **`middleware/
