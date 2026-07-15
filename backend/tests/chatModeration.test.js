@@ -353,6 +353,11 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
 
   // ══════════════ LOT 5 — IA de pré-classement ══════════════
   const ai = require('../services/moderation');
+  // On force le fournisseur heuristique : les tests doivent être déterministes,
+  // gratuits et hors-ligne. La qualité de Claude se mesure par le benchmark
+  // (docs/moderation-benchmark.md), pas par la suite de tests.
+  const realKey = process.env.ANTHROPIC_API_KEY;
+  delete process.env.ANTHROPIC_API_KEY;
   const setFlag = async (on) => {
     await supabase.from('feature_flags').upsert({ key: ai.FLAG_KEY, enabled: on }, { onConflict: 'key' });
     ai._resetFlagCache();
@@ -437,8 +442,15 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     const { data: after } = await supabase.from('chat_moderation_cases').select('priority').eq('id', again).single();
     assert.equal(after.priority, 'critical', 'un recalcul ne doit jamais rétrograder la priorité');
   });
+  await t('avec une clé configurée, Claude prend le relais', async () => {
+    process.env.ANTHROPIC_API_KEY = realKey || 'sk-ant-test';
+    assert.equal(ai.providerName(), 'claude');
+    assert.equal(ai.getProvider().name, 'claude');
+    if (realKey) process.env.ANTHROPIC_API_KEY = realKey; else delete process.env.ANTHROPIC_API_KEY;
+  });
 
   await setFlag(false);
+  if (realKey) process.env.ANTHROPIC_API_KEY = realKey;
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);
   process.exit(0);

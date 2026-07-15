@@ -109,8 +109,16 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
   Nouveau service `backend/services/moderation/` : `types.js` (contrat normalisé
   + garde-fous), `mockProvider.js` (heuristique, sans clé), `claudeProvider.js`
   (**`claude-opus-4-8`**, sortie JSON contrainte par `output_config.format`,
-  prompt calibré « la passion foot n'est pas de la modération », timeout 8 s,
-  cache du system prompt), `index.js` (flag + repli + orchestration).
+  prompt calibré « la passion foot n'est pas de la modération », timeout 25 s),
+  `index.js` (flag + repli + orchestration).
+  **Benchmark 3 modèles sur cas réels** (cf. `docs/moderation-benchmark.md`) :
+  sur 11 cas simples les 3 font 11/11, mais sur **13 cas subtils** Opus fait
+  **13/13**, Sonnet 5 **11/13** et Haiku 4.5 **10/13** — Haiku rate un racisme
+  explicite (« retourne cueillir des bananes »), et Sonnet+Haiku sanctionnent
+  le supporter qui **dénonce** un propos raciste. D'où le choix d'Opus.
+  ⚠️ **Pas de `cache_control`** : le prompt (~917 tokens) est sous le minimum
+  cachable d'Opus 4.8 (4096) — le marqueur serait ignoré silencieusement.
+  Coût réel mesuré : **~$6–9 / 1000 messages**.
   🔒 **Clé `ANTHROPIC_API_KEY` lue côté serveur uniquement**, jamais exposée
   (l'API ne renvoie que le NOM du fournisseur). **L'IA ne sanctionne pas** :
   elle ouvre un dossier `source='ai'` priorisé (`ai_risk_score`/`ai_categories`/

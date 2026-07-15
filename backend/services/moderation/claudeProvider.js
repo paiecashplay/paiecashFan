@@ -14,7 +14,11 @@ const { normalize, CATEGORIES, RISK_LEVELS, AI_ACTIONS } = require('./types');
 
 const MODEL = 'claude-opus-4-8';
 const MAX_CHARS = 2000;          // un message de salon est court ; on borne le coût
-const TIMEOUT_MS = 8000;         // au-delà, on ne bloque pas la modération
+// Généreux à dessein : l'analyse tourne APRÈS publication, sans await — personne
+// n'attend. Mesuré : ~3 s en moyenne, mais jusqu'à ~8 s sur les cas graves, qui
+// demandent le plus de réflexion. Un timeout serré ferait donc échouer en premier
+// les messages qu'il faut surtout ne pas rater.
+const TIMEOUT_MS = 25000;
 
 let client = null;
 function getClient() {
@@ -72,10 +76,12 @@ async function analyze({ content }) {
   const text = (content || '').slice(0, MAX_CHARS);
   if (!text.trim()) return normalize({ riskLevel: 'none' }, { provider: 'claude' });
 
+  // Pas de cache_control : le prompt système (~900 tokens) est sous le minimum
+  // cachable d'Opus 4.8 (4096). Le marqueur serait ignoré silencieusement.
   const response = await getClient().messages.create({
     model: MODEL,
     max_tokens: 1024,
-    system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
+    system: SYSTEM,
     output_config: { format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content: `Message à classer :\n<message>\n${text}\n</message>` }],
   }, { timeout: TIMEOUT_MS });
