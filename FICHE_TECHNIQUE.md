@@ -105,6 +105,14 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (ao)** — **Fix chat : auto-modération + signalement tactile**.
+  (1) Le menu « … » proposait « Masquer/Bloquer cet utilisateur » **sur son
+  propre message** → nouveau prop `isOwn` : sur son message, uniquement
+  « Copier ». (2) 🐛 **Le signalement était inaccessible sur mobile** : le
+  bouton était en `opacity-0` révélé au `group-hover`, or il n'y a pas de survol
+  au doigt → invisible. Désormais `opacity-60 lg:opacity-0 lg:group-hover:100`
+  (visible sur tactile, révélé au survol sur desktop). (3) **Bouton 🚩 Signaler
+  dédié**, à côté du « … » : action directe, plus enfouie dans un sous-menu.
 - **2026-07-15 (an)** — **Modération Fan Club — Lot 5 (IA de pré-classement)**.
   Nouveau service `backend/services/moderation/` : `types.js` (contrat normalisé
   + garde-fous), `mockProvider.js` (heuristique, sans clé), `claudeProvider.js`

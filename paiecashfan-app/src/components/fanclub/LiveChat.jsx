@@ -101,6 +101,7 @@ export function LiveChat({
                   {isClubMode && (
                     <MessageReportMenu
                       message={msg}
+                      isOwn={msg.authorId === currentUserId}
                       canReport={loggedIn && msg.authorId !== currentUserId}
                       onReport={onReport}
                       onHideUser={onHideUser}
