@@ -127,6 +127,99 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     assert.ok(error, 'La base doit refuser une sanction permanente sans issued_by');
   });
 
+  // ══════════════ LOT 2 — Back-office de traitement ══════════════
+  const { requireClubModerator } = require('../middleware/clubModerator');
+  const runMw = (authUser, tenant) => {
+    let status = null, nexted = false;
+    const req = { authUser, tenant };
+    const res = { status(s) { status = s; return this; }, json() { return this; } };
+    requireClubModerator(req, res, () => { nexted = true; });
+    return { nexted, status, moderatorType: req.moderatorType };
+  };
+  const { data: club2 } = await supabase.from('tenants').select('id').eq('type', 'club').neq('id', club.id).limit(1).maybeSingle();
+
+  console.log('\nAutorisation de modération');
+  await t('super_admin peut modérer tous les salons', async () => {
+    const r = runMw({ id: 'x', role: 'super_admin' }, { id: club.id });
+    assert.equal(r.nexted, true); assert.equal(r.moderatorType, 'super_admin');
+  });
+  await t('club_admin peut modérer SON salon', async () => {
+    const r = runMw({ id: 'x', role: 'club_admin', club_id: club.id }, { id: club.id });
+    assert.equal(r.nexted, true); assert.equal(r.moderatorType, 'club_admin');
+  });
+  await t('club_admin NE peut PAS modérer un autre salon', async () => {
+    if (!club2) return;
+    const r = runMw({ id: 'x', role: 'club_admin', club_id: club2.id }, { id: club.id });
+    assert.equal(r.nexted, false); assert.equal(r.status, 403);
+  });
+  await t('un simple fan ne peut pas modérer', async () => {
+    const r = runMw({ id: 'x', role: 'fan' }, { id: club.id });
+    assert.equal(r.nexted, false); assert.equal(r.status, 403);
+  });
+  await t('non authentifié → 401', async () => {
+    const r = runMw(null, { id: club.id });
+    assert.equal(r.nexted, false); assert.equal(r.status, 401);
+  });
+
+  console.log('\nFile de modération');
+  const { data: msg2 } = await supabase.from('fan_messages')
+    .insert({ tenant_id: club.id, author_id: other?.id || fan.id, content: '[test] message de modération' })
+    .select('id, author_id').single();
+
+  let caseId;
+  await t('un signalement crée un dossier', async () => {
+    const r = await mod.createReport({ messageId: msg2.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg2.author_id, reason: 'insult' });
+    assert.ok(r.caseId, 'un caseId doit être créé');
+    caseId = r.caseId;
+  });
+  await t('un 2e signalement n\'ouvre PAS un 2e dossier (dédup + compteur)', async () => {
+    if (!other) return;
+    await mod.createReport({ messageId: msg2.id, tenantId: club.id, reporterUserId: other.id, reportedUserId: msg2.author_id, reason: 'spam' });
+    const { data: cases } = await supabase.from('chat_moderation_cases').select('id, reports_count').eq('message_id', msg2.id).in('status', ['open', 'in_review']);
+    assert.equal(cases.length, 1, 'un seul dossier ouvert par message');
+    assert.equal(cases[0].reports_count, 2);
+  });
+  await t('le détail du dossier n\'expose JAMAIS le signalant', async () => {
+    const c = await mod.getCase(caseId);
+    assert.ok(c.reports.length >= 1);
+    c.reports.forEach((r) => assert.equal(r.reporter_user_id, undefined, 'reporter_user_id ne doit pas être renvoyé'));
+  });
+  await t('le dossier fournit le contexte du salon', async () => {
+    const c = await mod.getCase(caseId);
+    assert.ok(Array.isArray(c.context));
+    assert.ok(c.context.some((m) => m.isTarget), 'le message ciblé doit être marqué dans le contexte');
+  });
+
+  console.log('\nDécisions');
+  await t('décision invalide refusée', async () => {
+    await assert.rejects(() => mod.decideCase({ caseId, decision: 'nuke', actorId: fan.id, actorType: 'super_admin' }), (e) => e.code === 'BAD_DECISION');
+  });
+  await t('« masquer » retire le message du feed (sans le supprimer)', async () => {
+    await mod.decideCase({ caseId, decision: 'hide_message', reason: 'test', actorId: fan.id, actorType: 'super_admin' });
+    const feed = await require('../db/fanFeed').getFeed(club.id, fan.id);
+    assert.equal(feed.messages.some((m) => m.id === msg2.id), false);
+    const { data: m } = await supabase.from('fan_messages').select('moderation_status').eq('id', msg2.id).maybeSingle();
+    assert.equal(m.moderation_status, 'hidden');   // toujours en base
+  });
+  await t('toute décision crée un log d\'audit', async () => {
+    const { data: logs } = await supabase.from('chat_moderation_audit_logs').select('action, actor_type').eq('case_id', caseId);
+    assert.ok(logs.some((l) => l.action === 'decision:hide_message'), 'audit de la décision manquant');
+    assert.ok(logs.some((l) => l.action === 'case_opened'), 'audit d\'ouverture manquant');
+  });
+  await t('un dossier clos ne peut pas être re-statué', async () => {
+    await assert.rejects(() => mod.decideCase({ caseId, decision: 'dismiss', actorId: fan.id, actorType: 'super_admin' }), (e) => e.code === 'ALREADY_CLOSED');
+  });
+  await t('les signalements liés passent en « traités »', async () => {
+    const { data: reps } = await supabase.from('chat_reports').select('status').eq('message_id', msg2.id);
+    assert.ok(reps.every((r) => r.status === 'reviewed'));
+  });
+  await t('la file du club ne contient que SES dossiers', async () => {
+    const cases = await mod.listCases({ tenantId: club.id });
+    assert.ok(cases.every((c) => c.tenant_id === club.id));
+  });
+
+  await supabase.from('chat_reports').delete().eq('message_id', msg2.id);
+  await supabase.from('chat_moderation_cases').delete().eq('message_id', msg2.id);
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);
   process.exit(0);

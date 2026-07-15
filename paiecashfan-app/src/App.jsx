@@ -21,6 +21,7 @@ import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminTombola } from './pages/admin/AdminTombola';
 import { AdminBingo } from './pages/admin/AdminBingo';
+import { AdminModeration } from './pages/admin/AdminModeration';
 import { BingoPlay } from './pages/BingoPlay';
 import { SportBingo } from './pages/SportBingo';
 import { BingoResults } from './pages/BingoResults';
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="orders"              element={<AdminOrders />} />
           <Route path="tombola"             element={<AdminTombola />} />
           <Route path="bingo"               element={<AdminBingo />} />
+          <Route path="moderation"          element={<AdminModeration />} />
           <Route path="settings"            element={<AdminSettings />} />
         </Route>
 

@@ -9,6 +9,7 @@ const { requireAuth, optionalAuth } = require('../../../middleware/auth');
 const fanFeed = require('../../../db/fanFeed');
 const mod = require('../../../db/chatModeration');
 const favorites = require('../../../db/favorites');
+const { requireClubModerator } = require('../../../middleware/clubModerator');
 
 const router = express.Router();
 
@@ -166,6 +167,52 @@ router.post('/:slug/fan-feed/messages/:messageId/report', requireAuth, withTenan
     if (err.code === 'ALREADY_REPORTED') return fail(res, err.message, 409);
     if (err.code === 'BAD_REASON') return fail(res, err.message, 400);
     return fail(res, 'Signalement impossible : ' + err.message, 500);
+  }
+});
+
+// ── Modération côté club_admin (borné à SON salon) ───────────
+// GET /api/v2/clubs/:slug/moderation/cases?status=&priority=
+router.get('/:slug/moderation/cases', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const cases = await mod.listCases({
+      tenantId: req.tenant.id,                    // ← toujours borné au salon
+      status: req.query.status || null,
+      priority: req.query.priority || null,
+    });
+    return ok(res, { cases, moderatorType: req.moderatorType });
+  } catch (err) { return fail(res, 'File de modération : ' + err.message, 500); }
+});
+
+// GET /api/v2/clubs/:slug/moderation/cases/:id — détail (vérif d'appartenance).
+router.get('/:slug/moderation/cases/:id', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const c = await mod.getCase(req.params.id);
+    if (!c) return fail(res, 'Dossier introuvable.', 404);
+    if (c.tenant_id !== req.tenant.id) return fail(res, 'Ce dossier ne concerne pas ton salon.', 403);
+    return ok(res, { case: c });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// POST /api/v2/clubs/:slug/moderation/cases/:id/decision  { decision, reason }
+router.post('/:slug/moderation/cases/:id/decision', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    // Le dossier doit appartenir au salon du club_admin.
+    const c = await mod.getCase(req.params.id);
+    if (!c) return fail(res, 'Dossier introuvable.', 404);
+    if (c.tenant_id !== req.tenant.id) return fail(res, 'Ce dossier ne concerne pas ton salon.', 403);
+
+    const result = await mod.decideCase({
+      caseId: req.params.id,
+      decision: req.body?.decision,
+      reason: req.body?.reason || null,
+      actorId: req.authUser.id,
+      actorType: req.moderatorType,               // club_admin | super_admin
+    });
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_DECISION') return fail(res, err.message, 400);
+    if (err.code === 'ALREADY_CLOSED') return fail(res, err.message, 409);
+    return fail(res, 'Décision impossible : ' + err.message, 500);
   }
 });
 

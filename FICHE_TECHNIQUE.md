@@ -105,6 +105,21 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (ak)** — **Modération Fan Club — Lot 2 (back-office)**. Signalement
+  → **dossier** (`upsertCaseForMessage`, dédup via index unique 1 dossier ouvert/
+  message, `reports_count`, priorité `high` dès 3 signalements). **`middleware/
+  clubModerator.js`** : `requireClubModerator` — super_admin partout, **club_admin
+  borné à son `tenant_id`** (`requireRole` ne suffisait pas : rôle global). Routes
+  super_admin `/api/v2/admin/moderation/{cases,cases/:id,cases/:id/decision,stats}`
+  et club_admin `/api/v2/clubs/:slug/moderation/*` (double vérif d'appartenance du
+  dossier). Décisions : `dismiss` / `hide_message` / `remove_message` (**jamais de
+  suppression physique** : `hidden`/`removed` + `deleted_at`), signalements liés →
+  `reviewed`, **audit systématique** (`case_opened`, `decision:*`). Détail dossier :
+  message, **contexte du salon**, signalements **anonymisés** (`reporter_user_id`
+  jamais sélectionné), historique + sanctions du supporter. Front :
+  `components/moderation/ModerationQueue` (stats, filtres, file, modale détail)
+  réutilisé par **`/admin/moderation`** (tous clubs) et l'onglet **Modération de
+  `/mon-club/bo`** (son salon). Tests **31/31**.
 - **2026-07-15 (aj)** — **Modération Fan Club — Lot 1 (charte + signalement)**.
   Migration `chat-moderation.sql` : `fan_messages` + `moderation_status`/
   `moderation_case_id`/`deleted_at`/`edited_at` (**jamais de suppression
