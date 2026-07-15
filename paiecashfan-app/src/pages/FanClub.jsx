@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import {  Video, Users, Radio, LogIn} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/lib/api';
 
 import { Container } from '@/components/ui/Container';
 import { ClubFanCommunity } from '@/components/club/ClubFanCommunity';
 import { LiveChat } from '@/components/fanclub/LiveChat';
+import { CharterEntryModal } from '@/components/fanclub/CharterEntryModal';
+import { ReportMessageModal } from '@/components/fanclub/ReportMessageModal';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
@@ -47,6 +51,56 @@ export function FanClub() {
   } = useFanFeed(slug, mode);
   
   const [newPost, setNewPost] = useState('');
+
+  // ── Modération du salon (charte + signalement) ──────────────
+  const [access, setAccess] = useState(null);      // état d'accès (favori ? charte ? sanction ?)
+  const [charterOpen, setCharterOpen] = useState(false);
+  const [charterBusy, setCharterBusy] = useState(false);
+  const [reportTarget, setReportTarget] = useState(null);
+  const [hiddenUsers, setHiddenUsers] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('pcf:hiddenUsers') || '[]')); } catch { return new Set(); }
+  });
+
+  const loadAccess = useCallback(() => {
+    if (mode !== 'club' || !slug) return;
+    apiFetch(`/api/v2/clubs/${slug}/chat-access`)
+      .then((j) => setAccess(j.data || null))
+      .catch(() => setAccess(null));
+  }, [slug, mode]);
+  useEffect(() => { loadAccess(); }, [loadAccess, user]);
+
+  async function acceptCharter() {
+    setCharterBusy(true);
+    try { await apiFetch(`/api/v2/clubs/${slug}/chat-charter/accept`, { method: 'POST' }); setCharterOpen(false); loadAccess(); }
+    catch { /* silencieux */ }
+    setCharterBusy(false);
+  }
+
+  // Envoi de message : la charte doit être acceptée d'abord.
+  function handleSendMessage(content) {
+    if (!user) return null;
+    if (access?.activeSanction) return null;
+    if (access?.needsCharter) { setCharterOpen(true); return null; }
+    return sendMessage(content);
+  }
+
+  async function submitReport({ reason, comment }) {
+    const j = await apiFetch(`/api/v2/clubs/${slug}/fan-feed/messages/${reportTarget.id}/report`, {
+      method: 'POST', body: JSON.stringify({ reason, comment }),
+    });
+    return j;
+  }
+
+  function hideUser(userId) {
+    setHiddenUsers((prev) => {
+      const next = new Set(prev); next.add(userId);
+      try { localStorage.setItem('pcf:hiddenUsers', JSON.stringify([...next])); } catch { /* ignore */ }
+      return next;
+    });
+  }
+
+  // Messages filtrés des utilisateurs masqués localement par le fan.
+  const visibleMessages = (messages || []).filter((m) => !hiddenUsers.has(m.authorId));
 
   const [liveReactions, setLiveReactions] = useState([]);
 
@@ -198,12 +252,17 @@ export function FanClub() {
           <LiveChat
             mode={mode}
             club={club}
-            messages={messages}
+            messages={visibleMessages}
             loading={feedLoading}
             error={feedError}
             isEmpty={isChatEmpty}
             onRetry={reloadFeed}
-            onSendMessage={sendMessage}
+            onSendMessage={handleSendMessage}
+            access={access}
+            currentUserId={user?.id}
+            onReport={(m) => setReportTarget(m)}
+            onHideUser={hideUser}
+            onOpenCharter={() => setCharterOpen(true)}
           />
         </div>
 
@@ -251,6 +310,28 @@ export function FanClub() {
           />
         </div>
       </Container>
+
+      {/* ── Modération : charte d'entrée + signalement ────────── */}
+      <AnimatePresence>
+        {charterOpen && access && (
+          <CharterEntryModal
+            access={access}
+            busy={charterBusy}
+            onAccept={acceptCharter}
+            onClose={() => setCharterOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {reportTarget && (
+          <ReportMessageModal
+            message={reportTarget}
+            onSubmit={submitReport}
+            onClose={() => setReportTarget(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

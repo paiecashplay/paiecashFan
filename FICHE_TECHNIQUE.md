@@ -105,6 +105,23 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (aj)** — **Modération Fan Club — Lot 1 (charte + signalement)**.
+  Migration `chat-moderation.sql` : `fan_messages` + `moderation_status`/
+  `moderation_case_id`/`deleted_at`/`edited_at` (**jamais de suppression
+  physique**) et 5 tables (`chat_room_memberships`, `chat_reports`,
+  `chat_moderation_cases`, `chat_sanctions`, `chat_moderation_audit_logs`), RLS
+  deny-all. 🔒 **Garde-fous en base** : `CHECK (NOT is_permanent OR issued_by IS
+  NOT NULL)` → **l'IA ne peut jamais bannir définitivement** ; `UNIQUE(message_id,
+  reporter_user_id)` → 1 signalement/user/message ; index unique 1 dossier ouvert
+  par message. **`getFeed` filtre `published` + `deleted_at IS NULL`** (un message
+  masqué n'est jamais servi). `db/chatModeration.js` (charte versionnée, sanctions
+  actives, reports). Endpoints `GET /clubs/:slug/chat-access`,
+  `POST /clubs/:slug/chat-charter/accept`,
+  `POST /clubs/:slug/fan-feed/messages/:id/report` ; **`POST messages` durci**
+  (sanction → 403, charte → 403 : l'API ne contourne pas la modération). Front :
+  `CharterEntryModal` (renforcée si club non favori), `MessageReportMenu`,
+  `ReportMessageModal`, saisie contextuelle (connexion/charte/sanction), masquer
+  un utilisateur = préférence locale. Tests `chatModeration.test.js` **16/16**.
 - **2026-07-15 (ai)** — **Clubs favoris (⭐) + notifications ciblées (Phase B)**.
   Nouvelle table **`fan_favorite_clubs`** (multi-favoris + `is_primary` = club
   principal ; RLS deny-all ; migration `fan-favorite-clubs.sql`). ⚠️ **N'utilise

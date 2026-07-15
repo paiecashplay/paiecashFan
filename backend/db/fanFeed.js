@@ -37,8 +37,11 @@ async function getFeed(tenantId, currentUserId) {
   const [{ data: posts }, { data: messages }] = await Promise.all([
     supabase.from('fan_posts').select('id, author_id, content, created_at')
       .eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(100),
+    // Modération : on ne sert QUE les messages publiés et non supprimés.
+    // Le filtrage est fait ici (serveur) — jamais côté client.
     supabase.from('fan_messages').select('id, author_id, content, created_at')
-      .eq('tenant_id', tenantId).order('created_at', { ascending: true }).limit(100),
+      .eq('tenant_id', tenantId).eq('moderation_status', 'published').is('deleted_at', null)
+      .order('created_at', { ascending: true }).limit(100),
   ]);
 
   const postIds = (posts || []).map((p) => p.id);

@@ -7,6 +7,8 @@
 const express = require('express');
 const { requireAuth, optionalAuth } = require('../../../middleware/auth');
 const fanFeed = require('../../../db/fanFeed');
+const mod = require('../../../db/chatModeration');
+const favorites = require('../../../db/favorites');
 
 const router = express.Router();
 
@@ -72,16 +74,105 @@ router.post('/:slug/fan-feed/posts/:postId/like', requireAuth, withTenant, async
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/messages  { content }
+// Garde serveur : charte acceptée + aucune sanction bloquante.
 router.post('/:slug/fan-feed/messages', requireAuth, withTenant, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
+    // 1. Sanction active ? (l'accès direct à l'API ne contourne pas la modération)
+    const sanction = await mod.getActiveSanction(req.authUser.id, req.tenant.id);
+    if (sanction) return fail(res, sanctionMessage(sanction), 403, { sanction });
+
+    // 2. Charte de la version courante acceptée ?
+    if (await mod.needsCharter(req.tenant.id, req.authUser.id)) {
+      return fail(res, 'Tu dois accepter la charte du salon avant de publier.', 403, { needsCharter: true, charterVersion: mod.CHARTER_VERSION });
+    }
+
     const message = await fanFeed.createMessage(req.tenant.id, req.authUser.id, content);
-    return ok(res, { message });
+    return ok(res, { message, moderation: { status: 'published', reason: null, canAppeal: false } });
   } catch (err) {
     return fail(res, 'Envoi impossible : ' + err.message, 500);
   }
 });
+
+// ── Modération : accès au salon, charte, signalement ─────────
+
+// GET /api/v2/clubs/:slug/chat-access — état d'accès du visiteur au salon.
+// Public (optionalAuth) : dit au front quoi afficher (charte renforcée, sanction…).
+router.get('/:slug/chat-access', optionalAuth, withTenant, async (req, res) => {
+  try {
+    const clubName = req.tenant.name;
+    const userId = req.authUser?.id || null;
+    if (!userId) {
+      return ok(res, {
+        canRead: true, canWrite: false, isLoggedIn: false, clubName,
+        isFavorite: false, favoriteClubName: null,
+        needsCharter: false, charterVersion: mod.CHARTER_VERSION, activeSanction: null,
+      });
+    }
+
+    const [favs, needsCharter, sanction] = await Promise.all([
+      favorites.listFavorites(userId),
+      mod.needsCharter(req.tenant.id, userId),
+      mod.getActiveSanction(userId, req.tenant.id),
+    ]);
+    const isFavorite = favs.some((f) => f.club.id === req.tenant.id);
+    const primary = favs.find((f) => f.isPrimary);
+
+    return ok(res, {
+      canRead: true,
+      canWrite: !sanction,                 // la charte est un préalable géré via needsCharter
+      isLoggedIn: true,
+      clubName,
+      isFavorite,
+      favoriteClubName: primary?.club?.name || null,
+      favoriteClubSlug: primary?.club?.slug || null,
+      needsCharter,
+      charterVersion: mod.CHARTER_VERSION,
+      activeSanction: sanction,
+    });
+  } catch (err) { return fail(res, 'Accès au salon : ' + err.message, 500); }
+});
+
+// POST /api/v2/clubs/:slug/chat-charter/accept — enregistre l'acceptation.
+router.post('/:slug/chat-charter/accept', requireAuth, withTenant, async (req, res) => {
+  try { return ok(res, await mod.acceptCharter(req.tenant.id, req.authUser.id)); }
+  catch (err) { return fail(res, 'Acceptation impossible : ' + err.message, 500); }
+});
+
+// POST /api/v2/clubs/:slug/fan-feed/messages/:messageId/report  { reason, comment? }
+// Un seul signalement par utilisateur/message. Le signalant reste anonyme.
+router.post('/:slug/fan-feed/messages/:messageId/report', requireAuth, withTenant, async (req, res) => {
+  try {
+    const message = await mod.getMessage(req.params.messageId);
+    if (!message || message.tenant_id !== req.tenant.id) return fail(res, 'Message introuvable.', 404);
+    if (message.author_id === req.authUser.id) return fail(res, 'Tu ne peux pas signaler ton propre message.', 400);
+
+    const report = await mod.createReport({
+      messageId: message.id, tenantId: req.tenant.id,
+      reporterUserId: req.authUser.id, reportedUserId: message.author_id,
+      reason: clean(req.body?.reason), comment: clean(req.body?.comment) || null,
+    });
+    // (Lot 2 : ce signalement alimentera la file de modération.)
+    return ok(res, { reported: true, reportId: report.id });
+  } catch (err) {
+    if (err.code === 'ALREADY_REPORTED') return fail(res, err.message, 409);
+    if (err.code === 'BAD_REASON') return fail(res, err.message, 400);
+    return fail(res, 'Signalement impossible : ' + err.message, 500);
+  }
+});
+
+// Message joueur selon la sanction active.
+function sanctionMessage(s) {
+  const until = s.endsAt ? ` jusqu'au ${new Date(s.endsAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : '';
+  switch (s.type) {
+    case 'mute': return `Tu es temporairement en lecture seule${until}.`;
+    case 'room_suspension': return `Tu es suspendu de ce salon${until}.`;
+    case 'room_ban': return 'Tu es exclu de ce salon.';
+    case 'global_chat_ban': return 'Tu es exclu de tous les salons.';
+    default: return 'Tu ne peux pas publier pour le moment.';
+  }
+}
 
 module.exports = router;

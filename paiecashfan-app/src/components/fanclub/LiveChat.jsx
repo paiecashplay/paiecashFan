@@ -1,11 +1,15 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Send,
   MessageCircle,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Ban,
+  ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { MessageReportMenu } from './MessageReportMenu';
 
 export function LiveChat({
   mode = 'club',
@@ -15,11 +19,22 @@ export function LiveChat({
   error = null,
   isEmpty = false,
   onRetry,
-  onSendMessage
+  onSendMessage,
+  // Modération (mode club)
+  access = null,
+  currentUserId = null,
+  onReport,
+  onHideUser,
+  onOpenCharter
 }) {
   const [message, setMessage] = useState('');
 
   const isClubMode = mode === 'club';
+  const loggedIn = access ? access.isLoggedIn : !!currentUserId;
+  const sanction = access?.activeSanction || null;
+  const needsCharter = !!access?.needsCharter;
+  // On ne peut écrire que connecté, sans sanction bloquante.
+  const canWrite = !isClubMode || (loggedIn && !sanction);
 
   function handleSend() {
     const cleanMessage = message.trim();
@@ -74,16 +89,25 @@ export function LiveChat({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}
-              className="rounded-2xl bg-ink-900/60 p-4"
+              className="group rounded-2xl bg-ink-900/60 p-4"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="min-w-0 truncate text-sm font-bold text-bone-100">
                   {msg.author}
                 </span>
 
-                <span className="shrink-0 text-[10px] text-bone-500">
-                  {msg.createdAt}
-                </span>
+                <div className="flex shrink-0 items-center gap-1">
+                  <span className="text-[10px] text-bone-500">{msg.createdAt}</span>
+                  {isClubMode && (
+                    <MessageReportMenu
+                      message={msg}
+                      canReport={loggedIn && msg.authorId !== currentUserId}
+                      onReport={onReport}
+                      onHideUser={onHideUser}
+                      onBlockUser={onHideUser}
+                    />
+                  )}
+                </div>
               </div>
 
               <p className="mt-2 break-words text-sm text-bone-300">
@@ -94,35 +118,59 @@ export function LiveChat({
       </div>
 
       <div className="border-t border-white/10 p-4">
-        <div className="flex gap-2 sm:gap-3">
-          <input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSend();
-              }
-            }}
-            disabled={loading || Boolean(error)}
-            placeholder={
-              isClubMode
-                ? 'Écris dans le chat du Fan Club...'
-                : 'Écris à tes amis...'
-            }
-            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-bone-100 outline-none placeholder:text-bone-500 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={!message.trim() || loading || Boolean(error)}
-            aria-label="Envoyer le message"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ background: club.primaryColor }}
-          >
-            <Send size={18} />
+        {/* Sanction active → lecture seule */}
+        {isClubMode && sanction ? (
+          <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-300">
+            <Ban size={14} className="mt-0.5 shrink-0" />
+            <span>
+              {sanction.type === 'mute' && 'Tu es temporairement en lecture seule.'}
+              {sanction.type === 'room_suspension' && 'Tu es suspendu de ce salon.'}
+              {sanction.type === 'room_ban' && 'Tu es exclu de ce salon.'}
+              {sanction.type === 'global_chat_ban' && 'Tu es exclu de tous les salons.'}
+              {sanction.endsAt && !sanction.isPermanent && ` Jusqu'au ${new Date(sanction.endsAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}.`}
+            </span>
+          </div>
+        ) : isClubMode && !loggedIn ? (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+            <span className="text-xs text-bone-400">Connecte-toi pour participer au salon.</span>
+            <Link to="/login" className="shrink-0 rounded-lg bg-emerald-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-400">Se connecter</Link>
+          </div>
+        ) : isClubMode && needsCharter ? (
+          <button onClick={onOpenCharter} className="flex w-full items-center justify-between gap-3 rounded-xl border border-gold-400/30 bg-gold-400/10 px-4 py-3 text-left transition hover:bg-gold-400/15">
+            <span className="inline-flex items-center gap-2 text-xs text-gold-300"><ShieldAlert size={14} /> Accepte la charte du salon pour publier.</span>
+            <span className="shrink-0 text-[11px] font-black uppercase tracking-wider text-gold-400">Lire la charte</span>
           </button>
-        </div>
+        ) : (
+          <div className="flex gap-2 sm:gap-3">
+            <input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSend();
+                }
+              }}
+              disabled={loading || Boolean(error) || !canWrite}
+              placeholder={
+                isClubMode
+                  ? 'Écris dans le chat du Fan Club...'
+                  : 'Écris à tes amis...'
+              }
+              className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-bone-100 outline-none placeholder:text-bone-500 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={!message.trim() || loading || Boolean(error) || !canWrite}
+              aria-label="Envoyer le message"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40"
+              style={{ background: club.primaryColor }}
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
