@@ -56,6 +56,7 @@ export function FanClub() {
   const [access, setAccess] = useState(null);      // état d'accès (favori ? charte ? sanction ?)
   const [charterOpen, setCharterOpen] = useState(false);
   const [charterBusy, setCharterBusy] = useState(false);
+  const [charterDismissed, setCharterDismissed] = useState(false);   // « Plus tard » → ne pas ré-ouvrir
   const [reportTarget, setReportTarget] = useState(null);
   const [hiddenUsers, setHiddenUsers] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem('pcf:hiddenUsers') || '[]')); } catch { return new Set(); }
@@ -68,6 +69,16 @@ export function FanClub() {
       .catch(() => setAccess(null));
   }, [slug, mode]);
   useEffect(() => { loadAccess(); }, [loadAccess, user]);
+
+  // À l'ENTRÉE dans le salon : si la charte (version courante) n'est pas signée,
+  // on l'affiche — version renforcée si le club n'est pas dans les favoris.
+  useEffect(() => {
+    if (mode !== 'club' || charterDismissed) return;
+    if (access?.isLoggedIn && access.needsCharter) setCharterOpen(true);
+  }, [access, mode, charterDismissed]);
+
+  // Changement de salon → on réarme la charte.
+  useEffect(() => { setCharterDismissed(false); setCharterOpen(false); }, [slug]);
 
   async function acceptCharter() {
     setCharterBusy(true);
@@ -318,7 +329,7 @@ export function FanClub() {
             access={access}
             busy={charterBusy}
             onAccept={acceptCharter}
-            onClose={() => setCharterOpen(false)}
+            onClose={() => { setCharterOpen(false); setCharterDismissed(true); }}
           />
         )}
       </AnimatePresence>
