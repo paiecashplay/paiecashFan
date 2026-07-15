@@ -84,6 +84,25 @@ router.get('/config', async (req, res) => {
   });
 });
 
+// GET /api/v2/admin/moderation/users/:userId — profil de modération complet.
+router.get('/users/:userId', async (req, res) => {
+  try { return ok(res, await mod.getUserModerationHistory(req.params.userId)); }
+  catch (err) { return fail(res, 'Historique : ' + err.message, 500); }
+});
+
+// GET /api/v2/admin/moderation/audit?caseId=&actorId=&limit= — journal d'audit.
+router.get('/audit', async (req, res) => {
+  try {
+    const logs = await mod.listAuditLogs({
+      caseId: req.query.caseId || null,
+      tenantId: req.query.tenantId || null,
+      actorId: req.query.actorId || null,
+      limit: Math.min(200, parseInt(req.query.limit, 10) || 100),
+    });
+    return ok(res, { logs });
+  } catch (err) { return fail(res, 'Journal : ' + err.message, 500); }
+});
+
 // POST /api/v2/admin/moderation/sanctions/:id/revoke — lève une sanction.
 router.post('/sanctions/:id/revoke', async (req, res) => {
   try {

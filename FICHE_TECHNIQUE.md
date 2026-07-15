@@ -105,6 +105,18 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (am)** — **Modération Fan Club — Lot 4 (historique & audit)** + **UX
+  décision**. `getUserModerationHistory` (profil : stats messages/modérés/dossiers/
+  sanctions, **borné au salon pour un club_admin**, sanctions globales incluses) et
+  `listAuditLogs` (filtres case/tenant/acteur, nom d'acteur résolu, « Système »/« IA »
+  si automatique). Routes `GET /admin/moderation/users/:id|/audit` et
+  `GET /clubs/:slug/moderation/users/:id|/audit` (bornées). Front :
+  `UserHistoryModal` (profil + sanctions révocables), onglet **Journal d'audit**.
+  **Fix UX** : la décision est passée d'un choix implicite (3 boutons) à un flux
+  clair — *message au supporter* → *action sur le message* → *sanction* →
+  **récapitulatif** + **un bouton unique « Appliquer et notifier le supporter »**.
+  Fix « Invalid Date » sur message supprimé. Tests **48/48** (+ nettoyage sans
+  dossiers orphelins).
 - **2026-07-15 (al)** — **Modération Fan Club — Lot 3 (sanctions)**. `issueSanction`
   / `revokeSanction` / `listMySanctions` ; `decideCase` accepte une sanction jointe.
   Types : warning · mute · room_suspension · room_ban · global_chat_ban ·

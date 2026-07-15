@@ -230,6 +230,27 @@ router.get('/:slug/moderation/config', requireAuth, withTenant, requireClubModer
   });
 });
 
+// GET /api/v2/clubs/:slug/moderation/users/:userId — profil, borné au salon.
+router.get('/:slug/moderation/users/:userId', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    // club_admin : on ne montre QUE son salon (+ sanctions globales qui l'impactent).
+    const scope = req.moderatorType === 'super_admin' ? {} : { tenantId: req.tenant.id };
+    return ok(res, await mod.getUserModerationHistory(req.params.userId, scope));
+  } catch (err) { return fail(res, 'Historique : ' + err.message, 500); }
+});
+
+// GET /api/v2/clubs/:slug/moderation/audit — journal d'audit du salon.
+router.get('/:slug/moderation/audit', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const logs = await mod.listAuditLogs({
+      tenantId: req.tenant.id,                   // ← toujours borné au salon
+      caseId: req.query.caseId || null,
+      limit: Math.min(200, parseInt(req.query.limit, 10) || 100),
+    });
+    return ok(res, { logs });
+  } catch (err) { return fail(res, 'Journal : ' + err.message, 500); }
+});
+
 // POST /api/v2/clubs/:slug/moderation/sanctions/:id/revoke — lève une sanction du salon.
 router.post('/:slug/moderation/sanctions/:id/revoke', requireAuth, withTenant, requireClubModerator, async (req, res) => {
   try {

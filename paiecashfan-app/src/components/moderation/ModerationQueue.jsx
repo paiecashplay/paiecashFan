@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History } from 'lucide-react';
+import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History, Send } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { UserHistoryModal } from './UserHistoryModal';
 
 // File de modération réutilisable :
 //  - super_admin  → basePath = '/api/v2/admin/moderation'   (tous les salons)
@@ -20,18 +21,27 @@ const PRIORITY_STYLE = {
   normal: 'text-bone-300 bg-white/5 border-white/10',
   low: 'text-bone-500 bg-white/5 border-white/10',
 };
+const DECISION_LABEL = {
+  dismiss: 'Dossier classé', hide_message: 'Message masqué', remove_message: 'Message retiré',
+};
 const REASON_LABEL = {
   insult: 'Insulte', harassment: 'Harcèlement', hate: 'Haine', racism: 'Racisme',
   threat: 'Menace', violence: 'Violence', sexual_content: 'Contenu sexuel',
   personal_data: 'Données perso', spam: 'Spam', provocation: 'Provocation', other: 'Autre',
 };
-const fmt = (s) => { try { return new Date(s).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }); } catch { return s; } };
+const fmt = (s) => {
+  if (!s) return '—';
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? '—' : d.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+};
 
 export function ModerationQueue({ basePath, title = 'Modération', subtitle, showClub = true }) {
   const [cases, setCases] = useState(null);
   const [stats, setStats] = useState(null);
   const [filter, setFilter] = useState({ status: 'open', priority: '' });
   const [openCase, setOpenCase] = useState(null);
+  const [openUser, setOpenUser] = useState(null);   // historique d'un supporter
+  const [view, setView] = useState('queue');        // 'queue' | 'audit'
   const [toast, setToast] = useState('');
 
   const load = useCallback(() => {
@@ -60,6 +70,14 @@ export function ModerationQueue({ basePath, title = 'Modération', subtitle, sho
         <Stat label="Classés" value={stats?.dismissed ?? '—'} />
       </div>
 
+      {/* Vue : file / journal */}
+      <div className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-1">
+        <button onClick={() => setView('queue')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${view === 'queue' ? 'bg-emerald-500/20 text-emerald-300' : 'text-bone-400 hover:text-bone-200'}`}><ShieldAlert size={12} /> Dossiers</button>
+        <button onClick={() => setView('audit')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${view === 'audit' ? 'bg-emerald-500/20 text-emerald-300' : 'text-bone-400 hover:text-bone-200'}`}><History size={12} /> Journal d'audit</button>
+      </div>
+
+      {view === 'audit' ? <AuditJournal basePath={basePath} /> : (
+      <>
       {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2">
         {[['open', 'À traiter'], ['in_review', 'En cours'], ['resolved', 'Traités'], ['dismissed', 'Classés'], ['', 'Tous']].map(([v, l]) => (
@@ -105,12 +123,63 @@ export function ModerationQueue({ basePath, title = 'Modération', subtitle, sho
         </div>
       )}
 
+      </>
+      )}
+
       {openCase && (
         <CaseModal basePath={basePath} caseId={openCase} onClose={() => setOpenCase(null)}
+          onOpenUser={(uid) => setOpenUser(uid)}
           onDecided={(msg) => { setOpenCase(null); showToast(msg); load(); }} />
       )}
 
+      {openUser && (
+        <UserHistoryModal basePath={basePath} userId={openUser} onClose={() => setOpenUser(null)}
+          onRevoke={() => { showToast('Sanction levée'); load(); }} />
+      )}
+
       {toast && <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-white/10 bg-ink-800 px-4 py-3 text-sm text-bone-100 shadow-xl">{toast}</div>}
+    </div>
+  );
+}
+
+// ── Journal d'audit ──────────────────────────────────────────
+const ACTION_LABEL = (a) => {
+  if (a === 'case_opened') return 'Dossier ouvert';
+  if (a?.startsWith('decision:')) return 'Décision · ' + a.split(':')[1];
+  if (a?.startsWith('sanction:')) return 'Sanction · ' + a.split(':')[1];
+  if (a === 'sanction_revoked') return 'Sanction levée';
+  return a;
+};
+const ACTOR_STYLE = {
+  super_admin: 'text-emerald-300 bg-emerald-400/10 border-emerald-400/30',
+  club_admin: 'text-cyan-300 bg-cyan-400/10 border-cyan-400/30',
+  ai: 'text-violet-300 bg-violet-500/10 border-violet-500/30',
+  system: 'text-bone-400 bg-white/5 border-white/10',
+  user: 'text-bone-300 bg-white/5 border-white/10',
+};
+
+function AuditJournal({ basePath }) {
+  const [logs, setLogs] = useState(null);
+  useEffect(() => {
+    apiFetch(`${basePath}/audit?limit=100`).then((j) => setLogs(j.data?.logs || [])).catch(() => setLogs([]));
+  }, [basePath]);
+
+  if (logs === null) return <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>;
+  if (!logs.length) return <div className="rounded-2xl border border-white/10 bg-ink-800/40 p-10 text-center text-sm text-bone-400">Aucune action enregistrée.</div>;
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[11px] text-bone-500">Toutes les décisions de modération sont tracées (qui, quoi, quand). Journal en lecture seule.</p>
+      {logs.map((l) => (
+        <div key={l.id} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-ink-800/40 px-4 py-2.5">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${ACTOR_STYLE[l.actor_type] || ACTOR_STYLE.system}`}>{l.actor_type}</span>
+            <span className="truncate text-xs text-bone-200"><b className="text-bone-100">{l.actorName}</b> — {ACTION_LABEL(l.action)}</span>
+            {l.new_value?.reason && <span className="hidden truncate text-[11px] text-bone-500 sm:inline">« {l.new_value.reason} »</span>}
+          </div>
+          <span className="shrink-0 text-[10px] text-bone-600">{fmt(l.created_at)}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -125,12 +194,13 @@ function Stat({ label, value, accent = 'text-bone-50' }) {
 }
 
 // ── Détail d'un dossier + décision ───────────────────────────
-function CaseModal({ basePath, caseId, onClose, onDecided }) {
+function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
   const [c, setC] = useState(null);
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [config, setConfig] = useState(null);
+  const [msgAction, setMsgAction] = useState('dismiss');   // action sur le message signalé
   const [sanction, setSanction] = useState({ type: '', durationHours: 24, isPermanent: false });
 
   useEffect(() => {
@@ -213,6 +283,10 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
 
             {/* Historique utilisateur */}
             <Section icon={User} title="Historique du supporter">
+              <button onClick={() => onOpenUser?.(c.target?.id)}
+                className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
+                <User size={12} /> Voir le profil complet de {c.target?.name}
+              </button>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="rounded-lg bg-white/[0.03] p-3">
                   <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Dossiers précédents</p>
@@ -267,10 +341,26 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
             {['open', 'in_review'].includes(c.status) ? (
               <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                 <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Décision</p>
-                <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Motif (notifié au supporter + audit)"
-                  className="mt-2 w-full h-9 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-xs text-bone-100 outline-none focus:border-emerald-400/60" />
+                {/* 1. Message notifié au supporter */}
+                <label className="mt-2 block">
+                  <span className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Message au supporter (envoyé en notification)</span>
+                  <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={400}
+                    placeholder="Ex. : Vous recevez cet avertissement car votre message ne respecte pas la charte."
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 text-xs text-bone-100 outline-none focus:border-emerald-400/60" />
+                </label>
 
-                {/* Sanction optionnelle */}
+                {/* 2. Action sur le message signalé */}
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                  <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Action sur le message</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {[['dismiss', 'Aucune (classer)'], ['hide_message', 'Masquer'], ['remove_message', 'Retirer']].map(([v, l]) => (
+                      <button key={v} onClick={() => setMsgAction(v)}
+                        className={`rounded-full border px-3 py-1 text-[11px] font-bold transition ${msgAction === v ? 'border-gold-400/50 bg-gold-400/15 text-gold-400' : 'border-white/10 text-bone-400 hover:text-bone-200'}`}>{l}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Sanction optionnelle */}
                 <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
                   <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Sanction (optionnelle)</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -305,12 +395,27 @@ function CaseModal({ basePath, caseId, onClose, onDecided }) {
                 </div>
 
                 {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Btn onClick={() => decide('dismiss', 'Dossier classé sans suite')} busy={busy === 'dismiss'} icon={Check} tone="ghost">Classer sans suite</Btn>
-                  <Btn onClick={() => decide('hide_message', 'Message masqué')} busy={busy === 'hide_message'} icon={EyeOff} tone="gold">Masquer le message</Btn>
-                  <Btn onClick={() => decide('remove_message', 'Message retiré')} busy={busy === 'remove_message'} icon={Trash2} tone="red">Retirer le message</Btn>
+
+                {/* Récapitulatif + action unique */}
+                <div className="mt-3 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
+                  <p className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold">Ce qui va se passer</p>
+                  <ul className="mt-1.5 space-y-0.5 text-[11px] text-bone-300">
+                    <li>• {msgAction === 'dismiss' ? 'Le message reste publié, le dossier est classé.' : msgAction === 'hide_message' ? 'Le message est masqué du salon (conservé en base).' : 'Le message est retiré du salon (conservé en base).'}</li>
+                    <li>• {sanction.type
+                      ? <>Sanction <b className="text-red-300">{config?.labels?.[sanction.type] || sanction.type}</b>{!['warning', 'account_review'].includes(sanction.type) ? (sanction.isPermanent ? ' — définitive' : ` — ${({ 1: '1 h', 24: '24 h', 168: '7 j', 720: '30 j' })[sanction.durationHours] || sanction.durationHours + ' h'}`) : ''} appliquée.</>
+                      : 'Aucune sanction.'}</li>
+                    <li>• {sanction.type
+                      ? <><b className="text-emerald-300">Le supporter est notifié</b> (cloche) {reason.trim() ? 'avec ton message.' : '— ajoute un message ci-dessus pour lui expliquer.'}</>
+                      : 'Pas de notification (aucune sanction).'}</li>
+                  </ul>
                 </div>
-                <p className="mt-3 text-[10px] text-bone-500">Un message retiré n'est jamais supprimé physiquement. Le supporter est notifié de toute sanction.</p>
+
+                <button onClick={() => decide(msgAction, DECISION_LABEL[msgAction])} disabled={!!busy}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-400 disabled:opacity-50">
+                  {busy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                  {sanction.type ? 'Appliquer et notifier le supporter' : 'Enregistrer la décision'}
+                </button>
+                <p className="mt-2 text-[10px] text-bone-500">Un message retiré n'est jamais supprimé physiquement. Toute décision est tracée dans le journal d'audit.</p>
               </div>
             ) : (
               <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-3 text-xs text-emerald-200">

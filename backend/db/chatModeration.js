@@ -341,6 +341,79 @@ async function listMySanctions(userId) {
   }));
 }
 
+// ── Historique & audit (lot 4) ───────────────────────────────
+// Profil de modération d'un supporter. `tenantId` non nul = vue club_admin :
+// on ne lui montre QUE son salon (+ les sanctions globales, qui l'impactent).
+async function getUserModerationHistory(userId, { tenantId = null } = {}) {
+  const { data: prof } = await supabase.from('profiles')
+    .select('id, display_name, avatar_url, created_at').eq('id', userId).maybeSingle();
+
+  let cq = supabase.from('chat_moderation_cases')
+    .select('id, tenant_id, message_id, source, status, priority, decision, decision_reason, reports_count, created_at, resolved_at')
+    .eq('target_user_id', userId).order('created_at', { ascending: false }).limit(50);
+  if (tenantId) cq = cq.eq('tenant_id', tenantId);
+
+  let sq = supabase.from('chat_sanctions')
+    .select('id, tenant_id, case_id, sanction_type, scope, starts_at, ends_at, is_permanent, reason_text, issued_by, revoked_at, created_at')
+    .eq('user_id', userId).order('created_at', { ascending: false }).limit(50);
+  if (tenantId) sq = sq.or(`tenant_id.eq.${tenantId},scope.eq.global`);
+
+  let mq = supabase.from('fan_messages').select('id', { count: 'exact', head: true }).eq('author_id', userId);
+  let rq = supabase.from('fan_messages').select('id', { count: 'exact', head: true })
+    .eq('author_id', userId).in('moderation_status', ['hidden', 'removed', 'blocked']);
+  if (tenantId) { mq = mq.eq('tenant_id', tenantId); rq = rq.eq('tenant_id', tenantId); }
+
+  const [{ data: cases }, { data: sanctions }, { count: messages }, { count: moderated }] = await Promise.all([cq, sq, mq, rq]);
+
+  // Noms des clubs concernés
+  const tIds = [...new Set([...(cases || []).map((c) => c.tenant_id), ...(sanctions || []).map((s) => s.tenant_id)].filter(Boolean))];
+  const { data: clubs } = tIds.length ? await supabase.from('tenants').select('id, name, slug').in('id', tIds) : { data: [] };
+  const cById = Object.fromEntries((clubs || []).map((c) => [c.id, c]));
+  const now = Date.now();
+
+  return {
+    user: prof ? { id: prof.id, name: prof.display_name, avatar: prof.avatar_url, memberSince: prof.created_at }
+      : { id: userId, name: 'Supporter', avatar: null, memberSince: null },
+    stats: {
+      messages: messages || 0,
+      moderated: moderated || 0,
+      cases: (cases || []).length,
+      sanctions: (sanctions || []).length,
+      activeSanctions: (sanctions || []).filter((s) => !s.revoked_at && (s.is_permanent || !s.ends_at || new Date(s.ends_at).getTime() > now)).length,
+    },
+    cases: (cases || []).map((c) => ({ ...c, club: cById[c.tenant_id] || null })),
+    sanctions: (sanctions || []).map((s) => ({
+      ...s, label: SANCTION_LABEL[s.sanction_type] || s.sanction_type, club: s.tenant_id ? cById[s.tenant_id] || null : null,
+      isActive: !s.revoked_at && (s.is_permanent || !s.ends_at || new Date(s.ends_at).getTime() > now),
+    })),
+  };
+}
+
+// Journal d'audit consultable (filtrable). Enrichi du nom de l'acteur.
+async function listAuditLogs({ caseId = null, tenantId = null, actorId = null, limit = 100 } = {}) {
+  let caseIds = null;
+  if (tenantId) {
+    const { data: tc } = await supabase.from('chat_moderation_cases').select('id').eq('tenant_id', tenantId).limit(500);
+    caseIds = (tc || []).map((c) => c.id);
+    if (!caseIds.length) return [];
+  }
+
+  let q = supabase.from('chat_moderation_audit_logs')
+    .select('id, case_id, actor_type, actor_id, action, previous_value, new_value, created_at')
+    .order('created_at', { ascending: false }).limit(limit);
+  if (caseId) q = q.eq('case_id', caseId);
+  if (caseIds) q = q.in('case_id', caseIds);
+  if (actorId) q = q.eq('actor_id', actorId);
+  const { data: logs } = await q;
+  if (!logs?.length) return [];
+
+  const ids = [...new Set(logs.map((l) => l.actor_id).filter(Boolean))];
+  const { data: profs } = ids.length ? await supabase.from('profiles').select('id, display_name').in('id', ids) : { data: [] };
+  const byId = Object.fromEntries((profs || []).map((p) => [p.id, p.display_name]));
+  // actor_id NULL + actor_type ai/system = action automatique
+  return logs.map((l) => ({ ...l, actorName: l.actor_id ? (byId[l.actor_id] || 'Modérateur') : (l.actor_type === 'ai' ? 'IA' : 'Système') }));
+}
+
 // Décisions sur un dossier (une sanction peut y être jointe).
 const CASE_DECISIONS = ['dismiss', 'hide_message', 'remove_message'];
 
@@ -405,4 +478,5 @@ module.exports = {
   getActiveSanction, createReport, countReports, getMessage,
   audit, upsertCaseForMessage, listCases, getCase, decideCase,
   issueSanction, revokeSanction, listMySanctions,
+  getUserModerationHistory, listAuditLogs,
 };

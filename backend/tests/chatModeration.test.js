@@ -16,12 +16,27 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   const { data: other } = await supabase.from('profiles').select('id').neq('id', fan.id).limit(1).maybeSingle();
   if (!club || !fan) { console.error('Fixtures manquantes (club/fan).'); process.exit(1); }
 
+  // Nettoyage complet : on supprime les DOSSIERS avant les messages, sinon
+  // message_id passe à NULL (ON DELETE SET NULL) et les dossiers restent orphelins.
   const cleanup = async () => {
+    const { data: testMsgs } = await supabase.from('fan_messages').select('id').like('content', '[test]%');
+    const ids = (testMsgs || []).map((m) => m.id);
+    if (ids.length) {
+      const { data: cs } = await supabase.from('chat_moderation_cases').select('id').in('message_id', ids);
+      const cids = (cs || []).map((c) => c.id);
+      if (cids.length) {
+        await supabase.from('chat_moderation_audit_logs').delete().in('case_id', cids);
+        await supabase.from('chat_sanctions').delete().in('case_id', cids);
+        await supabase.from('chat_moderation_cases').delete().in('id', cids);
+      }
+      await supabase.from('chat_reports').delete().in('message_id', ids);
+    }
     await supabase.from('chat_reports').delete().eq('reporter_user_id', fan.id);
     await supabase.from('chat_sanctions').delete().eq('user_id', fan.id);
     await supabase.from('chat_room_memberships').delete().eq('user_id', fan.id).eq('tenant_id', club.id);
-    await supabase.from('fan_messages').delete().eq('content', '[test] message de modération');
+    await supabase.from('fan_messages').delete().like('content', '[test]%');
     await supabase.from('fan_favorite_clubs').delete().eq('user_id', fan.id).eq('tenant_id', club.id);
+    await supabase.from('notifications').delete().eq('user_id', fan.id).in('type', ['chat_sanction', 'chat_sanction_revoked']);
   };
   await cleanup();
 
@@ -295,11 +310,47 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     assert.equal(list.every((s) => typeof s.isActive === 'boolean'), true);
   });
 
-  await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', case3);
-  await supabase.from('chat_moderation_cases').delete().eq('id', case3);
-  await supabase.from('notifications').delete().eq('user_id', fan.id).in('type', ['chat_sanction', 'chat_sanction_revoked']);
-  await supabase.from('chat_reports').delete().eq('message_id', msg2.id);
-  await supabase.from('chat_moderation_cases').delete().eq('message_id', msg2.id);
+  // ══════════════ LOT 4 — Historique & audit ══════════════
+  console.log('\nHistorique du supporter');
+  await t('le profil de modération agrège dossiers, sanctions et messages', async () => {
+    const h = await mod.getUserModerationHistory(fan.id);
+    assert.ok(h.user?.id === fan.id);
+    assert.ok(typeof h.stats.messages === 'number');
+    assert.ok(typeof h.stats.cases === 'number');
+    assert.ok(Array.isArray(h.cases) && Array.isArray(h.sanctions));
+  });
+  await t('la vue club_admin est bornée à SON salon', async () => {
+    if (!club2) return;
+    // un dossier dans un AUTRE club ne doit pas apparaître
+    const { data: m4 } = await supabase.from('fan_messages')
+      .insert({ tenant_id: club2.id, author_id: fan.id, content: '[test] autre salon' }).select('id').single();
+    const otherCase = await mod.upsertCaseForMessage({ tenantId: club2.id, messageId: m4.id, targetUserId: fan.id, source: 'manual' });
+    const scoped = await mod.getUserModerationHistory(fan.id, { tenantId: club.id });
+    assert.equal(scoped.cases.some((c) => c.id === otherCase), false, 'un club_admin ne doit pas voir les dossiers d\'un autre club');
+    const global = await mod.getUserModerationHistory(fan.id);
+    assert.equal(global.cases.some((c) => c.id === otherCase), true, 'le super_admin voit tout');
+    await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', otherCase);
+    await supabase.from('chat_moderation_cases').delete().eq('id', otherCase);
+    await supabase.from('fan_messages').delete().eq('id', m4.id);
+  });
+
+  console.log('\nJournal d\'audit');
+  await t('le journal liste les actions avec le nom de l\'acteur', async () => {
+    const logs = await mod.listAuditLogs({ caseId: case3 });
+    assert.ok(logs.length >= 1);
+    assert.ok(logs.every((l) => typeof l.actorName === 'string'), 'actorName manquant');
+    assert.ok(logs.some((l) => l.action.startsWith('decision:')));
+  });
+  await t('le journal est filtrable par salon', async () => {
+    const logs = await mod.listAuditLogs({ tenantId: club.id });
+    assert.ok(Array.isArray(logs));
+  });
+  await t('une action automatique est attribuée au « Système »', async () => {
+    const logs = await mod.listAuditLogs({ caseId: case3 });
+    const opened = logs.find((l) => l.action === 'case_opened');
+    assert.equal(opened?.actorName, 'Système');
+  });
+
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);
   process.exit(0);
