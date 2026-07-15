@@ -26,6 +26,21 @@ async function withTenant(req, res, next) {
   next();
 }
 
+// Garde d'écriture du salon : AUCUNE sanction bloquante + charte acceptée.
+// Appliquée à TOUT ce qui publie (chat, publications, commentaires) : la charte
+// ne doit pas être contournable par un autre endpoint.
+async function requireChatAccess(req, res, next) {
+  try {
+    const sanction = await mod.getActiveSanction(req.authUser.id, req.tenant.id);
+    if (sanction) return fail(res, sanctionMessage(sanction), 403, { sanction });
+    if (await mod.needsCharter(req.tenant.id, req.authUser.id)) {
+      return fail(res, 'Tu dois accepter la charte du salon avant de publier.', 403,
+        { needsCharter: true, charterVersion: mod.CHARTER_VERSION });
+    }
+    next();
+  } catch (err) { return fail(res, 'Vérification d\'accès impossible : ' + err.message, 500); }
+}
+
 // GET /api/v2/clubs/:slug/fan-feed — public (consultable sans connexion).
 // Si l'utilisateur est connecté (optionalAuth), on renvoie aussi likedByMe.
 router.get('/:slug/fan-feed', optionalAuth, withTenant, async (req, res) => {
@@ -38,7 +53,7 @@ router.get('/:slug/fan-feed', optionalAuth, withTenant, async (req, res) => {
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/posts  { content }
-router.post('/:slug/fan-feed/posts', requireAuth, withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/posts', requireAuth, withTenant, requireChatAccess, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
@@ -51,7 +66,7 @@ router.post('/:slug/fan-feed/posts', requireAuth, withTenant, async (req, res) =
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/posts/:postId/comments  { content }
-router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, async (req, res) => {
+router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, requireChatAccess, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le commentaire est vide.');
   if (content.length > MAX) return fail(res, 'Commentaire trop long.');
@@ -74,21 +89,12 @@ router.post('/:slug/fan-feed/posts/:postId/like', requireAuth, withTenant, async
 });
 
 // POST /api/v2/clubs/:slug/fan-feed/messages  { content }
-// Garde serveur : charte acceptée + aucune sanction bloquante.
-router.post('/:slug/fan-feed/messages', requireAuth, withTenant, async (req, res) => {
+// Garde serveur (requireChatAccess) : charte acceptée + aucune sanction.
+router.post('/:slug/fan-feed/messages', requireAuth, withTenant, requireChatAccess, async (req, res) => {
   const content = clean(req.body?.content);
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
-    // 1. Sanction active ? (l'accès direct à l'API ne contourne pas la modération)
-    const sanction = await mod.getActiveSanction(req.authUser.id, req.tenant.id);
-    if (sanction) return fail(res, sanctionMessage(sanction), 403, { sanction });
-
-    // 2. Charte de la version courante acceptée ?
-    if (await mod.needsCharter(req.tenant.id, req.authUser.id)) {
-      return fail(res, 'Tu dois accepter la charte du salon avant de publier.', 403, { needsCharter: true, charterVersion: mod.CHARTER_VERSION });
-    }
-
     const message = await fanFeed.createMessage(req.tenant.id, req.authUser.id, content);
     return ok(res, { message, moderation: { status: 'published', reason: null, canAppeal: false } });
   } catch (err) {

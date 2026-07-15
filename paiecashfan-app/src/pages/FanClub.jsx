@@ -87,11 +87,9 @@ export function FanClub() {
     setCharterBusy(false);
   }
 
-  // Envoi de message : la charte doit être acceptée d'abord.
+  // Envoi de message : même garde que les publications (charte + sanction).
   function handleSendMessage(content) {
-    if (!user) return null;
-    if (access?.activeSanction) return null;
-    if (access?.needsCharter) { setCharterOpen(true); return null; }
+    if (!ensureCanWrite()) return false;
     return sendMessage(content);
   }
 
@@ -117,7 +115,18 @@ export function FanClub() {
 
   const [fanPoints, setFanPoints] = useState(0);
 
+  // Toute tentative d'écriture (chat, publication, commentaire) exige la charte.
+  // Renvoie false et ouvre la modale si elle n'est pas signée / si sanction.
+  function ensureCanWrite() {
+    if (mode !== 'club') return true;
+    if (!user) return false;
+    if (access?.activeSanction) return false;
+    if (access?.needsCharter) { setCharterDismissed(false); setCharterOpen(true); return false; }
+    return true;
+  }
+
   function handlePublish() {
+    if (!ensureCanWrite()) return;
     const published = publishPost(newPost);
 
     if (published) {
@@ -130,6 +139,7 @@ export function FanClub() {
   }
 
   function handleAddComment(postId, content) {
+    if (!ensureCanWrite()) return;
     addComment(postId, content);
   }
 
