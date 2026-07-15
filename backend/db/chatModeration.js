@@ -124,28 +124,45 @@ async function audit({ caseId, actorType, actorId = null, action, previousValue 
 // ── File de modération (dossiers) ────────────────────────────
 // Crée le dossier d'un message, ou incrémente le compteur s'il existe déjà.
 // Un seul dossier ouvert par message (garanti par index unique).
-async function upsertCaseForMessage({ tenantId, messageId, targetUserId, source = 'report' }) {
+const PRIORITY_RANK = { low: 0, normal: 1, high: 2, critical: 3 };
+const worst = (a, b) => (PRIORITY_RANK[b] > PRIORITY_RANK[a] ? b : a);
+
+// `ai` = verdict du pré-classement (lot 5). Un dossier ne peut que MONTER
+// en priorité : un signalement humain ne doit pas être enterré par l'IA,
+// et inversement.
+async function upsertCaseForMessage({ tenantId, messageId, targetUserId, source = 'report', ai = null }) {
   const reports = await countReports(messageId);
-  const priority = reports >= 3 ? 'high' : 'normal';
+  let priority = reports >= 3 ? 'high' : 'normal';
+  if (ai?.priority) priority = worst(priority, ai.priority);
+
+  const aiCols = ai ? {
+    ai_risk_score: ai.score, ai_categories: ai.categories,
+    ai_summary: `[${ai.provider}] ${ai.riskLevel} — ${ai.explanation}`.slice(0, 500),
+  } : {};
 
   const { data: existing } = await supabase.from('chat_moderation_cases')
-    .select('id, reports_count, priority').eq('message_id', messageId)
+    .select('id, reports_count, priority, source').eq('message_id', messageId)
     .in('status', ['open', 'in_review']).maybeSingle();
 
   if (existing) {
     await supabase.from('chat_moderation_cases')
-      .update({ reports_count: reports, priority }).eq('id', existing.id);
+      .update({ reports_count: reports, priority: worst(existing.priority, priority), ...aiCols })
+      .eq('id', existing.id);
+    if (ai) await audit({ caseId: existing.id, actorType: 'ai', action: 'ai_screened', newValue: { riskLevel: ai.riskLevel, categories: ai.categories, provider: ai.provider } });
     return existing.id;
   }
 
   const { data, error } = await supabase.from('chat_moderation_cases').insert({
     tenant_id: tenantId, message_id: messageId, target_user_id: targetUserId,
-    source, status: 'open', priority, reports_count: reports,
+    source, status: 'open', priority, reports_count: reports, ...aiCols,
   }).select('id').single();
   if (error) throw new Error(error.message);
 
   await supabase.from('fan_messages').update({ moderation_case_id: data.id }).eq('id', messageId);
-  await audit({ caseId: data.id, actorType: 'system', action: 'case_opened', newValue: { source, reports } });
+  await audit({
+    caseId: data.id, actorType: ai ? 'ai' : 'system', action: 'case_opened',
+    newValue: ai ? { source, reports, riskLevel: ai.riskLevel, categories: ai.categories, provider: ai.provider } : { source, reports },
+  });
   return data.id;
 }
 

@@ -105,6 +105,23 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (an)** — **Modération Fan Club — Lot 5 (IA de pré-classement)**.
+  Nouveau service `backend/services/moderation/` : `types.js` (contrat normalisé
+  + garde-fous), `mockProvider.js` (heuristique, sans clé), `claudeProvider.js`
+  (**`claude-opus-4-8`**, sortie JSON contrainte par `output_config.format`,
+  prompt calibré « la passion foot n'est pas de la modération », timeout 8 s,
+  cache du system prompt), `index.js` (flag + repli + orchestration).
+  🔒 **Clé `ANTHROPIC_API_KEY` lue côté serveur uniquement**, jamais exposée
+  (l'API ne renvoie que le NOM du fournisseur). **L'IA ne sanctionne pas** :
+  elle ouvre un dossier `source='ai'` priorisé (`ai_risk_score`/`ai_categories`/
+  `ai_summary`), le message **reste publié** (le masquage = lot 6). Garde-fous :
+  un « publish » sur risque critique est forcé en `flag_for_review` ; une action
+  inconnue est rejetée ; la priorité n'est **jamais rétrogradée** (`worst()`).
+  Analyse **après** publication, **sans await** (l'envoi n'attend jamais l'IA),
+  repli heuristique si Claude est indisponible. Activation :
+  flag `chat_ai_moderation_enabled` (+ coupe-circuit `CHAT_AI_MODERATION_ENABLED=false`).
+  Front : badge **IA** dans la file + bandeau « pré-classement automatique »
+  dans le dossier. Tests **59/59**.
 - **2026-07-15 (am)** — **Modération Fan Club — Lot 4 (historique & audit)** + **UX
   décision**. `getUserModerationHistory` (profil : stats messages/modérés/dossiers/
   sanctions, **borné au salon pour un club_admin**, sanctions globales incluses) et

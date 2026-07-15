@@ -9,6 +9,7 @@
 const express = require('express');
 const { requireAuth, requireRole } = require('../../../middleware/auth');
 const mod = require('../../../db/chatModeration');
+const aiMod = require('../../../services/moderation');
 
 const router = express.Router();
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
@@ -73,6 +74,7 @@ router.post('/cases/:id/decision', async (req, res) => {
 });
 
 // GET /api/v2/admin/moderation/config — types de sanctions autorisés + motifs.
+// 🔒 On expose le NOM du fournisseur IA, jamais la clé.
 router.get('/config', async (req, res) => {
   return ok(res, {
     charterVersion: mod.CHARTER_VERSION,
@@ -81,6 +83,7 @@ router.get('/config', async (req, res) => {
     sanctionTypes: mod.allowedSanctionsFor('super_admin'),
     permanentAllowed: mod.PERMANENT_ALLOWED,
     labels: mod.SANCTION_LABEL,
+    ai: { enabled: await aiMod.isEnabled(), provider: aiMod.providerName() },
   });
 });
 

@@ -351,6 +351,94 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     assert.equal(opened?.actorName, 'Système');
   });
 
+  // ══════════════ LOT 5 — IA de pré-classement ══════════════
+  const ai = require('../services/moderation');
+  const setFlag = async (on) => {
+    await supabase.from('feature_flags').upsert({ key: ai.FLAG_KEY, enabled: on }, { onConflict: 'key' });
+    ai._resetFlagCache();
+  };
+
+  console.log('\n🤖 Classement IA (heuristique)');
+  await t('la passion foot n\'est PAS modérée', async () => {
+    for (const txt of ['On est nuls ce soir, quel match pourri', 'L\'arbitre est un voleur !', 'Allez Rennes, on va les exploser']) {
+      const r = await ai.analyzeText(txt);
+      assert.equal(r.shouldOpenCase, false, `faux positif sur : ${txt}`);
+    }
+  });
+  await t('insulte, racisme, menace et données perso sont classés', async () => {
+    const cases = [['ferme ta gueule connard', 'insult'], ['sale negre', 'racism'], ['je vais te tuer', 'threat'], ['appelle moi au 06 12 34 56 78', 'personal_data']];
+    for (const [txt, cat] of cases) {
+      const r = await ai.analyzeText(txt);
+      assert.equal(r.shouldOpenCase, true, `raté : ${txt}`);
+      assert.ok(r.categories.includes(cat), `catégorie ${cat} attendue pour : ${txt}`);
+    }
+  });
+  await t('l\'obfuscation (n.e.g.r.e) ne passe pas', async () => {
+    const r = await ai.analyzeText('sale n.e.g.r.e');
+    assert.equal(r.riskLevel, 'critical');
+  });
+  await t('un « publish » sur un risque critique est ignoré', async () => {
+    const r = ai.normalize({ riskLevel: 'critical', recommendedAction: 'publish' }, { provider: 'test' });
+    assert.equal(r.recommendedAction, 'flag_for_review');
+    assert.equal(r.requiresHumanReview, true);
+  });
+  await t('une action inconnue de l\'IA est rejetée', async () => {
+    const r = ai.normalize({ riskLevel: 'low', recommendedAction: 'ban_user' }, { provider: 'test' });
+    assert.equal(r.recommendedAction, 'publish', 'l\'IA ne peut pas inventer une action');
+  });
+
+  console.log('\n🤖 Pré-classement d\'un message');
+  await t('flag désactivé → aucune analyse', async () => {
+    await setFlag(false);
+    const { data: m } = await supabase.from('fan_messages')
+      .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] sale negre' }).select('id').single();
+    const r = await ai.screenMessage({ messageId: m.id, tenantId: club.id, authorId: fan.id, content: '[test] sale negre' });
+    assert.equal(r, null);
+    const { count } = await supabase.from('chat_moderation_cases').select('id', { count: 'exact', head: true }).eq('message_id', m.id);
+    assert.equal(count || 0, 0, 'aucun dossier ne doit être ouvert flag off');
+    await supabase.from('fan_messages').delete().eq('id', m.id);
+  });
+
+  await setFlag(true);
+  const { data: msg5 } = await supabase.from('fan_messages')
+    .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] ferme ta gueule connard' }).select('id').single();
+
+  await t('flag activé → dossier ouvert, priorisé, source « ai »', async () => {
+    const r = await ai.screenMessage({ messageId: msg5.id, tenantId: club.id, authorId: fan.id, content: '[test] ferme ta gueule connard' });
+    assert.ok(r?.caseId, 'dossier non créé');
+    const { data: c } = await supabase.from('chat_moderation_cases')
+      .select('source, priority, ai_risk_score, ai_categories, ai_summary').eq('id', r.caseId).single();
+    assert.equal(c.source, 'ai');
+    assert.ok(c.ai_categories.includes('insult'));
+    assert.ok(c.ai_summary.includes('mock'), 'le fournisseur doit être tracé');
+  });
+  await t('le message reste PUBLIÉ (le lot 5 ne masque jamais)', async () => {
+    const { data: m } = await supabase.from('fan_messages').select('moderation_status, deleted_at').eq('id', msg5.id).single();
+    assert.equal(m.moderation_status, 'published');
+    assert.equal(m.deleted_at, null);
+  });
+  await t('l\'audit attribue l\'ouverture à l\'IA', async () => {
+    const { data: c } = await supabase.from('chat_moderation_cases').select('id').eq('message_id', msg5.id).single();
+    const logs = await mod.listAuditLogs({ caseId: c.id });
+    const opened = logs.find((l) => l.action === 'case_opened');
+    assert.equal(opened.actor_type, 'ai');
+    assert.equal(opened.actorName, 'IA');
+  });
+  await t('l\'IA ne peut PAS sanctionner ce qu\'elle a détecté', async () => {
+    await assert.rejects(
+      () => mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'room_ban', isPermanent: true, issuedBy: null, actorType: 'ai' }),
+      (e) => e.code === 'NEEDS_HUMAN'
+    );
+  });
+  await t('la priorité n\'est jamais rétrogradée', async () => {
+    const { data: before } = await supabase.from('chat_moderation_cases').select('id').eq('message_id', msg5.id).single();
+    await supabase.from('chat_moderation_cases').update({ priority: 'critical' }).eq('id', before.id);
+    const again = await mod.upsertCaseForMessage({ tenantId: club.id, messageId: msg5.id, targetUserId: fan.id, source: 'report' });
+    const { data: after } = await supabase.from('chat_moderation_cases').select('priority').eq('id', again).single();
+    assert.equal(after.priority, 'critical', 'un recalcul ne doit jamais rétrograder la priorité');
+  });
+
+  await setFlag(false);
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);
   process.exit(0);

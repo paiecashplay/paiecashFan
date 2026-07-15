@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History, Send } from 'lucide-react';
+import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History, Send, Sparkles } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { UserHistoryModal } from './UserHistoryModal';
@@ -34,6 +34,15 @@ const fmt = (s) => {
   const d = new Date(s);
   return isNaN(d.getTime()) ? '—' : d.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
 };
+
+// Badge « détecté par l'IA » — l'IA ne fait que pré-classer, jamais sanctionner.
+function AiBadge({ score }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-violet-300">
+      <Sparkles size={9} /> IA{typeof score === 'number' ? ` ${Math.round(score * 100)}%` : ''}
+    </span>
+  );
+}
 
 export function ModerationQueue({ basePath, title = 'Modération', subtitle, showClub = true }) {
   const [cases, setCases] = useState(null);
@@ -108,6 +117,7 @@ export function ModerationQueue({ basePath, title = 'Modération', subtitle, sho
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${PRIORITY_STYLE[c.priority] || PRIORITY_STYLE.normal}`}>{c.priority}</span>
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${STATUS_STYLE[c.status] || ''}`}>{c.status}</span>
+                    {c.source === 'ai' && <AiBadge score={c.ai_risk_score} />}
                     {showClub && c.club && <span className="text-[10px] text-bone-500">· {c.club.name}</span>}
                     <span className="inline-flex items-center gap-1 text-[10px] text-bone-500"><Flag size={10} /> {c.reports_count}</span>
                   </div>
@@ -252,6 +262,24 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
             </Section>
 
             {/* Signalements (anonymes) */}
+            {/* Verdict IA — pré-classement uniquement, la décision reste humaine */}
+            {c.source === 'ai' && (
+              <div className="rounded-xl border border-violet-500/25 bg-violet-500/[0.06] p-3">
+                <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-violet-300 font-bold">
+                  <Sparkles size={11} /> Pré-classement automatique
+                </p>
+                <p className="mt-1.5 text-xs text-bone-200">{c.ai_summary || 'Analyse indisponible.'}</p>
+                {c.ai_categories?.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {c.ai_categories.map((cat) => (
+                      <span key={cat} className="rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-bold text-violet-200">{REASON_LABEL[cat] || cat}</span>
+                    ))}
+                  </div>
+                )}
+                <p className="mt-2 text-[10px] text-bone-500">L'IA n'a fait que signaler ce message pour revue. Toute décision et toute sanction restent les tiennes.</p>
+              </div>
+            )}
+
             <Section icon={Flag} title={`Signalements (${c.reports?.length || 0})`}>
               <p className="mb-2 text-[10px] text-bone-500">Les signalants restent anonymes.</p>
               <div className="space-y-1.5">

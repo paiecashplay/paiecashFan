@@ -8,6 +8,7 @@ const express = require('express');
 const { requireAuth, optionalAuth } = require('../../../middleware/auth');
 const fanFeed = require('../../../db/fanFeed');
 const mod = require('../../../db/chatModeration');
+const aiMod = require('../../../services/moderation');
 const favorites = require('../../../db/favorites');
 const { requireClubModerator } = require('../../../middleware/clubModerator');
 const supabase = require('../../../db/supabase');
@@ -98,6 +99,10 @@ router.post('/:slug/fan-feed/messages', requireAuth, withTenant, requireChatAcce
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
     const message = await fanFeed.createMessage(req.tenant.id, req.authUser.id, content);
+    // Pré-classement IA (lot 5) : APRÈS publication, sans await — le supporter
+    // ne doit jamais attendre l'IA. Un risque avéré ouvre un dossier priorisé.
+    aiMod.screenMessage({ messageId: message.id, tenantId: req.tenant.id, authorId: req.authUser.id, content })
+      .catch((e) => console.warn('[moderation] pré-classement échoué :', e.message));
     return ok(res, { message, moderation: { status: 'published', reason: null, canAppeal: false } });
   } catch (err) {
     return fail(res, 'Envoi impossible : ' + err.message, 500);
