@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShieldAlert, Loader2, Check, ArrowLeft, FileText } from 'lucide-react';
+import { ShieldAlert, Loader2, Check, ArrowLeft, FileText, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 // Charte d'entrée dans le salon officiel des supporters d'un club.
@@ -47,8 +47,29 @@ export function CharterEntryModal({ access, busy, onAccept, onClose }) {
             <b className="text-bone-100"> menaces</b>, <b className="text-bone-100">harcèlement</b>, <b className="text-bone-100">provocations répétées</b>,
             <b className="text-bone-100"> spam</b> et <b className="text-bone-100">divulgation de données personnelles</b> sont interdits.
           </p>
-          <p className="text-bone-400">
-            Les messages peuvent être analysés automatiquement et signalés aux modérateurs.
+        </div>
+
+        {/* Décision automatisée : le supporter DOIT en être informé avant
+            d'accepter (RGPD art. 22 / DSA). D'où le bump de version de la
+            charte : les anciens acceptants doivent la revalider. */}
+        <div className="mt-4 rounded-2xl border border-violet-500/25 bg-violet-500/[0.07] p-4">
+          <p className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-violet-300">
+            <Sparkles size={12} /> Modération automatique
+          </p>
+          <p className="mt-2 text-sm text-bone-200">
+            Chaque message est analysé par une <b className="text-bone-50">intelligence artificielle</b> avant
+            publication. Les propos <b className="text-bone-50">racistes, haineux, sexuels, menaçants</b> ou
+            contenant des <b className="text-bone-50">données personnelles</b> sont
+            <b className="text-violet-200"> bloqués automatiquement</b> : ils ne sont jamais publiés,
+            et un modérateur en est informé.
+          </p>
+          <p className="mt-2 text-xs text-bone-400">
+            Chambrer, râler sur l'arbitre ou critiquer un joueur reste <b className="text-bone-300">totalement libre</b> —
+            c'est le foot. 😉 Seuls les propos qui blessent une personne sont bloqués.
+          </p>
+          <p className="mt-2 text-[11px] text-bone-500">
+            Une décision automatique peut se tromper : elle est toujours révisable par un humain,
+            et tu peux la contester. Aucune exclusion définitive n'est jamais prononcée par l'IA.
           </p>
         </div>
 
@@ -61,7 +82,10 @@ export function CharterEntryModal({ access, busy, onAccept, onClose }) {
               <li>Pas de spam, de publicité, ni de provocation répétée.</li>
               <li>Ne partage jamais de données personnelles (les tiennes ou celles d'autrui).</li>
               <li>Un message signalé est examiné par un modérateur ; les abus peuvent entraîner un avertissement, une suspension ou une exclusion.</li>
-              <li>Tu peux signaler tout message via le menu « … » du message.</li>
+              <li>Tu peux signaler tout message, publication ou commentaire via le bouton 🚩.</li>
+              <li>Les messages sont analysés automatiquement avant publication : les propos racistes, haineux, sexuels, menaçants ou contenant des données personnelles sont bloqués et ne sont jamais publiés.</li>
+              <li>Bloquer plusieurs messages d'affilée entraîne une mise en lecture seule temporaire, le temps qu'un modérateur relise.</li>
+              <li>Une décision automatique est toujours révisable par un humain : aucune exclusion définitive n'est prononcée par l'IA seule.</li>
             </ul>
           </div>
         )}

@@ -456,7 +456,10 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     process.env.ANTHROPIC_API_KEY = realKey || 'sk-ant-test';
     assert.equal(ai.providerName(), 'claude');
     assert.equal(ai.getProvider().name, 'claude');
-    if (realKey) process.env.ANTHROPIC_API_KEY = realKey; else delete process.env.ANTHROPIC_API_KEY;
+    // On rend l'état du BLOC de tests (sans clé) et non la vraie clé : sinon
+    // tous les tests suivants appelleraient le vrai Claude — payant, lent et
+    // dépendant du réseau. La clé n'est restaurée qu'à la toute fin.
+    delete process.env.ANTHROPIC_API_KEY;
   });
 
   // ══════════════ EXTENSION — posts & commentaires ══════════════
@@ -552,7 +555,126 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   await supabase.from('fan_comments').delete().eq('id', com1.id);
   await supabase.from('fan_posts').delete().eq('id', post1.id);
 
-  await restoreFlag();   // on rend le flag dans l'état trouvé (prod incluse)
+  // ══════════════ LOT 6 — Blocage AVANT publication ══════════════
+  console.log('\n🚧 Portail de publication (lot 6)');
+  const pre = require('../services/moderation/prepublish');
+  const { data: preFlagBefore } = await supabase.from('feature_flags')
+    .select('enabled').eq('key', pre.FLAG_KEY).maybeSingle();
+  const preInitial = preFlagBefore?.enabled ?? false;
+  const setPreFlag = async (on) => {
+    await supabase.from('feature_flags').upsert({ key: pre.FLAG_KEY, enabled: on }, { onConflict: 'key' });
+    pre._resetFlagCache();
+  };
+
+  await t('flag désactivé → le portail laisse tout passer', async () => {
+    await setPreFlag(false);
+    const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: fan.id, content: 'sale negre' });
+    assert.equal(v.allowed, true);
+    assert.equal(v.skipped, true);
+  });
+
+  await setPreFlag(true);
+
+  await t('l\'heuristique bloque l\'explicite SANS appeler Claude', async () => {
+    // pas de clé dans les tests → si ça bloque, c'est bien l'heuristique
+    const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: fan.id, content: 'sale negre' });
+    assert.equal(v.allowed, false);
+    assert.equal(v.action, 'blocked');
+    assert.ok(v.reason.includes('raciste'), 'le motif doit être explicite : ' + v.reason);
+  });
+  await t('la passion foot passe le portail', async () => {
+    for (const txt of ['On est nuls ce soir', 'L\'arbitre est un voleur !', 'Allez Rennes on va les exploser']) {
+      const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: other.id, content: txt });
+      assert.equal(v.allowed, true, 'faux positif du portail sur : ' + txt);
+    }
+  });
+  await t('🔓 FAIL-OPEN : sans IA disponible, on publie (on ne fait pas taire le salon)', async () => {
+    // Pas de clé → analyzeWithBudget renvoie null → le medium/implicite passe.
+    // C'est VOULU : bloquer parce que l'IA est en panne serait pire.
+    const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: other.id, content: 'Retourne cueillir des bananes toi' });
+    assert.equal(v.allowed, true);
+    assert.equal(v.degraded, true, 'le mode dégradé doit être signalé');
+  });
+  await t('le motif rendu au supporter ne recopie pas l\'analyse brute de l\'IA', async () => {
+    const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: fan.id, content: 'je vais te tuer' });
+    assert.ok(v.reason.includes('menace'));
+    assert.ok(!v.reason.includes('riskLevel') && !v.reason.includes('critical'), 'pas de jargon technique');
+  });
+
+  console.log('\n🚧 Contenu bloqué : stocké, jamais servi');
+  await t('un contenu bloqué est STOCKÉ (jamais jeté) et invisible du fil', async () => {
+    const v = await pre.screenBeforePublish({ contentType: 'post', tenantId: club.id, authorId: fan.id, content: '[test] sale negre bloque' });
+    assert.equal(v.allowed, false);
+    const stored = await mod.storeBlockedContent({
+      contentType: 'post', tenantId: club.id, authorId: fan.id,
+      content: '[test] sale negre bloque', ai: v.ai, openCase: true,
+    });
+    assert.ok(stored.id, 'le contenu doit être conservé pour l\'audit et l\'appel');
+    assert.ok(stored.caseId, 'un cas grave doit ouvrir un dossier');
+
+    const { data: row } = await supabase.from('fan_posts').select('moderation_status').eq('id', stored.id).single();
+    assert.equal(row.moderation_status, 'blocked');
+    const feed = await fanFeed.getFeed(club.id, fan.id);
+    assert.equal(JSON.stringify(feed).includes('[test] sale negre bloque'), false, 'un contenu bloqué ne doit JAMAIS être servi');
+
+    await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', stored.caseId);
+    await supabase.from('chat_moderation_cases').delete().eq('id', stored.caseId);
+    await supabase.from('fan_posts').delete().eq('id', stored.id);
+  });
+  await t('une demande de reformulation n\'ouvre PAS de dossier', async () => {
+    // proportionnalité : un « connard » refusé ne doit pas inonder la file
+    const stored = await mod.storeBlockedContent({
+      contentType: 'message', tenantId: club.id, authorId: fan.id,
+      content: '[test] connard', ai: { riskLevel: 'medium', categories: ['insult'], priority: 'normal', score: 0.3, explanation: 'x', provider: 'mock' },
+      openCase: false,
+    });
+    assert.equal(stored.caseId, null);
+    await supabase.from('fan_messages').delete().eq('id', stored.id);
+  });
+
+  console.log('\n🚧 Rate limit & suspension conservatoire');
+  await t('le flood est coupé avant tout appel IA', async () => {
+    const rows = Array.from({ length: pre.RATE_MAX }, (_, i) => ({
+      tenant_id: club.id, author_id: other.id, content: `[test] flood ${i}`,
+    }));
+    const { data: ins } = await supabase.from('fan_messages').insert(rows).select('id');
+    const v = await pre.screenBeforePublish({ contentType: 'message', tenantId: club.id, authorId: other.id, content: 'coucou' });
+    assert.equal(v.allowed, false);
+    assert.equal(v.action, 'rate_limited');
+    await supabase.from('fan_messages').delete().in('id', (ins || []).map((r) => r.id));
+  });
+  await t('la suspension conservatoire est TEMPORAIRE (jamais définitive)', async () => {
+    const rows = Array.from({ length: pre.BLOCK_STRIKES }, (_, i) => ({
+      tenant_id: club.id, author_id: fan.id, content: `[test] bloque ${i}`, moderation_status: 'blocked',
+    }));
+    const { data: ins } = await supabase.from('fan_messages').insert(rows).select('id');
+
+    const s = await pre.maybeSuspend({ tenantId: club.id, authorId: fan.id });
+    assert.ok(s, 'aucune suspension après ' + pre.BLOCK_STRIKES + ' blocages');
+    assert.equal(s.is_permanent, false, '🔒 l\'IA ne prononce JAMAIS de définitif');
+    assert.equal(s.issued_by, null, 'émise par l\'IA');
+    assert.ok(s.ends_at, 'une sanction IA doit toujours expirer');
+    const active = await mod.getActiveSanction(fan.id, club.id);
+    assert.equal(active?.type, 'mute');
+
+    await supabase.from('chat_sanctions').delete().eq('id', s.id);
+    await supabase.from('fan_messages').delete().in('id', (ins || []).map((r) => r.id));
+  });
+  await t('on n\'empile pas les suspensions', async () => {
+    const rows = Array.from({ length: pre.BLOCK_STRIKES }, (_, i) => ({
+      tenant_id: club.id, author_id: fan.id, content: `[test] bloque2 ${i}`, moderation_status: 'blocked',
+    }));
+    const { data: ins } = await supabase.from('fan_messages').insert(rows).select('id');
+    const s1 = await pre.maybeSuspend({ tenantId: club.id, authorId: fan.id });
+    const s2 = await pre.maybeSuspend({ tenantId: club.id, authorId: fan.id });
+    assert.ok(s1);
+    assert.equal(s2, null, 'une sanction déjà active ne doit pas être doublée');
+    await supabase.from('chat_sanctions').delete().eq('id', s1.id);
+    await supabase.from('fan_messages').delete().in('id', (ins || []).map((r) => r.id));
+  });
+
+  await setPreFlag(preInitial);   // on rend le flag dans l'état trouvé
+  await restoreFlag();            // idem pour le flag du lot 5 (prod incluse)
   if (realKey) process.env.ANTHROPIC_API_KEY = realKey;
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);

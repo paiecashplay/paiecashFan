@@ -9,6 +9,7 @@ const { requireAuth, optionalAuth } = require('../../../middleware/auth');
 const fanFeed = require('../../../db/fanFeed');
 const mod = require('../../../db/chatModeration');
 const aiMod = require('../../../services/moderation');
+const prepublish = require('../../../services/moderation/prepublish');
 const favorites = require('../../../db/favorites');
 const { requireClubModerator } = require('../../../middleware/clubModerator');
 const supabase = require('../../../db/supabase');
@@ -25,6 +26,43 @@ const clean = (v) => (typeof v === 'string' ? v.trim() : '');
 // jamais attendre l'IA, et une panne de l'IA ne doit jamais casser l'envoi.
 function screenAsync(args) {
   aiMod.screenContent(args).catch((e) => console.warn('[moderation] pré-classement échoué :', e.message));
+}
+
+// ── Portail de publication (lot 6) ───────────────────────────
+// Renvoie `null` si la publication est autorisée, sinon une réponse HTTP 422
+// expliquant le refus. Le contenu refusé est stocké (jamais jeté) : audit,
+// comptage des récidives et appel possible.
+//
+// 🔓 Fail-open : si l'IA n'a pas répondu dans le budget (`degraded`), on publie
+// et on repasse en analyse asynchrone. Une panne d'IA ne fait pas taire le salon.
+async function publishGate(req, res, { contentType, content, postId = null }) {
+  const v = await prepublish.screenBeforePublish({
+    contentType, tenantId: req.tenant.id, authorId: req.authUser.id, content,
+  }).catch(() => ({ allowed: true, degraded: true }));
+
+  if (v.allowed) return null;
+
+  // On garde une trace du refus (et un dossier si c'est grave).
+  const stored = await mod.storeBlockedContent({
+    contentType, tenantId: req.tenant.id, authorId: req.authUser.id, content,
+    ai: v.ai, postId, openCase: v.action === 'blocked',
+  }).catch(() => null);
+
+  // Récidive → suspension conservatoire (temporaire, révocable, jamais définitive).
+  const sanction = v.action === 'rate_limited' ? null
+    : await prepublish.maybeSuspend({ tenantId: req.tenant.id, authorId: req.authUser.id }).catch(() => null);
+
+  return res.status(422).json({
+    success: false, data: {
+      moderation: {
+        status: 'blocked', action: v.action, reason: v.reason,
+        categories: v.ai?.categories || [],
+        canAppeal: v.action === 'blocked' && !!stored?.caseId,
+        suspended: !!sanction,
+      },
+    },
+    error: v.reason,
+  });
 }
 
 // Résout le club (slug → tenant) et le pose sur req.
@@ -67,6 +105,9 @@ router.post('/:slug/fan-feed/posts', requireAuth, withTenant, requireChatAccess,
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
+    const blocked = await publishGate(req, res, { contentType: 'post', content });
+    if (blocked) return blocked;
+
     const post = await fanFeed.createPost(req.tenant.id, req.authUser.id, content);
     screenAsync({ contentType: 'post', contentId: post.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { post });
@@ -81,6 +122,9 @@ router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, r
   if (!content) return fail(res, 'Le commentaire est vide.');
   if (content.length > MAX) return fail(res, 'Commentaire trop long.');
   try {
+    const blocked = await publishGate(req, res, { contentType: 'comment', content, postId: req.params.postId });
+    if (blocked) return blocked;
+
     const comment = await fanFeed.addComment(req.params.postId, req.authUser.id, content);
     screenAsync({ contentType: 'comment', contentId: comment.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { comment });
@@ -106,6 +150,9 @@ router.post('/:slug/fan-feed/messages', requireAuth, withTenant, requireChatAcce
   if (!content) return fail(res, 'Le message est vide.');
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
+    const blocked = await publishGate(req, res, { contentType: 'message', content });
+    if (blocked) return blocked;
+
     const message = await fanFeed.createMessage(req.tenant.id, req.authUser.id, content);
     screenAsync({ contentType: 'message', contentId: message.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { message, moderation: { status: 'published', reason: null, canAppeal: false } });

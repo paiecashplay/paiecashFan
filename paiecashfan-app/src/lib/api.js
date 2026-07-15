@@ -49,8 +49,14 @@ export async function apiFetch(path, options = {}) {
   if (!res.ok) {
     // On tente de remonter le message d'erreur JSON du backend si présent.
     let msg = `API ${res.status} on ${path}`;
-    try { const j = await res.json(); if (j?.error) msg = j.error; } catch { /* pas de JSON */ }
-    throw new Error(msg);
+    let body = null;
+    try { body = await res.json(); if (body?.error) msg = body.error; } catch { /* pas de JSON */ }
+    // On attache le statut et le corps : un refus de modération (422) porte le
+    // motif et les catégories, qu'un simple message d'erreur perdrait.
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data = body?.data ?? null;
+    throw err;
   }
   return res.json();
 }

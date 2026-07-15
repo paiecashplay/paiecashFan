@@ -105,6 +105,29 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (aq)** — **Modération Fan Club — Lot 6 (blocage AVANT publication)**.
+  `services/moderation/prepublish.js` : pipeline du moins cher au plus cher —
+  **rate limit** (10/min, compte aussi les contenus bloqués : pas de flood par
+  refus) → **heuristique** (0 ms, gratuite, bloque l'explicite sans appeler
+  Claude) → **Claude** (rattrape l'implicite type « retourne cueillir des
+  bananes »). Appliqué aux **3 surfaces** via `publishGate()`.
+  🔓 **FAIL-OPEN** (budget 10 s) : si l'IA est lente ou en panne, on **publie**
+  et on repasse en analyse asynchrone — faire taire le salon serait pire (testé).
+  Politique : `high`/`critical` → **bloqué** + dossier ; `medium` → **reformuler**
+  sans dossier (proportionné) ; `none`/`low` → publié.
+  Le contenu refusé est **stocké** (`moderation_status='blocked'`) : audit,
+  comptage des récidives, appel (lot 7) — jamais servi (filtre de lecture).
+  **Suspension conservatoire** : 3 blocages en 10 min → lecture seule **1 h**,
+  🔒 temporaire et révocable, jamais définitive (testé), pas d'empilement.
+  Réponse **HTTP 422** portant motif + catégories ; `apiFetch` attache désormais
+  `status`/`data` à l'erreur. Front : `BlockedMessageModal` (motif, catégories,
+  bouton **Reformuler**), écho optimiste déjà présent dans `useFanFeed`.
+  **Charte v2026-07-16** (bump ⇒ ré-acceptation obligatoire) : encart
+  « Modération automatique » — informer d'une décision automatisée est requis
+  (RGPD art. 22 / DSA). Flag dédié `chat_ai_prepublish_enabled`.
+  Tests **78/78** (+10). 🐛 **Fix test** : un test restaurait la vraie clé API,
+  si bien que toute la suite appelait le vrai Claude (payant/lent) — 21 s au lieu
+  de plusieurs minutes.
 - **2026-07-16 (ap)** — **Modération étendue au FIL (posts + commentaires)**.
   🚨 **Trou corrigé** : les lots 1→5 ne couvraient que `fan_messages`. Un post ou
   un commentaire ne pouvait être **ni signalé, ni masqué, ni analysé par l'IA** —

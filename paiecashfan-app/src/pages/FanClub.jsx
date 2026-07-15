@@ -11,6 +11,7 @@ import { LiveChat } from '@/components/fanclub/LiveChat';
 import { CharterEntryModal } from '@/components/fanclub/CharterEntryModal';
 import { ReportMessageModal } from '@/components/fanclub/ReportMessageModal';
 import { ActiveSanctionBanner } from '@/components/fanclub/ActiveSanctionBanner';
+import { BlockedMessageModal } from '@/components/fanclub/BlockedMessageModal';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
@@ -49,7 +50,13 @@ export function FanClub() {
     isChatEmpty,
     sendMessage,
     match
-  } = useFanFeed(slug, mode);
+  } = useFanFeed(slug, mode, {
+    // Refus de l'IA avant publication : on explique, on ne montre pas d'erreur brute.
+    onModerationBlock: (moderation, draft) => {
+      setBlocked({ moderation, draft });
+      if (moderation.suspended) loadAccess();   // lecture seule → rafraîchit le bandeau
+    },
+  });
   
   const [newPost, setNewPost] = useState('');
 
@@ -59,6 +66,8 @@ export function FanClub() {
   const [charterBusy, setCharterBusy] = useState(false);
   const [charterDismissed, setCharterDismissed] = useState(false);   // « Plus tard » → ne pas ré-ouvrir
   const [reportTarget, setReportTarget] = useState(null);
+  // Refus de publication par l'IA (lot 6) : { moderation, draft }
+  const [blocked, setBlocked] = useState(null);
   const [hiddenUsers, setHiddenUsers] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem('pcf:hiddenUsers') || '[]')); } catch { return new Set(); }
   });
@@ -363,6 +372,18 @@ export function FanClub() {
             message={reportTarget}
             onSubmit={submitReport}
             onClose={() => setReportTarget(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Publication refusée par l'IA avant diffusion (lot 6) */}
+      <AnimatePresence>
+        {blocked && (
+          <BlockedMessageModal
+            moderation={blocked.moderation}
+            draft={blocked.draft}
+            onRewrite={() => { setNewPost(blocked.draft || ''); setBlocked(null); }}
+            onClose={() => setBlocked(null)}
           />
         )}
       </AnimatePresence>

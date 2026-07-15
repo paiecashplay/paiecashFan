@@ -37,7 +37,10 @@ function formatRelative(iso) {
 
 const withRelative = (o) => ({ ...o, createdAt: formatRelative(o.createdAt) });
 
-export function useFanFeed(clubId, mode = 'club') {
+// `onModerationBlock(moderation, draft)` est appelé quand le serveur REFUSE une
+// publication (lot 6, HTTP 422). Ce n'est pas une panne : on remonte le motif à
+// l'appelant pour l'expliquer au supporter, au lieu d'afficher une erreur brute.
+export function useFanFeed(clubId, mode = 'club', { onModerationBlock } = {}) {
   const { user, profile } = useAuth();
 
   const [fans, setFans] = useState([]);
@@ -86,6 +89,15 @@ export function useFanFeed(clubId, mode = 'club') {
 
   useEffect(() => { loadFeed(); }, [loadFeed]);
 
+  // Échec d'écriture. Un refus de modération (422) n'est PAS une panne : on le
+  // remonte tel quel pour l'expliquer. Dans les deux cas on recharge le feed,
+  // ce qui retire l'affichage optimiste du contenu non publié.
+  const handleWriteError = useCallback((e, draft) => {
+    if (e?.status === 422 && e.data?.moderation) onModerationBlock?.(e.data.moderation, draft);
+    else setError(e.message);
+    loadFeed(true);
+  }, [onModerationBlock, loadFeed]);
+
   // ─── Actions ────────────────────────────────────────────────
   // Mode club → optimiste + POST API + réconciliation silencieuse.
   // Mode friends → local uniquement.
@@ -101,12 +113,12 @@ export function useFanFeed(clubId, mode = 'club') {
       setClubPosts((p) => [optimistic, ...p]);
       apiFetch(`${FEED_PATH(clubId)}/posts`, { method: 'POST', body: JSON.stringify({ content: c }) })
         .then(() => loadFeed(true))
-        .catch((e) => { setError(e.message); loadFeed(true); });
+        .catch((e) => handleWriteError(e, c));
     } else {
       setFriendsPosts((p) => [optimistic, ...p]);
     }
     return true;
-  }, [clubId, mode, me.id, ensureMeInFans, loadFeed]);
+  }, [clubId, mode, me.id, ensureMeInFans, loadFeed, handleWriteError]);
 
   const likePost = useCallback((postId) => {
     if (!user) return;
@@ -117,11 +129,11 @@ export function useFanFeed(clubId, mode = 'club') {
       setClubPosts(toggle);
       apiFetch(`${FEED_PATH(clubId)}/posts/${postId}/like`, { method: 'POST' })
         .then(() => loadFeed(true))
-        .catch((e) => { setError(e.message); loadFeed(true); });
+        .catch((e) => handleWriteError(e, null));   // un like n'a pas de brouillon
     } else {
       setFriendsPosts(toggle);
     }
-  }, [clubId, mode, loadFeed]);
+  }, [clubId, mode, loadFeed, handleWriteError]);
 
   const addComment = useCallback((postId, content) => {
     if (!user) return false;
@@ -137,12 +149,12 @@ export function useFanFeed(clubId, mode = 'club') {
       setClubPosts(bump);
       apiFetch(`${FEED_PATH(clubId)}/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ content: c }) })
         .then(() => loadFeed(true))
-        .catch((e) => { setError(e.message); loadFeed(true); });
+        .catch((e) => handleWriteError(e, c));
     } else {
       setFriendsPosts(bump);
     }
     return true;
-  }, [clubId, mode, me.id, ensureMeInFans, loadFeed]);
+  }, [clubId, mode, me.id, ensureMeInFans, loadFeed, handleWriteError]);
 
   const sendMessage = useCallback((content) => {
     if (!user) return false;
@@ -155,12 +167,12 @@ export function useFanFeed(clubId, mode = 'club') {
       setClubMessages((m) => [...m, optimistic]);
       apiFetch(`${FEED_PATH(clubId)}/messages`, { method: 'POST', body: JSON.stringify({ content: c }) })
         .then(() => loadFeed(true))
-        .catch((e) => { setError(e.message); loadFeed(true); });
+        .catch((e) => handleWriteError(e, c));
     } else {
       setFriendsMessages((m) => [...m, optimistic]);
     }
     return true;
-  }, [clubId, mode, me.id, me.name, ensureMeInFans, loadFeed]);
+  }, [clubId, mode, me.id, me.name, ensureMeInFans, loadFeed, handleWriteError]);
 
   const isEmpty     = useMemo(() => !loading && !error && posts.length === 0, [loading, error, posts.length]);
   const isChatEmpty = useMemo(() => !loading && !error && messages.length === 0, [loading, error, messages.length]);

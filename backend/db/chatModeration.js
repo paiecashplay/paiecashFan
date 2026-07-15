@@ -8,7 +8,11 @@ const supabase = require('./supabase');
 const { createNotification } = require('./notifications');
 
 // Version de la charte : incrémenter la date force une nouvelle acceptation.
-const CHARTER_VERSION = '2026-07-15';
+// ⚠️ Bumper cette version à CHAQUE changement matériel de la charte : tous les
+// supporters devront la ré-accepter (`needsCharter` compare l'exact string).
+// 2026-07-16 : ajout de la modération automatisée par IA — on ne peut pas
+// soumettre quelqu'un à une décision automatisée sans l'en informer (RGPD/DSA).
+const CHARTER_VERSION = '2026-07-16';
 
 // Motifs de signalement autorisés (alignés sur les catégories de modération).
 const REPORT_REASONS = [
@@ -200,6 +204,30 @@ async function upsertCaseForContent({ tenantId, contentType = 'message', content
       : { source, contentType, reports },
   });
   return data.id;
+}
+
+// Enregistre un contenu REFUSÉ avant publication (lot 6).
+// On le STOCKE au lieu de le jeter : trace d'audit, comptage des récidives
+// (suspension conservatoire) et appel possible (lot 7). Il n'est jamais servi —
+// le filtre de lecture ne rend que `published`.
+async function storeBlockedContent({ contentType = 'message', tenantId, authorId, content, ai = null, postId = null, openCase = true }) {
+  assertContentType(contentType);
+  const row = { author_id: authorId, content, moderation_status: 'blocked' };
+  if (contentType === 'comment') row.post_id = postId; else row.tenant_id = tenantId;
+
+  const { data, error } = await supabase.from(CONTENT_TABLE[contentType])
+    .insert(row).select('id').single();
+  if (error) throw new Error(error.message);
+
+  // Dossier seulement pour les cas graves : un « connard » refusé et reformulé
+  // ne doit pas inonder la file des modérateurs.
+  let caseId = null;
+  if (openCase && ai) {
+    caseId = await upsertCaseForContent({
+      tenantId, contentType, contentId: data.id, targetUserId: authorId, source: 'ai', ai,
+    }).catch(() => null);
+  }
+  return { id: data.id, caseId };
 }
 
 // Liste la file. `tenantId` non nul = club_admin borné à son salon.
@@ -573,7 +601,7 @@ module.exports = {
   SANCTION_TYPES, GLOBAL_TYPES, PERMANENT_ALLOWED, SANCTION_LABEL, allowedSanctionsFor,
   getMembership, needsCharter, acceptCharter,
   getActiveSanction, createReport, countReports,
-  audit, upsertCaseForContent, listCases, getCase, decideCase,
+  audit, upsertCaseForContent, storeBlockedContent, listCases, getCase, decideCase,
   issueSanction, revokeSanction, listMySanctions,
   getUserModerationHistory, listAuditLogs,
   CONTENT_TYPES, CONTENT_TABLE, CONTENT_LABEL, getContent,
