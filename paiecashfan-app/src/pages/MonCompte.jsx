@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import {
   Wallet, Ticket, ShoppingBag, ExternalLink, Check, Pencil,
   Receipt, ShieldCheck, Loader2, ArrowRight, History, QrCode,
-  Download, X, Grid3x3, Trophy, Clock
+  Download, X, Grid3x3, Trophy, Clock, Star
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -139,8 +139,9 @@ export function MonCompte() {
             )}
           </div>
 
-          {/* ── Colonne latérale : wallet + profil ──────── */}
+          {/* ── Colonne latérale : clubs + wallet + profil ── */}
           <div className="space-y-6">
+            <FavoriteClubs />
             <WalletCard loading={loadingPcc} pcc={pcc} />
             <ProfileCard profile={profile} email={user?.email} updateProfile={updateProfile} />
           </div>
@@ -440,6 +441,70 @@ function MiniStat({ label, value, accent = 'text-bone-50' }) {
       <p className={`font-display text-2xl font-black tabular-nums ${accent}`}>{value}</p>
       <p className="mt-0.5 text-[9px] uppercase tracking-widest text-bone-500 font-bold">{label}</p>
     </div>
+  );
+}
+
+// ── Mes clubs suivis (⭐) ────────────────────────────────────
+function FavoriteClubs() {
+  const [favs, setFavs] = useState(null);
+  const [busy, setBusy] = useState(null);
+
+  const load = () => apiFetch('/api/v2/me/favorites').then((j) => setFavs(j.data?.favorites || [])).catch(() => setFavs([]));
+  useEffect(() => { load(); }, []);
+
+  async function makePrimary(tenantId) {
+    setBusy(tenantId);
+    try { await apiFetch(`/api/v2/me/favorites/${tenantId}/primary`, { method: 'PUT' }); await load(); } catch { /* silencieux */ }
+    setBusy(null);
+  }
+  async function remove(tenantId) {
+    setBusy(tenantId);
+    try { await apiFetch(`/api/v2/me/favorites/${tenantId}`, { method: 'POST' }); await load(); } catch { /* silencieux */ }
+    setBusy(null);
+  }
+
+  return (
+    <GlassCard className="p-5">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Mes clubs</p>
+        <Star size={13} className="text-gold-400" />
+      </div>
+
+      {favs === null ? (
+        <div className="mt-3 space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
+      ) : favs.length === 0 ? (
+        <div className="mt-3 text-center">
+          <p className="text-xs text-bone-400">Tu ne suis aucun club pour l'instant.</p>
+          <p className="mt-1 text-[11px] text-bone-500">Ouvre la fiche d'un club et clique sur ⭐ pour recevoir ses tombolas et actus.</p>
+          <Link to="/fan-club"><Button variant="primary" size="sm" className="mt-4">Découvrir les clubs</Button></Link>
+        </div>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {favs.map((f) => (
+            <div key={f.club.id} className={`rounded-xl border p-3 ${f.isPrimary ? 'border-gold-400/40 bg-gold-400/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+              <div className="flex items-center justify-between gap-2">
+                <Link to={`/clubs/${f.club.slug}`} className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-bone-100 truncate hover:text-emerald-400">{f.club.name}</p>
+                  <p className="text-[10px] text-bone-500 truncate">{[f.club.city, f.club.league_name].filter(Boolean).join(' · ') || f.club.sport}</p>
+                </Link>
+                {f.isPrimary && <span className="shrink-0 rounded-full bg-gold-400/15 border border-gold-400/30 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-gold-400">Principal</span>}
+              </div>
+              <div className="mt-2 flex items-center gap-3">
+                <Link to={`/clubs/${f.club.slug}/fan-club`} className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300">Communauté</Link>
+                {!f.isPrimary && (
+                  <button onClick={() => makePrimary(f.club.id)} disabled={busy === f.club.id} className="text-[11px] font-bold text-bone-400 hover:text-gold-400 disabled:opacity-50">
+                    Définir principal
+                  </button>
+                )}
+                <button onClick={() => remove(f.club.id)} disabled={busy === f.club.id} className="ml-auto text-[11px] font-bold text-bone-500 hover:text-red-400 disabled:opacity-50">
+                  Retirer
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </GlassCard>
   );
 }
 

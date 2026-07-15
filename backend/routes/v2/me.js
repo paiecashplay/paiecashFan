@@ -8,6 +8,7 @@ const express = require('express');
 const { requireAuth } = require('../../middleware/auth');
 const supabase = require('../../db/supabase');
 const pcc = require('../../services/paiecashcoin');
+const favorites_db = require('../../db/favorites');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -103,6 +104,30 @@ router.get('/pcc-history', async (req, res) => {
     return ok(res, { configured: true, walletReady: !!resolved.walletReady, transactions });
   } catch (err) {
     return fail(res, 'PCC history failed: ' + err.message, 500);
+  }
+});
+
+// ── Clubs favoris (⭐) ───────────────────────────────────────
+// GET /api/v2/me/favorites — mes clubs suivis (principal en premier) + ids.
+router.get('/favorites', async (req, res) => {
+  try {
+    const favorites = await favorites_db.listFavorites(req.authUser.id);
+    return ok(res, { favorites, tenantIds: favorites.map((f) => f.club.id) });
+  } catch (err) { return fail(res, 'Favoris : ' + err.message, 500); }
+});
+
+// POST /api/v2/me/favorites/:tenantId — ajoute/retire (toggle).
+router.post('/favorites/:tenantId', async (req, res) => {
+  try { return ok(res, await favorites_db.toggleFavorite(req.authUser.id, req.params.tenantId)); }
+  catch (err) { return fail(res, 'Favori impossible : ' + err.message, 500); }
+});
+
+// PUT /api/v2/me/favorites/:tenantId/primary — définit le club principal.
+router.put('/favorites/:tenantId/primary', async (req, res) => {
+  try { return ok(res, await favorites_db.setPrimary(req.authUser.id, req.params.tenantId)); }
+  catch (err) {
+    if (err.code === 'NOT_FAVORITE') return fail(res, err.message, 409);
+    return fail(res, err.message, 500);
   }
 });
 

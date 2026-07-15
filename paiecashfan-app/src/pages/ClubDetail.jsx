@@ -20,6 +20,7 @@ import { useClubDetail } from '@/hooks/useClubDetail';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
+import { FavoriteClubButton } from '@/components/club/FavoriteClubButton';
 import { useCart } from '@/hooks/useCart';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
@@ -259,6 +260,11 @@ function ClubHero({ club, backTo = '/', loading = false }) {
           <ArrowLeft size={14} />
           Retour
         </Link>
+
+        {/* ⭐ Suivre ce club → favoris + notifications ciblées */}
+        <div className="absolute top-6 right-6 z-20">
+          <FavoriteClubButton tenantId={club.id} />
+        </div>
 
         <motion.div
           className="flex flex-col items-center"

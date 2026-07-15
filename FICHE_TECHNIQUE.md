@@ -105,6 +105,16 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-15 (ai)** — **Clubs favoris (⭐) + notifications ciblées (Phase B)**.
+  Nouvelle table **`fan_favorite_clubs`** (multi-favoris + `is_primary` = club
+  principal ; RLS deny-all ; migration `fan-favorite-clubs.sql`). ⚠️ **N'utilise
+  PAS `profiles.club_id`** qui sert au rôle club_admin → un favori n'accorde
+  **aucun droit**. `db/favorites.js` (list/toggle/setPrimary/followersOfClub) +
+  routes `GET /me/favorites`, `POST /me/favorites/:tenantId` (toggle),
+  `PUT /me/favorites/:tenantId/primary`. **⭐ sur la fiche club**
+  (`FavoriteClubButton`, optimiste, redirige login) ; **card « Mes clubs »** dans
+  `/mon-compte` (principal, communauté, retirer, état vide). **Fan-out** : à la
+  création d'une tombola de club, notification à tous ses fans (⭐).
 - **2026-07-14 (ah)** — **Sport Bingo — Page « Jouer » premium (maquette)**. `BingoPlay`
   refait, thémé par compétition : hero cover (image + titre + chips + rebours),
   panneau **À propos**, **Comment ça marche** (identique à la page Jeux), onglets

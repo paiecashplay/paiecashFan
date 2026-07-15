@@ -6,6 +6,7 @@
 
 const supabase = require('./supabase');
 const { createNotification } = require('./notifications');
+const favorites = require('./favorites');
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
@@ -94,7 +95,26 @@ async function createCampaign(data) {
   };
   const { data: row, error } = await supabase.from('tombola_campaigns').insert(payload).select('*').single();
   if (error) throw new Error(error.message);
+  await notifyClubFollowers(row).catch(() => {});   // best-effort, non bloquant
   return enrich(row);
+}
+
+// Notifie les fans qui ont ce club en favori (⭐) qu'une tombola est lancée.
+async function notifyClubFollowers(campaign) {
+  if (!campaign?.tenant_id || campaign.status !== 'active') return;
+  const followers = await favorites.followersOfClub(campaign.tenant_id);
+  if (!followers.length) return;
+  const { data: club } = await supabase.from('tenants').select('name').eq('id', campaign.tenant_id).maybeSingle();
+  const lot = campaign.prize_label || campaign.title;
+  const clubName = club?.name || 'ton club';
+  for (const userId of followers) {
+    await createNotification({
+      user_id: userId, type: 'tombola_new',
+      title: `🎁 Nouvelle tombola : ${clubName}`,
+      message: `« ${lot} » vient d'être lancée. Tente ta chance dès maintenant !`,
+      metadata: { campaignId: campaign.id, tenantId: campaign.tenant_id, link: '/tombola' },
+    }).catch(() => {});
+  }
 }
 
 async function updateCampaign(id, updates) {
