@@ -105,6 +105,26 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (ap)** — **Modération étendue au FIL (posts + commentaires)**.
+  🚨 **Trou corrigé** : les lots 1→5 ne couvraient que `fan_messages`. Un post ou
+  un commentaire ne pouvait être **ni signalé, ni masqué, ni analysé par l'IA** —
+  publier dans le fil contournait charte, sanctions et IA.
+  Migration `chat-moderation-content.sql` : colonnes de modération sur
+  `fan_posts`/`fan_comments` + **signalements et dossiers POLYMORPHES**
+  (`content_type` ∈ message|post|comment + `content_id`, remplace `message_id`).
+  Couche métier généralisée : `getContent()`, `createReport({contentType,…})`,
+  `upsertCaseForContent()`, `decideCase()` agit sur la bonne table,
+  `screenContent()`. ⚠️ **`fan_comments` n'a pas de `tenant_id`** → résolu via le
+  post parent, sinon un club_admin pouvait modérer les commentaires d'un AUTRE
+  club (testé). **Filtre de lecture** ajouté sur posts ET commentaires dans
+  `getFeed` (un post masqué restait servi par l'API). Routes : un handler unique
+  `reportHandler(type)` monté sur `/messages|/posts|/comments/:contentId/report`.
+  Front : menu de signalement sur les posts, bouton 🚩 sur les commentaires,
+  badge **Chat/Post/Commentaire** dans le BO, contexte adapté (commentaires
+  frères pour un commentaire). Tests **68/68** (+8 sur le fil).
+  🐛 **Fix test** : la suite écrivait dans `feature_flags` (table partagée avec
+  la prod) et **laissait la modération IA désactivée** — le flag est désormais
+  sauvegardé/restauré.
 - **2026-07-15 (ao)** — **Fix chat : auto-modération + signalement tactile**.
   (1) Le menu « … » proposait « Masquer/Bloquer cet utilisateur » **sur son
   propre message** → nouveau prop `isOwn` : sur son message, uniquement

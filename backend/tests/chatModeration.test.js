@@ -16,20 +16,21 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   const { data: other } = await supabase.from('profiles').select('id').neq('id', fan.id).limit(1).maybeSingle();
   if (!club || !fan) { console.error('Fixtures manquantes (club/fan).'); process.exit(1); }
 
-  // Nettoyage complet : on supprime les DOSSIERS avant les messages, sinon
-  // message_id passe à NULL (ON DELETE SET NULL) et les dossiers restent orphelins.
+  // Nettoyage complet : on supprime les DOSSIERS avant les contenus, sinon
+  // content_id pointe dans le vide (plus de FK depuis le passage au polymorphe)
+  // et les dossiers restent orphelins dans la file du back-office.
   const cleanup = async () => {
     const { data: testMsgs } = await supabase.from('fan_messages').select('id').like('content', '[test]%');
     const ids = (testMsgs || []).map((m) => m.id);
     if (ids.length) {
-      const { data: cs } = await supabase.from('chat_moderation_cases').select('id').in('message_id', ids);
+      const { data: cs } = await supabase.from('chat_moderation_cases').select('id').eq('content_type', 'message').in('content_id', ids);
       const cids = (cs || []).map((c) => c.id);
       if (cids.length) {
         await supabase.from('chat_moderation_audit_logs').delete().in('case_id', cids);
         await supabase.from('chat_sanctions').delete().in('case_id', cids);
         await supabase.from('chat_moderation_cases').delete().in('id', cids);
       }
-      await supabase.from('chat_reports').delete().in('message_id', ids);
+      await supabase.from('chat_reports').delete().eq('content_type', 'message').in('content_id', ids);
     }
     await supabase.from('chat_reports').delete().eq('reporter_user_id', fan.id);
     await supabase.from('chat_sanctions').delete().eq('user_id', fan.id);
@@ -73,18 +74,18 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     .select('id, author_id').single();
 
   await t('un signalement est créé', async () => {
-    const r = await mod.createReport({ messageId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'insult', comment: 'test' });
+    const r = await mod.createReport({ contentType: 'message', contentId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'insult', comment: 'test' });
     assert.ok(r.id);
   });
   await t('un seul signalement par utilisateur/message', async () => {
     await assert.rejects(
-      () => mod.createReport({ messageId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'spam' }),
+      () => mod.createReport({ contentType: 'message', contentId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'spam' }),
       (e) => e.code === 'ALREADY_REPORTED'
     );
   });
   await t('motif invalide refusé', async () => {
     await assert.rejects(
-      () => mod.createReport({ messageId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'n_importe_quoi' }),
+      () => mod.createReport({ contentType: 'message', contentId: msg.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg.author_id, reason: 'n_importe_quoi' }),
       (e) => e.code === 'BAD_REASON'
     );
   });
@@ -183,14 +184,14 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
 
   let caseId;
   await t('un signalement crée un dossier', async () => {
-    const r = await mod.createReport({ messageId: msg2.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg2.author_id, reason: 'insult' });
+    const r = await mod.createReport({ contentType: 'message', contentId: msg2.id, tenantId: club.id, reporterUserId: fan.id, reportedUserId: msg2.author_id, reason: 'insult' });
     assert.ok(r.caseId, 'un caseId doit être créé');
     caseId = r.caseId;
   });
   await t('un 2e signalement n\'ouvre PAS un 2e dossier (dédup + compteur)', async () => {
     if (!other) return;
-    await mod.createReport({ messageId: msg2.id, tenantId: club.id, reporterUserId: other.id, reportedUserId: msg2.author_id, reason: 'spam' });
-    const { data: cases } = await supabase.from('chat_moderation_cases').select('id, reports_count').eq('message_id', msg2.id).in('status', ['open', 'in_review']);
+    await mod.createReport({ contentType: 'message', contentId: msg2.id, tenantId: club.id, reporterUserId: other.id, reportedUserId: msg2.author_id, reason: 'spam' });
+    const { data: cases } = await supabase.from('chat_moderation_cases').select('id, reports_count').eq('content_type', 'message').eq('content_id', msg2.id).in('status', ['open', 'in_review']);
     assert.equal(cases.length, 1, 'un seul dossier ouvert par message');
     assert.equal(cases[0].reports_count, 2);
   });
@@ -225,7 +226,7 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     await assert.rejects(() => mod.decideCase({ caseId, decision: 'dismiss', actorId: fan.id, actorType: 'super_admin' }), (e) => e.code === 'ALREADY_CLOSED');
   });
   await t('les signalements liés passent en « traités »', async () => {
-    const { data: reps } = await supabase.from('chat_reports').select('status').eq('message_id', msg2.id);
+    const { data: reps } = await supabase.from('chat_reports').select('status').eq('content_type', 'message').eq('content_id', msg2.id);
     assert.ok(reps.every((r) => r.status === 'reviewed'));
   });
   await t('la file du club ne contient que SES dossiers', async () => {
@@ -274,7 +275,7 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   console.log('\nÉmission & révocation');
   const { data: msg3 } = await supabase.from('fan_messages')
     .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] message de modération' }).select('id').single();
-  const case3 = await mod.upsertCaseForMessage({ tenantId: club.id, messageId: msg3.id, targetUserId: fan.id, source: 'manual' });
+  const case3 = await mod.upsertCaseForContent({ tenantId: club.id, contentType: 'message', contentId: msg3.id, targetUserId: fan.id, source: 'manual' });
 
   await t('décision + suspension : le supporter ne peut plus écrire', async () => {
     const r = await mod.decideCase({
@@ -324,7 +325,7 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     // un dossier dans un AUTRE club ne doit pas apparaître
     const { data: m4 } = await supabase.from('fan_messages')
       .insert({ tenant_id: club2.id, author_id: fan.id, content: '[test] autre salon' }).select('id').single();
-    const otherCase = await mod.upsertCaseForMessage({ tenantId: club2.id, messageId: m4.id, targetUserId: fan.id, source: 'manual' });
+    const otherCase = await mod.upsertCaseForContent({ tenantId: club2.id, contentType: 'message', contentId: m4.id, targetUserId: fan.id, source: 'manual' });
     const scoped = await mod.getUserModerationHistory(fan.id, { tenantId: club.id });
     assert.equal(scoped.cases.some((c) => c.id === otherCase), false, 'un club_admin ne doit pas voir les dossiers d\'un autre club');
     const global = await mod.getUserModerationHistory(fan.id);
@@ -358,10 +359,19 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   // (docs/moderation-benchmark.md), pas par la suite de tests.
   const realKey = process.env.ANTHROPIC_API_KEY;
   delete process.env.ANTHROPIC_API_KEY;
+
+  // ⚠️ feature_flags est une table PARTAGÉE AVEC LA PROD. Les tests doivent
+  // rendre le flag exactement dans l'état où ils l'ont trouvé : sinon la suite
+  // désactive silencieusement la modération IA en production.
+  const { data: flagBefore } = await supabase.from('feature_flags')
+    .select('enabled').eq('key', ai.FLAG_KEY).maybeSingle();
+  const initialFlag = flagBefore?.enabled ?? false;
+
   const setFlag = async (on) => {
     await supabase.from('feature_flags').upsert({ key: ai.FLAG_KEY, enabled: on }, { onConflict: 'key' });
     ai._resetFlagCache();
   };
+  const restoreFlag = async () => { await setFlag(initialFlag); };
 
   console.log('\n🤖 Classement IA (heuristique)');
   await t('la passion foot n\'est PAS modérée', async () => {
@@ -397,9 +407,9 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     await setFlag(false);
     const { data: m } = await supabase.from('fan_messages')
       .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] sale negre' }).select('id').single();
-    const r = await ai.screenMessage({ messageId: m.id, tenantId: club.id, authorId: fan.id, content: '[test] sale negre' });
+    const r = await ai.screenContent({ contentType: 'message', contentId: m.id, tenantId: club.id, authorId: fan.id, content: '[test] sale negre' });
     assert.equal(r, null);
-    const { count } = await supabase.from('chat_moderation_cases').select('id', { count: 'exact', head: true }).eq('message_id', m.id);
+    const { count } = await supabase.from('chat_moderation_cases').select('id', { count: 'exact', head: true }).eq('content_type', 'message').eq('content_id', m.id);
     assert.equal(count || 0, 0, 'aucun dossier ne doit être ouvert flag off');
     await supabase.from('fan_messages').delete().eq('id', m.id);
   });
@@ -409,7 +419,7 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] ferme ta gueule connard' }).select('id').single();
 
   await t('flag activé → dossier ouvert, priorisé, source « ai »', async () => {
-    const r = await ai.screenMessage({ messageId: msg5.id, tenantId: club.id, authorId: fan.id, content: '[test] ferme ta gueule connard' });
+    const r = await ai.screenContent({ contentType: 'message', contentId: msg5.id, tenantId: club.id, authorId: fan.id, content: '[test] ferme ta gueule connard' });
     assert.ok(r?.caseId, 'dossier non créé');
     const { data: c } = await supabase.from('chat_moderation_cases')
       .select('source, priority, ai_risk_score, ai_categories, ai_summary').eq('id', r.caseId).single();
@@ -423,7 +433,7 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     assert.equal(m.deleted_at, null);
   });
   await t('l\'audit attribue l\'ouverture à l\'IA', async () => {
-    const { data: c } = await supabase.from('chat_moderation_cases').select('id').eq('message_id', msg5.id).single();
+    const { data: c } = await supabase.from('chat_moderation_cases').select('id').eq('content_type', 'message').eq('content_id', msg5.id).single();
     const logs = await mod.listAuditLogs({ caseId: c.id });
     const opened = logs.find((l) => l.action === 'case_opened');
     assert.equal(opened.actor_type, 'ai');
@@ -436,9 +446,9 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     );
   });
   await t('la priorité n\'est jamais rétrogradée', async () => {
-    const { data: before } = await supabase.from('chat_moderation_cases').select('id').eq('message_id', msg5.id).single();
+    const { data: before } = await supabase.from('chat_moderation_cases').select('id').eq('content_type', 'message').eq('content_id', msg5.id).single();
     await supabase.from('chat_moderation_cases').update({ priority: 'critical' }).eq('id', before.id);
-    const again = await mod.upsertCaseForMessage({ tenantId: club.id, messageId: msg5.id, targetUserId: fan.id, source: 'report' });
+    const again = await mod.upsertCaseForContent({ tenantId: club.id, contentType: 'message', contentId: msg5.id, targetUserId: fan.id, source: 'report' });
     const { data: after } = await supabase.from('chat_moderation_cases').select('priority').eq('id', again).single();
     assert.equal(after.priority, 'critical', 'un recalcul ne doit jamais rétrograder la priorité');
   });
@@ -449,7 +459,100 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
     if (realKey) process.env.ANTHROPIC_API_KEY = realKey; else delete process.env.ANTHROPIC_API_KEY;
   });
 
-  await setFlag(false);
+  // ══════════════ EXTENSION — posts & commentaires ══════════════
+  console.log('\n📰 Modération du fil (posts & commentaires)');
+  const fanFeed = require('../db/fanFeed');
+
+  const { data: post1 } = await supabase.from('fan_posts')
+    .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] post a moderer' }).select('id').single();
+  const { data: com1 } = await supabase.from('fan_comments')
+    .insert({ post_id: post1.id, author_id: fan.id, content: '[test] commentaire a moderer' }).select('id').single();
+
+  await t('un post est signalable comme un message', async () => {
+    const r = await mod.createReport({
+      contentType: 'post', contentId: post1.id, tenantId: club.id,
+      reporterUserId: other.id, reportedUserId: fan.id, reason: 'insult',
+    });
+    assert.ok(r.id && r.caseId, 'dossier non ouvert pour le post');
+    const { data: c } = await supabase.from('chat_moderation_cases').select('content_type').eq('id', r.caseId).single();
+    assert.equal(c.content_type, 'post');
+  });
+  await t('un commentaire est signalable', async () => {
+    const r = await mod.createReport({
+      contentType: 'comment', contentId: com1.id, tenantId: club.id,
+      reporterUserId: other.id, reportedUserId: fan.id, reason: 'spam',
+    });
+    assert.ok(r.caseId);
+  });
+  await t('le tenant d\'un commentaire est résolu via le post parent', async () => {
+    // fan_comments n'a pas de tenant_id : sans cette résolution, le
+    // cloisonnement club_admin ne tiendrait pas.
+    const c = await mod.getContent('comment', com1.id);
+    assert.equal(c.tenant_id, club.id);
+  });
+  await t('un type de contenu inconnu est rejeté', async () => {
+    await assert.rejects(() => mod.getContent('facture', post1.id), (e) => e.code === 'BAD_CONTENT_TYPE');
+  });
+
+  await t('masquer un POST le retire du fil (sans le supprimer)', async () => {
+    const { data: cs } = await supabase.from('chat_moderation_cases').select('id')
+      .eq('content_type', 'post').eq('content_id', post1.id).in('status', ['open', 'in_review']).single();
+    await mod.decideCase({ caseId: cs.id, decision: 'hide_message', reason: 'test', actorId: fan.id, actorType: 'super_admin' });
+
+    const feed = await fanFeed.getFeed(club.id, fan.id);
+    assert.equal((feed.posts || []).some((p) => p.id === post1.id), false, 'le post masqué ne doit plus être servi');
+    const { data: still } = await supabase.from('fan_posts').select('id, moderation_status').eq('id', post1.id).single();
+    assert.equal(still.moderation_status, 'hidden', 'jamais de suppression physique');
+  });
+  await t('retirer un COMMENTAIRE le retire du fil (sans le supprimer)', async () => {
+    const { data: cs } = await supabase.from('chat_moderation_cases').select('id')
+      .eq('content_type', 'comment').eq('content_id', com1.id).in('status', ['open', 'in_review']).single();
+    await mod.decideCase({ caseId: cs.id, decision: 'remove_message', reason: 'test', actorId: fan.id, actorType: 'super_admin' });
+
+    const { data: p2 } = await supabase.from('fan_posts')
+      .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] post visible' }).select('id').single();
+    const feed = await fanFeed.getFeed(club.id, fan.id);
+    assert.equal(JSON.stringify(feed).includes('[test] commentaire a moderer'), false, 'le commentaire retiré ne doit plus apparaître');
+    const { data: still } = await supabase.from('fan_comments').select('moderation_status, deleted_at').eq('id', com1.id).single();
+    assert.equal(still.moderation_status, 'removed');
+    assert.ok(still.deleted_at, 'deleted_at doit être horodaté');
+    await supabase.from('fan_posts').delete().eq('id', p2.id);
+  });
+  await t('l\'IA pré-classe aussi les posts', async () => {
+    await setFlag(true);
+    const { data: p3 } = await supabase.from('fan_posts')
+      .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] sale negre' }).select('id').single();
+    const r = await ai.screenContent({ contentType: 'post', contentId: p3.id, tenantId: club.id, authorId: fan.id, content: 'sale negre' });
+    assert.ok(r?.caseId, 'aucun dossier IA sur le post');
+    const { data: c } = await supabase.from('chat_moderation_cases').select('content_type, source, priority').eq('id', r.caseId).single();
+    assert.equal(c.content_type, 'post');
+    assert.equal(c.source, 'ai');
+    assert.equal(c.priority, 'critical');
+    await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', r.caseId);
+    await supabase.from('chat_moderation_cases').delete().eq('id', r.caseId);
+    await supabase.from('fan_posts').delete().eq('id', p3.id);
+  });
+  await t('la file affiche le type de contenu', async () => {
+    const cases = await mod.listCases({ tenantId: club.id, status: null });
+    const post = cases.find((c) => c.content_type === 'post');
+    assert.ok(post, 'aucun dossier de post dans la file');
+    assert.equal(post.contentLabel, 'Post du fil');
+    assert.ok(post.content?.content?.includes('[test]'), 'le contenu du post doit être joint');
+  });
+
+  // nettoyage du fil
+  const { data: feedCases } = await supabase.from('chat_moderation_cases').select('id')
+    .in('content_type', ['post', 'comment']).in('content_id', [post1.id, com1.id]);
+  const fcIds = (feedCases || []).map((c) => c.id);
+  if (fcIds.length) {
+    await supabase.from('chat_moderation_audit_logs').delete().in('case_id', fcIds);
+    await supabase.from('chat_moderation_cases').delete().in('id', fcIds);
+  }
+  await supabase.from('chat_reports').delete().in('content_id', [post1.id, com1.id]);
+  await supabase.from('fan_comments').delete().eq('id', com1.id);
+  await supabase.from('fan_posts').delete().eq('id', post1.id);
+
+  await restoreFlag();   // on rend le flag dans l'état trouvé (prod incluse)
   if (realKey) process.env.ANTHROPIC_API_KEY = realKey;
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);

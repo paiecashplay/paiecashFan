@@ -22,7 +22,7 @@ const PRIORITY_STYLE = {
   low: 'text-bone-500 bg-white/5 border-white/10',
 };
 const DECISION_LABEL = {
-  dismiss: 'Dossier classé', hide_message: 'Message masqué', remove_message: 'Message retiré',
+  dismiss: 'Dossier classé', hide_message: 'Contenu masqué', remove_message: 'Contenu retiré',
 };
 const REASON_LABEL = {
   insult: 'Insulte', harassment: 'Harcèlement', hate: 'Haine', racism: 'Racisme',
@@ -34,6 +34,17 @@ const fmt = (s) => {
   const d = new Date(s);
   return isNaN(d.getTime()) ? '—' : d.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
 };
+
+// D'où vient le contenu : chat, fil ou commentaire.
+const CONTENT_STYLE = {
+  message: { label: 'Chat', cls: 'border-sky-400/30 bg-sky-400/10 text-sky-300' },
+  post: { label: 'Post', cls: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' },
+  comment: { label: 'Commentaire', cls: 'border-amber-400/30 bg-amber-400/10 text-amber-300' },
+};
+function ContentBadge({ type }) {
+  const s = CONTENT_STYLE[type] || CONTENT_STYLE.message;
+  return <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${s.cls}`}>{s.label}</span>;
+}
 
 // Badge « détecté par l'IA » — l'IA ne fait que pré-classer, jamais sanctionner.
 function AiBadge({ score }) {
@@ -117,6 +128,7 @@ export function ModerationQueue({ basePath, title = 'Modération', subtitle, sho
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${PRIORITY_STYLE[c.priority] || PRIORITY_STYLE.normal}`}>{c.priority}</span>
                     <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${STATUS_STYLE[c.status] || ''}`}>{c.status}</span>
+                    <ContentBadge type={c.content_type} />
                     {c.source === 'ai' && <AiBadge score={c.ai_risk_score} />}
                     {showClub && c.club && <span className="text-[10px] text-bone-500">· {c.club.name}</span>}
                     <span className="inline-flex items-center gap-1 text-[10px] text-bone-500"><Flag size={10} /> {c.reports_count}</span>
@@ -250,8 +262,8 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
           <div className="py-12 grid place-items-center"><Loader2 size={22} className="animate-spin text-bone-500" /></div>
         ) : (
           <div className="mt-4 space-y-4">
-            {/* Message signalé */}
-            <Section icon={MessageSquare} title="Message signalé">
+            {/* Contenu signalé — message du chat, post du fil ou commentaire */}
+            <Section icon={MessageSquare} title={`${c.contentLabel || 'Contenu'} signalé`}>
               <div className="rounded-xl border border-red-500/25 bg-red-500/[0.06] p-3">
                 <p className="text-[11px] text-bone-500">{c.target?.name} · {fmt(c.message?.created_at)}</p>
                 <p className="mt-1 text-sm text-bone-100">{c.message?.content || <i className="text-bone-500">Message supprimé</i>}</p>
@@ -295,9 +307,9 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
               </div>
             </Section>
 
-            {/* Contexte */}
+            {/* Contexte : messages voisins du salon, ou commentaires frères du post */}
             {c.context?.length > 0 && (
-              <Section icon={Clock} title="Contexte du salon">
+              <Section icon={Clock} title={c.content_type === 'comment' ? 'Autres commentaires du post' : 'Contexte du salon'}>
                 <div className="space-y-1">
                   {c.context.map((m) => (
                     <div key={m.id} className={`rounded-lg px-3 py-1.5 text-xs ${m.isTarget ? 'bg-red-500/10 border border-red-500/25' : 'bg-white/[0.02]'}`}>
@@ -377,9 +389,9 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] p-2.5 text-xs text-bone-100 outline-none focus:border-emerald-400/60" />
                 </label>
 
-                {/* 2. Action sur le message signalé */}
+                {/* 2. Action sur le contenu signalé */}
                 <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Action sur le message</p>
+                  <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Action sur le contenu</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {[['dismiss', 'Aucune (classer)'], ['hide_message', 'Masquer'], ['remove_message', 'Retirer']].map(([v, l]) => (
                       <button key={v} onClick={() => setMsgAction(v)}
@@ -428,7 +440,7 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
                 <div className="mt-3 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.05] p-3">
                   <p className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold">Ce qui va se passer</p>
                   <ul className="mt-1.5 space-y-0.5 text-[11px] text-bone-300">
-                    <li>• {msgAction === 'dismiss' ? 'Le message reste publié, le dossier est classé.' : msgAction === 'hide_message' ? 'Le message est masqué du salon (conservé en base).' : 'Le message est retiré du salon (conservé en base).'}</li>
+                    <li>• {msgAction === 'dismiss' ? 'Le contenu reste publié, le dossier est classé.' : msgAction === 'hide_message' ? 'Le contenu est masqué (conservé en base).' : 'Le contenu est retiré (conservé en base).'}</li>
                     <li>• {sanction.type
                       ? <>Sanction <b className="text-red-300">{config?.labels?.[sanction.type] || sanction.type}</b>{!['warning', 'account_review'].includes(sanction.type) ? (sanction.isPermanent ? ' — définitive' : ` — ${({ 1: '1 h', 24: '24 h', 168: '7 j', 720: '30 j' })[sanction.durationHours] || sanction.durationHours + ' h'}`) : ''} appliquée.</>
                       : 'Aucune sanction.'}</li>
@@ -443,7 +455,7 @@ function CaseModal({ basePath, caseId, onClose, onDecided, onOpenUser }) {
                   {busy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                   {sanction.type ? 'Appliquer et notifier le supporter' : 'Enregistrer la décision'}
                 </button>
-                <p className="mt-2 text-[10px] text-bone-500">Un message retiré n'est jamais supprimé physiquement. Toute décision est tracée dans le journal d'audit.</p>
+                <p className="mt-2 text-[10px] text-bone-500">Un contenu retiré n'est jamais supprimé physiquement. Toute décision est tracée dans le journal d'audit.</p>
               </div>
             ) : (
               <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-3 text-xs text-emerald-200">

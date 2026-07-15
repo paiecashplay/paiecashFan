@@ -78,39 +78,70 @@ async function getActiveSanction(userId, tenantId = null) {
   };
 }
 
+// ── Contenus modérables ──────────────────────────────────────
+// Le chat (fan_messages) ET le fil (fan_posts, fan_comments) se modèrent à
+// l'identique. Sans ça, publier dans le fil contournait toute la modération.
+const CONTENT_TYPES = ['message', 'post', 'comment'];
+const CONTENT_TABLE = { message: 'fan_messages', post: 'fan_posts', comment: 'fan_comments' };
+const CONTENT_LABEL = { message: 'Message du chat', post: 'Post du fil', comment: 'Commentaire' };
+
+function assertContentType(contentType) {
+  if (!CONTENT_TYPES.includes(contentType)) {
+    const e = new Error('Type de contenu inconnu.'); e.code = 'BAD_CONTENT_TYPE'; throw e;
+  }
+}
+
+// Récupère un contenu et résout SON salon.
+// ⚠️ fan_comments n'a pas de tenant_id : il est résolu via le post parent.
+// Sans ça, le cloisonnement club_admin ne tiendrait pas sur les commentaires.
+async function getContent(contentType, contentId) {
+  assertContentType(contentType);
+
+  if (contentType === 'comment') {
+    const { data } = await supabase.from('fan_comments')
+      .select('id, post_id, author_id, content, moderation_status, created_at')
+      .eq('id', contentId).maybeSingle();
+    if (!data) return null;
+    const { data: post } = await supabase.from('fan_posts')
+      .select('tenant_id').eq('id', data.post_id).maybeSingle();
+    return { ...data, tenant_id: post?.tenant_id || null, contentType };
+  }
+
+  const { data } = await supabase.from(CONTENT_TABLE[contentType])
+    .select('id, tenant_id, author_id, content, moderation_status, created_at')
+    .eq('id', contentId).maybeSingle();
+  return data ? { ...data, contentType } : null;
+}
+
 // ── Signalements ─────────────────────────────────────────────
-// Un seul signalement par (message, signalant). Le signalant reste anonyme.
-async function createReport({ messageId, tenantId, reporterUserId, reportedUserId, reason, comment }) {
+// Un seul signalement par (contenu, signalant). Le signalant reste anonyme.
+async function createReport({ contentType = 'message', contentId, tenantId, reporterUserId, reportedUserId, reason, comment }) {
+  assertContentType(contentType);
   if (!REPORT_REASONS.includes(reason)) { const e = new Error('Motif invalide.'); e.code = 'BAD_REASON'; throw e; }
   const { data, error } = await supabase.from('chat_reports').insert({
-    message_id: messageId, tenant_id: tenantId, reporter_user_id: reporterUserId,
-    reported_user_id: reportedUserId, reason, comment: comment || null,
+    content_type: contentType, content_id: contentId, tenant_id: tenantId,
+    reporter_user_id: reporterUserId, reported_user_id: reportedUserId,
+    reason, comment: comment || null,
   }).select('id, created_at').single();
 
   if (error) {
-    if (error.code === '23505') { const e = new Error('Tu as déjà signalé ce message.'); e.code = 'ALREADY_REPORTED'; throw e; }
+    if (error.code === '23505') { const e = new Error('Tu as déjà signalé ce contenu.'); e.code = 'ALREADY_REPORTED'; throw e; }
     throw new Error(error.message);
   }
 
   // Alimente la file de modération (création ou incrément du dossier).
-  const caseId = await upsertCaseForMessage({ tenantId, messageId, targetUserId: reportedUserId, source: 'report' })
+  const caseId = await upsertCaseForContent({ tenantId, contentType, contentId, targetUserId: reportedUserId, source: 'report' })
     .catch(() => null);   // best-effort : un signalement ne doit jamais échouer à cause du dossier
 
   return { id: data.id, createdAt: data.created_at, caseId };
 }
 
-// Nb de signalements ouverts sur un message (pour la file de modération, lot 2).
-async function countReports(messageId) {
+// Nb de signalements ouverts sur un contenu (pour la file de modération).
+async function countReports(contentType, contentId) {
   const { count } = await supabase.from('chat_reports')
-    .select('id', { count: 'exact', head: true }).eq('message_id', messageId);
+    .select('id', { count: 'exact', head: true })
+    .eq('content_type', contentType).eq('content_id', contentId);
   return count || 0;
-}
-
-// Récupère un message du salon (pour vérifier l'appartenance au tenant).
-async function getMessage(messageId) {
-  const { data } = await supabase.from('fan_messages')
-    .select('id, tenant_id, author_id, content, moderation_status, created_at').eq('id', messageId).maybeSingle();
-  return data || null;
 }
 
 // ── Journal d'audit (toute décision en laisse une trace) ─────
@@ -122,16 +153,17 @@ async function audit({ caseId, actorType, actorId = null, action, previousValue 
 }
 
 // ── File de modération (dossiers) ────────────────────────────
-// Crée le dossier d'un message, ou incrémente le compteur s'il existe déjà.
-// Un seul dossier ouvert par message (garanti par index unique).
+// Crée le dossier d'un contenu, ou incrémente le compteur s'il existe déjà.
+// Un seul dossier ouvert par contenu (garanti par index unique).
 const PRIORITY_RANK = { low: 0, normal: 1, high: 2, critical: 3 };
 const worst = (a, b) => (PRIORITY_RANK[b] > PRIORITY_RANK[a] ? b : a);
 
 // `ai` = verdict du pré-classement (lot 5). Un dossier ne peut que MONTER
 // en priorité : un signalement humain ne doit pas être enterré par l'IA,
 // et inversement.
-async function upsertCaseForMessage({ tenantId, messageId, targetUserId, source = 'report', ai = null }) {
-  const reports = await countReports(messageId);
+async function upsertCaseForContent({ tenantId, contentType = 'message', contentId, targetUserId, source = 'report', ai = null }) {
+  assertContentType(contentType);
+  const reports = await countReports(contentType, contentId);
   let priority = reports >= 3 ? 'high' : 'normal';
   if (ai?.priority) priority = worst(priority, ai.priority);
 
@@ -141,7 +173,8 @@ async function upsertCaseForMessage({ tenantId, messageId, targetUserId, source 
   } : {};
 
   const { data: existing } = await supabase.from('chat_moderation_cases')
-    .select('id, reports_count, priority, source').eq('message_id', messageId)
+    .select('id, reports_count, priority, source')
+    .eq('content_type', contentType).eq('content_id', contentId)
     .in('status', ['open', 'in_review']).maybeSingle();
 
   if (existing) {
@@ -153,72 +186,103 @@ async function upsertCaseForMessage({ tenantId, messageId, targetUserId, source 
   }
 
   const { data, error } = await supabase.from('chat_moderation_cases').insert({
-    tenant_id: tenantId, message_id: messageId, target_user_id: targetUserId,
-    source, status: 'open', priority, reports_count: reports, ...aiCols,
+    tenant_id: tenantId, content_type: contentType, content_id: contentId,
+    target_user_id: targetUserId, source, status: 'open', priority, reports_count: reports, ...aiCols,
   }).select('id').single();
   if (error) throw new Error(error.message);
 
-  await supabase.from('fan_messages').update({ moderation_case_id: data.id }).eq('id', messageId);
+  await supabase.from(CONTENT_TABLE[contentType])
+    .update({ moderation_case_id: data.id }).eq('id', contentId);
   await audit({
     caseId: data.id, actorType: ai ? 'ai' : 'system', action: 'case_opened',
-    newValue: ai ? { source, reports, riskLevel: ai.riskLevel, categories: ai.categories, provider: ai.provider } : { source, reports },
+    newValue: ai
+      ? { source, contentType, reports, riskLevel: ai.riskLevel, categories: ai.categories, provider: ai.provider }
+      : { source, contentType, reports },
   });
   return data.id;
 }
 
 // Liste la file. `tenantId` non nul = club_admin borné à son salon.
-async function listCases({ tenantId = null, status = null, priority = null, limit = 100 } = {}) {
+async function listCases({ tenantId = null, status = null, priority = null, contentType = null, limit = 100 } = {}) {
   let q = supabase.from('chat_moderation_cases')
-    .select('id, tenant_id, message_id, target_user_id, source, status, priority, reports_count, ai_risk_score, ai_summary, decision, created_at, resolved_at')
+    .select('id, tenant_id, content_type, content_id, target_user_id, source, status, priority, reports_count, ai_risk_score, ai_summary, decision, created_at, resolved_at')
     .order('created_at', { ascending: false }).limit(limit);
   if (tenantId) q = q.eq('tenant_id', tenantId);
   if (status) q = q.eq('status', status);
   if (priority) q = q.eq('priority', priority);
+  if (contentType) q = q.eq('content_type', contentType);
   const { data: cases } = await q;
   if (!cases?.length) return [];
 
-  const msgIds = [...new Set(cases.map((c) => c.message_id).filter(Boolean))];
+  // Les contenus vivent dans 3 tables : une requête par type présent.
+  const byType = {};
+  for (const c of cases) {
+    if (!c.content_id) continue;
+    (byType[c.content_type] ||= new Set()).add(c.content_id);
+  }
+  const contentRows = await Promise.all(Object.entries(byType).map(async ([type, ids]) => {
+    const { data } = await supabase.from(CONTENT_TABLE[type])
+      .select('id, content, moderation_status, created_at').in('id', [...ids]);
+    return (data || []).map((r) => [`${type}:${r.id}`, r]);
+  }));
+  const contentByKey = Object.fromEntries(contentRows.flat());
+
   const userIds = [...new Set(cases.map((c) => c.target_user_id))];
   const tenantIds = [...new Set(cases.map((c) => c.tenant_id))];
-  const [{ data: msgs }, { data: profs }, { data: clubs }] = await Promise.all([
-    msgIds.length ? supabase.from('fan_messages').select('id, content, moderation_status, created_at').in('id', msgIds) : { data: [] },
+  const [{ data: profs }, { data: clubs }] = await Promise.all([
     userIds.length ? supabase.from('profiles').select('id, display_name, avatar_url').in('id', userIds) : { data: [] },
     tenantIds.length ? supabase.from('tenants').select('id, name, slug').in('id', tenantIds) : { data: [] },
   ]);
-  const mById = Object.fromEntries((msgs || []).map((m) => [m.id, m]));
   const pById = Object.fromEntries((profs || []).map((p) => [p.id, p]));
   const cById = Object.fromEntries((clubs || []).map((c) => [c.id, c]));
 
-  return cases.map((c) => ({
-    ...c,
-    message: mById[c.message_id] || null,
-    target: pById[c.target_user_id] ? { id: c.target_user_id, name: pById[c.target_user_id].display_name, avatar: pById[c.target_user_id].avatar_url } : { id: c.target_user_id, name: 'Supporter', avatar: null },
-    club: cById[c.tenant_id] || null,
-  }));
+  return cases.map((c) => {
+    const content = contentByKey[`${c.content_type}:${c.content_id}`] || null;
+    return {
+      ...c,
+      content,
+      contentLabel: CONTENT_LABEL[c.content_type] || c.content_type,
+      message: content,   // rétro-compat front
+      target: pById[c.target_user_id] ? { id: c.target_user_id, name: pById[c.target_user_id].display_name, avatar: pById[c.target_user_id].avatar_url } : { id: c.target_user_id, name: 'Supporter', avatar: null },
+      club: cById[c.tenant_id] || null,
+    };
+  });
 }
 
-// Détail d'un dossier : message, contexte, signalements ANONYMISÉS, historique.
+// Détail d'un dossier : contenu, contexte, signalements ANONYMISÉS, historique.
 async function getCase(caseId) {
   const { data: c } = await supabase.from('chat_moderation_cases').select('*').eq('id', caseId).maybeSingle();
   if (!c) return null;
 
-  const [{ data: msg }, { data: reports }, { data: prof }, { data: club }] = await Promise.all([
-    c.message_id ? supabase.from('fan_messages').select('id, content, author_id, moderation_status, created_at').eq('id', c.message_id).maybeSingle() : { data: null },
+  const [msg, { data: reports }, { data: prof }, { data: club }] = await Promise.all([
+    c.content_id ? getContent(c.content_type, c.content_id).catch(() => null) : null,
     // ⚠️ On ne sélectionne JAMAIS reporter_user_id : le signalant reste anonyme.
-    supabase.from('chat_reports').select('id, reason, comment, status, created_at').eq('message_id', c.message_id).order('created_at', { ascending: false }),
+    supabase.from('chat_reports').select('id, reason, comment, status, created_at')
+      .eq('content_type', c.content_type).eq('content_id', c.content_id)
+      .order('created_at', { ascending: false }),
     supabase.from('profiles').select('id, display_name, avatar_url').eq('id', c.target_user_id).maybeSingle(),
     supabase.from('tenants').select('id, name, slug').eq('id', c.tenant_id).maybeSingle(),
   ]);
 
-  // Contexte : messages autour (avant/après) dans le même salon.
+  // Contexte : ce qui entoure le contenu. Le sens diffère selon le type —
+  //  · message    → les messages voisins du salon (±3)
+  //  · commentaire→ les autres commentaires du même post
+  //  · post       → aucun (il est autoportant)
   let context = [];
-  if (msg) {
+  if (msg && c.content_type === 'message') {
     const { data: around } = await supabase.from('fan_messages')
       .select('id, author_id, content, created_at, moderation_status')
       .eq('tenant_id', c.tenant_id).order('created_at', { ascending: true }).limit(200);
     const all = around || [];
     const idx = all.findIndex((m) => m.id === msg.id);
     context = idx >= 0 ? all.slice(Math.max(0, idx - 3), idx + 4) : [];
+  } else if (msg && c.content_type === 'comment') {
+    const { data: siblings } = await supabase.from('fan_comments')
+      .select('id, author_id, content, created_at, moderation_status')
+      .eq('post_id', msg.post_id).order('created_at', { ascending: true }).limit(20);
+    context = siblings || [];
+  }
+  if (context.length) {
     const ids = [...new Set(context.map((m) => m.author_id))];
     const { data: cp } = ids.length ? await supabase.from('profiles').select('id, display_name').in('id', ids) : { data: [] };
     const cpById = Object.fromEntries((cp || []).map((p) => [p.id, p.display_name]));
@@ -237,7 +301,9 @@ async function getCase(caseId) {
 
   return {
     ...c,
-    message: msg || null,
+    content: msg || null,
+    contentLabel: CONTENT_LABEL[c.content_type] || c.content_type,
+    message: msg || null,             // rétro-compat front
     club: club || null,
     target: prof ? { id: prof.id, name: prof.display_name, avatar: prof.avatar_url } : { id: c.target_user_id, name: 'Supporter', avatar: null },
     reports: reports || [],           // anonymes
@@ -366,7 +432,7 @@ async function getUserModerationHistory(userId, { tenantId = null } = {}) {
     .select('id, display_name, avatar_url, created_at').eq('id', userId).maybeSingle();
 
   let cq = supabase.from('chat_moderation_cases')
-    .select('id, tenant_id, message_id, source, status, priority, decision, decision_reason, reports_count, created_at, resolved_at')
+    .select('id, tenant_id, content_type, source, status, priority, decision, decision_reason, reports_count, created_at, resolved_at')
     .eq('target_user_id', userId).order('created_at', { ascending: false }).limit(50);
   if (tenantId) cq = cq.eq('tenant_id', tenantId);
 
@@ -375,12 +441,24 @@ async function getUserModerationHistory(userId, { tenantId = null } = {}) {
     .eq('user_id', userId).order('created_at', { ascending: false }).limit(50);
   if (tenantId) sq = sq.or(`tenant_id.eq.${tenantId},scope.eq.global`);
 
-  let mq = supabase.from('fan_messages').select('id', { count: 'exact', head: true }).eq('author_id', userId);
-  let rq = supabase.from('fan_messages').select('id', { count: 'exact', head: true })
-    .eq('author_id', userId).in('moderation_status', ['hidden', 'removed', 'blocked']);
-  if (tenantId) { mq = mq.eq('tenant_id', tenantId); rq = rq.eq('tenant_id', tenantId); }
+  // L'activité couvre les 3 surfaces : chat, posts, commentaires.
+  // (fan_comments n'a pas de tenant_id → non borné par salon ; c'est assumé,
+  //  le compteur reste indicatif.)
+  const countIn = async (table, scoped) => {
+    let q = supabase.from(table).select('id', { count: 'exact', head: true }).eq('author_id', userId);
+    if (tenantId && table !== 'fan_comments') q = q.eq('tenant_id', tenantId);
+    if (scoped) q = q.in('moderation_status', ['hidden', 'removed', 'blocked']);
+    const { count } = await q;
+    return count || 0;
+  };
 
-  const [{ data: cases }, { data: sanctions }, { count: messages }, { count: moderated }] = await Promise.all([cq, sq, mq, rq]);
+  const [{ data: cases }, { data: sanctions }, msgN, postN, comN, msgMod, postMod, comMod] = await Promise.all([
+    cq, sq,
+    countIn('fan_messages', false), countIn('fan_posts', false), countIn('fan_comments', false),
+    countIn('fan_messages', true), countIn('fan_posts', true), countIn('fan_comments', true),
+  ]);
+  const messages = msgN + postN + comN;
+  const moderated = msgMod + postMod + comMod;
 
   // Noms des clubs concernés
   const tIds = [...new Set([...(cases || []).map((c) => c.tenant_id), ...(sanctions || []).map((s) => s.tenant_id)].filter(Boolean))];
@@ -443,15 +521,17 @@ async function decideCase({ caseId, decision, reason = null, actorId, actorType,
 
   const now = new Date().toISOString();
   let previousMsgStatus = null;
+  const table = CONTENT_TABLE[c.content_type];
 
-  // Action sur le message — JAMAIS de suppression physique.
-  if (c.message_id && decision !== 'dismiss') {
-    const { data: m } = await supabase.from('fan_messages').select('moderation_status').eq('id', c.message_id).maybeSingle();
+  // Action sur le contenu (message, post OU commentaire) — JAMAIS de
+  // suppression physique.
+  if (c.content_id && table && decision !== 'dismiss') {
+    const { data: m } = await supabase.from(table).select('moderation_status').eq('id', c.content_id).maybeSingle();
     previousMsgStatus = m?.moderation_status || null;
     const patch = decision === 'hide_message'
       ? { moderation_status: 'hidden' }
       : { moderation_status: 'removed', deleted_at: now };
-    await supabase.from('fan_messages').update(patch).eq('id', c.message_id);
+    await supabase.from(table).update(patch).eq('id', c.content_id);
   }
 
   // Sanction éventuelle (émise AVANT la clôture pour que l'audit la rattache).
@@ -474,9 +554,9 @@ async function decideCase({ caseId, decision, reason = null, actorId, actorType,
   }).eq('id', caseId);
 
   // Les signalements liés passent en « traités ».
-  if (c.message_id) {
+  if (c.content_id) {
     await supabase.from('chat_reports').update({ status: decision === 'dismiss' ? 'dismissed' : 'reviewed', reviewed_by: actorId, reviewed_at: now })
-      .eq('message_id', c.message_id).eq('status', 'open');
+      .eq('content_type', c.content_type).eq('content_id', c.content_id).eq('status', 'open');
   }
 
   await audit({
@@ -492,8 +572,9 @@ module.exports = {
   CHARTER_VERSION, REPORT_REASONS, WRITE_BLOCKING, CASE_DECISIONS,
   SANCTION_TYPES, GLOBAL_TYPES, PERMANENT_ALLOWED, SANCTION_LABEL, allowedSanctionsFor,
   getMembership, needsCharter, acceptCharter,
-  getActiveSanction, createReport, countReports, getMessage,
-  audit, upsertCaseForMessage, listCases, getCase, decideCase,
+  getActiveSanction, createReport, countReports,
+  audit, upsertCaseForContent, listCases, getCase, decideCase,
   issueSanction, revokeSanction, listMySanctions,
   getUserModerationHistory, listAuditLogs,
+  CONTENT_TYPES, CONTENT_TABLE, CONTENT_LABEL, getContent,
 };

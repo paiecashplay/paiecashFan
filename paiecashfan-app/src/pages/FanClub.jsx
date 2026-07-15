@@ -94,8 +94,12 @@ export function FanClub() {
     return sendMessage(content);
   }
 
+  // Le signalement couvre les 3 surfaces : chat, posts et commentaires.
+  const REPORT_PATH = { message: 'messages', post: 'posts', comment: 'comments' };
+
   async function submitReport({ reason, comment }) {
-    const j = await apiFetch(`/api/v2/clubs/${slug}/fan-feed/messages/${reportTarget.id}/report`, {
+    const path = REPORT_PATH[reportTarget?.contentType || 'message'];
+    const j = await apiFetch(`/api/v2/clubs/${slug}/fan-feed/${path}/${reportTarget.id}/report`, {
       method: 'POST', body: JSON.stringify({ reason, comment }),
     });
     return j;
@@ -329,6 +333,9 @@ export function FanClub() {
             onPublish={handlePublish}
             onLikePost={handleLikePost}
             onAddComment={handleAddComment}
+            currentUserId={user?.id}
+            onReport={(m) => setReportTarget(m)}
+            onHideUser={hideUser}
             loading={feedLoading}
             error={feedError}
             isEmpty={feedIsEmpty}

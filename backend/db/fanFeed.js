@@ -34,11 +34,13 @@ async function fetchProfiles(ids) {
 // Feed complet d'un club : posts (+ compteurs + likedByMe), commentaires,
 // messages du chat, et la liste des participants (fans).
 async function getFeed(tenantId, currentUserId) {
+  // Modération : on ne sert QUE le contenu publié et non supprimé — posts,
+  // messages ET commentaires. Le filtrage est fait ici (serveur), jamais côté
+  // client : masquer en CSS laisserait le contenu dans la réponse API.
   const [{ data: posts }, { data: messages }] = await Promise.all([
     supabase.from('fan_posts').select('id, author_id, content, created_at')
-      .eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(100),
-    // Modération : on ne sert QUE les messages publiés et non supprimés.
-    // Le filtrage est fait ici (serveur) — jamais côté client.
+      .eq('tenant_id', tenantId).eq('moderation_status', 'published').is('deleted_at', null)
+      .order('created_at', { ascending: false }).limit(100),
     supabase.from('fan_messages').select('id, author_id, content, created_at')
       .eq('tenant_id', tenantId).eq('moderation_status', 'published').is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(100),
@@ -49,7 +51,9 @@ async function getFeed(tenantId, currentUserId) {
   // Commentaires + likes des posts du club (comptés en JS).
   const [{ data: comments }, { data: likes }] = await Promise.all([
     postIds.length
-      ? supabase.from('fan_comments').select('id, post_id, author_id, content, created_at').in('post_id', postIds).order('created_at', { ascending: true })
+      ? supabase.from('fan_comments').select('id, post_id, author_id, content, created_at')
+        .in('post_id', postIds).eq('moderation_status', 'published').is('deleted_at', null)
+        .order('created_at', { ascending: true })
       : Promise.resolve({ data: [] }),
     postIds.length
       ? supabase.from('fan_post_likes').select('post_id, user_id').in('post_id', postIds)

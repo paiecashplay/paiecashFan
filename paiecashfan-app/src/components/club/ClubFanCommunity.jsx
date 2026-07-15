@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send } from 'lucide-react';
+import { Heart, MessageCircle, Send, Flag } from 'lucide-react';
 import { onlineCount } from '@/data/clubMocks';
 import { useState } from 'react';
+import { MessageReportMenu } from '@/components/fanclub/MessageReportMenu';
 
 export function ClubFanCommunity({
   club,
@@ -13,6 +14,11 @@ export function ClubFanCommunity({
   onPublish,
   onLikePost,
   onAddComment,
+
+  // Modération du fil : mêmes règles que le chat (on ne se signale pas soi-même).
+  currentUserId = null,
+  onReport,
+  onHideUser,
 
   loading = false,
   error = null,
@@ -160,7 +166,7 @@ export function ClubFanCommunity({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.04 }}
-              className="rounded-2xl border border-white/10 bg-ink-900/60 p-4"
+              className="group rounded-2xl border border-white/10 bg-ink-900/60 p-4"
             >
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -189,6 +195,16 @@ export function ClubFanCommunity({
                     </p>
                   </div>
                 </div>
+
+                {/* Signalement d'un post — même garde que le chat */}
+                <MessageReportMenu
+                  message={{ id: post.id, content: post.content, authorId: post.authorId }}
+                  isOwn={post.authorId === currentUserId}
+                  canReport={!!currentUserId && post.authorId !== currentUserId}
+                  onReport={(m) => onReport?.({ ...m, contentType: 'post' })}
+                  onHideUser={onHideUser}
+                  onBlockUser={onHideUser}
+                />
               </div>
 
               <p className="mt-4 text-sm leading-relaxed text-bone-300">
@@ -227,11 +243,24 @@ export function ClubFanCommunity({
                             return (
                                 <div
                                 key={comment.id}
-                                className="rounded-xl bg-white/[0.04] px-4 py-3"
+                                className="group/com rounded-xl bg-white/[0.04] px-4 py-3"
                                 >
-                                <p className="text-xs font-bold text-bone-100">
-                                    {commentAuthor?.name || 'Supporter'}
-                                </p>
+                                <div className="flex items-start justify-between gap-2">
+                                  <p className="text-xs font-bold text-bone-100">
+                                      {commentAuthor?.name || 'Supporter'}
+                                  </p>
+                                  {/* Signalement d'un commentaire */}
+                                  {currentUserId && comment.authorId !== currentUserId && (
+                                    <button
+                                      onClick={() => onReport?.({ id: comment.id, content: comment.content, authorId: comment.authorId, contentType: 'comment' })}
+                                      aria-label="Signaler ce commentaire"
+                                      title="Signaler ce commentaire"
+                                      className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-bone-500 opacity-60 transition hover:bg-red-500/15 hover:text-red-400 lg:opacity-0 lg:group-hover/com:opacity-100"
+                                    >
+                                      <Flag size={11} />
+                                    </button>
+                                  )}
+                                </div>
 
                                 <p className="mt-1 text-sm text-bone-300">
                                     {comment.content}

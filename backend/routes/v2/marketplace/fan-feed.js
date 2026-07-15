@@ -21,6 +21,12 @@ const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: n
 const MAX = 2000;
 const clean = (v) => (typeof v === 'string' ? v.trim() : '');
 
+// Pré-classement IA : APRÈS publication, sans await — le supporter ne doit
+// jamais attendre l'IA, et une panne de l'IA ne doit jamais casser l'envoi.
+function screenAsync(args) {
+  aiMod.screenContent(args).catch((e) => console.warn('[moderation] pré-classement échoué :', e.message));
+}
+
 // Résout le club (slug → tenant) et le pose sur req.
 async function withTenant(req, res, next) {
   const tenant = await fanFeed.resolveTenantId(req.params.slug);
@@ -62,6 +68,7 @@ router.post('/:slug/fan-feed/posts', requireAuth, withTenant, requireChatAccess,
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
     const post = await fanFeed.createPost(req.tenant.id, req.authUser.id, content);
+    screenAsync({ contentType: 'post', contentId: post.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { post });
   } catch (err) {
     return fail(res, 'Publication impossible : ' + err.message, 500);
@@ -75,6 +82,7 @@ router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, r
   if (content.length > MAX) return fail(res, 'Commentaire trop long.');
   try {
     const comment = await fanFeed.addComment(req.params.postId, req.authUser.id, content);
+    screenAsync({ contentType: 'comment', contentId: comment.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { comment });
   } catch (err) {
     return fail(res, 'Commentaire impossible : ' + err.message, 500);
@@ -99,10 +107,7 @@ router.post('/:slug/fan-feed/messages', requireAuth, withTenant, requireChatAcce
   if (content.length > MAX) return fail(res, 'Message trop long.');
   try {
     const message = await fanFeed.createMessage(req.tenant.id, req.authUser.id, content);
-    // Pré-classement IA (lot 5) : APRÈS publication, sans await — le supporter
-    // ne doit jamais attendre l'IA. Un risque avéré ouvre un dossier priorisé.
-    aiMod.screenMessage({ messageId: message.id, tenantId: req.tenant.id, authorId: req.authUser.id, content })
-      .catch((e) => console.warn('[moderation] pré-classement échoué :', e.message));
+    screenAsync({ contentType: 'message', contentId: message.id, tenantId: req.tenant.id, authorId: req.authUser.id, content });
     return ok(res, { message, moderation: { status: 'published', reason: null, canAppeal: false } });
   } catch (err) {
     return fail(res, 'Envoi impossible : ' + err.message, 500);
@@ -154,27 +159,38 @@ router.post('/:slug/chat-charter/accept', requireAuth, withTenant, async (req, r
   catch (err) { return fail(res, 'Acceptation impossible : ' + err.message, 500); }
 });
 
-// POST /api/v2/clubs/:slug/fan-feed/messages/:messageId/report  { reason, comment? }
-// Un seul signalement par utilisateur/message. Le signalant reste anonyme.
-router.post('/:slug/fan-feed/messages/:messageId/report', requireAuth, withTenant, async (req, res) => {
-  try {
-    const message = await mod.getMessage(req.params.messageId);
-    if (!message || message.tenant_id !== req.tenant.id) return fail(res, 'Message introuvable.', 404);
-    if (message.author_id === req.authUser.id) return fail(res, 'Tu ne peux pas signaler ton propre message.', 400);
+// ── Signalement (chat, posts ET commentaires) ────────────────
+// Handler unique et polymorphe : une seule garde à maintenir pour les 3
+// surfaces. Un contenu ne peut être signalé qu'une fois par supporter, et le
+// signalant reste anonyme.
+function reportHandler(contentType) {
+  return async (req, res) => {
+    try {
+      const contentId = req.params.contentId;
+      const content = await mod.getContent(contentType, contentId);
+      if (!content) return fail(res, 'Contenu introuvable.', 404);
+      // Cloisonnement : on ne signale que dans le salon courant.
+      // (Pour un commentaire, tenant_id est résolu via le post parent.)
+      if (content.tenant_id !== req.tenant.id) return fail(res, 'Contenu introuvable.', 404);
+      if (content.author_id === req.authUser.id) return fail(res, 'Tu ne peux pas signaler ton propre contenu.', 400);
 
-    const report = await mod.createReport({
-      messageId: message.id, tenantId: req.tenant.id,
-      reporterUserId: req.authUser.id, reportedUserId: message.author_id,
-      reason: clean(req.body?.reason), comment: clean(req.body?.comment) || null,
-    });
-    // (Lot 2 : ce signalement alimentera la file de modération.)
-    return ok(res, { reported: true, reportId: report.id });
-  } catch (err) {
-    if (err.code === 'ALREADY_REPORTED') return fail(res, err.message, 409);
-    if (err.code === 'BAD_REASON') return fail(res, err.message, 400);
-    return fail(res, 'Signalement impossible : ' + err.message, 500);
-  }
-});
+      const report = await mod.createReport({
+        contentType, contentId: content.id, tenantId: req.tenant.id,
+        reporterUserId: req.authUser.id, reportedUserId: content.author_id,
+        reason: clean(req.body?.reason), comment: clean(req.body?.comment) || null,
+      });
+      return ok(res, { reported: true, reportId: report.id });
+    } catch (err) {
+      if (err.code === 'ALREADY_REPORTED') return fail(res, err.message, 409);
+      if (err.code === 'BAD_REASON') return fail(res, err.message, 400);
+      return fail(res, 'Signalement impossible : ' + err.message, 500);
+    }
+  };
+}
+
+router.post('/:slug/fan-feed/messages/:contentId/report', requireAuth, withTenant, reportHandler('message'));
+router.post('/:slug/fan-feed/posts/:contentId/report', requireAuth, withTenant, reportHandler('post'));
+router.post('/:slug/fan-feed/comments/:contentId/report', requireAuth, withTenant, reportHandler('comment'));
 
 // ── Modération côté club_admin (borné à SON salon) ───────────
 // GET /api/v2/clubs/:slug/moderation/cases?status=&priority=

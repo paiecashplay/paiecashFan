@@ -61,25 +61,17 @@ async function analyzeText(content) {
   }
 }
 
-// Pré-classement d'un message publié. Ne bloque jamais l'envoi :
-// à appeler sans await (fire-and-forget) depuis la route.
-async function screenMessage({ messageId, tenantId, authorId, content }) {
+// Pré-classement d'un contenu publié — message du chat, post OU commentaire.
+// Ne bloque jamais la publication : à appeler sans await (fire-and-forget).
+async function screenContent({ contentType = 'message', contentId, tenantId, authorId, content }) {
   if (!(await isEnabled())) return null;
   const result = await analyzeText(content);
-  if (!result) return null;
-
-  // Trace systématique du verdict sur le message.
-  await supabase.from('fan_messages')
-    .update({ ai_risk_level: result.riskLevel, ai_checked_at: new Date().toISOString() })
-    .eq('id', messageId)
-    .then(() => {}, () => {});   // colonnes optionnelles : on ignore si absentes
-
-  if (!result.shouldOpenCase) return result;
+  if (!result || !result.shouldOpenCase) return result;
 
   // On délègue à la couche métier : dédoublonnage + audit y sont déjà gérés.
   const mod = require('../../db/chatModeration');
-  const caseId = await mod.upsertCaseForMessage({
-    tenantId, messageId, targetUserId: authorId, source: 'ai', ai: result,
+  const caseId = await mod.upsertCaseForContent({
+    tenantId, contentType, contentId, targetUserId: authorId, source: 'ai', ai: result,
   });
   return { ...result, caseId };
 }
@@ -87,4 +79,4 @@ async function screenMessage({ messageId, tenantId, authorId, content }) {
 // Le flag est mis en cache 60 s : les tests doivent pouvoir le rafraîchir.
 function _resetFlagCache() { flagCache = { value: null, at: 0 }; }
 
-module.exports = { isEnabled, analyzeText, screenMessage, getProvider, providerName, FLAG_KEY, _resetFlagCache, ...types };
+module.exports = { isEnabled, analyzeText, screenContent, getProvider, providerName, FLAG_KEY, _resetFlagCache, ...types };
