@@ -37,7 +37,32 @@ export function ClubDetail() {
   const { slug } = useParams();
   const { club, players, starPlayer, trophies, products, members, loading } = useClubDetail(slug);
 
-  if (!club) return <NotFound slug={slug} />;
+  // Le club est encore en cours de récupération.
+  // Ne pas afficher "Club introuvable" pendant ce délai.
+  if (loading && !club) {
+    return (
+      <div className="grid min-h-[calc(100vh-80px)] place-items-center px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-emerald-400" />
+
+          <div>
+            <p className="font-display text-lg font-bold text-bone-100">
+              Chargement du club
+            </p>
+
+            <p className="mt-1 text-sm text-bone-500">
+              Les informations du club sont en cours de récupération.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Afficher cet écran uniquement après la fin du chargement.
+  if (!loading && !club) {
+    return <NotFound slug={slug} />;
+  }
 
   // Un hub de fédération (ex: tenant "Cameroun") a sa page CANONIQUE sur
   // /federations/:slug. On y redirige pour éviter la double page club/fédé.
