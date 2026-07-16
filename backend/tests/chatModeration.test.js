@@ -676,6 +676,113 @@ const t = async (name, fn) => { await fn(); passed++; console.log('  ✓', name)
   await setPreFlag(preInitial);   // on rend le flag dans l'état trouvé
   await restoreFlag();            // idem pour le flag du lot 5 (prod incluse)
   if (realKey) process.env.ANTHROPIC_API_KEY = realKey;
+
+  // ══════════════ LOT 7 — Appels & stats ══════════════
+  const appeals = require('../db/chatAppeals');
+  const cleanupAppeals = async () => {
+    const { data: aps } = await supabase.from('chat_appeals').select('id').eq('user_id', fan.id);
+    if ((aps || []).length) await supabase.from('chat_appeals').delete().in('id', aps.map((a) => a.id));
+  };
+  await cleanupAppeals();
+
+  // Fixtures : un message masqué via un dossier résolu + une sanction active.
+  const { data: msg7 } = await supabase.from('fan_messages')
+    .insert({ tenant_id: club.id, author_id: fan.id, content: '[test] message conteste', moderation_status: 'hidden' }).select('id').single();
+  const case7 = await mod.upsertCaseForContent({ tenantId: club.id, contentType: 'message', contentId: msg7.id, targetUserId: fan.id, source: 'ai', ai: { riskLevel: 'high', categories: ['insult'], priority: 'high', score: 0.8, explanation: 'x', provider: 'mock' } });
+  await mod.decideCase({ caseId: case7, decision: 'hide_message', reason: 'test', actorId: other.id, actorType: 'super_admin' });
+  const sanc7 = await mod.issueSanction({ userId: fan.id, tenantId: club.id, type: 'mute', durationHours: 24, issuedBy: other.id, actorType: 'super_admin' });
+
+  console.log('\n⚖️  Appels — dépôt');
+  let appealCaseId, appealSancId;
+  await t('un contenu masqué est contestable', async () => {
+    const a = await appeals.createAppeal({ userId: fan.id, targetType: 'case', targetId: case7, reason: 'je conteste' });
+    assert.ok(a.id); appealCaseId = a.id;
+  });
+  await t('une sanction active est contestable', async () => {
+    const a = await appeals.createAppeal({ userId: fan.id, targetType: 'sanction', targetId: sanc7.id, reason: 'pas juste' });
+    assert.ok(a.id); appealSancId = a.id;
+  });
+  await t('on ne conteste pas deux fois la même décision', async () => {
+    await assert.rejects(() => appeals.createAppeal({ userId: fan.id, targetType: 'case', targetId: case7, reason: 'encore' }), (e) => e.code === 'ALREADY_APPEALED');
+  });
+  await t('on ne conteste pas le dossier d\'un autre', async () => {
+    await assert.rejects(() => appeals.createAppeal({ userId: other.id, targetType: 'case', targetId: case7, reason: 'x' }), (e) => e.code === 'NOT_APPEALABLE');
+  });
+  await t('un dossier « classé sans suite » n\'est pas contestable', async () => {
+    const { data: m } = await supabase.from('fan_messages').insert({ tenant_id: club.id, author_id: fan.id, content: '[test] classe' }).select('id').single();
+    const cd = await mod.upsertCaseForContent({ tenantId: club.id, contentType: 'message', contentId: m.id, targetUserId: fan.id, source: 'report' });
+    await mod.decideCase({ caseId: cd, decision: 'dismiss', reason: 'rien', actorId: other.id, actorType: 'super_admin' });
+    await assert.rejects(() => appeals.createAppeal({ userId: fan.id, targetType: 'case', targetId: cd, reason: 'x' }), (e) => e.code === 'NOT_APPEALABLE');
+    await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', cd);
+    await supabase.from('chat_moderation_cases').delete().eq('id', cd);
+    await supabase.from('fan_messages').delete().eq('id', m.id);
+  });
+
+  console.log('\n⚖️  Ma modération (vue fan)');
+  await t('le fan voit ses contenus modérés et ses sanctions avec le statut d\'appel', async () => {
+    const v = await appeals.listMyModeration(fan.id);
+    assert.ok(v.moderatedContent.some((c) => c.caseId === case7 && c.appeal));
+    assert.ok(v.sanctions.some((s) => s.id === sanc7.id && s.appeal));
+  });
+
+  console.log('\n⚖️  Traitement (modérateur)');
+  await t('accepter un appel de sanction lève la sanction (réparation auto)', async () => {
+    const r = await appeals.decideAppeal({ appealId: appealSancId, decision: 'accept', actorId: other.id, actorType: 'super_admin' });
+    assert.equal(r.status, 'accepted');
+    assert.equal(await mod.getActiveSanction(fan.id, club.id), null, 'la sanction doit être levée');
+  });
+  await t('accepter un appel de contenu republie le message', async () => {
+    const r = await appeals.decideAppeal({ appealId: appealCaseId, decision: 'accept', actorId: other.id, actorType: 'super_admin' });
+    assert.equal(r.status, 'accepted');
+    const { data: m } = await supabase.from('fan_messages').select('moderation_status, deleted_at').eq('id', msg7.id).single();
+    assert.equal(m.moderation_status, 'published', 'le contenu doit être republié');
+    assert.equal(m.deleted_at, null);
+  });
+  await t('un appel déjà traité ne peut pas être re-statué', async () => {
+    await assert.rejects(() => appeals.decideAppeal({ appealId: appealCaseId, decision: 'reject', actorId: other.id, actorType: 'super_admin' }), (e) => e.code === 'ALREADY_CLOSED');
+  });
+  await t('le fan est notifié du résultat de son appel', async () => {
+    const { data: n } = await supabase.from('notifications').select('type').eq('user_id', fan.id).eq('type', 'chat_appeal_result').limit(1);
+    assert.ok((n || []).length, 'notification de résultat d\'appel manquante');
+  });
+  await t('rejeter un appel le clôt avec le motif', async () => {
+    const { data: m } = await supabase.from('fan_messages').insert({ tenant_id: club.id, author_id: fan.id, content: '[test] rejete', moderation_status: 'removed', deleted_at: new Date().toISOString() }).select('id').single();
+    const cd = await mod.upsertCaseForContent({ tenantId: club.id, contentType: 'message', contentId: m.id, targetUserId: fan.id, source: 'report' });
+    await mod.decideCase({ caseId: cd, decision: 'remove_message', reason: 'x', actorId: other.id, actorType: 'super_admin' });
+    const a = await appeals.createAppeal({ userId: fan.id, targetType: 'case', targetId: cd, reason: 'rends-moi mon message' });
+    const r = await appeals.decideAppeal({ appealId: a.id, decision: 'reject', note: 'décision maintenue', actorId: other.id, actorType: 'super_admin' });
+    assert.equal(r.status, 'rejected');
+    const { data: still } = await supabase.from('fan_messages').select('moderation_status').eq('id', m.id).single();
+    assert.equal(still.moderation_status, 'removed', 'un appel rejeté ne republie PAS');
+    await supabase.from('chat_appeals').delete().eq('id', a.id);
+    await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', cd);
+    await supabase.from('chat_moderation_cases').delete().eq('id', cd);
+    await supabase.from('fan_messages').delete().eq('id', m.id);
+  });
+  await t('la file d\'appels d\'un club ne voit que SES appels', async () => {
+    if (!club2) return;
+    const list = await appeals.listAppeals({ tenantId: club2.id, status: null });
+    assert.equal(list.some((a) => a.tenant_id === club.id), false, 'cloisonnement : pas les appels d\'un autre salon');
+  });
+
+  console.log('\n📊 Statistiques avancées');
+  await t('les stats agrègent dossiers, sanctions, appels et catégories', async () => {
+    const st = await mod.moderationStats({ tenantId: club.id });
+    assert.ok(typeof st.cases.total === 'number');
+    assert.ok(st.cases.bySource && typeof st.cases.bySource === 'object');
+    assert.ok(Array.isArray(st.topCategories));
+    assert.ok(typeof st.appeals.total === 'number');
+    assert.ok('acceptanceRate' in st.appeals);
+  });
+
+  // nettoyage lot 7
+  await cleanupAppeals();
+  await supabase.from('chat_sanctions').delete().eq('id', sanc7.id);
+  await supabase.from('chat_moderation_audit_logs').delete().eq('case_id', case7);
+  await supabase.from('chat_moderation_cases').delete().eq('id', case7);
+  await supabase.from('fan_messages').delete().eq('id', msg7.id);
+  await supabase.from('notifications').delete().eq('user_id', fan.id).eq('type', 'chat_appeal_result');
+
   await cleanup();
   console.log(`\n✅ ${passed} tests OK`);
   process.exit(0);

@@ -105,6 +105,21 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (at)** — **Modération Fan Club — Lot 7 (appels + stats avancées)**.
+  Migration `chat-appeals.sql` : table `chat_appeals` avec cible **POLYMORPHE**
+  (`target_type` case|sanction + `target_id`) — un fan conteste un contenu modéré
+  OU une sanction (couvre les suspensions auto sans dossier). `tenant_id` nullable
+  (sanction globale → super_admin). Module `db/chatAppeals.js` :
+  `listMyModeration` (vue fan), `createAppeal` (1 seul appel/décision, ownership
+  vérifié, dossier « classé » non contestable), `listAppeals`/`getAppeal`
+  (cloisonné), `decideAppeal` → **réparation AUTO** à l'acceptation (republication
+  `moderation_status='published'` / levée de sanction), notification `chat_appeal_result`.
+  `moderationStats()` : dossiers par origine/type, top catégories IA, sanctions
+  actives, taux d'acceptation des appels, délai moyen. Routes fan (`/me/moderation`,
+  `POST /me/moderation/appeals`) + modérateur admin & club (appels, décision,
+  `stats/advanced`), tous bornés. Front : onglet **Ma modération** dans MonCompte
+  (`MaModeration` + `AppealModal`), onglets **Appels** et **Stats** dans
+  `ModerationQueue`. Tests **91/91**. Clôt la série de modération (Lots 1→7).
 - **2026-07-16 (as)** — **Notification persistante au fan quand son message est bloqué**.
   La modale s'affiche déjà en temps réel ; on ajoute une **notification dans la
   cloche 🔔** (type `chat_blocked`) pour que le fan retrouve l'info : « Ton

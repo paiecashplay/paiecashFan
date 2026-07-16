@@ -5,8 +5,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import {
   Wallet, Ticket, ShoppingBag, ExternalLink, Check, Pencil,
   Receipt, ShieldCheck, Loader2, ArrowRight, History, QrCode,
-  Download, X, Grid3x3, Trophy, Clock, Star
+  Download, X, Grid3x3, Trophy, Clock, Star, Scale
 } from 'lucide-react';
+import { MaModeration } from '@/components/fanclub/MaModeration';
 
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -108,9 +109,14 @@ export function MonCompte() {
               <TabBtn active={tab === 'history'} onClick={() => setTab('history')} icon={<History size={15} />}>
                 Historique PCC
               </TabBtn>
+              <TabBtn active={tab === 'moderation'} onClick={() => setTab('moderation')} icon={<Scale size={15} />}>
+                Ma modération
+              </TabBtn>
             </div>
 
-            {tab === 'bingo' ? (
+            {tab === 'moderation' ? (
+              <MaModeration />
+            ) : tab === 'bingo' ? (
               <BingoCards loading={loadingBingo} cards={bingoCards} />
             ) : tab === 'orders' ? (
               loadingOrders ? (

@@ -10,6 +10,7 @@ const supabase = require('../../db/supabase');
 const pcc = require('../../services/paiecashcoin');
 const favorites_db = require('../../db/favorites');
 const chatMod = require('../../db/chatModeration');
+const chatAppeals = require('../../db/chatAppeals');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -139,6 +140,30 @@ router.get('/chat-sanctions', async (req, res) => {
     const sanctions = await chatMod.listMySanctions(req.authUser.id);
     return ok(res, { sanctions, active: sanctions.filter((s) => s.isActive) });
   } catch (err) { return fail(res, 'Sanctions : ' + err.message, 500); }
+});
+
+// ── Ma modération : contenus modérés + sanctions + appels (lot 7) ──
+// GET /api/v2/me/moderation — ce que le fan peut voir et contester.
+router.get('/moderation', async (req, res) => {
+  try { return ok(res, await chatAppeals.listMyModeration(req.authUser.id)); }
+  catch (err) { return fail(res, 'Ma modération : ' + err.message, 500); }
+});
+
+// POST /api/v2/me/moderation/appeals  { targetType, targetId, reason }
+router.post('/moderation/appeals', async (req, res) => {
+  try {
+    const appeal = await chatAppeals.createAppeal({
+      userId: req.authUser.id,
+      targetType: req.body?.targetType,
+      targetId: req.body?.targetId,
+      reason: req.body?.reason,
+    });
+    return ok(res, { appeal });
+  } catch (err) {
+    if (err.code === 'ALREADY_APPEALED') return fail(res, err.message, 409);
+    if (['BAD_TARGET', 'NOT_APPEALABLE'].includes(err.code)) return fail(res, err.message, 400);
+    return fail(res, 'Contestation impossible : ' + err.message, 500);
+  }
 });
 
 // ── Notifications ────────────────────────────────────────────

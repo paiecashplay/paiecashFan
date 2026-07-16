@@ -9,6 +9,7 @@
 const express = require('express');
 const { requireAuth, requireRole } = require('../../../middleware/auth');
 const mod = require('../../../db/chatModeration');
+const appeals_db = require('../../../db/chatAppeals');
 const aiMod = require('../../../services/moderation');
 
 const router = express.Router();
@@ -104,6 +105,46 @@ router.get('/audit', async (req, res) => {
     });
     return ok(res, { logs });
   } catch (err) { return fail(res, 'Journal : ' + err.message, 500); }
+});
+
+// ── Appels (lot 7) ───────────────────────────────────────────
+// GET /api/v2/admin/moderation/appeals?status=
+router.get('/appeals', async (req, res) => {
+  try {
+    const appeals = await appeals_db.listAppeals({ status: req.query.status || 'open' });
+    return ok(res, { appeals });
+  } catch (err) { return fail(res, 'Appels : ' + err.message, 500); }
+});
+
+// GET /api/v2/admin/moderation/appeals/:id
+router.get('/appeals/:id', async (req, res) => {
+  try {
+    const appeal = await appeals_db.getAppeal(req.params.id);
+    if (!appeal) return fail(res, 'Appel introuvable.', 404);
+    return ok(res, { appeal });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// POST /api/v2/admin/moderation/appeals/:id/decision  { decision, note }
+router.post('/appeals/:id/decision', async (req, res) => {
+  try {
+    const result = await appeals_db.decideAppeal({
+      appealId: req.params.id, decision: req.body?.decision, note: req.body?.note || null,
+      actorId: req.authUser.id, actorType: 'super_admin',
+    });
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_DECISION') return fail(res, err.message, 400);
+    if (err.code === 'NOT_FOUND') return fail(res, err.message, 404);
+    if (err.code === 'ALREADY_CLOSED') return fail(res, err.message, 409);
+    return fail(res, 'Décision impossible : ' + err.message, 500);
+  }
+});
+
+// GET /api/v2/admin/moderation/stats/advanced — stats détaillées.
+router.get('/stats/advanced', async (req, res) => {
+  try { return ok(res, await mod.moderationStats({})); }
+  catch (err) { return fail(res, err.message, 500); }
 });
 
 // POST /api/v2/admin/moderation/sanctions/:id/revoke — lève une sanction.

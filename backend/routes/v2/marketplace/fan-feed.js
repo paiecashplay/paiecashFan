@@ -10,6 +10,7 @@ const fanFeed = require('../../../db/fanFeed');
 const mod = require('../../../db/chatModeration');
 const aiMod = require('../../../services/moderation');
 const prepublish = require('../../../services/moderation/prepublish');
+const appeals_db = require('../../../db/chatAppeals');
 const favorites = require('../../../db/favorites');
 const { requireClubModerator } = require('../../../middleware/clubModerator');
 const supabase = require('../../../db/supabase');
@@ -345,6 +346,58 @@ router.post('/:slug/moderation/sanctions/:id/revoke', requireAuth, withTenant, r
     if (err.code === 'ALREADY_REVOKED') return fail(res, err.message, 409);
     return fail(res, 'Révocation impossible : ' + err.message, 500);
   }
+});
+
+// ── Appels du salon (lot 7) — club_admin borné à SON salon ───
+// GET /api/v2/clubs/:slug/moderation/appeals?status=
+router.get('/:slug/moderation/appeals', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    // super_admin voit tout ; club_admin uniquement les appels de son salon.
+    const scope = req.moderatorType === 'super_admin' ? {} : { tenantId: req.tenant.id };
+    const appeals = await appeals_db.listAppeals({ ...scope, status: req.query.status || 'open' });
+    return ok(res, { appeals });
+  } catch (err) { return fail(res, 'Appels : ' + err.message, 500); }
+});
+
+// GET /api/v2/clubs/:slug/moderation/appeals/:id
+router.get('/:slug/moderation/appeals/:id', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const appeal = await appeals_db.getAppeal(req.params.id);
+    if (!appeal) return fail(res, 'Appel introuvable.', 404);
+    if (req.moderatorType !== 'super_admin' && appeal.tenant_id !== req.tenant.id) {
+      return fail(res, 'Cet appel ne concerne pas ton salon.', 403);
+    }
+    return ok(res, { appeal });
+  } catch (err) { return fail(res, err.message, 500); }
+});
+
+// POST /api/v2/clubs/:slug/moderation/appeals/:id/decision  { decision, note }
+router.post('/:slug/moderation/appeals/:id/decision', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const appeal = await appeals_db.getAppeal(req.params.id);
+    if (!appeal) return fail(res, 'Appel introuvable.', 404);
+    if (req.moderatorType !== 'super_admin' && appeal.tenant_id !== req.tenant.id) {
+      return fail(res, 'Cet appel ne concerne pas ton salon.', 403);
+    }
+    const result = await appeals_db.decideAppeal({
+      appealId: req.params.id, decision: req.body?.decision, note: req.body?.note || null,
+      actorId: req.authUser.id, actorType: req.moderatorType,
+    });
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_DECISION') return fail(res, err.message, 400);
+    if (err.code === 'NOT_FOUND') return fail(res, err.message, 404);
+    if (err.code === 'ALREADY_CLOSED') return fail(res, err.message, 409);
+    return fail(res, 'Décision impossible : ' + err.message, 500);
+  }
+});
+
+// GET /api/v2/clubs/:slug/moderation/stats/advanced — stats du salon.
+router.get('/:slug/moderation/stats/advanced', requireAuth, withTenant, requireClubModerator, async (req, res) => {
+  try {
+    const scope = req.moderatorType === 'super_admin' ? {} : { tenantId: req.tenant.id };
+    return ok(res, await mod.moderationStats(scope));
+  } catch (err) { return fail(res, err.message, 500); }
 });
 
 // Message joueur selon la sanction active.

@@ -512,6 +512,55 @@ async function getUserModerationHistory(userId, { tenantId = null } = {}) {
   };
 }
 
+// Statistiques avancées. `tenantId` non nul = club_admin borné à son salon.
+async function moderationStats({ tenantId = null } = {}) {
+  const scope = (q) => (tenantId ? q.eq('tenant_id', tenantId) : q);
+
+  const [{ data: cases }, { data: sanctions }, { data: appeals }] = await Promise.all([
+    scope(supabase.from('chat_moderation_cases')
+      .select('status, priority, source, content_type, ai_categories, created_at, resolved_at')).limit(1000),
+    scope(supabase.from('chat_sanctions').select('sanction_type, ends_at, is_permanent, revoked_at')).limit(1000),
+    scope(supabase.from('chat_appeals').select('status')).limit(1000),
+  ]);
+
+  const cs = cases || [], sa = sanctions || [], ap = appeals || [];
+  const now = Date.now();
+  const countBy = (rows, key) => rows.reduce((m, r) => { const k = r[key] || 'inconnu'; m[k] = (m[k] || 0) + 1; return m; }, {});
+
+  // Top catégories détectées par l'IA
+  const catCount = {};
+  for (const c of cs) for (const cat of c.ai_categories || []) if (cat !== 'clean') catCount[cat] = (catCount[cat] || 0) + 1;
+  const topCategories = Object.entries(catCount).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([category, count]) => ({ category, count }));
+
+  // Délai moyen de traitement (dossiers résolus)
+  const resolved = cs.filter((c) => c.resolved_at && c.created_at);
+  const avgResolutionMs = resolved.length
+    ? Math.round(resolved.reduce((s, c) => s + (new Date(c.resolved_at) - new Date(c.created_at)), 0) / resolved.length)
+    : null;
+
+  const activeSanctions = sa.filter((s) => !s.revoked_at && (s.is_permanent || !s.ends_at || new Date(s.ends_at).getTime() > now)).length;
+  const acceptedAppeals = ap.filter((a) => a.status === 'accepted').length;
+  const decidedAppeals = ap.filter((a) => a.status !== 'open').length;
+
+  return {
+    cases: {
+      total: cs.length,
+      byStatus: countBy(cs, 'status'),
+      bySource: countBy(cs, 'source'),       // report / ai / manual
+      byContentType: countBy(cs, 'content_type'),
+      urgent: cs.filter((c) => ['high', 'critical'].includes(c.priority) && c.status === 'open').length,
+    },
+    sanctions: { total: sa.length, active: activeSanctions, byType: countBy(sa, 'sanction_type') },
+    appeals: {
+      total: ap.length, pending: ap.filter((a) => a.status === 'open').length,
+      accepted: acceptedAppeals, rejected: ap.filter((a) => a.status === 'rejected').length,
+      acceptanceRate: decidedAppeals ? Math.round((acceptedAppeals / decidedAppeals) * 100) : null,
+    },
+    topCategories,
+    avgResolutionMs,
+  };
+}
+
 // Journal d'audit consultable (filtrable). Enrichi du nom de l'acteur.
 async function listAuditLogs({ caseId = null, tenantId = null, actorId = null, limit = 100 } = {}) {
   let caseIds = null;
@@ -603,6 +652,6 @@ module.exports = {
   getActiveSanction, createReport, countReports,
   audit, upsertCaseForContent, storeBlockedContent, listCases, getCase, decideCase,
   issueSanction, revokeSanction, listMySanctions,
-  getUserModerationHistory, listAuditLogs,
+  getUserModerationHistory, listAuditLogs, moderationStats,
   CONTENT_TYPES, CONTENT_TABLE, CONTENT_LABEL, getContent,
 };

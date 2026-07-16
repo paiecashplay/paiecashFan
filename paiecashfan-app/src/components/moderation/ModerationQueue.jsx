@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History, Send, Sparkles } from 'lucide-react';
+import { ShieldAlert, ShieldOff, Loader2, Flag, EyeOff, Trash2, Check, X, Clock, MessageSquare, User, History, Send, Sparkles, Scale, BarChart3, CheckCircle2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { UserHistoryModal } from './UserHistoryModal';
@@ -90,13 +90,17 @@ export function ModerationQueue({ basePath, title = 'Modération', subtitle, sho
         <Stat label="Classés" value={stats?.dismissed ?? '—'} />
       </div>
 
-      {/* Vue : file / journal */}
-      <div className="inline-flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-1">
-        <button onClick={() => setView('queue')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${view === 'queue' ? 'bg-emerald-500/20 text-emerald-300' : 'text-bone-400 hover:text-bone-200'}`}><ShieldAlert size={12} /> Dossiers</button>
-        <button onClick={() => setView('audit')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${view === 'audit' ? 'bg-emerald-500/20 text-emerald-300' : 'text-bone-400 hover:text-bone-200'}`}><History size={12} /> Journal d'audit</button>
+      {/* Vue : dossiers / appels / stats / journal */}
+      <div className="inline-flex flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-1">
+        {[['queue', 'Dossiers', ShieldAlert], ['appeals', 'Appels', Scale], ['stats', 'Stats', BarChart3], ['audit', "Journal d'audit", History]].map(([v, label, Icon]) => (
+          <button key={v} onClick={() => setView(v)} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${view === v ? 'bg-emerald-500/20 text-emerald-300' : 'text-bone-400 hover:text-bone-200'}`}><Icon size={12} /> {label}</button>
+        ))}
       </div>
 
-      {view === 'audit' ? <AuditJournal basePath={basePath} /> : (
+      {view === 'audit' ? <AuditJournal basePath={basePath} />
+      : view === 'appeals' ? <AppealsQueue basePath={basePath} onToast={showToast} />
+      : view === 'stats' ? <StatsPanel basePath={basePath} />
+      : (
       <>
       {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2">
@@ -205,6 +209,115 @@ function AuditJournal({ basePath }) {
     </div>
   );
 }
+
+// ── File des appels ──────────────────────────────────────────
+function AppealsQueue({ basePath, onToast }) {
+  const [appeals, setAppeals] = useState(null);
+  const [busy, setBusy] = useState('');
+  const [notes, setNotes] = useState({});
+
+  const load = useCallback(() => {
+    apiFetch(`${basePath}/appeals?status=open`).then((j) => setAppeals(j.data?.appeals || [])).catch(() => setAppeals([]));
+  }, [basePath]);
+  useEffect(() => { load(); }, [load]);
+
+  async function decide(id, decision) {
+    setBusy(id + decision);
+    try {
+      await apiFetch(`${basePath}/appeals/${id}/decision`, { method: 'POST', body: JSON.stringify({ decision, note: notes[id] || null }) });
+      onToast?.(decision === 'accept' ? 'Contestation acceptée — réparation appliquée' : 'Contestation rejetée');
+      load();
+    } catch (e) { onToast?.(e?.message || 'Décision impossible.'); }
+    setBusy('');
+  }
+
+  if (appeals === null) return <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-2xl" />)}</div>;
+  if (!appeals.length) return <div className="rounded-2xl border border-white/10 bg-ink-800/40 p-10 text-center"><Check className="mx-auto text-emerald-400" size={34} /><p className="mt-3 text-sm text-bone-400">Aucune contestation en attente. 🎉</p></div>;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px] text-bone-500">Accepter = réparation automatique (contenu republié / sanction levée). Le supporter est notifié dans les deux cas.</p>
+      {appeals.map((a) => (
+        <div key={a.id} className="rounded-2xl border border-white/10 bg-ink-800/40 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-sky-300">{a.targetLabel}</span>
+            {a.club && <span className="text-[10px] text-bone-500">· {a.club.name}</span>}
+            <span className="text-[11px] text-bone-400">par <b className="text-bone-300">{a.appellant?.name}</b></span>
+            <span className="ml-auto text-[10px] text-bone-600">{fmt(a.created_at)}</span>
+          </div>
+          {a.reason && <p className="mt-2 rounded-lg bg-white/[0.03] p-3 text-sm text-bone-200 italic">« {a.reason} »</p>}
+          <input value={notes[a.id] || ''} onChange={(e) => setNotes((n) => ({ ...n, [a.id]: e.target.value }))}
+            placeholder="Motif (notifié au supporter en cas de rejet)"
+            className="mt-3 w-full h-9 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-xs text-bone-100 outline-none focus:border-emerald-400/60" />
+          <div className="mt-3 flex gap-2">
+            <Btn onClick={() => decide(a.id, 'accept')} busy={busy === a.id + 'accept'} icon={CheckCircle2} tone="gold">Accepter (réparer)</Btn>
+            <Btn onClick={() => decide(a.id, 'reject')} busy={busy === a.id + 'reject'} icon={X} tone="ghost">Rejeter</Btn>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Statistiques avancées ────────────────────────────────────
+function StatsPanel({ basePath }) {
+  const [st, setSt] = useState(null);
+  useEffect(() => {
+    apiFetch(`${basePath}/stats/advanced`).then((j) => setSt(j.data || null)).catch(() => setSt(null));
+  }, [basePath]);
+
+  if (!st) return <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>;
+
+  const hours = st.avgResolutionMs != null ? Math.round(st.avgResolutionMs / 3600000 * 10) / 10 : null;
+  const Row = ({ obj }) => (
+    <div className="flex flex-wrap gap-1.5">
+      {Object.entries(obj || {}).map(([k, v]) => (
+        <span key={k} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-bone-300"><b className="text-bone-100">{v}</b> {SOURCE_LABEL[k] || REASON_LABEL[k] || k}</span>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Stat label="Dossiers" value={st.cases.total} />
+        <Stat label="Urgents ouverts" value={st.cases.urgent} accent="text-red-400" />
+        <Stat label="Sanctions actives" value={st.sanctions.active} accent="text-gold-400" />
+        <Stat label="Appels en attente" value={st.appeals.pending} accent="text-sky-300" />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-ink-800/40 p-4">
+          <p className="mb-2 text-[10px] uppercase tracking-widest text-bone-500 font-bold">Dossiers par origine</p>
+          <Row obj={st.cases.bySource} />
+          <p className="mt-3 mb-2 text-[10px] uppercase tracking-widest text-bone-500 font-bold">Par type de contenu</p>
+          <Row obj={st.cases.byContentType} />
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-ink-800/40 p-4">
+          <p className="mb-2 text-[10px] uppercase tracking-widest text-bone-500 font-bold">Catégories les plus détectées</p>
+          {st.topCategories.length ? (
+            <div className="space-y-1.5">
+              {st.topCategories.map((c) => (
+                <div key={c.category} className="flex items-center justify-between text-xs">
+                  <span className="text-bone-300">{REASON_LABEL[c.category] || c.category}</span>
+                  <span className="font-bold text-bone-100 tabular-nums">{c.count}</span>
+                </div>
+              ))}
+            </div>
+          ) : <p className="text-xs text-bone-500">Aucune donnée.</p>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Stat label="Appels acceptés" value={st.appeals.accepted} accent="text-emerald-400" />
+        <Stat label="Taux d'acceptation" value={st.appeals.acceptanceRate != null ? st.appeals.acceptanceRate + ' %' : '—'} />
+        <Stat label="Délai moyen" value={hours != null ? hours + ' h' : '—'} />
+      </div>
+    </div>
+  );
+}
+
+const SOURCE_LABEL = { report: 'signalement', ai: 'IA', manual: 'manuel', message: 'chat', post: 'post', comment: 'commentaire', open: 'ouverts', resolved: 'résolus', dismissed: 'classés', in_review: 'en cours' };
 
 function Stat({ label, value, accent = 'text-bone-50' }) {
   return (
