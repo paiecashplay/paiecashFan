@@ -18,6 +18,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('../../db/supabase');
+const { createNotification } = require('../../db/notifications');
 const mock = require('./mockProvider');
 const { normalize } = require('./types');
 
@@ -160,8 +161,35 @@ function reasonFor(r) {
     : "Ton message n'a pas été publié car il ne respecte pas la charte du salon.";
 }
 
+// ── Notification au fan dont le message a été bloqué ─────────
+// La modale s'affiche déjà en temps réel ; cette notification PERSISTE dans la
+// cloche pour que le fan retrouve l'info et sache pourquoi son message manque.
+// Anti-flood : une seule notif de blocage par fan et par salon toutes les 5 min
+// (sinon 10 messages bloqués = 10 notifications).
+const NOTIFY_COOLDOWN_MS = 5 * 60_000;
+const CONTENT_NOUN = { message: 'message', post: 'publication', comment: 'commentaire' };
+
+async function notifyBlocked({ tenantId, authorId, clubName, contentType = 'message', categories = [] }) {
+  // Cooldown : a-t-on déjà notifié ce fan récemment pour ce salon ?
+  const since = new Date(Date.now() - NOTIFY_COOLDOWN_MS).toISOString();
+  const { data: recent } = await supabase.from('notifications')
+    .select('id').eq('user_id', authorId).eq('type', 'chat_blocked')
+    .gte('created_at', since).contains('metadata', { tenantId }).limit(1);
+  if (recent?.length) return null;
+
+  const noun = CONTENT_NOUN[contentType] || 'message';
+  const where = clubName ? ` du salon ${clubName}` : '';
+  return createNotification({
+    user_id: authorId,
+    type: 'chat_blocked',
+    title: 'Message non publié',
+    message: `Ton ${noun}${where} n'a pas été publié car il ne respecte pas notre charte. Un modérateur en a été informé.`,
+    metadata: { tenantId, contentType, categories },
+  }).catch((e) => { console.warn('[moderation] notif de blocage impossible :', e.message); return null; });
+}
+
 module.exports = {
-  screenBeforePublish, maybeSuspend, isEnabled, isRateLimited,
+  screenBeforePublish, maybeSuspend, notifyBlocked, isEnabled, isRateLimited,
   FLAG_KEY, _resetFlagCache,
   RATE_MAX, BLOCK_STRIKES, CONSERVATORY_HOURS, CLAUDE_BUDGET_MS,
 };

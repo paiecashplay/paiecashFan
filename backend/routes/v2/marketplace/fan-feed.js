@@ -55,6 +55,15 @@ async function publishGate(req, res, { contentType, content, postId = null }) {
   const sanction = v.action === 'rate_limited' ? null
     : await prepublish.maybeSuspend({ tenantId: req.tenant.id, authorId: req.authUser.id }).catch(() => null);
 
+  // Notification persistante au fan (sauf simple rate-limit : ce n'est pas une
+  // violation de charte). Fire-and-forget : ne bloque pas la réponse.
+  if (v.action !== 'rate_limited') {
+    prepublish.notifyBlocked({
+      tenantId: req.tenant.id, authorId: req.authUser.id, clubName: req.tenant.name,
+      contentType, categories: v.ai?.categories || [],
+    }).catch(() => {});
+  }
+
   return res.status(422).json({
     success: false, data: {
       moderation: {

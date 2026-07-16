@@ -105,6 +105,17 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (as)** — **Notification persistante au fan quand son message est bloqué**.
+  La modale s'affiche déjà en temps réel ; on ajoute une **notification dans la
+  cloche 🔔** (type `chat_blocked`) pour que le fan retrouve l'info : « Ton
+  {message/publication/commentaire} du salon {club} n'a pas été publié car il ne
+  respecte pas notre charte. Un modérateur en a été informé. » Émise depuis
+  `publishGate` (fire-and-forget), **sauf sur simple rate-limit** (pas une
+  violation de charte). **Anti-flood** : `notifyBlocked` n'émet qu'une notif de
+  blocage par fan **et par salon** toutes les 5 min (sinon 10 messages bloqués =
+  10 notifs). Icônes front ajoutées pour `chat_blocked`/`chat_sanction`/
+  `chat_sanction_revoked` dans `NotificationBell`. Le modérateur reste seul juge
+  d'une éventuelle sanction (l'IA a juste bloqué + ouvert le dossier).
 - **2026-07-16 (ar)** — **Fix : supporters coincés en 403 sur le salon**.
   Symptôme : certains supporters ne pouvaient ni poster ni commenter (403), même
   après avoir « accepté la charte ». Cause racine (3 maillons) : (1) `ensureCanWrite`

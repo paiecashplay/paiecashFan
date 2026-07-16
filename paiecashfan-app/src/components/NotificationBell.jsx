@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle } from 'lucide-react';
+import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle, ShieldAlert, Ban } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
@@ -10,6 +10,9 @@ const ICONS = {
   tombola_win: Gift,
   match_reply: MessageCircle,
   message: MessageCircle,
+  chat_blocked: ShieldAlert,
+  chat_sanction: Ban,
+  chat_sanction_revoked: CheckCheck,
 };
 const iconFor = (type) => ICONS[type] || Trophy;
 
