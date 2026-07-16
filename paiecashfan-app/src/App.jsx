@@ -8,6 +8,7 @@ import { Home } from './pages/Home';
 import { Boutique } from './pages/Boutique';
 import { Tombola } from './pages/Tombola';
 import { FanClub } from './pages/FanClub';
+import { FanClubHub } from './pages/FanClubHub';
 import { FederationDetail } from './pages/FederationDetail';
 import { ClubDetail } from './pages/ClubDetail';
 import { Login } from './pages/Login';
@@ -85,7 +86,7 @@ export default function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/boutique" element={<Boutique />} />
                   <Route path="/tombola" element={<Tombola />} />
-                  <Route path="/fan-club" element={<FanClub />} />
+                  <Route path="/fan-club" element={<FanClubHub />} />
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />

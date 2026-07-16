@@ -105,6 +105,20 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (au)** — **Page Fan Club refondue en HUB (annuaire des salons)**.
+  `/fan-club` n'est plus le salon PSG par défaut mais un **annuaire premium**
+  (nouvelle page `FanClubHub`) ; le salon d'un club reste sur
+  `/clubs/:slug/fan-club`. Hero `fan-club-home.webp` (converti du PNG : 1804→87 ko,
+  −95 %). Nouvel endpoint `GET /api/v2/clubs/fan-hub?search=` (`favorites.getFanHubData`)
+  avec **compteurs RÉELS** : `supportersCount` (favoris), `membersCount` (charte
+  acceptée), `isOfficial` (club_admin assigné). ~1900 clubs en base → on ne les
+  charge pas tous : **défaut** = clubs des grandes ligues (~176, 58 ko),
+  **recherche** = tout le catalogue côté serveur (debounce). Front : **favoris en
+  premier**, puis Ligue 1, puis populaires ; **accès rapide** au salon favori
+  (carte en tête) ; recherche/tri, « Voir plus », bandeau valeurs. Devise (motto)
+  greffée depuis `clubProfiles` (PSG/OM en ont une). Badge **LIVE** codé mais
+  masqué (`isLive:false`) en attendant l'intégration matchs (API-Football).
+  ⚠️ « En ligne » remplacé par « Membres » (pas de système de présence temps réel).
 - **2026-07-16 (at)** — **Modération Fan Club — Lot 7 (appels + stats avancées)**.
   Migration `chat-appeals.sql` : table `chat_appeals` avec cible **POLYMORPHE**
   (`target_type` case|sanction + `target_id`) — un fan conteste un contenu modéré

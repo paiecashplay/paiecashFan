@@ -101,6 +101,15 @@ async function requireChatAccess(req, res, next) {
   } catch (err) { return fail(res, 'Vérification d\'accès impossible : ' + err.message, 500); }
 }
 
+// GET /api/v2/clubs/fan-hub — annuaire des salons (page Fan Club).
+// Public : liste tous les salons + compteurs réels. Si connecté, annote les
+// favoris et le salon principal (pour l'accès rapide + le tri favoris d'abord).
+router.get('/fan-hub', optionalAuth, async (req, res) => {
+  try {
+    return ok(res, await favorites.getFanHubData({ userId: req.authUser?.id || null, search: req.query.search || null }));
+  } catch (err) { return fail(res, 'Chargement des salons impossible : ' + err.message, 500); }
+});
+
 // GET /api/v2/clubs/:slug/fan-feed — public (consultable sans connexion).
 // Si l'utilisateur est connecté (optionalAuth), on renvoie aussi likedByMe.
 router.get('/:slug/fan-feed', optionalAuth, withTenant, async (req, res) => {

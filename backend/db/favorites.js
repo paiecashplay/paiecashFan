@@ -72,4 +72,67 @@ async function followersOfClub(tenantId) {
   return [...new Set((data || []).map((r) => r.user_id))];
 }
 
-module.exports = { listFavorites, listFavoriteTenantIds, isFavorite, toggleFavorite, setPrimary, followersOfClub };
+// ── Hub Fan Club : la liste des salons + compteurs RÉELS ─────
+// - supportersCount : fans ayant ce club en favori (⭐)
+// - membersCount    : fans ayant rejoint le salon (charte acceptée)
+// - isOfficial      : un modérateur (club_admin) gère ce salon
+//
+// Il y a ~1900 clubs actifs → on ne les charge PAS tous. Par défaut on renvoie
+// les clubs d'une vraie ligue (~176), + les favoris du fan. La RECHERCHE, elle,
+// interroge tout le catalogue par nom (côté serveur).
+const HUB_FIELDS = 'id, slug, name, logo_url, primary_color, country, city, league_name';
+
+async function getFanHubData({ userId = null, search = null } = {}) {
+  const countBy = (rows, key) => (rows || []).reduce((m, r) => { if (r[key]) m[r[key]] = (m[r[key]] || 0) + 1; return m; }, {});
+
+  // Ensemble de clubs à renvoyer : recherche (tout le catalogue) ou défaut (ligues).
+  let clubsQuery;
+  if (search && search.trim()) {
+    clubsQuery = supabase.from('tenants').select(HUB_FIELDS)
+      .eq('status', 'active').not('is_federation_hub', 'is', true)
+      .ilike('name', `%${search.trim()}%`).order('name', { ascending: true }).limit(40);
+  } else {
+    clubsQuery = supabase.from('tenants').select(HUB_FIELDS)
+      .eq('status', 'active').not('is_federation_hub', 'is', true)
+      .not('league_name', 'is', null).order('name', { ascending: true }).limit(400);
+  }
+
+  const [{ data: clubs }, { data: favs }, { data: mems }, { data: admins }] = await Promise.all([
+    clubsQuery,
+    supabase.from('fan_favorite_clubs').select('tenant_id'),
+    supabase.from('chat_room_memberships').select('tenant_id'),
+    supabase.from('profiles').select('club_id').eq('role', 'club_admin').not('club_id', 'is', null),
+  ]);
+
+  const supporters = countBy(favs, 'tenant_id');
+  const members = countBy(mems, 'tenant_id');
+  const officialSet = new Set((admins || []).map((a) => a.club_id));
+
+  let favoriteIds = new Set(), primaryId = null, myFavClubs = [];
+  if (userId) {
+    const mine = await listFavorites(userId);
+    myFavClubs = mine.map((f) => f.club).filter(Boolean);
+    favoriteIds = new Set(myFavClubs.map((c) => c.id));
+    primaryId = mine.find((f) => f.isPrimary)?.club?.id || null;
+  }
+
+  // On garantit que les FAVORIS du fan figurent dans la liste, même hors ligue
+  // (ex. une sélection nationale suivie). On les fusionne s'ils manquent.
+  const byId = new Map((clubs || []).map((c) => [c.id, c]));
+  if (!search) for (const f of myFavClubs) if (!byId.has(f.id)) byId.set(f.id, { ...f, logo_url: f.logo_url || null, primary_color: f.primary_color || null });
+
+  const enriched = [...byId.values()].map((c) => ({
+    id: c.id, slug: c.slug, name: c.name, logo: c.logo_url || null, primaryColor: c.primary_color || null,
+    country: c.country || null, city: c.city || null, league: c.league_name || null,
+    supportersCount: supporters[c.id] || 0,
+    membersCount: members[c.id] || 0,
+    isOfficial: officialSet.has(c.id),
+    isFavorite: favoriteIds.has(c.id),
+    isPrimary: c.id === primaryId,
+    isLive: false,   // réservé : branché plus tard sur les vrais matchs (API-Football)
+  }));
+
+  return { clubs: enriched, primary: enriched.find((c) => c.isPrimary) || null };
+}
+
+module.exports = { listFavorites, listFavoriteTenantIds, isFavorite, toggleFavorite, setPrimary, followersOfClub, getFanHubData };
