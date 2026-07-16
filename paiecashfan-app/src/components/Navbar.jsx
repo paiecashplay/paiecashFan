@@ -7,6 +7,7 @@ import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
 import { NotificationBell } from './NotificationBell';
+import { NavbarSearch } from './NavbarSearch';
 
 const nav = [
   { label: 'Accueil',   to: '/' },
@@ -19,6 +20,7 @@ const nav = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -80,7 +82,7 @@ export function Navbar() {
 
         {/* Actions droite */}
         <div className="flex items-center gap-2">
-          <IconButton aria-label="Recherche" className="hidden md:inline-flex">
+          <IconButton aria-label="Recherche" className="inline-flex" onClick={() => setSearchOpen(true)}>
             <Search size={16} />
           </IconButton>
           <NotificationBell />
@@ -139,6 +141,10 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+      <NavbarSearch
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
     </motion.header>
   );
 }
