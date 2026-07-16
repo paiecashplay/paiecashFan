@@ -64,17 +64,23 @@ export function FanClubHub() {
       <Container>
         {/* ── Hero ─────────────────────────────────────────── */}
         <header className="relative overflow-hidden rounded-3xl border border-white/10">
-          {/* Le supporter à l'écharpe est AU CENTRE de la photo, mais le hero est
-              une bande large (rognage vertical) : object-position horizontal
-              n'aurait aucun effet. On passe donc par un fond ZOOMÉ (backgroundSize
-              > 100 %) qui crée le débordement horizontal, puis on positionne.
-              👉 RÉGLAGE : baisser le 1er % de backgroundPosition = fan plus à DROITE ;
-                 l'augmenter = plus à gauche. Le 2e % ajuste le cadrage vertical. */}
-          <div className="absolute inset-0 bg-no-repeat"
-            style={{ backgroundImage: `url(${HERO})`, backgroundSize: '95% auto', backgroundPosition: '320% 58%' }} />
+          {/* Cadrage RESPONSIVE du hero :
+              • Mobile/tablette : `cover` centré → toute la hauteur de la photo
+                (écharpe comprise), fan au centre. Robuste sur écran étroit.
+              • Desktop (lg) : cadrage validé par la cliente — fond zoomé positionné
+                pour placer le supporter à l'écharpe à DROITE, titre à gauche.
+              👉 RÉGLAGE DESKTOP : les valeurs lg:[background-size] / lg:[background-position]
+                 ci-dessous (baisser le 1er % de position = fan plus à droite). */}
+          <div
+            className="absolute inset-0 bg-no-repeat bg-cover bg-center
+                       lg:[background-size:95%_auto] lg:[background-position:320%_58%]"
+            style={{ backgroundImage: `url(${HERO})` }} />
           {/* Voile sombre surtout à GAUCHE (lisibilité du titre) et quasi nul à
               DROITE pour laisser lire l'écharpe « PASSION • RESPECT • FIERTÉ ». */}
           <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent" />
+          {/* Mobile : le titre occupe toute la largeur → voile uniforme léger pour
+              garantir le contraste. Retiré en desktop (le dégradé gauche suffit). */}
+          <div className="absolute inset-0 bg-ink-950/35 lg:hidden" />
           <div className="relative px-6 py-12 sm:px-10 sm:py-16 max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-400">
               <Radio size={12} /> Fan Club
