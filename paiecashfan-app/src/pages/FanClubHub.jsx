@@ -64,8 +64,11 @@ export function FanClubHub() {
       <Container>
         {/* ── Hero ─────────────────────────────────────────── */}
         <header className="relative overflow-hidden rounded-3xl border border-white/10">
-          <img src={HERO} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/85 to-ink-950/30" />
+          {/* Cadrage décalé à droite : on voit le supporter à l'écharpe. */}
+          <img src={HERO} alt="" className="absolute inset-0 h-full w-full object-cover object-[72%_center]" />
+          {/* Voile sombre surtout à GAUCHE (lisibilité du titre) et quasi nul à
+              DROITE pour laisser lire l'écharpe « PASSION • RESPECT • FIERTÉ ». */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent" />
           <div className="relative px-6 py-12 sm:px-10 sm:py-16 max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-400">
               <Radio size={12} /> Fan Club
@@ -174,15 +177,18 @@ function ClubCard({ club }) {
       </div>
 
       <h3 className="relative mt-4 font-display text-lg font-black leading-tight text-bone-50">{club.name}</h3>
-      {club.motto && <p className="relative mt-0.5 text-xs font-bold" style={{ color: club.mottoColor || '#9ca3af' }}>{club.motto}</p>}
+      {/* Ligne devise toujours réservée (min-h) → cartes de hauteur homogène. */}
+      <p className="relative mt-0.5 min-h-[1.1rem] text-xs font-bold" style={{ color: club.mottoColor || '#9ca3af' }}>{club.motto || ' '}</p>
 
-      <div className="relative mt-4 grid grid-cols-2 gap-2">
+      <div className="relative mt-4 mb-4 grid grid-cols-2 gap-2">
         <Metric value={club.supportersCount} label="Supporters" />
         <Metric value={club.membersCount} label="Membres" />
       </div>
 
+      {/* mt-auto : le bouton est poussé en bas → tous alignés d'une carte à l'autre
+          (même si un nom de club passe sur 2 lignes). */}
       <Link to={`/clubs/${club.slug}/fan-club`}
-        className="relative mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-[11px] font-black uppercase tracking-wider text-bone-200 transition group-hover:border-emerald-400/40 group-hover:bg-emerald-400/10 group-hover:text-emerald-300">
+        className="relative mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-[11px] font-black uppercase tracking-wider text-bone-200 transition group-hover:border-emerald-400/40 group-hover:bg-emerald-400/10 group-hover:text-emerald-300">
         Entrer dans le salon <ArrowRight size={13} />
       </Link>
     </div>
