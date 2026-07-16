@@ -64,8 +64,14 @@ export function FanClubHub() {
       <Container>
         {/* ── Hero ─────────────────────────────────────────── */}
         <header className="relative overflow-hidden rounded-3xl border border-white/10">
-          {/* Cadrage décalé à droite : on voit le supporter à l'écharpe. */}
-          <img src={HERO} alt="" className="absolute inset-0 h-full w-full object-cover object-[72%_center]" />
+          {/* Le supporter à l'écharpe est AU CENTRE de la photo, mais le hero est
+              une bande large (rognage vertical) : object-position horizontal
+              n'aurait aucun effet. On passe donc par un fond ZOOMÉ (backgroundSize
+              > 100 %) qui crée le débordement horizontal, puis on positionne.
+              👉 RÉGLAGE : baisser le 1er % de backgroundPosition = fan plus à DROITE ;
+                 l'augmenter = plus à gauche. Le 2e % ajuste le cadrage vertical. */}
+          <div className="absolute inset-0 bg-no-repeat"
+            style={{ backgroundImage: `url(${HERO})`, backgroundSize: '95% auto', backgroundPosition: '320% 58%' }} />
           {/* Voile sombre surtout à GAUCHE (lisibilité du titre) et quasi nul à
               DROITE pour laisser lire l'écharpe « PASSION • RESPECT • FIERTÉ ». */}
           <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent" />
