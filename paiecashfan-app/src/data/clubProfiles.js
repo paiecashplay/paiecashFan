@@ -12,6 +12,29 @@
 
 export const clubProfiles = {
   // ────────────────────────────────────────────────────────────
+  // Devises des clubs de Ligue 1 (cartes du hub Fan Club).
+  // Entrées minimales : motto + mottoColor.
+  //  ✅ = devise/cri de ralliement OFFICIEL ou iconique
+  //  🟡 = surnom / identité bien réels, mais PAS une devise officielle
+  //       (aucune devise officielle connue pour ces clubs — à corriger librement)
+  // ────────────────────────────────────────────────────────────
+  'as-monaco':          { motto: 'Daghe Munegu',          mottoColor: '#CE1126' },   // ✅ monégasque
+  'nice':               { motto: 'Nissa La Bella',        mottoColor: '#E4022E' },   // ✅ hymne niçois
+  'lens':               { motto: 'Sang et Or',            mottoColor: '#FDE047' },   // ✅ identité RC Lens
+  'le-havre':           { motto: 'Le Doyen',              mottoColor: '#00A3E0' },   // ✅ plus vieux club FR (1872)
+  'olympique-lyonnais': { motto: 'Fiers d\'être Lyonnais', mottoColor: '#DA020E' },  // 🟡 chant de supporters
+  'lille':              { motto: 'Les Dogues',            mottoColor: '#E01E13' },   // 🟡 surnom
+  'rennes':             { motto: 'Rouge et Noir',         mottoColor: '#E23237' },   // 🟡 couleurs
+  'toulouse':           { motto: 'Les Violets',           mottoColor: '#7C3AED' },   // 🟡 couleurs
+  'strasbourg':         { motto: 'Le Racing',             mottoColor: '#0077C8' },   // 🟡 identité
+  'auxerre':            { motto: 'L\'AJA',                mottoColor: '#1E3A8A' },   // 🟡 sigle
+  'angers':             { motto: 'Le SCO',                mottoColor: '#E5E7EB' },   // 🟡 sigle
+  'lorient':            { motto: 'Les Merlus',            mottoColor: '#F97316' },   // 🟡 surnom
+  'stade-brestois-29':  { motto: 'Allez Brest',           mottoColor: '#E4002B' },   // 🟡 cri
+  'estac-troyes':       { motto: 'Les Troyens',           mottoColor: '#1D4ED8' },   // 🟡 surnom
+  'le-mans':            { motto: 'Les Manceaux',          mottoColor: '#EAB308' },   // 🟡 surnom
+
+  // ────────────────────────────────────────────────────────────
   // Paris Saint-Germain — Ligue 1
   // ────────────────────────────────────────────────────────────
   'paris-saint-germain': {
