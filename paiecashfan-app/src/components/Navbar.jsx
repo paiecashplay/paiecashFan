@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, Settings, ShoppingBag, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
+import { LogOut, Menu, Settings, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -86,9 +86,6 @@ export function Navbar() {
             <Search size={16} />
           </IconButton>
           <NotificationBell />
-          <IconButton aria-label="Panier" className="hidden md:inline-flex">
-            <ShoppingBag size={16} />
-          </IconButton>
 
           {/* Bouton auth contextuel */}
           <div className="hidden md:block">

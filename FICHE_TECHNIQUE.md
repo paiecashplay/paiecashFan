@@ -105,6 +105,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (av)** — **Recherche navbar (loupe) + retrait de l'icône panier**.
+  Fonctionnalité livrée par Kelvine (branche `feature/navbar-search`), revue et
+  intégrée : `NavbarSearch` (modale) branchée sur la loupe → `GET /api/v2/marketplace/search?q=`
+  (endpoint serveur existant, service-role + sanitize anti-injection PostgREST,
+  recherche clubs + fédérations). Front propre : `apiFetch` (jamais Supabase
+  direct), debounce 250 ms + annulation, fusion résultats API + données statiques
+  dédoublonnée, Échap pour fermer, loupe désormais visible aussi sur mobile.
+  **Complété** (partie non faite par la stagiaire) : suppression de l'icône
+  `ShoppingBag` (« Panier », décorative et sans lien) à côté de « Se connecter ».
 - **2026-07-16 (au)** — **Page Fan Club refondue en HUB (annuaire des salons)**.
   `/fan-club` n'est plus le salon PSG par défaut mais un **annuaire premium**
   (nouvelle page `FanClubHub`) ; le salon d'un club reste sur
