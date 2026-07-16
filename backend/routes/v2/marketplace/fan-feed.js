@@ -17,7 +17,10 @@ const supabase = require('../../../db/supabase');
 const router = express.Router();
 
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
-const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: null, error: msg });
+// `extra` (optionnel) est renvoyé dans `data` : il porte le CONTEXTE d'un refus
+// (needsCharter, sanction…) pour que le front sache réagir — sans lui, un 403
+// est « aveugle » et le supporter reste coincé.
+const fail = (res, msg, s = 400, extra = null) => res.status(s).json({ success: false, data: extra, error: msg });
 
 const MAX = 2000;
 const clean = (v) => (typeof v === 'string' ? v.trim() : '');

@@ -105,6 +105,20 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-16 (ar)** — **Fix : supporters coincés en 403 sur le salon**.
+  Symptôme : certains supporters ne pouvaient ni poster ni commenter (403), même
+  après avoir « accepté la charte ». Cause racine (3 maillons) : (1) `ensureCanWrite`
+  faisait `if (access?.needsCharter)` → quand l'accès n'était pas encore chargé
+  (`access === null`), le test était falsy et **le message partait avant vérif de
+  la charte** → 403 serveur. (2) `fail()` **ignorait son 4e argument** → la réponse
+  403 ne portait ni `needsCharter` ni la sanction : un 403 « aveugle ». (3) Le front
+  **n'ouvrait pas la charte sur un 403** → supporter coincé sur une erreur brute.
+  Fixes : `ensureCanWrite` bloque tant que `access` est null (+ relance le
+  chargement) ; `fail(res,msg,status,extra)` renvoie `extra` dans `data` ;
+  `useFanFeed` route les 403 vers `onAccessDenied(data)` → FanClub **rouvre la
+  charte** (needsCharter) ou rafraîchit l'accès (sanction). Auto-réparant : toute
+  écriture refusée re-propose la charte. Backend `acceptCharter` vérifié OK (le
+  bug était uniquement dans l'enchaînement front + réponse 403).
 - **2026-07-16 (aq)** — **Modération Fan Club — Lot 6 (blocage AVANT publication)**.
   `services/moderation/prepublish.js` : pipeline du moins cher au plus cher —
   **rate limit** (10/min, compte aussi les contenus bloqués : pas de flood par

@@ -37,10 +37,11 @@ function formatRelative(iso) {
 
 const withRelative = (o) => ({ ...o, createdAt: formatRelative(o.createdAt) });
 
-// `onModerationBlock(moderation, draft)` est appelé quand le serveur REFUSE une
-// publication (lot 6, HTTP 422). Ce n'est pas une panne : on remonte le motif à
-// l'appelant pour l'expliquer au supporter, au lieu d'afficher une erreur brute.
-export function useFanFeed(clubId, mode = 'club', { onModerationBlock } = {}) {
+// Callbacks de refus (le serveur a dit non, ce n'est pas une panne) :
+//  · onModerationBlock(moderation, draft) → contenu refusé par l'IA (422)
+//  · onAccessDenied(data)                 → charte manquante ou sanction (403)
+// On remonte le contexte à l'appelant au lieu d'afficher une erreur brute.
+export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessDenied } = {}) {
   const { user, profile } = useAuth();
 
   const [fans, setFans] = useState([]);
@@ -94,9 +95,12 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock } = {}) {
   // ce qui retire l'affichage optimiste du contenu non publié.
   const handleWriteError = useCallback((e, draft) => {
     if (e?.status === 422 && e.data?.moderation) onModerationBlock?.(e.data.moderation, draft);
+    // 403 = charte manquante ou sanction. On laisse l'appelant rouvrir la
+    // charte / rafraîchir l'accès, plutôt que d'afficher une erreur brute.
+    else if (e?.status === 403) onAccessDenied?.(e.data || {});
     else setError(e.message);
     loadFeed(true);
-  }, [onModerationBlock, loadFeed]);
+  }, [onModerationBlock, onAccessDenied, loadFeed]);
 
   // ─── Actions ────────────────────────────────────────────────
   // Mode club → optimiste + POST API + réconciliation silencieuse.

@@ -56,6 +56,13 @@ export function FanClub() {
       setBlocked({ moderation, draft });
       if (moderation.suspended) loadAccess();   // lecture seule → rafraîchit le bandeau
     },
+    // Refus d'accès (403) : charte manquante → on rouvre la modale d'acceptation ;
+    // sanction → on rafraîchit l'accès pour afficher le bandeau. Auto-réparant :
+    // le supporter n'est jamais coincé sans savoir quoi faire.
+    onAccessDenied: (data) => {
+      loadAccess();
+      if (data?.needsCharter) { setCharterDismissed(false); setCharterOpen(true); }
+    },
   });
   
   const [newPost, setNewPost] = useState('');
@@ -134,8 +141,12 @@ export function FanClub() {
   function ensureCanWrite() {
     if (mode !== 'club') return true;
     if (!user) return false;
-    if (access?.activeSanction) return false;
-    if (access?.needsCharter) { setCharterDismissed(false); setCharterOpen(true); return false; }
+    // Accès pas encore chargé : on ne prend pas le risque de laisser passer un
+    // message sans avoir vérifié la charte (sinon 403 côté serveur, message
+    // perdu). On relance le chargement et on bloque le temps de savoir.
+    if (!access) { loadAccess(); return false; }
+    if (access.activeSanction) return false;
+    if (access.needsCharter) { setCharterDismissed(false); setCharterOpen(true); return false; }
     return true;
   }
 
