@@ -17,6 +17,7 @@ import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
+import { usePresence } from '@/hooks/usePresence';
 
 // Club par défaut quand on arrive sur /fan-club sans slug.
 const DEFAULT_SLUG = 'paris-saint-germain';
@@ -35,6 +36,10 @@ export function FanClub() {
 
   const { user } = useAuth();
   const [mode, setMode] = useState('club');
+
+  // Présence en ligne : battement de cœur tant qu'on est dans le salon d'un club
+  // (connecté). Le backend en déduit qui est « en ligne » dans ce salon.
+  usePresence(slug, mode === 'club' && !!user);
   const {
     fans,
     posts,

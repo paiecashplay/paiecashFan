@@ -105,6 +105,19 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-17 (aw)** — **Présence en ligne par salon (chantier 2 Fan Club)**.
+  Corrige « je suis noté hors ligne alors que je suis connecté » : la présence
+  était codée en dur (`online:false`). Migration `chat-presence.sql` : table
+  `chat_presence(tenant_id, user_id, last_seen_at)`, RLS deny-all. `db/presence.js` :
+  `heartbeat()` (upsert) + `onlineInTenant()` (en ligne = vu < **75 s**). Modèle
+  heartbeat + fenêtre, **sans websocket** (cohérent avec le polling de l'app,
+  nettoyage implicite). Route `POST /api/v2/clubs/:slug/presence`. `getFeed`
+  annote chaque participant `online`, **inclut les présents non-auteurs**, trie
+  les en-ligne d'abord, renvoie `onlineCount` réel. Front : hook `usePresence`
+  (battement toutes les 30 s tant que la page est ouverte + onglet visible,
+  reping au retour d'onglet, cleanup au départ), branché dans `FanClub` (salon
+  de club + connecté). `ParticipantsPanel` consomme déjà `fan.online`.
+  Tests **5/5** (`tests/presence.test.js`).
 - **2026-07-16 (av)** — **Recherche navbar (loupe) + retrait de l'icône panier**.
   Fonctionnalité livrée par Kelvine (branche `feature/navbar-search`), revue et
   intégrée : `NavbarSearch` (modale) branchée sur la loupe → `GET /api/v2/marketplace/search?q=`

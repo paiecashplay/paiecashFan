@@ -6,6 +6,7 @@
 
 const supabase = require('./supabase');
 const { getTenantBySlugFlexible } = require('./tenants');
+const presence = require('./presence');
 
 async function resolveTenantId(slug) {
   const t = await getTenantBySlugFlexible(slug);
@@ -67,16 +68,26 @@ async function getFeed(tenantId, currentUserId) {
   });
   (comments || []).forEach((c) => { commentCount[c.post_id] = (commentCount[c.post_id] || 0) + 1; });
 
-  // Participants (auteurs de posts / commentaires / messages).
+  // Présence en ligne (chantier 2) : qui est actuellement dans CE salon.
+  const onlineIds = await presence.onlineInTenant(tenantId).catch(() => new Set());
+
+  // Participants : auteurs (posts/commentaires/messages) + présents non-auteurs
+  // (un supporter qui regarde sans avoir posté doit apparaître « en ligne »).
   const authorIds = [
     ...(posts || []).map((p) => p.author_id),
     ...(comments || []).map((c) => c.author_id),
     ...(messages || []).map((m) => m.author_id),
   ];
-  const profiles = await fetchProfiles(authorIds);
+  const profiles = await fetchProfiles([...authorIds, ...onlineIds]);
+  // Annotation réelle de la présence (fetchProfiles pose online:false par défaut).
+  Object.values(profiles).forEach((p) => { p.online = onlineIds.has(p.id); });
+
+  // Les en-ligne d'abord, puis alphabétique.
+  const fans = Object.values(profiles).sort((a, b) => (b.online - a.online) || a.name.localeCompare(b.name));
 
   return {
-    fans: Object.values(profiles),
+    fans,
+    onlineCount: onlineIds.size,
     posts: (posts || []).map((p) => ({
       id: p.id,
       authorId: p.author_id,

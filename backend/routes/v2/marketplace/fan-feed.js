@@ -11,6 +11,7 @@ const mod = require('../../../db/chatModeration');
 const aiMod = require('../../../services/moderation');
 const prepublish = require('../../../services/moderation/prepublish');
 const appeals_db = require('../../../db/chatAppeals');
+const presence = require('../../../db/presence');
 const favorites = require('../../../db/favorites');
 const { requireClubModerator } = require('../../../middleware/clubModerator');
 const supabase = require('../../../db/supabase');
@@ -108,6 +109,16 @@ router.get('/fan-hub', optionalAuth, async (req, res) => {
   try {
     return ok(res, await favorites.getFanHubData({ userId: req.authUser?.id || null, search: req.query.search || null }));
   } catch (err) { return fail(res, 'Chargement des salons impossible : ' + err.message, 500); }
+});
+
+// POST /api/v2/clubs/:slug/presence — battement de cœur (chantier 2).
+// Le fan signale qu'il est présent dans ce salon, maintenant. Fire-and-forget
+// côté front (toutes les ~30 s tant que la page est ouverte).
+router.post('/:slug/presence', requireAuth, withTenant, async (req, res) => {
+  try {
+    await presence.heartbeat(req.tenant.id, req.authUser.id);
+    return ok(res, { ok: true });
+  } catch (err) { return fail(res, 'Présence : ' + err.message, 500); }
 });
 
 // GET /api/v2/clubs/:slug/fan-feed — public (consultable sans connexion).
