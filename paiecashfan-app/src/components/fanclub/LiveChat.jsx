@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Send,
@@ -29,12 +29,92 @@ export function LiveChat({
 }) {
   const [message, setMessage] = useState('');
 
+  // Références pour le scroll automatique
+  const messagesContainerRef = useRef(null);
+  const bottomRef = useRef(null);
+  const isNearBottomRef = useRef(true);
+  const initialScrollDoneRef = useRef(false);
+  const lastMessageIdRef = useRef(null);
+
   const isClubMode = mode === 'club';
   const loggedIn = access ? access.isLoggedIn : !!currentUserId;
   const sanction = access?.activeSanction || null;
   const needsCharter = !!access?.needsCharter;
   // On ne peut écrire que connecté, sans sanction bloquante.
   const canWrite = !isClubMode || (loggedIn && !sanction);
+
+  // Scroll automatique vers le bas si on est proche du bas
+  function handleMessagesScroll() {
+    const container = messagesContainerRef.current;
+
+    if (!container) return;
+
+    const distanceFromBottom =
+      container.scrollHeight -
+      container.scrollTop -
+      container.clientHeight;
+
+    isNearBottomRef.current = distanceFromBottom <= 120;
+  }
+
+  // Réinitialisation des références de scroll à chaque changement de mode ou de club
+  useEffect(() => {
+    initialScrollDoneRef.current = false;
+    isNearBottomRef.current = true;
+    lastMessageIdRef.current = null;
+  }, [mode, club?.slug]);
+
+  // Scroll automatique vers le bas si on est proche du bas
+  useEffect(() => {
+    if (loading || error) return;
+
+    const lastMessage = messages[messages.length - 1];
+    const lastMessageId = lastMessage?.id ?? null;
+
+    // À la première ouverture, toujours afficher le dernier message.
+    if (!initialScrollDoneRef.current) {
+      initialScrollDoneRef.current = true;
+      lastMessageIdRef.current = lastMessageId;
+
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({
+          behavior: 'auto',
+          block: 'end'
+        });
+      });
+
+      return;
+    }
+
+  // Le polling a renvoyé exactement le même dernier message :
+  // ne pas déplacer le scroll.
+  if (lastMessageId === lastMessageIdRef.current) {
+    return;
+  }
+
+  lastMessageIdRef.current = lastMessageId;
+
+    const isMyMessage =
+      Boolean(currentUserId) &&
+      lastMessage?.authorId === currentUserId;
+
+    // On descend si :
+    // - l'utilisateur était déjà proche du bas ;
+    // - ou le nouveau message est le sien.
+    if (isNearBottomRef.current || isMyMessage) {
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end'
+        });
+      });
+    }
+  }, [
+    messages,
+    loading,
+    error,
+    currentUserId
+  ]);
 
   function handleSend() {
     const cleanMessage = message.trim();
@@ -49,8 +129,8 @@ export function LiveChat({
   }
 
   return (
-    <section className="flex h-full min-h-[360px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] sm:min-h-[420px]">
-      <div className="border-b border-white/10 p-4 sm:p-5">
+    <section className="flex h-[70vh] min-h-[420px] max-h-[720px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] max-sm:h-[65vh] max-sm:min-h-[360px]">
+      <div className="shrink-0 border-b border-white/10 p-4 sm:p-5">
         <h2 className="flex items-center gap-2 text-lg font-black text-bone-50">
           <MessageCircle
             size={20}
@@ -66,8 +146,9 @@ export function LiveChat({
             : 'Discute uniquement avec tes amis pendant le live.'}
         </p>
       </div>
-
-      <div className="flex-1 space-y-3 overflow-y-auto p-4 sm:p-5">
+      
+      {/* Conteneur des messages avec scroll */}
+      <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:p-5">
         {loading && <ChatSkeleton />}
 
         {!loading && error && (
@@ -115,10 +196,14 @@ export function LiveChat({
                 {msg.content}
               </p>
             </motion.div>
-          ))}
+          ))
+        }
+
+        {/* Élément invisible pour le scroll automatique */}
+        <div ref={bottomRef} aria-hidden="true" className="h-px"/>
       </div>
 
-      <div className="border-t border-white/10 p-4">
+      <div className="shrink-0 border-t border-white/10 bg-ink-950/80 p-4 backdrop-blur">
         {/* Sanction active → lecture seule */}
         {isClubMode && sanction ? (
           <div className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-300">

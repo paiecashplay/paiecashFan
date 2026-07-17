@@ -18,6 +18,7 @@ import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
 
+
 // Club par défaut quand on arrive sur /fan-club sans slug.
 const DEFAULT_SLUG = 'paris-saint-germain';
 
@@ -49,7 +50,8 @@ export function FanClub() {
     messages,
     isChatEmpty,
     sendMessage,
-    match
+    match,
+    counters
   } = useFanFeed(slug, mode, {
     // Refus de l'IA avant publication : on explique, on ne montre pas d'erreur brute.
     onModerationBlock: (moderation, draft) => {
@@ -235,7 +237,7 @@ export function FanClub() {
             title="Streaming Fan Club"
             badge="Public"
             description="Regarde le live officiel avec tous les supporters du club."
-            meta={feedLoading ? 'Chargement...' : `${fans.length} supporters`}
+            meta={feedLoading ? 'Chargement...' : `${new Intl.NumberFormat('fr-FR').format(counters.supportersCount)} supporters`}
             color="emerald"
             onClick={() => setMode('club')}
           />

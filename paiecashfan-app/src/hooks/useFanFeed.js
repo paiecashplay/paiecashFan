@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -15,13 +15,6 @@ import { useAuth } from '@/context/AuthContext';
  */
 
 const FEED_PATH = (clubId) => `/api/v2/clubs/${encodeURIComponent(clubId)}/fan-feed`;
-
-// Bandeau match (statique pour l'instant, non lié au feed).
-const match = {
-  homeTeam: 'Paris Saint-Germain', awayTeam: 'Marseille',
-  homeScore: 2, awayScore: 1, competition: 'Ligue 1', minute: 85,
-  supporters: '12 541', messages: '2 154', reactions: '18 521',
-};
 
 // ISO → libellé relatif FR ("à l'instant", "il y a 5 min", "il y a 2 h", date).
 function formatRelative(iso) {
@@ -42,6 +35,7 @@ const withRelative = (o) => ({ ...o, createdAt: formatRelative(o.createdAt) });
 //  · onAccessDenied(data)                 → charte manquante ou sanction (403)
 // On remonte le contexte à l'appelant au lieu d'afficher une erreur brute.
 export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessDenied } = {}) {
+  
   const { user, profile } = useAuth();
 
   const [fans, setFans] = useState([]);
@@ -54,8 +48,15 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessD
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [counters, setCounters] = useState({supportersCount: 0,messagesCount: 0,reactionsCount: 0 });
+
+  //Nombre d'écritures en cours (optimistes) → on ne recharge pas le feed tant qu'il y a des écritures en cours
+  const pendingWritesRef = useRef(0);
+
   const posts    = useMemo(() => (mode === 'club' ? clubPosts : friendsPosts), [mode, clubPosts, friendsPosts]);
   const messages = useMemo(() => (mode === 'club' ? clubMessages : friendsMessages), [mode, clubMessages, friendsMessages]);
+
+
 
   // Auteur courant (pour l'affichage optimiste) + injection dans `fans`.
   const me = useMemo(() => ({
@@ -77,18 +78,55 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessD
     try {
       const res = await apiFetch(FEED_PATH(clubId));
       const d = res?.data || {};
+      setCounters({
+        supportersCount: Number(d.counters?.supportersCount || 0),
+        messagesCount: Number(d.counters?.messagesCount || 0),
+        reactionsCount: Number(d.counters?.reactionsCount || 0)
+      });
+
       setFans(d.fans || []);
       setClubPosts((d.posts || []).map(withRelative));
       setComments((d.comments || []).map(withRelative));
       setClubMessages((d.messages || []).map(withRelative));
     } catch (err) {
-      setError(err?.message || 'Impossible de charger le Fan Club.');
+      
+      // Ceci permet d'éviter qu’une panne temporaire du polling casse le chat
+      if (!silent) {
+        setError(
+          err?.message ||
+          'Impossible de charger le Fan Club.'
+        );
+      } else {
+        console.warn('Rafraîchissement silencieux du Fan Club échoué :', err);
+      }
     } finally {
       if (!silent) setLoading(false);
     }
   }, [clubId]);
 
-  useEffect(() => { loadFeed(); }, [loadFeed]);
+  // Chargement initial + rechargements périodiques (mode club uniquement).
+  useEffect(() => {
+    if (!clubId || mode !== 'club') return;
+
+    loadFeed();
+  }, [clubId, mode, loadFeed]);
+
+  // Périodicité de rafraîchissement silencieux du feed (mode club uniquement, toutes les 5s).
+  useEffect(() => {
+    if (!clubId || mode !== 'club') return undefined;;
+
+    const intervalId = window.setInterval(() => {
+      if (pendingWritesRef.current === 0){
+        loadFeed(true);
+      }
+      
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [clubId, mode, loadFeed]);
+
 
   // Échec d'écriture. Un refus de modération (422) n'est PAS une panne : on le
   // remonte tel quel pour l'expliquer. Dans les deux cas on recharge le feed,
@@ -169,9 +207,23 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessD
     if (mode === 'club') {
       ensureMeInFans();
       setClubMessages((m) => [...m, optimistic]);
+
+      //On signale qu’une écriture est en cours
+      pendingWritesRef.current += 1;
+
       apiFetch(`${FEED_PATH(clubId)}/messages`, { method: 'POST', body: JSON.stringify({ content: c }) })
-        .then(() => loadFeed(true))
-        .catch((e) => handleWriteError(e, c));
+        .then(() => 
+          //On signale qu’une écriture est terminée et on recharge le feed
+          {pendingWritesRef.current = Math.max(0,pendingWritesRef.current - 1);
+
+          return loadFeed(true)
+        })
+        .catch((e) => {
+          //On signale qu’une écriture est terminée et on recharge le feed
+          pendingWritesRef.current = Math.max(0,pendingWritesRef.current - 1);
+
+          return handleWriteError(e, c)
+        });
     } else {
       setFriendsMessages((m) => [...m, optimistic]);
     }
@@ -181,11 +233,29 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessD
   const isEmpty     = useMemo(() => !loading && !error && posts.length === 0, [loading, error, posts.length]);
   const isChatEmpty = useMemo(() => !loading && !error && messages.length === 0, [loading, error, messages.length]);
 
+  // Match semi statique (counters mis à jour dynamiquement, le reste est fixe pour l'instant).
+  const match = useMemo(
+    () => ({
+      homeTeam: 'Paris Saint-Germain',
+      awayTeam: 'Marseille',
+      homeScore: 2,
+      awayScore: 1,
+      competition: 'Ligue 1',
+      minute: 85,
+
+      supportersCount: counters.supportersCount,
+      messagesCount: counters.messagesCount,
+      reactionsCount: counters.reactionsCount
+    }),
+    [counters]
+  );
+
   return {
     fans, posts, comments, messages,
     loading, error, isEmpty, isChatEmpty,
     reload: loadFeed,
     publishPost, likePost, addComment, sendMessage,
     match,
+    counters
   };
 }

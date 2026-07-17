@@ -1,5 +1,7 @@
 import { Radio, Users, Heart, MessageCircle } from 'lucide-react';
 
+const formatCount = (value) => new Intl.NumberFormat('fr-FR').format(Number(value || 0));
+
 // Bandeau "match en direct" du Fan Club.
 // Données issues du hook useFanFeed (prop `match`), avec repli sûr si absente.
 // Layout responsive (mobile → desktop).
@@ -11,9 +13,9 @@ export function LiveMatchBanner({ mode, match }) {
   const awayScore   = m.awayScore   ?? 1;
   const competition = m.competition ?? 'Ligue 1';
   const minute      = m.minute      ?? 85;
-  const supporters  = m.supporters  ?? '12 541';
-  const messages    = m.messages    ?? '2 154';
-  const reactions   = m.reactions   ?? '18 521';
+  const supporters  = formatCount(m.supportersCount)  ?? '';
+  const messages    = formatCount(m.messagesCount)   ?? '';
+  const reactions   = formatCount(m.reactionsCount)   ?? '';
 
   return (
     <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
