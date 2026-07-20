@@ -114,6 +114,13 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (bh)** — **Logo officiel PaieCashFan** (badge P + ballon, vert/or).
+  Source PNG 2,1 Mo sur fond gris → **détourée avec sharp** (trim du badge + masque
+  coins arrondis → fond transparent) et optimisée : `paiecashfan-logo.webp` (85 KB)
+  dans le **header** (remplace le « P » placeholder), favicons 32/48 + apple-touch
+  + icônes PWA 192/512 générés depuis le logo, et **`og-image.png` 1200×630** composée
+  (logo + « PaieCashFan » + tagline + rubriques sur fond de marque) → remplace l'image
+  de partage provisoire. Original lourd supprimé du repo.
 - **2026-07-20 (bg)** — **SEO & partage de lien** (mise en prod sur `paiecashfan.com`).
   `index.html` : Open Graph + Twitter Card (aperçu WhatsApp/LinkedIn/X), canonical,
   robots, keywords, JSON-LD (Organization + WebSite). Nouveaux fichiers publics :

@@ -44,9 +44,12 @@ export function Navbar() {
       <Container className="flex h-16 md:h-20 items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-          <span className="relative h-9 w-9 rounded-xl bg-gradient-hero shadow-glow-emerald transition-transform group-hover:scale-110">
-            <span className="absolute inset-1 rounded-lg bg-ink-900/60 backdrop-blur grid place-items-center text-[11px] font-black text-bone-50 font-display">P</span>
-          </span>
+          <img
+            src="/paiecashfan-logo.webp"
+            alt="PaieCashFan"
+            width="40" height="40"
+            className="h-9 w-9 md:h-10 md:w-10 rounded-xl shadow-glow-emerald transition-transform group-hover:scale-110"
+          />
           <span className="font-display text-lg md:text-xl font-bold tracking-tight text-bone-50">
             PaieCash<span className="text-emerald-400">Fan</span>
           </span>
