@@ -7,7 +7,8 @@ import {
 import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio,
+  Layers, CalendarClock, Loader2
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -22,6 +23,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { FavoriteClubButton } from '@/components/club/FavoriteClubButton';
 import { useCart } from '@/hooks/useCart';
+import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
 
@@ -1244,7 +1246,17 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [openProduct, setOpenProduct] = useState(null);
 
   // Panier persisté (Supabase) si connecté + club en base, sinon local.
-  const { items: cart, addItem, updateQty, removeItem, totalItems, totalPrice, persisted } = useCart(club.id);
+  const { items: cart, addItem, updateQty, removeItem, clear, totalItems, totalPrice, persisted } = useCart(club.id);
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // ── Paiement boutique (même moteur que la billetterie) ──────
+  const [mode, setMode] = useState('pcc_full');   // pcc_full | card_full | pcc_split | bnpl
+  const [status, setStatus] = useState('idle');    // idle | paying
+  const [payError, setPayError] = useState('');
+  const [topUp, setTopUp] = useState(null);        // { message, found } si solde/wallet insuffisant
+  const [rechargeOpen, setRechargeOpen] = useState(false);
 
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
@@ -1256,6 +1268,36 @@ function MerchandiseSection({ club, apiProducts = [] }) {
     await addItem(item); // { productId, size, qty, unitPrice }
     setOpenProduct(null);
   };
+
+  async function handleCheckout() {
+    if (!user) { setPayError('Tu dois être connecté pour payer.'); return; }
+    if (!cart.length) return;
+    setPayError(''); setTopUp(null); setStatus('paying');
+    try {
+      const res = await apiFetch('/api/v2/checkout/boutique', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: cart.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null })),
+          mode,
+          origin: window.location.origin,
+        }),
+      });
+      // Modes carte / mixte / BNPL → redirection Stripe (PaieCashCoin).
+      if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
+      // pcc_full → payé immédiatement.
+      await clear();
+      setStatus('idle');
+      navigate('/mon-compte');
+    } catch (err) {
+      const msg = err?.message || 'Paiement impossible pour le moment.';
+      if (/insuffisant|wallet|recharge/i.test(msg)) {
+        setTopUp({ message: msg, found: err?.data?.found });
+      } else {
+        setPayError(msg);
+      }
+      setStatus('idle');
+    }
+  }
 
   return (
     <section id="merchandise" className="py-16 md:py-20 border-t border-white/5 scroll-mt-20">
@@ -1379,9 +1421,26 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             persisted={persisted}
             onRemove={(itemId) => removeItem(itemId)}
             onQtyChange={(itemId, qty) => updateQty(itemId, qty)}
+            mode={mode}
+            onModeChange={setMode}
+            status={status}
+            payError={payError}
+            topUp={topUp}
+            onCheckout={handleCheckout}
+            onRecharge={() => setRechargeOpen(true)}
+            isLogged={!!user}
           />
         )}
       </Container>
+
+      {rechargeOpen && (
+        <PccRechargeModal
+          email={user?.email}
+          found={topUp?.found}
+          reason={topUp?.message || 'Ton solde PCC est insuffisant pour ce paiement.'}
+          onClose={() => setRechargeOpen(false)}
+        />
+      )}
 
       {/* Modale de sélection du produit (taille + quantité) */}
       <AnimatePresence>
@@ -1398,11 +1457,21 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   );
 }
 
+// Modes de paiement boutique (identiques à la billetterie).
+const BOUTIQUE_PAY_MODES = [
+  { id: 'pcc_full',  label: 'PCC',         icon: Wallet,        cta: 'Payer en PCC' },
+  { id: 'card_full', label: 'Carte',       icon: CreditCard,    cta: 'Payer par carte' },
+  { id: 'pcc_split', label: 'PCC + carte', icon: Layers,        cta: 'Payer (PCC + carte)' },
+  { id: 'bnpl',      label: '3× / 4×',     icon: CalendarClock, cta: 'Payer en 3× / 4×' },
+];
+
 // ── CART FOOTER ──────────────────────────────────────────────────────
 // Affichage détaillé du panier : items avec qty/taille/prix unitaire +
-// total + bouton checkout. Apparaît sous la grille produits dès qu'un
-// article est ajouté.
-function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, persisted, onRemove, onQtyChange }) {
+// total + sélecteur de mode + bouton checkout. Apparaît sous la grille
+// produits dès qu'un article est ajouté.
+function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, persisted, onRemove, onQtyChange,
+  mode = 'pcc_full', onModeChange, status = 'idle', payError, topUp, onCheckout, onRecharge, isLogged }) {
+  const activeMode = BOUTIQUE_PAY_MODES.find((m) => m.id === mode) || BOUTIQUE_PAY_MODES[0];
   const totalEuro = cart.reduce((sum, item) => {
     const product = products.find((p) => p.id === item.product_id);
     if (!product) return sum;
@@ -1528,31 +1597,89 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
         })}
       </ul>
 
-      <div className="px-5 py-4 border-t border-white/5 flex items-center justify-between gap-4 bg-white/[0.02]">
+      <div className="px-5 py-4 border-t border-white/5 bg-white/[0.02] space-y-4">
+        {/* Sélecteur du mode de paiement */}
         <div>
-          <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
-            Total à payer
+          <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold mb-2">
+            Mode de paiement
           </div>
-
-          <div
-            className="font-display text-2xl md:text-3xl font-black tabular-nums"
-            style={{ color: primaryColor }}
-          >
-            {formatPCC(totalPrice)} PCC
-          </div>
-
-          <div className="mt-1 text-sm text-bone-400">
-            {formatEuro(totalEuro)}
+          <div className="flex flex-wrap gap-2">
+            {BOUTIQUE_PAY_MODES.map((m) => {
+              const Icon = m.icon;
+              const isActive = m.id === mode;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => onModeChange?.(m.id)}
+                  className={cn(
+                    'inline-flex items-center gap-2 h-9 px-3 rounded-full text-[11px] uppercase tracking-[0.14em] font-bold transition-all',
+                    isActive ? 'text-ink-900 shadow-lg' : 'bg-white/[0.04] border border-white/10 text-bone-300 hover:text-bone-50'
+                  )}
+                  style={isActive ? { background: primaryColor } : undefined}
+                >
+                  <Icon size={13} />
+                  {m.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <button
-          className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105"
-          style={{ background: primaryColor }}
-        >
-          <ShoppingBag size={14} />
-          Passer commande
-        </button>
+        {/* Total + bouton */}
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
+              Total à payer
+            </div>
+            <div
+              className="font-display text-2xl md:text-3xl font-black tabular-nums"
+              style={{ color: primaryColor }}
+            >
+              {formatPCC(totalPrice)} PCC
+            </div>
+            <div className="mt-1 text-sm text-bone-400">
+              {formatEuro(totalEuro)}
+            </div>
+          </div>
+
+          <button
+            onClick={onCheckout}
+            disabled={status === 'paying' || !isLogged}
+            className="inline-flex items-center gap-2 h-12 px-6 rounded-full text-[11px] uppercase tracking-[0.18em] font-bold text-ink-900 shadow-lg transition-transform hover:scale-105 disabled:opacity-60 disabled:hover:scale-100"
+            style={{ background: primaryColor }}
+          >
+            {status === 'paying' ? (
+              <><Loader2 size={14} className="animate-spin" />{mode === 'pcc_full' ? 'Paiement...' : 'Redirection...'}</>
+            ) : (
+              <><ShoppingBag size={14} />{activeMode.cta}</>
+            )}
+          </button>
+        </div>
+
+        {!isLogged && (
+          <p className="text-center text-xs text-bone-500">Tu dois être connecté pour payer.</p>
+        )}
+
+        {payError && (
+          <p className="text-sm text-rose-300">{payError}</p>
+        )}
+
+        {/* Solde / wallet insuffisant → popup de rechargement PaieCashCoin */}
+        {topUp && (
+          <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+            <div className="flex items-start gap-2 text-sm text-amber-200">
+              <Wallet size={16} className="mt-0.5 shrink-0" />
+              <span>{topUp.message}</span>
+            </div>
+            <button
+              onClick={onRecharge}
+              className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-ink-900 hover:bg-amber-300 transition"
+            >
+              <Wallet size={14} />
+              Recharger mon wallet PCC
+            </button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

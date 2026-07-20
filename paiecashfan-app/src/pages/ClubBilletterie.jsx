@@ -30,8 +30,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { formatPCC } from '@/data/clubMerchandise';
 import { buildDefaultTicketing } from '@/utils/ticketingPrices';
-
-const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
+import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 
 const PAY_MODES = [
   { id: 'pcc_full',  label: 'PCC',         icon: Wallet,        cta: 'Payer en PCC',           hint: 'Débit direct de ton solde PCC disponible.' },
@@ -439,6 +438,7 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const [topUp, setTopUp] = useState(null);        // { balance, missing } si solde insuffisant
+  const [rechargeOpen, setRechargeOpen] = useState(false);   // popup rechargement PCC
   const [confirmation, setConfirmation] = useState(null);
   const [mode, setMode] = useState('pcc_full');    // pcc_full | card_full | pcc_split | bnpl
 
@@ -482,7 +482,8 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
       // apiFetch remonte le message backend. On détecte le cas "recharge".
       const msg = err?.message || 'Paiement impossible pour le moment.';
       if (/insuffisant|wallet|recharge/i.test(msg)) {
-        setTopUp({ message: msg });
+        // found : distingue "pas de compte PCC" (→ inscription) de "solde bas" (→ connexion).
+        setTopUp({ message: msg, found: err?.data?.found });
       } else {
         setError(msg);
       }
@@ -678,15 +679,13 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
                   <Wallet size={16} className="mt-0.5 shrink-0" />
                   <span>{topUp.message}</span>
                 </div>
-                <a
-                  href={`${PCC_APP_URL}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => setRechargeOpen(true)}
                   className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-ink-900 hover:bg-amber-300 transition"
                 >
                   <Wallet size={14} />
                   Recharger mon wallet PCC
-                </a>
+                </button>
               </div>
             )}
 
@@ -719,6 +718,15 @@ function TicketingCartModal({ cart, onClose, onRemoveItem, onClearCart, navigate
           </div>
         )}
       </motion.div>
+
+      {rechargeOpen && (
+        <PccRechargeModal
+          email={user?.email}
+          found={topUp?.found}
+          reason={topUp?.message || 'Ton solde PCC est insuffisant pour ce paiement.'}
+          onClose={() => setRechargeOpen(false)}
+        />
+      )}
     </div>
   );
 }

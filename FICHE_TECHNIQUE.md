@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-07-10.
+> Dernière mise à jour : 2026-07-20.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -102,9 +102,33 @@ a tout, le club_admin est **scopé à son `club_id`**.
 Voir **`TODO.md`** (sécurité pré-vérif documents, infra email prod, checkout PCC,
 persistance DB panier billetterie, page Fan Club à brancher au back…).
 
+- ⏳ **Suivi du stock boutique (à faire une fois le site vraiment en prod)** : le
+  checkout boutique **vérifie** la disponibilité à l'achat mais ne **décrémente pas**
+  encore `products.total_sold` après paiement (pour la carte, la confirmation réelle
+  passe par la réconciliation Stripe → décrémenter à la redirection compterait les
+  paniers abandonnés). Prévoir : décrément fiable sur commande confirmée + gestion/
+  affichage du stock **côté BO Super Admin** ET **côté BO Club** (édition du stock,
+  alerte rupture, bascule `sold_out`). Aujourd'hui la majorité des produits sont en
+  `stock: -1` (illimité), sans impact immédiat.
+
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (az)** — **Paiement : popup de rechargement PCC + option carte sur la
+  boutique**. (1) **Popup explicative `PccRechargeModal`** avant la redirection vers
+  PaieCashCoin (remplace les liens bruts de Mon Compte + billetterie) : dit où va le
+  fan, avec quel email, et **choisit connexion vs inscription** selon `found` (email
+  présent dans la BDD PCC) — deep-links `…/login?redirect=/dashboard?tab=wallet` ou
+  `…/register?ref=paiecashfan`. `GET /me/pcc` renvoie désormais `found` ; les 402
+  `needTopUp` du checkout aussi. (2) **Checkout boutique branché** (le bouton « Passer
+  commande » était mort) : nouvelle route `POST /api/v2/checkout/boutique` qui valide
+  les produits **serveur** (prix `pcc_price`/`eur_price` recalculés, stock vérifié,
+  `status='active'` requis), groupée par club. **Factorisation `settleCheckout`**
+  partagée par billetterie ET boutique (PCC direct / carte Stripe / mixte / 3×-4×),
+  zéro duplication. Front `MerchandiseSection` : sélecteur **PCC / Carte / PCC+carte /
+  3×-4×**, redirection Stripe (carte), vidage panier + retour compte (PCC), bandeau
+  recharge + popup. ⚠️ Décrément de stock **non** automatisé → voir TODO « Suivi du
+  stock boutique » (à faire en prod, BO Super Admin + BO Club).
 - **2026-07-17 (ay)** — **Réactions emoji sur les messages du chat**. Migration
   `fan-message-reactions.sql` : table `fan_message_reactions(message_id, user_id,
   emoji)` (PK composite → un emoji différent par user/message), CHECK liste

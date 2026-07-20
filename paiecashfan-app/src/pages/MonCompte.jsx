@@ -8,6 +8,7 @@ import {
   Download, X, Grid3x3, Trophy, Clock, Star, Scale
 } from 'lucide-react';
 import { MaModeration } from '@/components/fanclub/MaModeration';
+import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -15,8 +16,6 @@ import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
-
-const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
 
 const fmt = (n) => Number(n || 0).toLocaleString('fr-FR');
 const fmtDate = (s) => {
@@ -51,6 +50,7 @@ export function MonCompte() {
 
   const [tab, setTab] = useState('orders');       // 'orders' | 'history' | 'bingo'
   const [ticket, setTicket] = useState(null);      // commande billetterie affichée
+  const [rechargeOpen, setRechargeOpen] = useState(false);   // popup rechargement PCC
 
   useEffect(() => {
     apiFetch('/api/v2/me/orders')
@@ -148,7 +148,7 @@ export function MonCompte() {
           {/* ── Colonne latérale : clubs + wallet + profil ── */}
           <div className="space-y-6">
             <FavoriteClubs />
-            <WalletCard loading={loadingPcc} pcc={pcc} />
+            <WalletCard loading={loadingPcc} pcc={pcc} onRecharge={() => setRechargeOpen(true)} />
             <ProfileCard profile={profile} email={user?.email} updateProfile={updateProfile} />
           </div>
         </div>
@@ -156,6 +156,16 @@ export function MonCompte() {
 
       {ticket && (
         <TicketModal order={ticket} buyer={profile?.display_name || user?.email} onClose={() => setTicket(null)} />
+      )}
+      {rechargeOpen && (
+        <PccRechargeModal
+          email={user?.email}
+          found={pcc?.found}
+          reason={pcc?.found === false
+            ? null
+            : (pcc?.walletReady ? null : 'Ton compte PaieCashCoin existe mais son wallet n\'est pas encore activé.')}
+          onClose={() => setRechargeOpen(false)}
+        />
       )}
     </div>
   );
@@ -514,7 +524,7 @@ function FavoriteClubs() {
   );
 }
 
-function WalletCard({ loading, pcc }) {
+function WalletCard({ loading, pcc, onRecharge }) {
   return (
     <GlassCard className="p-5">
       <div className="flex items-center gap-2">
@@ -541,10 +551,10 @@ function WalletCard({ loading, pcc }) {
         </p>
       )}
 
-      <a href={PCC_APP_URL} target="_blank" rel="noopener noreferrer"
+      <button onClick={() => onRecharge?.()}
         className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300 transition">
         {pcc?.walletReady ? 'Recharger' : 'Créer mon wallet'} <ExternalLink size={13} />
-      </a>
+      </button>
     </GlassCard>
   );
 }

@@ -65,7 +65,7 @@ router.get('/orders', async (req, res) => {
 // GET /api/v2/me/pcc — état du wallet PaieCashCoin du fan (solde, lié ?).
 // Sans effet de bord (resolve + quote à 1€ pour lire le solde).
 router.get('/pcc', async (req, res) => {
-  if (!pcc.isConfigured()) return ok(res, { configured: false, walletReady: false, balance: null });
+  if (!pcc.isConfigured()) return ok(res, { configured: false, found: false, walletReady: false, balance: null });
   try {
     const email = req.authUser.email;
     const resolved = await pcc.resolveUser(email).catch(() => null);
@@ -74,9 +74,10 @@ router.get('/pcc', async (req, res) => {
       const q = await pcc.quote({ userEmail: email, amountEur: 1, preferredMode: 'pcc_full' }).catch(() => null);
       balance = q ? Number(q.currentPccBalance) || 0 : null;
     }
-    return ok(res, { configured: true, walletReady: !!resolved?.walletReady, balance });
+    // found = l'email existe dans la BDD PaieCashCoin (→ login) ; sinon register.
+    return ok(res, { configured: true, found: !!resolved?.found, walletReady: !!resolved?.walletReady, balance });
   } catch {
-    return ok(res, { configured: true, walletReady: false, balance: null });
+    return ok(res, { configured: true, found: false, walletReady: false, balance: null });
   }
 });
 
