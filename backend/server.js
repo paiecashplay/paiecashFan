@@ -135,6 +135,7 @@ const v2AdminGov      = require('./routes/v2/admin/governance');
 const v2AdminCrudClubs = require('./routes/v2/admin/clubs-crud');
 const v2AdminUsers    = require('./routes/v2/admin/users');
 const v2AdminModeration = require('./routes/v2/admin/moderation');
+const v2AdminPrizes   = require('./routes/v2/admin/prizes');
 
 // Platform 1: Mint Engine + Wallet Super App
 app.use('/api/v2/mint/auth', v2MintAuth);
@@ -166,6 +167,7 @@ app.use('/api/v2/admin', v2AdminGov);
 app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);
+app.use('/api/v2/admin/prizes', v2AdminPrizes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'running', network: process.env.BLOCKCHAIN }, error: '' });

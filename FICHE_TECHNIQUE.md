@@ -114,6 +114,18 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (be)** — **Gains & remise des lots — Lot B (BO club + super admin)**.
+  Écran « Lots à expédier » partagé : `db/prizeClaims.js` + `listClaims`
+  (scopé : super_admin = tout, club_admin = son club), `updateFulfillment`
+  (statut + transporteur + n° de suivi + notes, timestamps, **refuse l'expédition
+  sans adresse**, notifie le gagnant à expédié/livré), `remindAddress` (relance
+  du gagnant sans adresse). Route `routes/v2/admin/prizes.js` (`GET /`,
+  `PATCH /:id`, `POST /:id/remind`) avec cloisonnement par rôle. Front :
+  composant réutilisable `PrizeFulfillmentPanel` (filtres par statut, saisie
+  suivi, boutons expédié/livré/relancer) monté dans **BO Super Admin**
+  (`/admin/prizes`, onglet « Gains & lots ») ET **BO Club** (MonClubBO, onglet
+  « Gains »). Aucune migration (même table). Reste Lot C : notifs de relance
+  automatiques + branchement loto/bingo.
 - **2026-07-20 (bd)** — **Gains & remise des lots — Lot A (côté fan)**. Système
   générique (tombola/loto/bingo) de suivi des lots gagnés. Migration
   `prize-claims.sql` : table `prize_claims` (game_type + game_ref polymorphes,

@@ -100,4 +100,93 @@ async function submitAddress(claimId, userId, address = {}) {
   return shape(data);
 }
 
-module.exports = { createClaim, listMyClaims, submitAddress, shape, SHIP_FIELDS };
+// ── Côté BO (club / super admin) ─────────────────────────────
+
+// Vue admin d'un claim : + nom du gagnant + drapeau adresse renseignée.
+async function adminShape(c) {
+  const base = await shape(c);
+  const { data } = await supabase.from('profiles').select('display_name').eq('id', c.winner_user_id).maybeSingle();
+  return { ...base, winnerName: data?.display_name || 'Supporter', hasAddress: !!c.ship_address1 };
+}
+
+// Liste des gains à traiter. `tenantId` :
+//   · undefined → tout (super admin)
+//   · <uuid>    → gains de ce club (club admin)
+//   · null      → gains « plateforme » (sans club) — réservé au super admin
+async function listClaims({ tenantId = undefined, status = null, gameType = null } = {}) {
+  let q = supabase.from('prize_claims').select('*').order('won_at', { ascending: false });
+  if (tenantId !== undefined) q = tenantId === null ? q.is('tenant_id', null) : q.eq('tenant_id', tenantId);
+  if (status) q = q.eq('status', status);
+  if (gameType) q = q.eq('game_type', gameType);
+  const { data, error } = await q;
+  if (error) throw new Error(`listClaims: ${error.message}`);
+  return Promise.all((data || []).map(adminShape));
+}
+
+async function getClaimRaw(id) {
+  const { data } = await supabase.from('prize_claims').select('*').eq('id', id).maybeSingle();
+  return data || null;
+}
+
+const FULFILLMENT_STATUSES = ['pending_address', 'preparing', 'shipped', 'delivered', 'cancelled'];
+
+// Met à jour la remise d'un lot (statut, transporteur, n° de suivi, notes) et
+// notifie le gagnant aux étapes clés (expédié / livré).
+async function updateFulfillment(claimId, { status, carrier, trackingNumber, trackingUrl, notes } = {}) {
+  const c = await getClaimRaw(claimId);
+  if (!c) { const e = new Error('Gain introuvable.'); e.code = 'NOT_FOUND'; throw e; }
+
+  const updates = { updated_at: new Date().toISOString() };
+  if (status !== undefined) {
+    if (!FULFILLMENT_STATUSES.includes(status)) { const e = new Error('Statut invalide.'); e.code = 'BAD_INPUT'; throw e; }
+    // Un lot physique ne peut pas être expédié sans adresse.
+    if (status === 'shipped' && c.prize_type === 'physical' && !c.ship_address1) {
+      const e = new Error("Impossible d'expédier : l'adresse du gagnant n'est pas renseignée."); e.code = 'NO_ADDRESS'; throw e;
+    }
+    updates.status = status;
+    if (status === 'shipped' && !c.shipped_at) updates.shipped_at = new Date().toISOString();
+    if (status === 'delivered' && !c.delivered_at) updates.delivered_at = new Date().toISOString();
+  }
+  if (carrier !== undefined) updates.carrier = carrier || null;
+  if (trackingNumber !== undefined) updates.tracking_number = trackingNumber || null;
+  if (trackingUrl !== undefined) updates.tracking_url = trackingUrl || null;
+  if (notes !== undefined) updates.notes = notes || null;
+
+  const { data, error } = await supabase.from('prize_claims').update(updates).eq('id', claimId).select('*').single();
+  if (error) throw new Error(`updateFulfillment: ${error.message}`);
+
+  // Notifications aux transitions importantes (best-effort).
+  const lot = c.prize_label || 'Ton lot';
+  if (status === 'shipped') {
+    await createNotification({
+      user_id: c.winner_user_id, type: 'prize_shipped', title: '🚚 Ton lot est expédié !',
+      message: `« ${lot} » a été expédié${carrier ? ` via ${carrier}` : ''}${trackingNumber ? ` — suivi : ${trackingNumber}` : ''}.`,
+      metadata: { link: '/mon-compte?tab=prizes' },
+    }).catch(() => {});
+  } else if (status === 'delivered') {
+    await createNotification({
+      user_id: c.winner_user_id, type: 'prize_delivered', title: '✅ Lot livré',
+      message: `« ${lot} » a été marqué comme livré. Profite bien ! 🎉`,
+      metadata: { link: '/mon-compte?tab=prizes' },
+    }).catch(() => {});
+  }
+  return adminShape(data);
+}
+
+// Relance le gagnant qui n'a pas encore renseigné son adresse (notification).
+async function remindAddress(claimId) {
+  const c = await getClaimRaw(claimId);
+  if (!c) { const e = new Error('Gain introuvable.'); e.code = 'NOT_FOUND'; throw e; }
+  if (c.status !== 'pending_address') { const e = new Error('Ce gain a déjà une adresse.'); e.code = 'HAS_ADDRESS'; throw e; }
+  await createNotification({
+    user_id: c.winner_user_id, type: 'prize_reminder', title: '📮 Renseigne ton adresse',
+    message: `Pour recevoir « ${c.prize_label || 'ton lot'} », renseigne ton adresse postale dans « Mes gains ».`,
+    metadata: { link: '/mon-compte?tab=prizes' },
+  });
+  return { reminded: true };
+}
+
+module.exports = {
+  createClaim, listMyClaims, submitAddress, shape, SHIP_FIELDS,
+  listClaims, getClaimRaw, updateFulfillment, remindAddress, FULFILLMENT_STATUSES,
+};
