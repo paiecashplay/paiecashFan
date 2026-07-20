@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Send, Flag } from 'lucide-react';
+import { Heart, MessageCircle, Send, Check, X } from 'lucide-react';
 import { onlineCount } from '@/data/clubMocks';
 import { useState } from 'react';
 import { MessageReportMenu } from '@/components/fanclub/MessageReportMenu';
@@ -12,8 +12,12 @@ export function ClubFanCommunity({
   newPost,
   setNewPost,
   onPublish,
+  onUpdatePost,
+  onDeletePost,
   onLikePost,
   onAddComment,
+  onUpdateComment,
+  onDeleteComment,
 
   // Modération du fil : mêmes règles que le chat (on ne se signale pas soi-même).
   currentUserId = null,
@@ -31,18 +35,112 @@ export function ClubFanCommunity({
   const [openedPostId, setOpenedPostId] = useState(null);
   const [visibleComments, setVisibleComments] = useState({});
 
-  function toggleComments(postId) {
-  if (openedPostId === postId) {
-    setOpenedPostId(null);
-    return;
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editingPostContent, setEditingPostContent] = useState('');
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentContent, setEditingCommentContent] = useState('');
+
+  function startEditingPost(post) {
+    if (!post) return;
+
+    setEditingPostId(post.id);
+    setEditingPostContent(post.content || '');
+
+    setEditingCommentId(null);
+    setEditingCommentContent('');
   }
 
-  setOpenedPostId(postId);
+  function cancelEditingPost() {
+    setEditingPostId(null);
+    setEditingPostContent('');
+  }
 
-  setVisibleComments((prev) => ({
-    ...prev,
-    [postId]: 3
-  }));
+  function saveEditingPost() {
+    const cleanContent = editingPostContent.trim();
+
+    if (!editingPostId || !cleanContent) {
+      return;
+    }
+
+    const updated = onUpdatePost?.(
+      editingPostId,
+      cleanContent
+    );
+
+    if (updated !== false) {
+      cancelEditingPost();
+    }
+  }
+
+  function handleDeletePost(post) {
+    if (!post?.id) return;
+
+    const confirmed = window.confirm(
+      'Voulez-vous vraiment supprimer cette publication et ses commentaires ?'
+    );
+
+    if (!confirmed) return;
+
+    onDeletePost?.(post.id);
+  }
+
+  function startEditingComment(comment) {
+    if (!comment) return;
+
+    setEditingCommentId(comment.id);
+    setEditingCommentContent(comment.content || '');
+
+    setEditingPostId(null);
+    setEditingPostContent('');
+  }
+
+  function cancelEditingComment() {
+    setEditingCommentId(null);
+    setEditingCommentContent('');
+  }
+
+  function saveEditingComment() {
+    const cleanContent = editingCommentContent.trim();
+
+    if (!editingCommentId || !cleanContent) {
+      return;
+    }
+
+    const updated = onUpdateComment?.(
+      editingCommentId,
+      cleanContent
+    );
+
+    if (updated !== false) {
+      cancelEditingComment();
+    }
+  }
+
+  function handleDeleteComment(comment) {
+    if (!comment?.id) return;
+
+    const confirmed = window.confirm(
+      'Voulez-vous vraiment supprimer ce commentaire ?'
+    );
+
+    if (!confirmed) return;
+
+    onDeleteComment?.(comment.id);
+  }
+
+  function toggleComments(postId) {
+    if (openedPostId === postId) {
+      setOpenedPostId(null);
+      return;
+    }
+
+    setOpenedPostId(postId);
+
+    setVisibleComments((prev) => ({
+      ...prev,
+      [postId]: 3
+    }));
   }
 
   return (
@@ -204,12 +302,69 @@ export function ClubFanCommunity({
                   onReport={(m) => onReport?.({ ...m, contentType: 'post' })}
                   onHideUser={onHideUser}
                   onBlockUser={onHideUser}
+                  onEdit={() => startEditingPost(post)}
+                  onDelete={() => handleDeletePost(post)}
                 />
               </div>
 
-              <p className="mt-4 text-sm leading-relaxed text-bone-300">
-                {post.content}
-              </p>
+              {editingPostId === post.id ? (
+                  <div className="mt-4">
+                    <textarea
+                      value={editingPostContent}
+                      onChange={(event) =>
+                        setEditingPostContent(event.target.value)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === 'Escape') {
+                          cancelEditingPost();
+                        }
+
+                        if (
+                          event.key === 'Enter' &&
+                          !event.shiftKey
+                        ) {
+                          event.preventDefault();
+                          saveEditingPost();
+                        }
+                      }}
+                      rows={4}
+                      maxLength={500}
+                      autoFocus
+                      className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-bone-100 outline-none placeholder:text-bone-500 focus:border-white/20"
+                    />
+
+                    <div className="mt-2 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={cancelEditingPost}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-bone-300 transition hover:bg-white/5"
+                      >
+                        <X size={14} />
+                        Annuler
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={saveEditingPost}
+                        disabled={!editingPostContent.trim()}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-black text-ink-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Check size={14} />
+                        Enregistrer
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm leading-relaxed text-bone-300">
+                    {post.content}
+
+                    {post.edited && (
+                      <span className="ml-2 text-[10px] italic text-bone-500">
+                        modifié
+                      </span>
+                    )}
+                  </p>
+                )}
                 <div className="mt-5 flex items-center gap-6 border-t border-white/10 pt-4">
                     <button
                         onClick={() => onLikePost(post.id)}
@@ -250,21 +405,99 @@ export function ClubFanCommunity({
                                       {commentAuthor?.name || 'Supporter'}
                                   </p>
                                   {/* Signalement d'un commentaire */}
-                                  {currentUserId && comment.authorId !== currentUserId && (
-                                    <button
-                                      onClick={() => onReport?.({ id: comment.id, content: comment.content, authorId: comment.authorId, contentType: 'comment' })}
-                                      aria-label="Signaler ce commentaire"
-                                      title="Signaler ce commentaire"
-                                      className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-bone-500 opacity-60 transition hover:bg-red-500/15 hover:text-red-400 lg:opacity-0 lg:group-hover/com:opacity-100"
-                                    >
-                                      <Flag size={11} />
-                                    </button>
-                                  )}
+                                  <MessageReportMenu
+                                    message={{
+                                      id: comment.id,
+                                      content: comment.content,
+                                      authorId: comment.authorId,
+                                    }}
+                                    isOwn={
+                                      comment.authorId === currentUserId
+                                    }
+                                    canReport={
+                                      !!currentUserId &&
+                                      comment.authorId !== currentUserId
+                                    }
+                                    onReport={(message) =>
+                                      onReport?.({
+                                        ...message,
+                                        contentType: 'comment',
+                                      })
+                                    }
+                                    onHideUser={onHideUser}
+                                    onBlockUser={onHideUser}
+                                    onEdit={() =>
+                                      startEditingComment(comment)
+                                    }
+                                    onDelete={() =>
+                                      handleDeleteComment(comment)
+                                    }
+                                  />
                                 </div>
 
-                                <p className="mt-1 text-sm text-bone-300">
-                                    {comment.content}
-                                </p>
+                                {editingCommentId === comment.id ? (
+                                    <div className="mt-2">
+                                      <textarea
+                                        value={editingCommentContent}
+                                        onChange={(event) =>
+                                          setEditingCommentContent(
+                                            event.target.value
+                                          )
+                                        }
+                                        onKeyDown={(event) => {
+                                          if (event.key === 'Escape') {
+                                            cancelEditingComment();
+                                          }
+
+                                          if (
+                                            event.key === 'Enter' &&
+                                            !event.shiftKey
+                                          ) {
+                                            event.preventDefault();
+                                            saveEditingComment();
+                                          }
+                                        }}
+                                        rows={3}
+                                        maxLength={500}
+                                        autoFocus
+                                        className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-bone-100 outline-none focus:border-white/20"
+                                      />
+
+                                      <div className="mt-2 flex justify-end gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={cancelEditingComment}
+                                          className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2.5 py-1.5 text-[11px] font-bold text-bone-300 hover:bg-white/5"
+                                        >
+                                          <X size={12} />
+                                          Annuler
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          onClick={saveEditingComment}
+                                          disabled={
+                                            !editingCommentContent.trim()
+                                          }
+                                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 text-[11px] font-black text-ink-950 disabled:opacity-50"
+                                        >
+                                          <Check size={12} />
+                                          Enregistrer
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p className="mt-1 text-sm text-bone-300">
+                                      {comment.content}
+
+                                      {comment.edited && (
+                                        <span className="ml-2 text-[10px] italic text-bone-500">
+                                          modifié
+                                        </span>
+                                      )}
+                                    </p>
+                                  )
+                                }
 
                                 <p className="mt-1 text-[10px] text-bone-500">
                                     {comment.createdAt}

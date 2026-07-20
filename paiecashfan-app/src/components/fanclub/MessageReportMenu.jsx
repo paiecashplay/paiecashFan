@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MoreHorizontal, Flag, EyeOff, Ban, Copy, Check } from 'lucide-react';
+import { MoreHorizontal, Flag, EyeOff, Ban, Copy, Check,  Pencil, Trash2} from 'lucide-react';
 
 // Actions d'un message : [Signaler] + menu « … ».
 //
@@ -10,7 +10,7 @@ import { MoreHorizontal, Flag, EyeOff, Ban, Copy, Check } from 'lucide-react';
 //     inaccessible. Visible par défaut, révélé au survol sur desktop (lg:).
 //
 // Masquer/bloquer sont LOCAUX (préférence perso, pas une décision de modération).
-export function MessageReportMenu({ message, isOwn = false, canReport, onReport, onHideUser, onBlockUser }) {
+export function MessageReportMenu({ message, isOwn = false, canReport, onReport, onHideUser, onBlockUser, onEdit, onDelete,}) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef(null);
@@ -64,14 +64,53 @@ export function MessageReportMenu({ message, isOwn = false, canReport, onReport,
       </button>
 
       {open && (
-        <div className="absolute right-0 top-8 z-30 w-56 overflow-hidden rounded-xl border border-white/10 bg-ink-900/95 backdrop-blur-xl shadow-2xl">
-          <Item icon={Copy} onClick={copy}>Copier le message</Item>
-          {/* On ne se masque ni ne se bloque soi-même */}
-          {!isOwn && (
+        <div className="absolute right-0 top-8 z-30 w-56 overflow-hidden rounded-xl border border-white/10 bg-ink-900/95 shadow-2xl backdrop-blur-xl">
+          <Item icon={Copy} onClick={copy}>
+            Copier le message
+          </Item>
+
+          {isOwn ? (
             <>
-              <Item icon={EyeOff} onClick={() => onHideUser?.(message.authorId)}>Masquer cet utilisateur pour moi</Item>
-              <Item icon={Ban} onClick={() => onBlockUser?.(message.authorId)}>Bloquer cet utilisateur</Item>
-              {canReport && <Item icon={Flag} onClick={() => onReport?.(message)} danger>Signaler ce message</Item>}
+              <Item
+                icon={Pencil}
+                onClick={() => onEdit?.(message)}
+              >
+                Modifier le message
+              </Item>
+
+              <Item
+                icon={Trash2}
+                onClick={() => onDelete?.(message)}
+                danger
+              >
+                Supprimer le message
+              </Item>
+            </>
+          ) : (
+            <>
+              <Item
+                icon={EyeOff}
+                onClick={() => onHideUser?.(message.authorId)}
+              >
+                Masquer cet utilisateur pour moi
+              </Item>
+
+              <Item
+                icon={Ban}
+                onClick={() => onBlockUser?.(message.authorId)}
+              >
+                Bloquer cet utilisateur
+              </Item>
+
+              {canReport && (
+                <Item
+                  icon={Flag}
+                  onClick={() => onReport?.(message)}
+                  danger
+                >
+                  Signaler ce message
+                </Item>
+              )}
             </>
           )}
         </div>

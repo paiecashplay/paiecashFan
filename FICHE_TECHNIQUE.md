@@ -114,6 +114,17 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (bf)** — **Merge stagiaire : édition/suppression des messages, posts &
+  commentaires du Fan Club** (branche `feature/fanclub-message-edit-delete`).
+  4 conflits résolus en conservant **les deux** apports : mes réactions/favoris/
+  présence/compteurs ET l'edit/delete. Backend : `updateMessage`/`deleteMessage`
+  (+ posts/commentaires) avec **check auteur serveur** et **suppression logique**
+  (`deleted_at`, conservé pour l'audit). L'édition **repasse par la modération**
+  (`publishGate` + `screenAsync` + `requireChatAccess`) → pas de contournement
+  poste-propre-puis-édite-abusif. Front : édition inline (textarea) + confirm de
+  suppression via `MessageReportMenu`, réactions masquées pendant l'édition,
+  `{...message}` préserve les réactions. Aucune migration (`deleted_at` déjà là).
+  Vérifié : build front OK, boot backend OK, **91 tests modération OK**.
 - **2026-07-20 (be)** — **Gains & remise des lots — Lot B (BO club + super admin)**.
   Écran « Lots à expédier » partagé : `db/prizeClaims.js` + `listClaims`
   (scopé : super_admin = tout, club_admin = son club), `updateFulfillment`

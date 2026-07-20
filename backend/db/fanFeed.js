@@ -238,11 +238,236 @@ async function createPost(tenantId, authorId, content) {
   return { id: data.id, authorId: data.author_id, content: data.content, createdAt: data.created_at, likes: 0, comments: 0, likedByMe: false };
 }
 
+async function updatePost(tenantId, postId, authorId, content) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_posts')
+    .select('id, tenant_id, author_id')
+    .eq('id', postId)
+    .eq('tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    throw contentError(
+      'Publication introuvable.',
+      'POST_NOT_FOUND'
+    );
+  }
+
+  if (existing.author_id !== authorId) {
+    throw contentError(
+      'Tu ne peux modifier que tes propres publications.',
+      'POST_FORBIDDEN'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('fan_posts')
+    .update({
+      content,
+    })
+    .eq('id', postId)
+    .eq('tenant_id', tenantId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null)
+    .select('id, author_id, content, created_at')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    content: data.content,
+    createdAt: data.created_at,
+  };
+}
+
+async function deletePost(tenantId, postId, authorId) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_posts')
+    .select('id, tenant_id, author_id')
+    .eq('id', postId)
+    .eq('tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    throw contentError(
+      'Publication introuvable.',
+      'POST_NOT_FOUND'
+    );
+  }
+
+  if (existing.author_id !== authorId) {
+    throw contentError(
+      'Tu ne peux supprimer que tes propres publications.',
+      'POST_FORBIDDEN'
+    );
+  }
+
+  const deletedAt = new Date().toISOString();
+
+  const { error } = await supabase
+    .from('fan_posts')
+    .update({
+      deleted_at: deletedAt,
+    })
+    .eq('id', postId)
+    .eq('tenant_id', tenantId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // Les commentaires sont également masqués.
+  const { error: commentsError } = await supabase
+    .from('fan_comments')
+    .update({
+      deleted_at: deletedAt,
+    })
+    .eq('post_id', postId)
+    .is('deleted_at', null);
+
+  if (commentsError) {
+    throw new Error(commentsError.message);
+  }
+
+  return {
+    id: postId,
+    deleted: true,
+  };
+}
+
 async function addComment(postId, authorId, content) {
   const { data, error } = await supabase.from('fan_comments')
     .insert({ post_id: postId, author_id: authorId, content }).select('id, post_id, author_id, content, created_at').single();
   if (error) throw new Error(error.message);
   return { id: data.id, postId: data.post_id, authorId: data.author_id, content: data.content, createdAt: data.created_at };
+}
+
+async function updateComment(tenantId, commentId, authorId, content) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_comments')
+    .select(`
+      id,
+      author_id,
+      post_id,
+      fan_posts!inner (
+        tenant_id
+      )
+    `)
+    .eq('id', commentId)
+    .eq('fan_posts.tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    throw contentError(
+      'Commentaire introuvable.',
+      'COMMENT_NOT_FOUND'
+    );
+  }
+
+  if (existing.author_id !== authorId) {
+    throw contentError(
+      'Tu ne peux modifier que tes propres commentaires.',
+      'COMMENT_FORBIDDEN'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('fan_comments')
+    .update({
+      content,
+    })
+    .eq('id', commentId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null)
+    .select('id, post_id, author_id, content, created_at')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    postId: data.post_id,
+    authorId: data.author_id,
+    content: data.content,
+    createdAt: data.created_at,
+  };
+}
+
+async function deleteComment(tenantId, commentId, authorId) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_comments')
+    .select(`
+      id,
+      author_id,
+      post_id,
+      fan_posts!inner (
+        tenant_id
+      )
+    `)
+    .eq('id', commentId)
+    .eq('fan_posts.tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    throw contentError(
+      'Commentaire introuvable.',
+      'COMMENT_NOT_FOUND'
+    );
+  }
+
+  if (existing.author_id !== authorId) {
+    throw contentError(
+      'Tu ne peux supprimer que tes propres commentaires.',
+      'COMMENT_FORBIDDEN'
+    );
+  }
+
+  const { error } = await supabase
+    .from('fan_comments')
+    .update({
+      deleted_at: new Date().toISOString(),
+    })
+    .eq('id', commentId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    id: commentId,
+    postId: existing.post_id,
+    deleted: true,
+  };
 }
 
 // Toggle like (insert / delete). Renvoie { liked }.
@@ -265,7 +490,112 @@ async function createMessage(tenantId, authorId, content) {
   return { id: data.id, authorId: data.author_id, content: data.content, createdAt: data.created_at };
 }
 
+function contentError(message, code) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+// Modifie un message du chat.
+// La vérification de l'auteur est faite côté serveur : un utilisateur ne peut
+// modifier que son propre message dans le salon concerné.
+async function updateMessage(tenantId, messageId, authorId, content) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_messages')
+    .select('id, tenant_id, author_id, content, created_at')
+    .eq('id', messageId)
+    .eq('tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    const error = new Error('Message introuvable.');
+    error.code = 'MESSAGE_NOT_FOUND';
+    throw error;
+  }
+
+  if (existing.author_id !== authorId) {
+    const error = new Error('Tu ne peux modifier que tes propres messages.');
+    error.code = 'MESSAGE_FORBIDDEN';
+    throw error;
+  }
+
+  const { data, error } = await supabase
+    .from('fan_messages')
+    .update({ content })
+    .eq('id', messageId)
+    .eq('tenant_id', tenantId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null)
+    .select('id, author_id, content, created_at')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    content: data.content,
+    createdAt: data.created_at,
+  };
+}
+
+// Suppression logique d'un message.
+// Le message reste conservé en base pour l'audit et la modération,
+// mais il n'est plus renvoyé dans le fan feed.
+async function deleteMessage(tenantId, messageId, authorId) {
+  const { data: existing, error: findError } = await supabase
+    .from('fan_messages')
+    .select('id, tenant_id, author_id')
+    .eq('id', messageId)
+    .eq('tenant_id', tenantId)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (findError) {
+    throw new Error(findError.message);
+  }
+
+  if (!existing) {
+    const error = new Error('Message introuvable.');
+    error.code = 'MESSAGE_NOT_FOUND';
+    throw error;
+  }
+
+  if (existing.author_id !== authorId) {
+    const error = new Error('Tu ne peux supprimer que tes propres messages.');
+    error.code = 'MESSAGE_FORBIDDEN';
+    throw error;
+  }
+
+  const { error } = await supabase
+    .from('fan_messages')
+    .update({
+      deleted_at: new Date().toISOString(),
+    })
+    .eq('id', messageId)
+    .eq('tenant_id', tenantId)
+    .eq('author_id', authorId)
+    .is('deleted_at', null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    id: messageId,
+    deleted: true,
+  };
+}
+
 module.exports = {
-  resolveTenantId, getFeed, createPost, addComment, toggleLike, createMessage,
+  resolveTenantId, getFeed, createPost, updatePost, deletePost, addComment, updateComment,
+  deleteComment, toggleLike, createMessage, updateMessage, deleteMessage,
   toggleMessageReaction, reactionsForMessages, MESSAGE_REACTIONS,
 };
