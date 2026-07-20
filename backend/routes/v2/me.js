@@ -11,6 +11,7 @@ const pcc = require('../../services/paiecashcoin');
 const favorites_db = require('../../db/favorites');
 const chatMod = require('../../db/chatModeration');
 const chatAppeals = require('../../db/chatAppeals');
+const prizeClaims = require('../../db/prizeClaims');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -164,6 +165,27 @@ router.post('/moderation/appeals', async (req, res) => {
     if (err.code === 'ALREADY_APPEALED') return fail(res, err.message, 409);
     if (['BAD_TARGET', 'NOT_APPEALABLE'].includes(err.code)) return fail(res, err.message, 400);
     return fail(res, 'Contestation impossible : ' + err.message, 500);
+  }
+});
+
+// ── Mes gains (lots tombola / loto / bingo) ──────────────────
+// GET /api/v2/me/prizes — mes lots gagnés + leur statut de remise.
+router.get('/prizes', async (req, res) => {
+  try { return ok(res, { prizes: await prizeClaims.listMyClaims(req.authUser.id) }); }
+  catch (err) { return fail(res, 'Mes gains : ' + err.message, 500); }
+});
+
+// POST /api/v2/me/prizes/:id/address — renseigne/met à jour l'adresse de livraison.
+// Body: { name, phone?, address1, address2?, postalCode, city, country? }
+router.post('/prizes/:id/address', async (req, res) => {
+  try {
+    const prize = await prizeClaims.submitAddress(req.params.id, req.authUser.id, req.body || {});
+    return ok(res, { prize });
+  } catch (err) {
+    if (err.code === 'NOT_FOUND') return fail(res, err.message, 404);
+    if (['BAD_INPUT', 'DIGITAL'].includes(err.code)) return fail(res, err.message, 400);
+    if (err.code === 'LOCKED') return fail(res, err.message, 409);
+    return fail(res, 'Enregistrement impossible : ' + err.message, 500);
   }
 });
 

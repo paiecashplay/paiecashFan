@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Wallet, Ticket, ShoppingBag, ExternalLink, Check, Pencil,
   Receipt, ShieldCheck, Loader2, ArrowRight, History, QrCode,
-  Download, X, Grid3x3, Trophy, Clock, Star, Scale
+  Download, X, Grid3x3, Trophy, Clock, Star, Scale, Gift
 } from 'lucide-react';
 import { MaModeration } from '@/components/fanclub/MaModeration';
+import { MesGains } from '@/components/account/MesGains';
 import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 
 import { Container } from '@/components/ui/Container';
@@ -48,7 +49,10 @@ export function MonCompte() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [loadingBingo, setLoadingBingo] = useState(true);
 
-  const [tab, setTab] = useState('orders');       // 'orders' | 'history' | 'bingo'
+  const [searchParams] = useSearchParams();
+  const TABS = ['orders', 'bingo', 'prizes', 'history', 'moderation'];
+  // 'orders' | 'bingo' | 'prizes' | 'history' | 'moderation' — deep-link via ?tab=
+  const [tab, setTab] = useState(() => (TABS.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'orders'));
   const [ticket, setTicket] = useState(null);      // commande billetterie affichée
   const [rechargeOpen, setRechargeOpen] = useState(false);   // popup rechargement PCC
 
@@ -106,6 +110,9 @@ export function MonCompte() {
               <TabBtn active={tab === 'bingo'} onClick={() => setTab('bingo')} icon={<Grid3x3 size={15} />}>
                 Mes grilles
               </TabBtn>
+              <TabBtn active={tab === 'prizes'} onClick={() => setTab('prizes')} icon={<Gift size={15} />}>
+                Mes gains
+              </TabBtn>
               <TabBtn active={tab === 'history'} onClick={() => setTab('history')} icon={<History size={15} />}>
                 Historique PCC
               </TabBtn>
@@ -116,6 +123,8 @@ export function MonCompte() {
 
             {tab === 'moderation' ? (
               <MaModeration />
+            ) : tab === 'prizes' ? (
+              <MesGains />
             ) : tab === 'bingo' ? (
               <BingoCards loading={loadingBingo} cards={bingoCards} />
             ) : tab === 'orders' ? (

@@ -114,6 +114,20 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (bd)** — **Gains & remise des lots — Lot A (côté fan)**. Système
+  générique (tombola/loto/bingo) de suivi des lots gagnés. Migration
+  `prize-claims.sql` : table `prize_claims` (game_type + game_ref polymorphes,
+  `winner_user_id`, `prize_type` physical/digital, `status`
+  pending_address→preparing→shipped→delivered, coordonnées de livraison + suivi
+  postal, index unique (jeu,réf,gagnant) → tirage idempotent, RLS deny-all).
+  `db/prizeClaims.js` : `createClaim` (idempotent, digital→delivered direct),
+  `listMyClaims`, `submitAddress` (adresse **collectée au 1er gain**, RGPD-clean ;
+  pending_address→preparing). `tombola.drawWinner` crée le claim + notif orientée
+  « Mes gains » (`/mon-compte?tab=prizes`). Routes fan `GET /me/prizes`,
+  `POST /me/prizes/:id/address`. Front : onglet **« Mes gains »** (Mon Compte,
+  deep-link `?tab=prizes`) avec statut lisible + modale de saisie d'adresse.
+  ⚠️ **Requiert la migration `prize-claims.sql`**. Suite : Lot B (écran expédition
+  BO club/super admin + n° de suivi) puis Lot C (notifs + branchement loto/bingo).
 - **2026-07-20 (bc)** — **Paiement carte sur la tombola** (un fan sans compte PCC ne
   pouvait pas jouer). L'achat passe désormais par le moteur générique
   `settleCheckout` (nouvelle route `POST /checkout/tombola`, `buildTombolaGroups`

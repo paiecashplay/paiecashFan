@@ -6,6 +6,7 @@
 
 const supabase = require('./supabase');
 const { createNotification } = require('./notifications');
+const prizeClaims = require('./prizeClaims');
 const favorites = require('./favorites');
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
@@ -172,12 +173,19 @@ async function drawWinner(campaignId) {
     drawn_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   }).eq('id', campaignId).eq('status', 'active'); // garde-fou idempotent
 
-  // Notifie le gagnant (best-effort, non bloquant).
   const lot = raw.prize_label || raw.title;
+
+  // Crée le « claim » de gain (statut + remise du lot). Idempotent.
+  await prizeClaims.createClaim({
+    gameType: 'tombola', gameRef: campaignId, tenantId: raw.tenant_id || null,
+    winnerUserId: pick.user_id, prizeLabel: lot, prizeType: 'physical',
+  }).catch((e) => console.error('[TOMBOLA] createClaim:', e.message));
+
+  // Notifie le gagnant → l'oriente vers « Mes gains » pour renseigner son adresse.
   await createNotification({
     user_id: pick.user_id, type: 'tombola_win', title: `🎉 Tu as gagné : ${lot} !`,
-    message: `Félicitations ! Ton ticket a été tiré au sort pour « ${lot} ». On te recontacte pour la remise du lot.`,
-    metadata: { campaignId, link: '/tombola' },
+    message: `Félicitations ! Ton ticket a été tiré au sort pour « ${lot} ». Renseigne ton adresse dans « Mes gains » pour recevoir ton lot.`,
+    metadata: { campaignId, link: '/mon-compte?tab=prizes' },
   }).catch(() => {});
 
   return { drawn: true, winnerUserId: pick.user_id, ticketId: pick.id };
