@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Ticket, Gift, Check, X, Users, ShieldCheck, Trophy, Sparkles,
-  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3, ArrowRight, Target
+  Gamepad2, Wallet, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Grid3x3, ArrowRight, Target,
+  CreditCard, Layers, CalendarClock
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -13,8 +14,15 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { EditionCard } from '@/components/bingo/EditionCard';
+import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 
-const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
+// Modes de paiement (identiques billetterie/boutique).
+const PAY_MODES = [
+  { id: 'pcc_full',  label: 'PCC',         icon: Wallet,        cta: 'Payer en PCC' },
+  { id: 'card_full', label: 'Carte',       icon: CreditCard,    cta: 'Payer par carte' },
+  { id: 'pcc_split', label: 'PCC + carte', icon: Layers,        cta: 'Payer (PCC + carte)' },
+  { id: 'bnpl',      label: '3× / 4×',     icon: CalendarClock, cta: 'Payer en 3× / 4×' },
+];
 
 // Grille de jeux « à venir » — showcase statique (pas encore branché).
 const UPCOMING_GAMES = [
@@ -332,25 +340,34 @@ function TombolaCard({ campaign, onBuy }) {
   );
 }
 
-// ── Modale d'achat de tickets (paiement PCC) ─────────────────
+// ── Modale d'achat de tickets (PCC ou carte via le checkout générique) ───
 function BuyModal({ campaign, onClose, onDone }) {
   const { user } = useAuth();
   const [qty, setQty] = useState(1);
+  const [mode, setMode] = useState('pcc_full');
   const [status, setStatus] = useState('idle'); // idle | paying | success
   const [error, setError] = useState('');
-  const [topUp, setTopUp] = useState(false);
+  const [topUp, setTopUp] = useState(null);      // { message, found } | null
+  const [rechargeOpen, setRechargeOpen] = useState(false);
   const total = qty * campaign.ticketPricePcc;
+  const activeMode = PAY_MODES.find((m) => m.id === mode) || PAY_MODES[0];
 
   async function pay() {
-    setError(''); setTopUp(false);
+    setError(''); setTopUp(null);
     if (!user) { setError('Connecte-toi pour participer.'); return; }
     setStatus('paying');
     try {
-      await apiFetch(`/api/v2/tombola/${campaign.id}/buy`, { method: 'POST', body: JSON.stringify({ quantity: qty }) });
-      setStatus('success');
+      const res = await apiFetch('/api/v2/checkout/tombola', {
+        method: 'POST',
+        body: JSON.stringify({ items: [{ campaignId: campaign.id, quantity: qty }], mode, origin: window.location.origin }),
+      });
+      // Modes carte / mixte / BNPL → redirection Stripe (le ticket est créé au retour).
+      if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
+      setStatus('success');   // pcc_full → payé immédiatement
     } catch (e) {
       const msg = e?.message || 'Achat impossible.';
-      if (/insuffisant|wallet|recharge/i.test(msg)) setTopUp(true); else setError(msg);
+      if (/insuffisant|wallet|recharge/i.test(msg)) setTopUp({ message: msg, found: e?.data?.found });
+      else setError(msg);
       setStatus('idle');
     }
   }
@@ -384,6 +401,28 @@ function BuyModal({ campaign, onClose, onDone }) {
               </div>
             </div>
 
+            {/* Sélecteur du mode de paiement */}
+            <div className="mt-6">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">Mode de paiement</span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {PAY_MODES.map((m) => {
+                  const Icon = m.icon;
+                  const isActive = m.id === mode;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setMode(m.id)}
+                      className={`inline-flex items-center gap-2 h-9 px-3 rounded-full text-[11px] uppercase tracking-[0.14em] font-bold transition-all ${
+                        isActive ? 'bg-gold-400 text-ink-900 shadow-lg' : 'bg-white/[0.04] border border-white/10 text-bone-300 hover:text-bone-50'
+                      }`}
+                    >
+                      <Icon size={13} /> {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="mt-6 flex items-end justify-between border-t border-white/10 pt-4">
               <span className="text-[10px] uppercase tracking-[0.32em] text-bone-400 font-bold">Total</span>
               <span className="font-display text-3xl font-black text-emerald-400 tabular-nums">{total} PCC</span>
@@ -392,20 +431,31 @@ function BuyModal({ campaign, onClose, onDone }) {
             {error && <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><AlertCircle size={16} className="mt-0.5 shrink-0" />{error}</div>}
             {topUp && (
               <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
-                <p className="text-sm text-amber-200">Solde PCC insuffisant.</p>
-                <a href={PCC_APP_URL} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-amber-300 transition"><Wallet size={14} /> Recharger mon wallet</a>
+                <p className="text-sm text-amber-200">{topUp.message || 'Solde PCC insuffisant.'}</p>
+                <button onClick={() => setRechargeOpen(true)} className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-amber-300 transition"><Wallet size={14} /> Recharger mon wallet</button>
               </div>
             )}
             {!user && !error && <p className="mt-4 text-center text-xs text-bone-500">Tu dois être connecté pour participer.</p>}
 
             <div className="mt-6 flex justify-end">
               <Button variant="gold" size="md" onClick={pay} disabled={status === 'paying'}>
-                {status === 'paying' ? <><Loader2 size={15} className="animate-spin" /> Paiement…</> : <><Ticket size={15} /> Payer {total} PCC</>}
+                {status === 'paying'
+                  ? <><Loader2 size={15} className="animate-spin" /> {mode === 'pcc_full' ? 'Paiement…' : 'Redirection…'}</>
+                  : <><Ticket size={15} /> {activeMode.cta}</>}
               </Button>
             </div>
           </>
         )}
       </motion.div>
+
+      {rechargeOpen && (
+        <PccRechargeModal
+          email={user?.email}
+          found={topUp?.found}
+          reason={topUp?.message || 'Ton solde PCC est insuffisant pour ce paiement.'}
+          onClose={() => setRechargeOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -114,6 +114,26 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (bc)** — **Paiement carte sur la tombola** (un fan sans compte PCC ne
+  pouvait pas jouer). L'achat passe désormais par le moteur générique
+  `settleCheckout` (nouvelle route `POST /checkout/tombola`, `buildTombolaGroups`
+  valide campagne active + dispo + prix serveur). Le ticket est créé **à la
+  confirmation du paiement** via `grantGameEntitlements` (idempotent, flag
+  `granted`) : en direct pour PCC, à la réconciliation Stripe pour la carte
+  (`/checkout/status` étendu). Front `Tombola`/`BuyModal` : sélecteur PCC/Carte/
+  PCC+carte/3×-4× + redirection Stripe + popup rechargement. ⚠️ **Requiert la
+  migration `orders-tenant-nullable.sql`** : toutes les tombolas sont « plateforme »
+  (sans club) or `orders.tenant_id` était NOT NULL. Constat : bingo = crédits
+  séparés, loto = salons gratuits → carte non nécessaire pour eux.
+- **2026-07-20 (bb)** — **Popup inscription PCC pédagogique**. Cas « inscription » de
+  `PccRechargeModal` : avantages (+5% PCC à l'inscription `SIGNUP_BONUS_PCT`,
+  paiement 1 clic, offres/cashback) + rappel que le wallet **n'est pas obligatoire**
+  (paiement CB possible partout).
+- **2026-07-20 (ba)** — **Favoris depuis le Fan Club**. Le fan pouvait entrer dans un
+  salon sans pouvoir le suivre. Ajout : étoile toggle sur chaque carte de l'annuaire
+  `FanClubHub` (part de l'état connu, un seul POST/clic, pas de GET par carte) +
+  bouton « Suivre ce club » (`FavoriteClubButton`) dans le header de la page salon
+  `FanClub`.
 - **2026-07-20 (az)** — **Paiement : popup de rechargement PCC + option carte sur la
   boutique**. (1) **Popup explicative `PccRechargeModal`** avant la redirection vers
   PaieCashCoin (remplace les liens bruts de Mon Compte + billetterie) : dit où va le

@@ -19,6 +19,7 @@ const supabase = require('../../../db/supabase');
 const tenantsDb = require('../../../db/tenants');
 const ordersDb = require('../../../db/orders');
 const productsDb = require('../../../db/products');
+const tombolaDb = require('../../../db/tombola');
 const pcc = require('../../../services/paiecashcoin');
 const { resolveOffers } = require('../../../services/ticketingPricing');
 
@@ -134,6 +135,63 @@ async function buildBoutiqueGroups(items, res) {
   return { groups, grandTotalEur: round2(grandTotalEur) };
 }
 
+// Idem pour la TOMBOLA : valide chaque campagne (active, disponibilité), recalcule
+// le prix serveur. Le ticket n'est PAS créé ici — il l'est à la confirmation du
+// paiement (grantGameEntitlements), pour que la carte (async Stripe) soit sûre.
+async function buildTombolaGroups(items, res) {
+  const groups = [];
+  let grandTotalEur = 0;
+  for (const it of items) {
+    const campaignId = it?.campaignId || it?.id;
+    const quantity = Math.max(1, parseInt(it?.quantity, 10) || 1);
+    if (!campaignId) { fail(res, 'Tombola invalide.'); return null; }
+
+    const c = await tombolaDb.getCampaign(campaignId);
+    if (!c || c.status !== 'active') { fail(res, "Cette tombola n'est plus disponible.", 409); return null; }
+    if (c.ticketsTotal != null && c.ticketsSold + quantity > c.ticketsTotal) {
+      fail(res, `Il ne reste que ${Math.max(0, c.ticketsTotal - c.ticketsSold)} ticket(s).`, 409); return null;
+    }
+    const unit = Number(c.ticketPricePcc) || 0;
+    if (unit <= 0) { fail(res, 'Prix de ticket invalide.'); return null; }
+    const totalEur = round2(unit * quantity);
+    grandTotalEur += totalEur;
+
+    // Tombola de club → tenant réel ; tombola plateforme (tenantId null) → PaieCashFan.
+    const tenant = c.tenantId
+      ? { id: c.tenantId, name: c.clubName || 'PaieCashFan', slug: c.clubSlug || 'paiecashfan' }
+      : { id: null, name: 'PaieCashFan', slug: 'paiecashfan' };
+    groups.push({
+      tenant, merchantRef: `paiecashfan:tombola:${campaignId}`,
+      orderItems: [{ campaignId, name: `Tombola — ${c.title}`, type: 'tombola', quantity, price: unit, price_eur: unit }],
+      totalEur, totalPcc: totalEur,
+    });
+  }
+  return { groups, grandTotalEur: round2(grandTotalEur) };
+}
+
+// Attribue les entrées de jeu (ex : tickets tombola) une fois le paiement d'une
+// commande CONFIRMÉ. Idempotent via le flag `granted` dans les notes. No-op pour
+// la billetterie / boutique (kind différent).
+async function grantGameEntitlements(order) {
+  const notes = safeParse(order.metadata?.notes);
+  if (notes?.granted) return;                      // déjà attribué
+  const items = order.metadata?.items || [];
+  const reference = notes?.pccReference || null;
+
+  if (notes?.kind === 'tombola') {
+    for (const it of items) {
+      if (!it.campaignId) continue;
+      try {
+        await tombolaDb.recordTickets({
+          campaignId: it.campaignId, userId: order.user_id, quantity: it.quantity,
+          totalPcc: round2((it.price_eur || it.price || 0) * it.quantity), reference,
+        });
+      } catch (e) { console.error('[CHECKOUT] grant tombola:', e.message); }
+    }
+  }
+  await mergeNotes(order, { granted: true }).catch(() => {});
+}
+
 // Règlement commun à la billetterie et à la boutique. Les groupes/total sont
 // déjà validés et recalculés serveur (buildGroups / buildBoutiqueGroups) ; seul
 // le `kind` change (libellé, notes de commande). Répond directement sur `res`.
@@ -174,6 +232,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind }) {
         });
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
+        await grantGameEntitlements(order);   // tombola : crée le(s) ticket(s)
       } catch (e) {
         console.error(`[CHECKOUT] pcc_full: paiement OK mais échec createOrder (${g.tenant.slug}):`, e.message);
       }
@@ -219,6 +278,8 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind }) {
   if (pay?.status === 'completed') {
     await mergeNotes(order, { pccReference: pay.reference, pccUsed: pay.pccUsed, mode: pay.mode, paidAt: new Date().toISOString(), pending: false });
     await ordersDb.updateOrderStatus(order.id, 'completed');
+    const fresh = await ordersDb.getOrderById(order.id).catch(() => order);
+    await grantGameEntitlements(fresh || order);   // tombola : crée le(s) ticket(s)
     return ok(res, { paid: true, mode: pay.mode, orders: [{ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId: order.id, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc }] });
   }
 
@@ -268,6 +329,25 @@ router.post('/boutique', async (req, res) => {
   }
 });
 
+// POST /api/v2/checkout/tombola
+// Body: { items:[{campaignId,quantity}], mode?, origin?, bnplInstallments? }
+// Le ticket est créé à la confirmation du paiement (grantGameEntitlements).
+router.post('/tombola', async (req, res) => {
+  try {
+    if (!pcc.isConfigured()) return fail(res, 'Paiement momentanément indisponible (configuration manquante).', 503);
+    const items = Array.isArray(req.body?.items) ? req.body.items : [];
+    if (!items.length) return fail(res, 'Aucun ticket sélectionné.');
+    const mode = MODES.includes(req.body?.mode) ? req.body.mode : 'pcc_full';
+
+    const built = await buildTombolaGroups(items, res);
+    if (!built) return; // buildTombolaGroups a déjà répondu
+    return settleCheckout(req, res, { ...built, mode, kind: 'tombola' });
+  } catch (err) {
+    console.error('[CHECKOUT] Erreur:', err.message);
+    return fail(res, `Échec du paiement : ${err.message}`, 500);
+  }
+});
+
 // GET /api/v2/checkout/status?order=<id>
 // Réconcilie une commande carte au retour de Stripe (via /pay/history).
 router.get('/status', async (req, res) => {
@@ -284,7 +364,10 @@ router.get('/status', async (req, res) => {
       items: o.metadata?.items || [],
     });
 
-    if (order.status === 'completed') return ok(res, { status: 'completed', order: shape(order) });
+    if (order.status === 'completed') {
+      await grantGameEntitlements(order);   // défensif : attribue si pas déjà fait
+      return ok(res, { status: 'completed', order: shape(order) });
+    }
 
     const ref = safeParse(order.metadata?.notes)?.pccReference;
     if (ref && pcc.isConfigured()) {
@@ -294,6 +377,7 @@ router.get('/status', async (req, res) => {
         const tx = (Array.isArray(hist) ? hist : []).find((t) => t.reference === ref);
         if (tx?.status === 'completed') {
           await ordersDb.updateOrderStatus(order.id, 'completed');
+          await grantGameEntitlements(order);   // tombola payée par carte : crée le ticket
           return ok(res, { status: 'completed', order: shape({ ...order, status: 'completed' }) });
         }
         if (tx && ['failed', 'refunded'].includes(tx.status)) {
