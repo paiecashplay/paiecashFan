@@ -55,6 +55,7 @@ export function FanClub() {
     messages,
     isChatEmpty,
     sendMessage,
+    toggleMessageReaction,
     match,
     counters
   } = useFanFeed(slug, mode, {
@@ -324,6 +325,7 @@ export function FanClub() {
             onReport={(m) => setReportTarget(m)}
             onHideUser={hideUser}
             onOpenCharter={() => setCharterOpen(true)}
+            onToggleReaction={(messageId, emoji) => { if (ensureCanWrite()) toggleMessageReaction(messageId, emoji); }}
           />
         </div>
 

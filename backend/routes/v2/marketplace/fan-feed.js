@@ -239,6 +239,23 @@ router.post('/:slug/chat-charter/accept', requireAuth, withTenant, async (req, r
   catch (err) { return fail(res, 'Acceptation impossible : ' + err.message, 500); }
 });
 
+// POST /api/v2/clubs/:slug/fan-feed/messages/:messageId/reactions  { emoji }
+// Bascule une réaction emoji. Même garde que l'écriture : un supporter
+// sanctionné ou n'ayant pas accepté la charte ne peut pas réagir non plus.
+router.post('/:slug/fan-feed/messages/:messageId/reactions', requireAuth, withTenant, requireChatAccess, async (req, res) => {
+  try {
+    // Cloisonnement : le message doit appartenir à CE salon.
+    const message = await mod.getContent('message', req.params.messageId);
+    if (!message || message.tenant_id !== req.tenant.id) return fail(res, 'Message introuvable.', 404);
+
+    const result = await fanFeed.toggleMessageReaction(message.id, req.authUser.id, clean(req.body?.emoji));
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_EMOJI') return fail(res, err.message, 400);
+    return fail(res, 'Réaction impossible : ' + err.message, 500);
+  }
+});
+
 // ── Signalement (chat, posts ET commentaires) ────────────────
 // Handler unique et polymorphe : une seule garde à maintenir pour les 3
 // surfaces. Un contenu ne peut être signalé qu'une fois par supporter, et le

@@ -138,6 +138,10 @@ async function getFeed(tenantId, currentUserId) {
   // Présence en ligne (chantier 2) : qui est actuellement dans CE salon.
   const onlineIds = await presence.onlineInTenant(tenantId).catch(() => new Set());
 
+  // Réactions emoji des messages affichés.
+  const msgReactions = await reactionsForMessages((messages || []).map((m) => m.id), currentUserId)
+    .catch(() => ({}));
+
   // Participants : auteurs (posts/commentaires/messages) + présents non-auteurs
   // (un supporter qui regarde sans avoir posté doit apparaître « en ligne »).
   const authorIds = [
@@ -180,8 +184,51 @@ async function getFeed(tenantId, currentUserId) {
       author: profiles[m.author_id]?.name || 'Supporter',
       content: m.content,
       createdAt: m.created_at,
+      reactions: msgReactions[m.id] || [],
     })),
   };
+}
+
+// ── Réactions emoji sur les messages du chat ─────────────────
+// Jeu fermé : on refuse tout emoji hors liste (la base a la même contrainte).
+const MESSAGE_REACTIONS = ['👍', '👎', '❤️', '😂', '😮', '🔥'];
+
+// Bascule une réaction (poser / retirer). Renvoie l'état après action.
+async function toggleMessageReaction(messageId, userId, emoji) {
+  if (!MESSAGE_REACTIONS.includes(emoji)) {
+    const e = new Error('Réaction non autorisée.'); e.code = 'BAD_EMOJI'; throw e;
+  }
+  const { data: existing } = await supabase.from('fan_message_reactions')
+    .select('message_id').eq('message_id', messageId).eq('user_id', userId).eq('emoji', emoji).maybeSingle();
+
+  if (existing) {
+    await supabase.from('fan_message_reactions')
+      .delete().eq('message_id', messageId).eq('user_id', userId).eq('emoji', emoji);
+    return { emoji, reacted: false };
+  }
+  const { error } = await supabase.from('fan_message_reactions')
+    .insert({ message_id: messageId, user_id: userId, emoji });
+  if (error) throw new Error(error.message);
+  return { emoji, reacted: true };
+}
+
+// Agrège les réactions des messages affichés :
+//   { [messageId]: [{ emoji, count, mine }] }
+async function reactionsForMessages(messageIds, currentUserId) {
+  if (!messageIds.length) return {};
+  const { data } = await supabase.from('fan_message_reactions')
+    .select('message_id, user_id, emoji').in('message_id', messageIds);
+
+  const byMessage = {};
+  for (const r of data || []) {
+    const bucket = (byMessage[r.message_id] ||= {});
+    const entry = (bucket[r.emoji] ||= { emoji: r.emoji, count: 0, mine: false });
+    entry.count += 1;
+    if (currentUserId && r.user_id === currentUserId) entry.mine = true;
+  }
+  // Ordre stable = celui de la palette (évite que les puces sautent au re-render).
+  return Object.fromEntries(Object.entries(byMessage).map(([id, m]) =>
+    [id, MESSAGE_REACTIONS.filter((e) => m[e]).map((e) => m[e])]));
 }
 
 async function createPost(tenantId, authorId, content) {
@@ -218,4 +265,7 @@ async function createMessage(tenantId, authorId, content) {
   return { id: data.id, authorId: data.author_id, content: data.content, createdAt: data.created_at };
 }
 
-module.exports = { resolveTenantId, getFeed, createPost, addComment, toggleLike, createMessage };
+module.exports = {
+  resolveTenantId, getFeed, createPost, addComment, toggleLike, createMessage,
+  toggleMessageReaction, reactionsForMessages, MESSAGE_REACTIONS,
+};

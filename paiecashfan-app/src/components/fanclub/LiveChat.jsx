@@ -6,7 +6,8 @@ import {
   RefreshCw,
   AlertTriangle,
   Ban,
-  ShieldAlert
+  ShieldAlert,
+  SmilePlus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MessageReportMenu } from './MessageReportMenu';
@@ -25,7 +26,8 @@ export function LiveChat({
   currentUserId = null,
   onReport,
   onHideUser,
-  onOpenCharter
+  onOpenCharter,
+  onToggleReaction
 }) {
   const [message, setMessage] = useState('');
 
@@ -199,6 +201,12 @@ export function LiveChat({
               <p className="mt-2 break-words text-sm text-bone-300">
                 {msg.content}
               </p>
+
+              <MessageReactions
+                reactions={msg.reactions}
+                canReact={canWrite && loggedIn}
+                onToggle={(emoji) => onToggleReaction?.(msg.id, emoji)}
+              />
             </motion.div>
           ))
         }
@@ -263,6 +271,76 @@ export function LiveChat({
         )}
       </div>
     </section>
+  );
+}
+
+// Palette fermée, identique au backend (et à la contrainte en base).
+const REACTION_EMOJIS = ['👍', '👎', '❤️', '😂', '😮', '🔥'];
+
+// Puces de réaction sous un message + sélecteur d'emoji.
+// Les puces posées restent visibles ; le sélecteur n'apparaît qu'au survol
+// (ou au focus clavier) pour ne pas surcharger le fil.
+function MessageReactions({ reactions = [], canReact, onToggle }) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const has = reactions.length > 0;
+  if (!has && !canReact) return null;
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+      {reactions.map((r) => (
+        <button
+          key={r.emoji}
+          type="button"
+          disabled={!canReact}
+          onClick={() => onToggle(r.emoji)}
+          aria-pressed={r.mine}
+          title={r.mine ? 'Retirer ma réaction' : 'Réagir'}
+          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition ${
+            r.mine
+              ? 'border-emerald-400/50 bg-emerald-400/15 text-emerald-200'
+              : 'border-white/10 bg-white/[0.04] text-bone-300 hover:border-white/20'
+          } ${canReact ? '' : 'cursor-default opacity-70'}`}
+        >
+          <span>{r.emoji}</span>
+          <span className="tabular-nums font-bold">{r.count}</span>
+        </button>
+      ))}
+
+      {canReact && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setPickerOpen((v) => !v)}
+            aria-label="Ajouter une réaction"
+            className={`grid h-6 w-6 place-items-center rounded-full border border-white/10 text-bone-500 transition hover:border-white/25 hover:text-bone-200 ${
+              has || pickerOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+            }`}
+          >
+            <SmilePlus size={13} />
+          </button>
+
+          {pickerOpen && (
+            <>
+              {/* clic en dehors → ferme */}
+              <div className="fixed inset-0 z-10" onClick={() => setPickerOpen(false)} />
+              <div className="absolute bottom-8 left-0 z-20 flex gap-1 rounded-full border border-white/10 bg-ink-900 px-2 py-1.5 shadow-xl">
+                {REACTION_EMOJIS.map((e) => (
+                  <button
+                    key={e}
+                    type="button"
+                    onClick={() => { onToggle(e); setPickerOpen(false); }}
+                    className="rounded-full px-1 text-base transition hover:scale-125"
+                    title={`Réagir ${e}`}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

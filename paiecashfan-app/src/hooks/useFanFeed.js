@@ -250,11 +250,40 @@ export function useFanFeed(clubId, mode = 'club', { onModerationBlock, onAccessD
     [counters]
   );
 
+  // Bascule une réaction emoji sur un message du chat. Mise à jour optimiste :
+  // la puce réagit au clic, le serveur confirme ensuite.
+  const toggleMessageReaction = useCallback((messageId, emoji) => {
+    if (!user || mode !== 'club') return;
+
+    setClubMessages((list) => list.map((m) => {
+      if (m.id !== messageId) return m;
+      const reactions = m.reactions || [];
+      const existing = reactions.find((r) => r.emoji === emoji);
+      if (!existing) return { ...m, reactions: [...reactions, { emoji, count: 1, mine: true }] };
+      const count = existing.count + (existing.mine ? -1 : 1);
+      return {
+        ...m,
+        // count 0 → la puce disparaît
+        reactions: count <= 0
+          ? reactions.filter((r) => r.emoji !== emoji)
+          : reactions.map((r) => (r.emoji === emoji ? { ...r, count, mine: !r.mine } : r)),
+      };
+    }));
+
+    pendingWritesRef.current += 1;
+    apiFetch(`${FEED_PATH(clubId)}/messages/${messageId}/reactions`, {
+      method: 'POST', body: JSON.stringify({ emoji }),
+    })
+      .catch((e) => handleWriteError(e, null))
+      .finally(() => { pendingWritesRef.current = Math.max(0, pendingWritesRef.current - 1); });
+  }, [clubId, mode, user, handleWriteError]);
+
   return {
     fans, posts, comments, messages,
     loading, error, isEmpty, isChatEmpty,
     reload: loadFeed,
     publishPost, likePost, addComment, sendMessage,
+    toggleMessageReaction,
     match,
     counters
   };

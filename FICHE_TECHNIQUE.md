@@ -105,6 +105,24 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-17 (ay)** — **Réactions emoji sur les messages du chat**. Migration
+  `fan-message-reactions.sql` : table `fan_message_reactions(message_id, user_id,
+  emoji)` (PK composite → un emoji différent par user/message), CHECK liste
+  blanche (👍👎❤️😂😮🔥), RLS deny-all. Backend : `toggleMessageReaction` (bascule),
+  `reactionsForMessages` (agrégat `{emoji,count,mine}` ordre palette),
+  `getFeed.messages[].reactions`. Route `POST .../messages/:id/reactions` avec la
+  **même garde `requireChatAccess`** que l'écriture (sanctionné/charte ⇒ pas de
+  réaction) + cloisonnement salon. Front : `MessageReactions` (puces + sélecteur
+  au survol), bascule optimiste, garde `pendingWrites`. Validé à 3 niveaux
+  (UI / backend / base).
+- **2026-07-17 (ax)** — **Merge chantiers 1 & 3 (Kelvine) : chat dynamique +
+  compteurs réels**. Chat borné + scroll interne (`min-h-0`), auto-scroll
+  intelligent (seuil 120 px, pas de saut si même dernier message), polling 5 s
+  (garde `pendingWrites`), compteurs réels (messages publiés / supporters=favoris
+  / réactions=likes). Conflit `getFeed` résolu (sa branche antérieure à la
+  présence) : compteurs + présence conservés. Fix layout : côte-à-côte
+  streaming/chat abaissé `xl:`→`lg:` (basculait sous la vidéo avant 1280 px) +
+  `lg:h-full` pour aligner le chat sur la vidéo.
 - **2026-07-17 (aw)** — **Présence en ligne par salon (chantier 2 Fan Club)**.
   Corrige « je suis noté hors ligne alors que je suis connecté » : la présence
   était codée en dur (`online:false`). Migration `chat-presence.sql` : table
