@@ -49,11 +49,17 @@ export function FanClub() {
     isEmpty: feedIsEmpty,
     reload: reloadFeed,
     publishPost,
+    updatePost,
+    deletePost,
     likePost,
     addComment,
+    updateComment,
+    deleteComment,
     messages,
     isChatEmpty,
     sendMessage,
+    updateMessage,
+    deleteMessage,
     match
   } = useFanFeed(slug, mode, {
     // Refus de l'IA avant publication : on explique, on ne montre pas d'erreur brute.
@@ -164,6 +170,18 @@ export function FanClub() {
     }
   }
 
+  function handleUpdatePost(postId, content) {
+    if (!ensureCanWrite()) return false;
+
+    return updatePost(postId, content);
+  }
+
+  function handleDeletePost(postId) {
+    return deletePost(postId);
+  }
+
+
+
   function handleLikePost(postId) {
     likePost(postId);
   }
@@ -171,6 +189,16 @@ export function FanClub() {
   function handleAddComment(postId, content) {
     if (!ensureCanWrite()) return;
     addComment(postId, content);
+  }
+
+  function handleUpdateComment(commentId, content) {
+    if (!ensureCanWrite()) return false;
+
+    return updateComment(commentId, content);
+  }
+
+  function handleDeleteComment(commentId) {
+    return deleteComment(commentId);
   }
 
   function handleLiveReaction(emoji) {
@@ -314,6 +342,8 @@ export function FanClub() {
             isEmpty={isChatEmpty}
             onRetry={reloadFeed}
             onSendMessage={handleSendMessage}
+            onUpdateMessage={updateMessage}
+            onDeleteMessage={deleteMessage}
             access={access}
             currentUserId={user?.id}
             onReport={(m) => setReportTarget(m)}
@@ -356,8 +386,12 @@ export function FanClub() {
             newPost={newPost}
             setNewPost={setNewPost}
             onPublish={handlePublish}
+            onUpdatePost={handleUpdatePost}
+            onDeletePost={handleDeletePost}
             onLikePost={handleLikePost}
             onAddComment={handleAddComment}
+            onUpdateComment={handleUpdateComment}
+            onDeleteComment={handleDeleteComment}
             currentUserId={user?.id}
             onReport={(m) => setReportTarget(m)}
             onHideUser={hideUser}

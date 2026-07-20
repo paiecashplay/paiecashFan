@@ -166,6 +166,178 @@ router.post('/:slug/fan-feed/posts/:postId/comments', requireAuth, withTenant, r
   }
 });
 
+// PATCH /api/v2/clubs/:slug/fan-feed/posts/:postId
+// Permet à l'auteur de modifier sa propre publication.
+router.patch('/:slug/fan-feed/posts/:postId', requireAuth, withTenant, requireChatAccess, async (req, res) => {
+    const content = clean(req.body?.content);
+
+    if (!content) {
+      return fail(res, 'La publication est vide.');
+    }
+
+    if (content.length > MAX) {
+      return fail(res, 'Publication trop longue.');
+    }
+
+    try {
+      const blocked = await publishGate(req, res, {
+        contentType: 'post',
+        content,
+      });
+
+      if (blocked) {
+        return blocked;
+      }
+
+      const post = await fanFeed.updatePost(
+        req.tenant.id,
+        req.params.postId,
+        req.authUser.id,
+        content
+      );
+
+      screenAsync({
+        contentType: 'post',
+        contentId: post.id,
+        tenantId: req.tenant.id,
+        authorId: req.authUser.id,
+        content,
+      });
+
+      return ok(res, { post });
+    } catch (err) {
+      if (err.code === 'POST_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'POST_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Modification de la publication impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
+// DELETE /api/v2/clubs/:slug/fan-feed/posts/:postId
+// Suppression logique d'une publication appartenant à l'utilisateur.
+router.delete('/:slug/fan-feed/posts/:postId', requireAuth, withTenant, async (req, res) => {
+    try {
+      const result = await fanFeed.deletePost(
+        req.tenant.id,
+        req.params.postId,
+        req.authUser.id
+      );
+
+      return ok(res, result);
+    } catch (err) {
+      if (err.code === 'POST_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'POST_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Suppression de la publication impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
+// PATCH /api/v2/clubs/:slug/fan-feed/comments/:commentId
+// Permet à l'auteur de modifier son propre commentaire.
+router.patch('/:slug/fan-feed/comments/:commentId', requireAuth, withTenant, requireChatAccess, async (req, res) => {
+    const content = clean(req.body?.content);
+
+    if (!content) {
+      return fail(res, 'Le commentaire est vide.');
+    }
+
+    if (content.length > MAX) {
+      return fail(res, 'Commentaire trop long.');
+    }
+
+    try {
+      const blocked = await publishGate(req, res, {
+        contentType: 'comment',
+        content,
+      });
+
+      if (blocked) {
+        return blocked;
+      }
+
+      const comment = await fanFeed.updateComment(
+        req.tenant.id,
+        req.params.commentId,
+        req.authUser.id,
+        content
+      );
+
+      screenAsync({
+        contentType: 'comment',
+        contentId: comment.id,
+        tenantId: req.tenant.id,
+        authorId: req.authUser.id,
+        content,
+      });
+
+      return ok(res, { comment });
+    } catch (err) {
+      if (err.code === 'COMMENT_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'COMMENT_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Modification du commentaire impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
+// DELETE /api/v2/clubs/:slug/fan-feed/comments/:commentId
+// Suppression logique d'un commentaire appartenant à l'utilisateur.
+router.delete('/:slug/fan-feed/comments/:commentId', requireAuth, withTenant, async (req, res) => {
+    try {
+      const result = await fanFeed.deleteComment(
+        req.tenant.id,
+        req.params.commentId,
+        req.authUser.id
+      );
+
+      return ok(res, result);
+    } catch (err) {
+      if (err.code === 'COMMENT_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'COMMENT_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Suppression du commentaire impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
 // POST /api/v2/clubs/:slug/fan-feed/posts/:postId/like  → toggle
 router.post('/:slug/fan-feed/posts/:postId/like', requireAuth, withTenant, async (req, res) => {
   try {
@@ -193,6 +365,103 @@ router.post('/:slug/fan-feed/messages', requireAuth, withTenant, requireChatAcce
     return fail(res, 'Envoi impossible : ' + err.message, 500);
   }
 });
+
+// PATCH /api/v2/clubs/:slug/fan-feed/messages/:messageId
+// Permet à l'auteur de modifier son propre message.
+router.patch('/:slug/fan-feed/messages/:messageId', requireAuth, withTenant, requireChatAccess, async (req, res) => {
+    const content = clean(req.body?.content);
+
+    if (!content) {
+      return fail(res, 'Le message est vide.');
+    }
+
+    if (content.length > MAX) {
+      return fail(res, 'Message trop long.');
+    }
+
+    try {
+      // Le nouveau contenu repasse par la modération avant publication.
+      const blocked = await publishGate(req, res, {
+        contentType: 'message',
+        content,
+      });
+
+      if (blocked) {
+        return blocked;
+      }
+
+      const message = await fanFeed.updateMessage(
+        req.tenant.id,
+        req.params.messageId,
+        req.authUser.id,
+        content
+      );
+
+      screenAsync({
+        contentType: 'message',
+        contentId: message.id,
+        tenantId: req.tenant.id,
+        authorId: req.authUser.id,
+        content,
+      });
+
+      return ok(res, {
+        message,
+        moderation: {
+          status: 'published',
+          reason: null,
+          canAppeal: false,
+        },
+      });
+    } catch (err) {
+      if (err.code === 'MESSAGE_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'MESSAGE_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Modification impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
+// DELETE /api/v2/clubs/:slug/fan-feed/messages/:messageId
+// Effectue une suppression logique du message.
+router.delete('/:slug/fan-feed/messages/:messageId', requireAuth, withTenant, async (req, res) => {
+    try {
+      const result = await fanFeed.deleteMessage(
+        req.tenant.id,
+        req.params.messageId,
+        req.authUser.id
+      );
+
+      return ok(res, result);
+    } catch (err) {
+      if (err.code === 'MESSAGE_NOT_FOUND') {
+        return fail(res, err.message, 404);
+      }
+
+      if (err.code === 'MESSAGE_FORBIDDEN') {
+        return fail(res, err.message, 403);
+      }
+
+      return fail(
+        res,
+        'Suppression impossible : ' + err.message,
+        500
+      );
+    }
+  }
+);
+
+
+
 
 // ── Modération : accès au salon, charte, signalement ─────────
 

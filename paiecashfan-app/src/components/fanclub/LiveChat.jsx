@@ -6,7 +6,10 @@ import {
   RefreshCw,
   AlertTriangle,
   Ban,
-  ShieldAlert
+  ShieldAlert,
+  Check,
+  X,
+  LoaderCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MessageReportMenu } from './MessageReportMenu';
@@ -20,6 +23,8 @@ export function LiveChat({
   isEmpty = false,
   onRetry,
   onSendMessage,
+  onUpdateMessage,
+  onDeleteMessage,
   // Modération (mode club)
   access = null,
   currentUserId = null,
@@ -28,6 +33,10 @@ export function LiveChat({
   onOpenCharter
 }) {
   const [message, setMessage] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [editingBusy, setEditingBusy] = useState(false);
+  const [deletingMessageId, setDeletingMessageId] = useState(null);
 
   const isClubMode = mode === 'club';
   const loggedIn = access ? access.isLoggedIn : !!currentUserId;
@@ -45,6 +54,62 @@ export function LiveChat({
 
     if (sent !== false) {
       setMessage('');
+    }
+  }
+
+  function startEditing(messageToEdit) {
+    if (!messageToEdit) return;
+
+    setEditingMessageId(messageToEdit.id);
+    setEditingContent(messageToEdit.content || '');
+  }
+
+  function cancelEditing() {
+    if (editingBusy) return;
+
+    setEditingMessageId(null);
+    setEditingContent('');
+  }
+
+  async function saveEditing() {
+    const cleanContent = editingContent.trim();
+
+    if (!editingMessageId || !cleanContent || editingBusy) {
+      return;
+    }
+
+    setEditingBusy(true);
+
+    try {
+      const updated = await onUpdateMessage?.(
+        editingMessageId,
+        cleanContent
+      );
+
+      if (updated !== false) {
+        setEditingMessageId(null);
+        setEditingContent('');
+      }
+    } finally {
+      setEditingBusy(false);
+    }
+  }
+
+  async function handleDelete(messageToDelete) {
+    if (!messageToDelete?.id || deletingMessageId) return;
+
+    const confirmed = window.confirm(
+      'Voulez-vous vraiment supprimer ce message ?'
+    );
+
+    if (!confirmed) return;
+
+    setDeletingMessageId(messageToDelete.id);
+
+    try {
+      await onDeleteMessage?.(messageToDelete.id);
+    } finally {
+      setDeletingMessageId(null);
     }
   }
 
@@ -106,14 +171,79 @@ export function LiveChat({
                       onReport={onReport}
                       onHideUser={onHideUser}
                       onBlockUser={onHideUser}
+                      onEdit={startEditing}
+                      onDelete={handleDelete}
                     />
                   )}
                 </div>
               </div>
 
-              <p className="mt-2 break-words text-sm text-bone-300">
-                {msg.content}
-              </p>
+              {editingMessageId === msg.id ? (
+                <div className="mt-3">
+                  <textarea
+                    value={editingContent}
+                    onChange={(event) => setEditingContent(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Escape') {
+                        cancelEditing();
+                      }
+
+                      if (
+                        event.key === 'Enter' &&
+                        !event.shiftKey
+                      ) {
+                        event.preventDefault();
+                        saveEditing();
+                      }
+                    }}
+                    disabled={editingBusy}
+                    rows={3}
+                    autoFocus
+                    maxLength={500}
+                    className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-bone-100 outline-none placeholder:text-bone-500 focus:border-emerald-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+
+                  <div className="mt-2 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={cancelEditing}
+                      disabled={editingBusy}
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/10 px-3 text-xs font-bold text-bone-300 transition hover:bg-white/5 disabled:opacity-50"
+                    >
+                      <X size={14} />
+                      Annuler
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={saveEditing}
+                      disabled={!editingContent.trim() || editingBusy}
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-black text-ink-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {editingBusy ? (
+                        <LoaderCircle
+                          size={14}
+                          className="animate-spin"
+                        />
+                      ) : (
+                        <Check size={14} />
+                      )}
+
+                      Enregistrer
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p
+                  className={`mt-2 break-words text-sm text-bone-300 ${
+                    deletingMessageId === msg.id
+                      ? 'opacity-40'
+                      : ''
+                  }`}
+                >
+                  {msg.content}
+                </p>
+              )}
             </motion.div>
           ))}
       </div>
