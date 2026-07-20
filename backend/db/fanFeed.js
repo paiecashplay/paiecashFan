@@ -38,17 +38,83 @@ async function getFeed(tenantId, currentUserId) {
   // Modération : on ne sert QUE le contenu publié et non supprimé — posts,
   // messages ET commentaires. Le filtrage est fait ici (serveur), jamais côté
   // client : masquer en CSS laisserait le contenu dans la réponse API.
-  const [{ data: posts }, { data: messages }] = await Promise.all([
+  const [
+    { data: posts, error: postsError }, 
+    { data: messages, error: messagesError }, 
+    { count: messagesCount, error: messagesCountError },
+    { count: supportersCount, error: supportersCountError }] = await Promise.all([
     supabase.from('fan_posts').select('id, author_id, content, created_at')
       .eq('tenant_id', tenantId).eq('moderation_status', 'published').is('deleted_at', null)
       .order('created_at', { ascending: false }).limit(100),
     supabase.from('fan_messages').select('id, author_id, content, created_at')
       .eq('tenant_id', tenantId).eq('moderation_status', 'published').is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(100),
+    supabase.from('fan_messages').select('id', {count: 'exact', head: true})
+      .eq('tenant_id', tenantId)
+      .eq('moderation_status', 'published')
+      .is('deleted_at', null),
+    supabase.from('fan_favorite_clubs').select('id', {count: 'exact',head: true})
+      .eq('tenant_id', tenantId)
   ]);
+
+  if (postsError) {
+    throw new Error(
+      `Chargement des publications impossible : ${postsError.message}`
+    );
+  }
+
+  if (messagesError) {
+    throw new Error(
+      `Chargement des messages impossible : ${messagesError.message}`
+    );
+  }
+
+  if (messagesCountError) {
+    throw new Error(
+      `Comptage des messages impossible : ${messagesCountError.message}`
+    );
+  }
+
+  if (supportersCountError) {
+    throw new Error(
+      `Comptage des supporters impossible : ${supportersCountError.message}`
+    );
+  }
 
   const postIds = (posts || []).map((p) => p.id);
 
+  // Récupération des posts publiés pour le comptage des réactions (likes).
+  const { data: publishedPostIds, error: publishedPostIdsError } =
+    await supabase.from('fan_posts').select('id').eq('tenant_id', tenantId)
+      .eq('moderation_status', 'published')
+      .is('deleted_at', null);
+
+    const allPublishedPostIds = (publishedPostIds || []).map((post) => post.id
+  );
+
+  if (publishedPostIdsError) {
+    throw new Error(
+      `Récupération des posts publiés impossible : ${publishedPostIdsError.message}`
+    );
+  }
+
+  // Comptage de toutes les réactions (likes) sur les posts publiés du club.
+  const {count: reactionsCount, error: reactionsCountError} = allPublishedPostIds.length
+    ? await supabase
+        .from('fan_post_likes')
+        .select('post_id', {
+          count: 'exact',
+          head: true
+        })
+        .in('post_id', allPublishedPostIds)
+    : { count: 0, error: null };
+
+  if (reactionsCountError) {
+    throw new Error(
+      `Comptage des réactions impossible : ${reactionsCountError.message}`
+    );
+  }
+  
   // Commentaires + likes des posts du club (comptés en JS).
   const [{ data: comments }, { data: likes }] = await Promise.all([
     postIds.length
@@ -59,6 +125,7 @@ async function getFeed(tenantId, currentUserId) {
     postIds.length
       ? supabase.from('fan_post_likes').select('post_id, user_id').in('post_id', postIds)
       : Promise.resolve({ data: [] }),
+    
   ]);
 
   const likeCount = {}, commentCount = {}, likedByMe = {};
@@ -86,8 +153,15 @@ async function getFeed(tenantId, currentUserId) {
   const fans = Object.values(profiles).sort((a, b) => (b.online - a.online) || a.name.localeCompare(b.name));
 
   return {
+    // Participants triés (en ligne d'abord) + présence réelle — chantier 2.
     fans,
     onlineCount: onlineIds.size,
+    // Compteurs réels du salon — chantier 1.
+    counters: {
+      messagesCount: Number(messagesCount || 0),
+      supportersCount: Number(supportersCount || 0),
+      reactionsCount: Number(reactionsCount || 0),
+    },
     posts: (posts || []).map((p) => ({
       id: p.id,
       authorId: p.author_id,

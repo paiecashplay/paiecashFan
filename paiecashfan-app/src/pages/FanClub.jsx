@@ -19,6 +19,7 @@ import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { usePresence } from '@/hooks/usePresence';
 
+
 // Club par défaut quand on arrive sur /fan-club sans slug.
 const DEFAULT_SLUG = 'paris-saint-germain';
 
@@ -54,7 +55,8 @@ export function FanClub() {
     messages,
     isChatEmpty,
     sendMessage,
-    match
+    match,
+    counters
   } = useFanFeed(slug, mode, {
     // Refus de l'IA avant publication : on explique, on ne montre pas d'erreur brute.
     onModerationBlock: (moderation, draft) => {
@@ -240,7 +242,7 @@ export function FanClub() {
             title="Streaming Fan Club"
             badge="Public"
             description="Regarde le live officiel avec tous les supporters du club."
-            meta={feedLoading ? 'Chargement...' : `${fans.length} supporters`}
+            meta={feedLoading ? 'Chargement...' : `${new Intl.NumberFormat('fr-FR').format(counters.supportersCount)} supporters`}
             color="emerald"
             onClick={() => setMode('club')}
           />
@@ -266,7 +268,10 @@ export function FanClub() {
           fanPoints={fanPoints}
         />
 
-        <div className="mt-6 grid gap-5 md:mt-8 xl:grid-cols-[minmax(0,1.5fr)_420px]">
+        {/* Streaming à GAUCHE + chat à DROITE dès `lg` (1024 px). Avant, le
+            côte-à-côte n'arrivait qu'à `xl` (1280 px) : sur un écran un peu
+            moins large, le chat basculait sous la vidéo. */}
+        <div className="mt-6 grid gap-5 md:mt-8 lg:grid-cols-[minmax(0,1.5fr)_400px] xl:grid-cols-[minmax(0,1.5fr)_420px]">
           <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40">
             <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div>
