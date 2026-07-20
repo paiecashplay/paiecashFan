@@ -114,6 +114,15 @@ persistance DB panier billetterie, page Fan Club à brancher au back…).
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-20 (bg)** — **SEO & partage de lien** (mise en prod sur `paiecashfan.com`).
+  `index.html` : Open Graph + Twitter Card (aperçu WhatsApp/LinkedIn/X), canonical,
+  robots, keywords, JSON-LD (Organization + WebSite). Nouveaux fichiers publics :
+  `robots.txt` (bloque /admin, /mon-compte, /mon-club, /checkout…), `sitemap.xml`
+  (pages publiques), `site.webmanifest` (PWA), `favicon.svg` **provisoire** on-brand
+  (était référencé mais absent → 404). Image de partage **provisoire** = hero
+  fan-club (à remplacer par `/og-image.png` 1200×630 une fois le logo créé).
+  À faire ensuite : vrai logo (header + favicon + og-image), sitemap **dynamique**
+  par club/fédération (généré depuis `tenants`).
 - **2026-07-20 (bf)** — **Merge stagiaire : édition/suppression des messages, posts &
   commentaires du Fan Club** (branche `feature/fanclub-message-edit-delete`).
   4 conflits résolus en conservant **les deux** apports : mes réactions/favoris/

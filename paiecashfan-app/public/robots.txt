@@ -1,0 +1,14 @@
+# robots.txt — paiecashfan.com
+User-agent: *
+Allow: /
+
+# Espaces privés / fonctionnels : pas d'indexation
+Disallow: /admin
+Disallow: /mon-compte
+Disallow: /mon-club
+Disallow: /parametres
+Disallow: /checkout
+Disallow: /login
+Disallow: /reset-password
+
+Sitemap: https://paiecashfan.com/sitemap.xml
