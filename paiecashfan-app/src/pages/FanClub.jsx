@@ -7,6 +7,7 @@ import { apiFetch } from '@/lib/api';
 
 import { Container } from '@/components/ui/Container';
 import { ClubFanCommunity } from '@/components/club/ClubFanCommunity';
+import { FavoriteClubButton } from '@/components/club/FavoriteClubButton';
 import { LiveChat } from '@/components/fanclub/LiveChat';
 import { CharterEntryModal } from '@/components/fanclub/CharterEntryModal';
 import { ReportMessageModal } from '@/components/fanclub/ReportMessageModal';
@@ -30,6 +31,7 @@ export function FanClub() {
 
   const club = {
     slug,
+    id: dbClub?.id || null,
     name: dbClub?.name || 'Fan Club',
     primaryColor: dbClub?.primaryColor || dbClub?.primary_color || '#004170',
     logo: dbClub?.logo || dbClub?.logo_url || null,
@@ -202,9 +204,14 @@ export function FanClub() {
           />
 
           <div className="relative">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
-              <Radio size={13} />
-              Fan Club Live
+            <div className="flex items-start justify-between gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
+                <Radio size={13} />
+                Fan Club Live
+              </div>
+
+              {/* ⭐ Suivre ce club en favori directement depuis le salon */}
+              {club.id && <FavoriteClubButton tenantId={club.id} />}
             </div>
 
             <h1 className="mt-5 break-words font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl md:text-6xl">

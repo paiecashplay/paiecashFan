@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ChevronDown, Users, Radio, ShieldCheck, ShieldAlert, MessageSquare, FileText, ArrowRight, Star, Loader2 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import { getClubProfile } from '@/data/clubProfiles';
 
 const HERO = '/images/fan-club/fan-club-home.webp';
@@ -174,14 +175,18 @@ function ClubLogo({ club, size = 56 }) {
 }
 
 function ClubCard({ club }) {
+  const [fav, setFav] = useState(!!club.isFavorite);
+
   return (
-    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-ink-900/60 p-5 transition hover:-translate-y-0.5 ${club.isFavorite ? 'border-emerald-400/50' : 'border-white/10 hover:border-white/20'}`}>
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-ink-900/60 p-5 transition hover:-translate-y-0.5 ${fav ? 'border-emerald-400/50' : 'border-white/10 hover:border-white/20'}`}>
       {/* halo couleur du club */}
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-20 blur-3xl" style={{ background: club.primaryColor || '#22c55e' }} />
 
       <div className="relative flex items-start justify-between">
         <ClubLogo club={club} />
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1.5">
+          {/* ⭐ Ajouter/retirer ce club des favoris directement depuis l'annuaire */}
+          <FavStar tenantId={club.id} fav={fav} onChange={setFav} />
           {club.isOfficial && <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400">Salon officiel</span>}
           {/* Badge LIVE prévu — masqué tant qu'aucun vrai match n'est en cours */}
           {club.isLive && <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-red-400"><span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" /> Live</span>}
@@ -204,6 +209,43 @@ function ClubCard({ club }) {
         Entrer dans le salon <ArrowRight size={13} />
       </Link>
     </div>
+  );
+}
+
+// Étoile favori compacte pour les cartes de l'annuaire. Part de l'état déjà
+// connu (club.isFavorite) → un seul POST au clic, pas de GET par carte.
+function FavStar({ tenantId, fav, onChange }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  async function toggle(e) {
+    e.preventDefault(); e.stopPropagation();   // ne pas déclencher le lien de la carte
+    if (!user) { navigate('/login'); return; }
+    if (busy || !tenantId) return;
+    setBusy(true);
+    const next = !fav;
+    onChange(next);   // optimiste
+    try { const j = await apiFetch(`/api/v2/me/favorites/${tenantId}`, { method: 'POST' }); onChange(!!j.data?.favorite); }
+    catch { onChange(!next); }
+    setBusy(false);
+  }
+
+  if (!tenantId) return null;
+  return (
+    <button
+      onClick={toggle}
+      disabled={busy}
+      aria-pressed={fav}
+      title={fav ? 'Retirer de mes clubs favoris' : 'Ajouter à mes clubs favoris'}
+      className={`grid h-8 w-8 place-items-center rounded-full border transition ${
+        fav
+          ? 'border-emerald-400/50 bg-emerald-400/15 text-emerald-400'
+          : 'border-white/15 bg-ink-900/60 text-bone-300 hover:border-emerald-400/40 hover:text-emerald-400'
+      }`}
+    >
+      {busy ? <Loader2 size={13} className="animate-spin" /> : <Star size={14} className={fav ? 'fill-emerald-400' : ''} />}
+    </button>
   );
 }
 
