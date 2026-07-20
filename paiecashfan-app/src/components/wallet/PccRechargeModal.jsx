@@ -1,8 +1,19 @@
 import { motion } from 'framer-motion';
-import { Wallet, ExternalLink, Info, X, ShieldCheck } from 'lucide-react';
+import { Wallet, ExternalLink, Info, X, ShieldCheck, BadgePercent, CreditCard, Gift, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 const PCC_APP_URL = import.meta.env.VITE_PAIECASHCOIN_URL || 'https://www.paiecashcoin.com';
+
+// Bonus d'inscription PaieCashCoin (valeur donnée par la cliente — ajustable ici
+// si la promo change côté PCC).
+const SIGNUP_BONUS_PCT = 5;
+
+// Avantages affichés pour inciter (sans forcer) à créer un wallet PCC.
+const PCC_PERKS = [
+  { icon: Gift, text: `+${SIGNUP_BONUS_PCT}% de PCC offerts à l'inscription` },
+  { icon: Zap, text: 'Paiement en 1 clic, sans ressaisir ta carte' },
+  { icon: BadgePercent, text: 'Offres et cashback réservés aux détenteurs de PCC' },
+];
 
 // Popup explicative avant la redirection vers PaieCashCoin pour recharger le
 // solde PCC. Objectif : que le fan ne soit pas perdu — on lui dit OÙ il va, avec
@@ -53,6 +64,25 @@ export function PccRechargeModal({ email, found, reason, onClose }) {
               ? <>Ton email n'a pas encore de compte <b className="text-bone-100">PaieCashCoin</b>, notre partenaire de paiement. Crée-le en une minute pour alimenter et payer en PCC.</>
               : <>Le rechargement se fait en toute sécurité sur <b className="text-bone-100">PaieCashCoin</b>, notre partenaire de paiement. Tu vas être redirigé vers ton espace pour ajouter des PCC.</>}
           </p>
+          {/* Avantages du wallet PCC (cas inscription) — incitatif, jamais bloquant. */}
+          {needsRegister && (
+            <ul className="space-y-1.5 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-3">
+              {PCC_PERKS.map(({ icon: Icon, text }, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-bone-200">
+                  <Icon size={14} className="mt-0.5 shrink-0 text-emerald-400" /> {text}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Rappel : ce n'est pas obligatoire — la carte reste possible partout. */}
+          {needsRegister && (
+            <p className="inline-flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-bone-300">
+              <CreditCard size={14} className="mt-0.5 shrink-0 text-bone-400" />
+              Pas envie de créer un compte ? Aucun souci : tu peux payer par <b className="text-bone-100">carte bancaire</b> sur la boutique, les jeux et la billetterie, sans wallet PCC.
+            </p>
+          )}
+
           {email && (
             <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
               👉 {needsRegister
