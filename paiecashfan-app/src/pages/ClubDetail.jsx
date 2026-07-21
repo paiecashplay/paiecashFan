@@ -1245,77 +1245,31 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [activeCat, setActiveCat] = useState('all');
   const [openProduct, setOpenProduct] = useState(null);
 
-  // Panier persisté (Supabase) si connecté + club en base, sinon local.
-  const { items: cart, addItem, updateQty, removeItem, clear, totalItems, totalPrice, setCartClub } = useCart();
+  // Panier boutique GLOBAL (contexte). Le checkout se fait dans la popup navbar.
+  const { items: cart, addItem, updateQty, removeItem, totalItems, totalPrice, setCartClub, openCart } = useCart();
 
   // Rattache le panier global à CE club (change de club → nouveau panier).
   useEffect(() => {
     if (club?.slug) setCartClub({ slug: club.slug, name: club.name, primaryColor: club.primaryColor });
   }, [club?.slug, club?.name, club?.primaryColor, setCartClub]);
 
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  // ── Paiement boutique (même moteur que la billetterie) ──────
-  const [mode, setMode] = useState('pcc_full');   // pcc_full | card_full | pcc_split | bnpl
-  const [status, setStatus] = useState('idle');    // idle | paying
-  const [payError, setPayError] = useState('');
-  const [topUp, setTopUp] = useState(null);        // { message, found } si solde/wallet insuffisant
-  const [rechargeOpen, setRechargeOpen] = useState(false);
-  const [shippingOpen, setShippingOpen] = useState(false);  // modale d'adresse de livraison
-  const cartRef = useRef(null);   // ancre pour défiler vers le panier
-  const scrollToCart = () => cartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
     [products, activeCat]
   );
 
-  // Ajoute (ou fusionne si même produit/taille déjà au panier) un item.
+  // Ajoute au panier (enrichi pour l'affichage dans la popup) puis ouvre la popup.
   const handleAddItem = async (item) => {
-    await addItem(item); // { productId, size, qty, unitPrice }
+    const p = products.find((x) => x.id === item.productId);
+    await addItem({
+      ...item,
+      name: p?.name,
+      image: p?.image || (Array.isArray(p?.images) ? p.images[0] : null),
+      unitPriceEur: p ? getProductEuroPrice(p) : (item.unitPrice || 0),
+    });
     setOpenProduct(null);
+    openCart();
   };
-
-  // Clic « Passer commande » → on collecte d'abord l'adresse de livraison.
-  function openCheckout() {
-    if (!user) { setPayError('Tu dois être connecté pour payer.'); return; }
-    if (!cart.length) return;
-    setPayError(''); setTopUp(null);
-    setShippingOpen(true);
-  }
-
-  // Paiement réel (après saisie de l'adresse). shipping = { name, address1, ... }.
-  async function pay(shipping) {
-    setPayError(''); setTopUp(null); setStatus('paying');
-    try {
-      const res = await apiFetch('/api/v2/checkout/boutique', {
-        method: 'POST',
-        body: JSON.stringify({
-          items: cart.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null })),
-          mode,
-          origin: window.location.origin,
-          shipping,
-        }),
-      });
-      // Modes carte / mixte / BNPL → redirection Stripe (PaieCashCoin).
-      if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
-      // pcc_full → payé immédiatement.
-      await clear();
-      setStatus('idle');
-      setShippingOpen(false);
-      navigate('/mon-compte');
-    } catch (err) {
-      const msg = err?.message || 'Paiement impossible pour le moment.';
-      if (/insuffisant|wallet|recharge/i.test(msg)) {
-        setTopUp({ message: msg, found: err?.data?.found });
-        setShippingOpen(false);   // laisse voir le bandeau de rechargement
-      } else {
-        setPayError(msg);         // affiché dans la modale d'adresse
-      }
-      setStatus('idle');
-    }
-  }
 
   return (
     <section id="merchandise" className="py-16 md:py-20 border-t border-white/5 scroll-mt-20">
@@ -1337,10 +1291,10 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             </p>
           </div>
 
-          {/* Compteur panier — cliquable : défile jusqu'au panier / commande */}
+          {/* Compteur panier — ouvre la popup mini-panier */}
           <button
             type="button"
-            onClick={scrollToCart}
+            onClick={openCart}
             disabled={totalItems === 0}
             title={totalItems > 0 ? 'Voir mon panier' : 'Ton panier est vide'}
             className="flex items-center gap-3 rounded-2xl p-1.5 transition hover:bg-white/[0.04] disabled:cursor-default disabled:opacity-70"
@@ -1434,49 +1388,8 @@ function MerchandiseSection({ club, apiProducts = [] }) {
           </div>
         )}
 
-        {/* Détail du panier */}
-        {cart.length > 0 && (
-          <div ref={cartRef} className="scroll-mt-24">
-          <CartFooter
-            cart={cart}
-            products={products}
-            totalPrice={totalPrice}
-            totalItems={totalItems}
-            primaryColor={club.primaryColor}
-            onRemove={(itemId) => removeItem(itemId)}
-            onQtyChange={(itemId, qty) => updateQty(itemId, qty)}
-            mode={mode}
-            onModeChange={setMode}
-            status={status}
-            payError={payError}
-            topUp={topUp}
-            onCheckout={openCheckout}
-            onRecharge={() => setRechargeOpen(true)}
-            isLogged={!!user}
-          />
-          </div>
-        )}
+        {/* Le panier + le paiement sont dans la popup mini-panier (navbar). */}
       </Container>
-
-      {rechargeOpen && (
-        <PccRechargeModal
-          email={user?.email}
-          found={topUp?.found}
-          reason={topUp?.message || 'Ton solde PCC est insuffisant pour ce paiement.'}
-          onClose={() => setRechargeOpen(false)}
-        />
-      )}
-
-      {shippingOpen && (
-        <ShippingModal
-          totalPcc={totalPrice}
-          cta={BOUTIQUE_PAY_MODES.find((m) => m.id === mode)?.cta || 'Payer'}
-          paying={status === 'paying'}
-          error={payError}
-          onSubmit={pay}
-          onClose={() => { if (status !== 'paying') setShippingOpen(false); }}
-        />
-      )}
 
       {/* Modale de sélection du produit (taille + quantité) */}
       <AnimatePresence>

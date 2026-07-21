@@ -106,6 +106,10 @@ a tout, le club_admin est **scopé à son `club_id`**.
 - Optionnel : champ `prize_type` (physical/digital) sur la campagne tombola → l'admin marque un lot digital (pas d'adresse demandée).
 - ✅ **Relances automatiques (CRON)** : livré le 2026-07-21 (job `prizeReminders`, cadence 48 h puis /3 j, plafond 3, escalade BO au 3e rappel).
 
+### 🚚 Frais de port + points relais (à faire — demandé le 2026-07-22)
+- **Frais de livraison** par zone (France domicile / France relais / Europe / International), **calculés serveur**, réglables au BO (forfaits ; affinage au poids possible plus tard).
+- **Point relais** : au checkout, choix domicile **ou** point relais → widget du **transporteur** (Mondial Relay recommandé — carte + API ; PAS Google Maps) pour choisir le point. Nécessite un **compte marchand transporteur** (à ouvrir). Point relais + frais stockés sur la commande, visibles fan + BO.
+
 ### 🛒 Boutique / stock
 - **Suivi du stock** : le checkout **vérifie** la dispo mais ne **décrémente pas** `products.total_sold` après paiement (pour la carte, décrémenter à la redirection compterait les paniers abandonnés → le faire sur commande **confirmée** via la réconciliation `/checkout/status`). Ajouter la **gestion/édition du stock côté BO Super Admin ET BO Club** (alerte rupture, bascule `sold_out`). Aujourd'hui la plupart des produits sont en `stock: -1` (illimité) → pas d'impact immédiat.
 
@@ -128,6 +132,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-22 (bq)** — **Mini-panier en popup + fix « produit indisponible »**.
+  (1) **Popup panier** : tout le checkout (articles, mode, adresse, paiement) passe
+  dans une **popup ancrée à l'icône navbar** (`components/cart/CartMenu.jsx`),
+  ouverte à l'ajout d'un article et depuis le compteur boutique. `CartContext`
+  enrichi (nom/image/€ + état d'ouverture). Le bloc panier en bas de la boutique
+  (`CartFooter`) est retiré de la page. (2) **Fix data** : PSG (et Paris FC) avaient
+  **0 produit en base** → la boutique affichait des produits **statiques** non
+  achetables (`home-jersey`…) → checkout 404 « produit indisponible ». Le script
+  `hydrate-static` seede désormais aussi les **produits** depuis `clubProfiles.js`
+  (non destructif) → exécuté (--commit) : +8 produits PSG, +8 Paris FC.
 - **2026-07-22 (bp)** — **Panier boutique dans la navbar (état global)**. Le panier
   était local à la page boutique + son compteur n'était pas cliquable → invisible/
   bloquant. Passé en **contexte global `CartContext`** (session, en mémoire, rattaché

@@ -14,7 +14,7 @@ const COMMIT = process.argv.includes('--commit');
   const modPath = pathToFileURL(path.resolve(__dirname, '../../paiecashfan-app/src/data/clubProfiles.js')).href;
   const { clubProfiles } = await import(modPath);
 
-  let clubsTouched = 0, playersAdded = 0, trophiesAdded = 0, infosPatched = 0;
+  let clubsTouched = 0, playersAdded = 0, trophiesAdded = 0, infosPatched = 0, productsAdded = 0;
 
   for (const [slug, prof] of Object.entries(clubProfiles)) {
     const { data: tenant } = await supabase.from('tenants')
@@ -63,6 +63,31 @@ const COMMIT = process.argv.includes('--commit');
       }
     }
 
+    // ── Produits / boutique ────────────────────────────────────
+    if (Array.isArray(prof.merchandise) && prof.merchandise.length) {
+      const { count } = await supabase.from('products').select('id', { count: 'exact', head: true }).eq('tenant_id', tenant.id);
+      if (!count) {
+        const rows = prof.merchandise.map((m, i) => ({
+          tenant_id: tenant.id,
+          category_slug: m.category || 'autre',
+          name: m.name,
+          description: m.description || null,
+          pcc_price: Number(m.price) || 0,
+          eur_price: Number(m.priceEur ?? m.price) || 0,
+          image_url: m.image || (Array.isArray(m.images) && m.images[0]) || null,
+          images: Array.isArray(m.images) ? m.images : (m.image ? [m.image] : []),
+          sizes: Array.isArray(m.sizes) ? m.sizes : [],
+          emoji: m.emoji || null,
+          stock: -1,
+          status: 'active',
+          display_order: i,
+        }));
+        actions.push(`+${rows.length} produits`);
+        if (COMMIT) { const { error } = await supabase.from('products').insert(rows); if (error) actions.push('ERR produits:' + error.message); }
+        productsAdded += rows.length;
+      }
+    }
+
     // ── Infos club (uniquement champs vides) ───────────────────
     const patch = {};
     const map = {
@@ -82,6 +107,6 @@ const COMMIT = process.argv.includes('--commit');
     if (actions.length) { clubsTouched++; console.log(`${tenant.name.padEnd(26)} → ${actions.join(' | ')}`); }
   }
 
-  console.log(`\n${COMMIT ? '✅ APPLIQUÉ' : '🔎 DRY-RUN'} — clubs: ${clubsTouched}, joueurs: ${playersAdded}, trophées: ${trophiesAdded}, infos: ${infosPatched}`);
+  console.log(`\n${COMMIT ? '✅ APPLIQUÉ' : '🔎 DRY-RUN'} — clubs: ${clubsTouched}, joueurs: ${playersAdded}, trophées: ${trophiesAdded}, produits: ${productsAdded}, infos: ${infosPatched}`);
   if (!COMMIT) console.log('→ relance avec --commit pour appliquer.');
 })().catch((e) => { console.error('ERREUR:', e.message); process.exit(1); });
