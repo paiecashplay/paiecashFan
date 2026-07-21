@@ -98,18 +98,33 @@ a tout, le club_admin est **scopé à son `club_id`**.
 - Branches de travail : `feature/integration-marketplace` (principale), branches stagiaires
   mergées après revue.
 
-## 9. TODO
-Voir **`TODO.md`** (sécurité pré-vérif documents, infra email prod, checkout PCC,
-persistance DB panier billetterie, page Fan Club à brancher au back…).
+## 9. TODO — reste à faire (màj 2026-07-21)
+> Le site est **en prod sur `paiecashfan.com`**. Le plus gros est fait. Backlog priorisé ci-dessous.
 
-- ⏳ **Suivi du stock boutique (à faire une fois le site vraiment en prod)** : le
-  checkout boutique **vérifie** la disponibilité à l'achat mais ne **décrémente pas**
-  encore `products.total_sold` après paiement (pour la carte, la confirmation réelle
-  passe par la réconciliation Stripe → décrémenter à la redirection compterait les
-  paniers abandonnés). Prévoir : décrément fiable sur commande confirmée + gestion/
-  affichage du stock **côté BO Super Admin** ET **côté BO Club** (édition du stock,
-  alerte rupture, bascule `sold_out`). Aujourd'hui la majorité des produits sont en
-  `stock: -1` (illimité), sans impact immédiat.
+### 🎁 Gains / lots — Lot C (suite de A+B déjà livrés)
+- **Relances automatiques** (CRON) : rappeler le gagnant qui n'a pas saisi son adresse après X jours (aujourd'hui la relance est **manuelle** depuis le BO). Réutiliser l'infra CRON existante.
+- **Brancher loto & bingo** sur `prize_claims` (la table est déjà générique) : d'abord **clarifier quels lots physiques** ces jeux distribuent (loto = salons gratuits temps réel, bingo = éditions à crédits) avant de câbler leurs événements de gain.
+- Optionnel : champ `prize_type` (physical/digital) sur la campagne tombola → l'admin marque un lot digital (pas d'adresse demandée).
+
+### 🛒 Boutique / stock
+- **Suivi du stock** : le checkout **vérifie** la dispo mais ne **décrémente pas** `products.total_sold` après paiement (pour la carte, décrémenter à la redirection compterait les paniers abandonnés → le faire sur commande **confirmée** via la réconciliation `/checkout/status`). Ajouter la **gestion/édition du stock côté BO Super Admin ET BO Club** (alerte rupture, bascule `sold_out`). Aujourd'hui la plupart des produits sont en `stock: -1` (illimité) → pas d'impact immédiat.
+
+### 💳 Paiement / PaieCashCoin — à vérifier côté partenaire
+- Confirmer que les **deep-links PCC** existent vraiment : `…/login?redirect=/dashboard?tab=wallet` et `…/register?ref=paiecashfan`.
+- Confirmer que PaieCashCoin **whitelist `paiecashfan.com`** pour les callbacks Stripe (les `successUrl` utilisent désormais ce domaine).
+
+### 🔎 SEO / domaine (suite de la mise en prod)
+- **À faire par la cliente (sans code)** : soumettre `sitemap.xml` dans **Google Search Console** ; rafraîchir l'aperçu de partage via le **Facebook Sharing Debugger**.
+- **Sitemap dynamique** : route backend générant le sitemap depuis `tenants` → référencer chaque club/fédération.
+- **Meta par page** (react-helmet) : titres/descriptions spécifiques par club/page.
+- Nettoyage : `public/favicon.svg` (P provisoire) n'est plus référencé → peut être supprimé.
+
+### 🔴 Reporté (hors périmètre, à planifier)
+- **API-Football** : bannière de match live (`LiveMatchBanner` affiche encore un score codé en dur PSG 2-1 Marseille 85').
+- **Streaming vidéo** du Fan Club (le lecteur est un placeholder).
+
+### Historique
+Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Resend, persistance DB panier billetterie…).
 
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
