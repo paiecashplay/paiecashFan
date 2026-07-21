@@ -195,7 +195,24 @@ async function grantGameEntitlements(order) {
 // Règlement commun à la billetterie et à la boutique. Les groupes/total sont
 // déjà validés et recalculés serveur (buildGroups / buildBoutiqueGroups) ; seul
 // le `kind` change (libellé, notes de commande). Répond directement sur `res`.
-async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind }) {
+// Normalise/valide une adresse de livraison. Renvoie l'objet propre ou null si
+// incomplet (nom, adresse, code postal, ville obligatoires).
+function cleanShipping(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const s = {
+    name: String(raw.name || '').trim(),
+    phone: String(raw.phone || '').trim() || null,
+    address1: String(raw.address1 || '').trim(),
+    address2: String(raw.address2 || '').trim() || null,
+    postalCode: String(raw.postalCode || '').trim(),
+    city: String(raw.city || '').trim(),
+    country: String(raw.country || '').trim() || 'France',
+  };
+  if (!s.name || !s.address1 || !s.postalCode || !s.city) return null;
+  return s;
+}
+
+async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shipping = null }) {
   const { email, id: authId } = req.authUser;
 
   // ── Mode PCC intégral : débit immédiat, multi-clubs OK ──────
@@ -228,7 +245,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind }) {
         const order = await ordersDb.createOrder({
           user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
           items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-          notes: JSON.stringify({ kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString() }),
+          notes: JSON.stringify({ kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
         });
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
@@ -254,7 +271,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind }) {
   const order = await ordersDb.createOrder({
     user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
     items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-    notes: JSON.stringify({ kind, mode, pending: true, createdAt: new Date().toISOString() }),
+    notes: JSON.stringify({ kind, mode, pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
   });
 
   // 2. Exécution → Stripe Checkout URL.
@@ -312,7 +329,8 @@ router.post('/ticketing', async (req, res) => {
 });
 
 // POST /api/v2/checkout/boutique
-// Body: { items:[{product_id,quantity,size?}], mode?, origin?, bnplInstallments? }
+// Body: { items:[{product_id,quantity,size?}], mode?, origin?, shipping:{...} }
+// Produits physiques → adresse de livraison OBLIGATOIRE.
 router.post('/boutique', async (req, res) => {
   try {
     if (!pcc.isConfigured()) return fail(res, 'Paiement momentanément indisponible (configuration manquante).', 503);
@@ -320,9 +338,12 @@ router.post('/boutique', async (req, res) => {
     if (!items.length) return fail(res, 'Panier vide.');
     const mode = MODES.includes(req.body?.mode) ? req.body.mode : 'pcc_full';
 
+    const shipping = cleanShipping(req.body?.shipping);
+    if (!shipping) return fail(res, 'Adresse de livraison requise (nom, adresse, code postal et ville).');
+
     const built = await buildBoutiqueGroups(items, res);
     if (!built) return; // buildBoutiqueGroups a déjà répondu
-    return settleCheckout(req, res, { ...built, mode, kind: 'boutique' });
+    return settleCheckout(req, res, { ...built, mode, kind: 'boutique', shipping });
   } catch (err) {
     console.error('[CHECKOUT] Erreur:', err.message);
     return fail(res, `Échec du paiement : ${err.message}`, 500);

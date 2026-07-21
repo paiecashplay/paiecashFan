@@ -8,7 +8,7 @@ import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
   Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio,
-  Layers, CalendarClock, Loader2
+  Layers, CalendarClock, Loader2, MapPin
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -1257,6 +1257,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [payError, setPayError] = useState('');
   const [topUp, setTopUp] = useState(null);        // { message, found } si solde/wallet insuffisant
   const [rechargeOpen, setRechargeOpen] = useState(false);
+  const [shippingOpen, setShippingOpen] = useState(false);  // modale d'adresse de livraison
 
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
@@ -1269,9 +1270,16 @@ function MerchandiseSection({ club, apiProducts = [] }) {
     setOpenProduct(null);
   };
 
-  async function handleCheckout() {
+  // Clic « Passer commande » → on collecte d'abord l'adresse de livraison.
+  function openCheckout() {
     if (!user) { setPayError('Tu dois être connecté pour payer.'); return; }
     if (!cart.length) return;
+    setPayError(''); setTopUp(null);
+    setShippingOpen(true);
+  }
+
+  // Paiement réel (après saisie de l'adresse). shipping = { name, address1, ... }.
+  async function pay(shipping) {
     setPayError(''); setTopUp(null); setStatus('paying');
     try {
       const res = await apiFetch('/api/v2/checkout/boutique', {
@@ -1280,6 +1288,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
           items: cart.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null })),
           mode,
           origin: window.location.origin,
+          shipping,
         }),
       });
       // Modes carte / mixte / BNPL → redirection Stripe (PaieCashCoin).
@@ -1287,13 +1296,15 @@ function MerchandiseSection({ club, apiProducts = [] }) {
       // pcc_full → payé immédiatement.
       await clear();
       setStatus('idle');
+      setShippingOpen(false);
       navigate('/mon-compte');
     } catch (err) {
       const msg = err?.message || 'Paiement impossible pour le moment.';
       if (/insuffisant|wallet|recharge/i.test(msg)) {
         setTopUp({ message: msg, found: err?.data?.found });
+        setShippingOpen(false);   // laisse voir le bandeau de rechargement
       } else {
-        setPayError(msg);
+        setPayError(msg);         // affiché dans la modale d'adresse
       }
       setStatus('idle');
     }
@@ -1426,7 +1437,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             status={status}
             payError={payError}
             topUp={topUp}
-            onCheckout={handleCheckout}
+            onCheckout={openCheckout}
             onRecharge={() => setRechargeOpen(true)}
             isLogged={!!user}
           />
@@ -1439,6 +1450,17 @@ function MerchandiseSection({ club, apiProducts = [] }) {
           found={topUp?.found}
           reason={topUp?.message || 'Ton solde PCC est insuffisant pour ce paiement.'}
           onClose={() => setRechargeOpen(false)}
+        />
+      )}
+
+      {shippingOpen && (
+        <ShippingModal
+          totalPcc={totalPrice}
+          cta={BOUTIQUE_PAY_MODES.find((m) => m.id === mode)?.cta || 'Payer'}
+          paying={status === 'paying'}
+          error={payError}
+          onSubmit={pay}
+          onClose={() => { if (status !== 'paying') setShippingOpen(false); }}
         />
       )}
 
@@ -1464,6 +1486,71 @@ const BOUTIQUE_PAY_MODES = [
   { id: 'pcc_split', label: 'PCC + carte', icon: Layers,        cta: 'Payer (PCC + carte)' },
   { id: 'bnpl',      label: '3× / 4×',     icon: CalendarClock, cta: 'Payer en 3× / 4×' },
 ];
+
+// ── MODALE ADRESSE DE LIVRAISON (checkout boutique) ──────────────────
+// Collecte l'adresse d'envoi avant le paiement (produits physiques).
+function ShippingModal({ totalPcc, cta, paying, error, onSubmit, onClose }) {
+  const [form, setForm] = useState({
+    name: '', phone: '', address1: '', address2: '', postalCode: '', city: '', country: 'France',
+  });
+  const [localError, setLocalError] = useState('');
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  function submit() {
+    setLocalError('');
+    if (!form.name || !form.address1 || !form.postalCode || !form.city) {
+      setLocalError('Nom, adresse, code postal et ville sont obligatoires.'); return;
+    }
+    onSubmit(form);
+  }
+
+  return (
+    <div className="fixed inset-0 z-[80] grid place-items-center bg-black/80 p-4" onClick={onClose}>
+      <motion.div onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="w-full max-w-md rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <MapPin size={18} className="text-emerald-400" />
+            <h3 className="font-display text-lg font-black uppercase text-bone-50">Adresse de livraison</h3>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-bone-400 hover:text-bone-100"><X size={15} /></button>
+        </div>
+        <p className="mt-1.5 text-xs text-bone-400">On t'enverra ta commande à cette adresse.</p>
+
+        <div className="mt-4 space-y-2.5">
+          <ShipField label="Nom complet *" value={form.name} onChange={set('name')} />
+          <ShipField label="Adresse *" value={form.address1} onChange={set('address1')} />
+          <ShipField label="Complément (optionnel)" value={form.address2} onChange={set('address2')} />
+          <div className="grid grid-cols-2 gap-2.5">
+            <ShipField label="Code postal *" value={form.postalCode} onChange={set('postalCode')} />
+            <ShipField label="Ville *" value={form.city} onChange={set('city')} />
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <ShipField label="Pays" value={form.country} onChange={set('country')} />
+            <ShipField label="Téléphone (optionnel)" value={form.phone} onChange={set('phone')} />
+          </div>
+        </div>
+
+        {(localError || error) && <p className="mt-3 text-sm text-rose-300">{localError || error}</p>}
+
+        <button onClick={submit} disabled={paying}
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-ink-900 hover:bg-emerald-300 transition disabled:opacity-60">
+          {paying ? <><Loader2 size={14} className="animate-spin" /> Traitement…</> : <><ShoppingBag size={14} /> {cta} · {formatPCC(totalPcc)} PCC</>}
+        </button>
+      </motion.div>
+    </div>
+  );
+}
+
+function ShipField({ label, value, onChange }) {
+  return (
+    <label className="block">
+      <span className="text-[10px] uppercase tracking-[0.18em] text-bone-400 font-bold">{label}</span>
+      <input value={value} onChange={onChange}
+        className="mt-1 w-full rounded-xl border border-white/10 bg-ink-900/60 px-3 py-2 text-sm text-bone-100 outline-none focus:border-emerald-400/50" />
+    </label>
+  );
+}
 
 // ── CART FOOTER ──────────────────────────────────────────────────────
 // Affichage détaillé du panier : items avec qty/taille/prix unitaire +

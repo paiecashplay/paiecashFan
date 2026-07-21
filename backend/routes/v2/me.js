@@ -54,6 +54,11 @@ router.get('/orders', async (req, res) => {
         totalEur: Number(o.metadata?.total_eur || 0),
         kind: notes?.kind || (items.some((i) => i.offerId) ? 'ticketing' : 'product'),
         reference: notes?.pccReference || null,
+        // Livraison (commandes boutique physiques).
+        shippingStatus: notes?.shippingStatus || null,
+        carrier: notes?.carrier || null,
+        trackingNumber: notes?.trackingNumber || null,
+        trackingUrl: notes?.trackingUrl || null,
       };
     });
 

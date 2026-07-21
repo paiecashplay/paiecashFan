@@ -196,10 +196,18 @@ function TabBtn({ active, onClick, icon, children }) {
   );
 }
 
+const SHIP_FAN = {
+  preparing: { l: 'En préparation', c: 'text-sky-300 border-sky-400/30 bg-sky-400/10' },
+  shipped:   { l: 'Expédié',        c: 'text-emerald-300 border-emerald-400/30 bg-emerald-400/10' },
+  delivered: { l: 'Livré',          c: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10' },
+  cancelled: { l: 'Annulé',         c: 'text-bone-400 border-white/10 bg-white/5' },
+};
+
 function OrderCard({ order, onViewTicket }) {
   const Icon = order.kind === 'ticketing' ? Ticket : ShoppingBag;
   const st = STATUS_LABEL[order.status] || { label: order.status, cls: 'text-bone-400 bg-white/5 border-white/10' };
   const isTicket = order.kind === 'ticketing' && order.status === 'completed';
+  const ship = order.shippingStatus ? SHIP_FAN[order.shippingStatus] : null;
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -246,6 +254,19 @@ function OrderCard({ order, onViewTicket }) {
             </button>
           )}
         </div>
+
+        {/* Livraison (commandes boutique) */}
+        {ship && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-black uppercase tracking-wider ${ship.c}`}>{ship.l}</span>
+            {order.shippingStatus === 'shipped' && order.trackingNumber && (
+              <span className="text-bone-400">
+                Suivi{order.carrier ? ` (${order.carrier})` : ''} : <span className="font-mono text-bone-200">{order.trackingNumber}</span>
+                {order.trackingUrl && <a href={order.trackingUrl} target="_blank" rel="noopener noreferrer" className="ml-1.5 inline-flex items-center gap-0.5 text-emerald-400 hover:text-emerald-300">Suivre <ExternalLink size={10} /></a>}
+              </span>
+            )}
+          </div>
+        )}
       </GlassCard>
     </motion.div>
   );

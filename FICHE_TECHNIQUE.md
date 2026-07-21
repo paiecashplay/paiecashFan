@@ -128,6 +128,18 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bn)** — **Livraison boutique : adresse à la commande + expédition BO**.
+  (1) **Checkout** : adresse de livraison **obligatoire** (produits physiques) —
+  modale au clic « Passer commande » (`ShippingModal`), envoyée à
+  `/checkout/boutique` (`shipping` validé serveur, stocké dans `orders.metadata`).
+  (2) **Fan** : statut de livraison (En préparation → Expédié + n° de suivi →
+  Livré) dans « Billets & commandes » (`/me/orders` enrichi). (3) **BO Super
+  Admin** : page **Commandes** — chaque commande boutique s'ouvre sur l'adresse +
+  saisie transporteur/n° de suivi + boutons expédié/livré (`PATCH /admin/orders/
+  :id/fulfillment`, `requireRole('super_admin')`, notifie l'acheteur). Aucune
+  migration (livraison dans `metadata.notes`). Note : la route `GET /admin/orders`
+  préexistante n'a pas de garde d'auth explicite (à sécuriser plus tard) ; le
+  nouveau PATCH est protégé.
 - **2026-07-21 (bm)** — **Fix : ajout au panier boutique cassé (erreur 400)**. Le hook
   `useCart` écrivait **en direct dans Supabase** (`orders`/`order_items`) depuis le
   navigateur → violait la règle d'archi (front → backend uniquement) et échouait

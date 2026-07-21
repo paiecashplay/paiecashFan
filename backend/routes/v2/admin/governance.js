@@ -6,10 +6,13 @@ const express = require('express');
 const db = require('../../../database');
 const sharedDb = require('../../../services/shared-db');
 const treasuryService = require('../../../services/treasury-service');
+const { requireAuth, requireRole } = require('../../../middleware/auth');
+const notifications = require('../../../db/notifications');
 const router = express.Router();
 
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: null, error: msg });
+const parseNotes = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || {}); } catch { return {}; } };
 
 // POST /api/v2/admin/governance/contests - create a new contest
 router.post('/contests', async (req, res) => {
@@ -199,10 +202,8 @@ router.get('/orders', async (req, res) => {
     const tenantMap  = Object.fromEntries((tenantsRes.data  || []).map(t => [t.id, t]));
     const profileMap = Object.fromEntries((profilesRes.data || []).map(p => [p.id, p]));
 
-    const safeParse = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || null); } catch { return null; } };
-
     const rows = (orders || []).map(o => {
-      const notes = safeParse(o.metadata?.notes);
+      const notes = parseNotes(o.metadata?.notes);
       return {
         id: o.id,
         createdAt: o.created_at,
@@ -213,14 +214,66 @@ router.get('/orders', async (req, res) => {
         totalPcc: Number(o.total_pcc || 0),
         totalEur: Number(o.metadata?.total_eur || 0),
         items: o.metadata?.items || [],
-        kind: notes?.kind || (Array.isArray(o.metadata?.items) && o.metadata.items.some(i => i.offerId) ? 'ticketing' : 'product'),
-        reference: notes?.pccReference || null,
+        kind: notes.kind || (Array.isArray(o.metadata?.items) && o.metadata.items.some(i => i.offerId) ? 'ticketing' : 'product'),
+        reference: notes.pccReference || null,
+        // Livraison (commandes boutique physiques).
+        shipping: notes.shipping || null,
+        shippingStatus: notes.shippingStatus || null,
+        carrier: notes.carrier || null,
+        trackingNumber: notes.trackingNumber || null,
+        trackingUrl: notes.trackingUrl || null,
       };
     });
 
     return ok(res, { orders: rows, total: count ?? 0, page, limit });
   } catch (err) {
     return fail(res, 'Orders fetch failed: ' + err.message, 500);
+  }
+});
+
+// PATCH /api/v2/admin/orders/:id/fulfillment — expédition d'une commande boutique.
+// Body: { status?, carrier?, trackingNumber?, trackingUrl? }. Notifie l'acheteur.
+router.patch('/orders/:id/fulfillment', requireAuth, requireRole('super_admin'), async (req, res) => {
+  try {
+    const supabase = require('../../../db/supabase');
+    const { data: order } = await supabase.from('orders').select('*').eq('id', req.params.id).maybeSingle();
+    if (!order) return fail(res, 'Commande introuvable.', 404);
+
+    const notes = parseNotes(order.metadata?.notes);
+    if (!notes.shipping) return fail(res, "Cette commande n'a pas d'adresse de livraison.", 400);
+
+    const { status, carrier, trackingNumber, trackingUrl } = req.body || {};
+    const VALID = ['preparing', 'shipped', 'delivered', 'cancelled'];
+    if (status !== undefined && !VALID.includes(status)) return fail(res, 'Statut invalide.');
+
+    const next = { ...notes };
+    if (status !== undefined) next.shippingStatus = status;
+    if (carrier !== undefined) next.carrier = carrier || null;
+    if (trackingNumber !== undefined) next.trackingNumber = trackingNumber || null;
+    if (trackingUrl !== undefined) next.trackingUrl = trackingUrl || null;
+    if (status === 'shipped' && !next.shippedAt) next.shippedAt = new Date().toISOString();
+    if (status === 'delivered' && !next.deliveredAt) next.deliveredAt = new Date().toISOString();
+
+    const metadata = { ...(order.metadata || {}), notes: JSON.stringify(next) };
+    await supabase.from('orders').update({ metadata }).eq('id', order.id);
+
+    // Notifie l'acheteur aux étapes clés.
+    if (status === 'shipped') {
+      await notifications.createNotification({
+        user_id: order.user_id, type: 'prize_shipped', title: '🚚 Ta commande est expédiée !',
+        message: `Ta commande boutique a été expédiée${carrier ? ` via ${carrier}` : ''}${trackingNumber ? ` — suivi : ${trackingNumber}` : ''}.`,
+        metadata: { link: '/mon-compte' },
+      }).catch(() => {});
+    } else if (status === 'delivered') {
+      await notifications.createNotification({
+        user_id: order.user_id, type: 'prize_delivered', title: '✅ Commande livrée',
+        message: 'Ta commande boutique a été marquée comme livrée. Profite bien ! 🎉',
+        metadata: { link: '/mon-compte' },
+      }).catch(() => {});
+    }
+    return ok(res, { ok: true });
+  } catch (err) {
+    return fail(res, 'Mise à jour impossible : ' + err.message, 500);
   }
 });
 
