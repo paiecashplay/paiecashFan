@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, Settings, User, X, ChevronDown, Search, Lock, Building2 } from 'lucide-react';
+import { LogOut, Menu, Settings, User, X, ChevronDown, Search, Lock, Building2, ShoppingBag } from 'lucide-react';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/cn';
 import { NotificationBell } from './NotificationBell';
 import { NavbarSearch } from './NavbarSearch';
@@ -88,6 +89,7 @@ export function Navbar() {
           <IconButton aria-label="Recherche" className="inline-flex" onClick={() => setSearchOpen(true)}>
             <Search size={16} />
           </IconButton>
+          <CartButton />
           <NotificationBell />
 
           {/* Bouton auth contextuel */}
@@ -349,6 +351,34 @@ function MobileAuthButtons({ onClose }) {
         S'inscrire
       </Button>
     </div>
+  );
+}
+
+// Panier boutique dans la navbar — visible dès qu'il y a des articles.
+// Sur la page du club : défile vers la boutique ; ailleurs : y navigue.
+function CartButton() {
+  const cart = useCart();
+  const navigate = useNavigate();
+  if (!cart?.totalItems || !cart.club) return null;
+
+  const onClick = () => {
+    const el = document.getElementById('merchandise');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else navigate(`/clubs/${cart.club.slug}`);
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      aria-label="Mon panier"
+      title={`Panier — ${cart.totalItems} article${cart.totalItems > 1 ? 's' : ''}`}
+      className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-bone-200 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors"
+    >
+      <ShoppingBag size={16} />
+      <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-emerald-400 px-1 text-[9px] font-black text-ink-900 shadow-glow-emerald">
+        {cart.totalItems > 9 ? '9+' : cart.totalItems}
+      </span>
+    </button>
   );
 }
 

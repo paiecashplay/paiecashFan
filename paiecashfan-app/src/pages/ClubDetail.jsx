@@ -22,7 +22,7 @@ import { useFanFeed } from '@/hooks/useFanFeed';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { FavoriteClubButton } from '@/components/club/FavoriteClubButton';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/context/CartContext';
 import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
@@ -1246,7 +1246,12 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [openProduct, setOpenProduct] = useState(null);
 
   // Panier persisté (Supabase) si connecté + club en base, sinon local.
-  const { items: cart, addItem, updateQty, removeItem, clear, totalItems, totalPrice, persisted } = useCart(club.id);
+  const { items: cart, addItem, updateQty, removeItem, clear, totalItems, totalPrice, setCartClub } = useCart();
+
+  // Rattache le panier global à CE club (change de club → nouveau panier).
+  useEffect(() => {
+    if (club?.slug) setCartClub({ slug: club.slug, name: club.name, primaryColor: club.primaryColor });
+  }, [club?.slug, club?.name, club?.primaryColor, setCartClub]);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -1258,6 +1263,8 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [topUp, setTopUp] = useState(null);        // { message, found } si solde/wallet insuffisant
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [shippingOpen, setShippingOpen] = useState(false);  // modale d'adresse de livraison
+  const cartRef = useRef(null);   // ancre pour défiler vers le panier
+  const scrollToCart = () => cartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   const filtered = useMemo(
     () => (activeCat === 'all' ? products : products.filter((p) => p.category === activeCat)),
@@ -1330,8 +1337,14 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             </p>
           </div>
 
-          {/* Compteur panier */}
-          <div className="flex items-center gap-3">
+          {/* Compteur panier — cliquable : défile jusqu'au panier / commande */}
+          <button
+            type="button"
+            onClick={scrollToCart}
+            disabled={totalItems === 0}
+            title={totalItems > 0 ? 'Voir mon panier' : 'Ton panier est vide'}
+            className="flex items-center gap-3 rounded-2xl p-1.5 transition hover:bg-white/[0.04] disabled:cursor-default disabled:opacity-70"
+          >
             <div className="text-right">
               <div className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-bold">
                 Panier
@@ -1361,7 +1374,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
                 </span>
               )}
             </div>
-          </div>
+          </button>
         </header>
 
         {/* Tabs catégories */}
@@ -1423,13 +1436,13 @@ function MerchandiseSection({ club, apiProducts = [] }) {
 
         {/* Détail du panier */}
         {cart.length > 0 && (
+          <div ref={cartRef} className="scroll-mt-24">
           <CartFooter
             cart={cart}
             products={products}
             totalPrice={totalPrice}
             totalItems={totalItems}
             primaryColor={club.primaryColor}
-            persisted={persisted}
             onRemove={(itemId) => removeItem(itemId)}
             onQtyChange={(itemId, qty) => updateQty(itemId, qty)}
             mode={mode}
@@ -1441,6 +1454,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             onRecharge={() => setRechargeOpen(true)}
             isLogged={!!user}
           />
+          </div>
         )}
       </Container>
 

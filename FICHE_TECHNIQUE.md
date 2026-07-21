@@ -128,6 +128,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-22 (bp)** — **Panier boutique dans la navbar (état global)**. Le panier
+  était local à la page boutique + son compteur n'était pas cliquable → invisible/
+  bloquant. Passé en **contexte global `CartContext`** (session, en mémoire, rattaché
+  à UN club — changer de club repart d'un panier vide). Nouveau **bouton panier dans
+  la navbar** (visible dès qu'il y a des articles, badge + lien : défile vers la
+  boutique si on y est, sinon y navigue). Le compteur en tête de boutique est aussi
+  rendu **cliquable** (défile vers le panier). Ancien `hooks/useCart.js` (qui
+  écrivait en direct dans Supabase) supprimé.
 - **2026-07-22 (bo)** — **🔒 Fix sécurité : routes `/admin` (governance) exposées sans
   auth**. `routes/v2/admin/governance.js` n'avait **aucune garde** au niveau routeur
   → `GET /admin/orders`, `/users`, `/wallets`, `/transactions`, `/treasury`,

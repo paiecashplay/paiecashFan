@@ -1,5 +1,6 @@
 import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
+import { CartProvider } from '@/context/CartContext';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ScrollTopButton } from './components/ScrollTopButton';
 import { Navbar } from './components/Navbar';
@@ -45,6 +46,7 @@ import { IdleLogout } from './components/IdleLogout';
 export default function App() {
   return (
     <AuthProvider>
+     <CartProvider>
       {/* Gestion de la déconnexion automatique après inactivité */}
        <IdleLogout />
       {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}
@@ -149,6 +151,7 @@ export default function App() {
           }
         />
       </Routes>
+     </CartProvider>
     </AuthProvider>
   );
 }
