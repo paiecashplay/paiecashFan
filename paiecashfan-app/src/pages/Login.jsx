@@ -122,9 +122,7 @@ export function Login() {
         <div className="rounded-2xl border border-white/10 bg-ink-800/60 backdrop-blur-xl p-8">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-hero shadow-glow-emerald grid place-items-center">
-              <span className="font-display font-black text-xl text-white">P</span>
-            </div>
+            <img src="/paiecashfan-logo.webp" alt="PaieCashFan" className="h-14 w-14 rounded-2xl shadow-glow-emerald" />
           </div>
 
           {/* Titre */}

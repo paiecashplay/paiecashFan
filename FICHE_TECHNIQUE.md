@@ -132,6 +132,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-22 (bs)** — **Parcours panier e-commerce (page `/panier` + toast, fin du
+  dropdown)**. Suppression du mini-panier flottant (redondant). Désormais : ajout →
+  **toast discret** (`CartToast`, haut-droite desktop / bas mobile, auto-close 2.8s,
+  `role=status`, actions Voir le panier / Continuer) + **badge animé** (scale, nb
+  d'unités). Clic sur l'icône panier → **navigation directe `/panier`** (nouvelle
+  **`CartPage`** : liste, quantités, suppression, code promo (UI), récap, sous-total,
+  livraison, total PCC/€, réassurance, solde PCC, « Passer commande » → CheckoutModal).
+  `CartContext` : retrait de l'état popup (`open/openCart/...`), ajout `lastAdded`.
+  Le bouton « Passer commande » n'existe plus que sur `/panier` / le checkout.
+  Logo du **login** : « P » remplacé par le vrai logo.
 - **2026-07-22 (br)** — **Checkout Modal premium (assistant 3 étapes)**. Remplace la
   petite popup de paiement par un **grand modal centré** (1100px / 85vh, plein écran
   mobile, fond `#090b10`, radius 28px, backdrop blur, scroll-lock, animations) —

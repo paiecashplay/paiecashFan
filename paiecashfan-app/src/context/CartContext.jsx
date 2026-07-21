@@ -17,8 +17,8 @@ let seq = 1;
 export function CartProvider({ children }) {
   const [club, setClub] = useState(null);   // { slug, name, primaryColor }
   const [items, setItems] = useState([]);
-  const [open, setOpen] = useState(false);          // popup mini-panier
   const [checkoutOpen, setCheckoutOpen] = useState(false);  // grand modal de checkout
+  const [lastAdded, setLastAdded] = useState(null);         // dernier article ajouté (toast)
   const clubRef = useRef(null);
 
   // La boutique déclare son club. Changement de club → nouveau panier.
@@ -32,6 +32,8 @@ export function CartProvider({ children }) {
   // item d'ajout : { productId, name, image, size, qty, unitPrice, unitPriceEur }
   const addItem = useCallback((it) => {
     const { productId, name = '', image = null, size = null, qty = 1, unitPrice = 0, unitPriceEur = 0 } = it || {};
+    // Déclenche le toast « article ajouté » (clé unique pour rejouer l'anim).
+    setLastAdded({ name, image, size: size || null, qty, key: `${productId}-${size || ''}-${seq}` });
     setItems((prev) => {
       const idx = prev.findIndex((i) => sameLine(i, productId, size));
       if (idx >= 0) {
@@ -62,20 +64,16 @@ export function CartProvider({ children }) {
   const totalPrice = items.reduce((s, i) => s + Number(i.total_pcc || 0), 0);
   const totalEur = items.reduce((s, i) => s + Number(i.total_eur || 0), 0);
 
-  const openCart = useCallback(() => setOpen(true), []);
-  const closeCart = useCallback(() => setOpen(false), []);
-  const toggleCart = useCallback(() => setOpen((v) => !v), []);
-
-  // Ouvre le grand modal de checkout (et ferme la mini-popup).
-  const openCheckout = useCallback(() => { setOpen(false); setCheckoutOpen(true); }, []);
+  const openCheckout = useCallback(() => setCheckoutOpen(true), []);
   const closeCheckout = useCallback(() => setCheckoutOpen(false), []);
+  const clearLastAdded = useCallback(() => setLastAdded(null), []);
 
   return (
     <CartContext.Provider value={{
       club, items, setCartClub, addItem, updateQty, removeItem, clear,
       totalItems, totalPrice, totalEur,
-      open, openCart, closeCart, toggleCart,
       checkoutOpen, openCheckout, closeCheckout,
+      lastAdded, clearLastAdded,
     }}>
       {children}
     </CartContext.Provider>

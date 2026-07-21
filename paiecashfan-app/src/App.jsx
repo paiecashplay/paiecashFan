@@ -2,6 +2,8 @@ import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { CheckoutModal } from '@/components/cart/CheckoutModal';
+import { CartToast } from '@/components/cart/CartToast';
+import { CartPage } from './pages/CartPage';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ScrollTopButton } from './components/ScrollTopButton';
 import { Navbar } from './components/Navbar';
@@ -48,8 +50,9 @@ export default function App() {
   return (
     <AuthProvider>
      <CartProvider>
-      {/* Modal de checkout premium (global, ouvert depuis le panier) */}
+      {/* Modal de checkout premium + toast d'ajout (globaux) */}
       <CheckoutModal />
+      <CartToast />
       {/* Gestion de la déconnexion automatique après inactivité */}
        <IdleLogout />
       {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}
@@ -92,6 +95,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/boutique" element={<Boutique />} />
+                  <Route path="/panier" element={<CartPage />} />
                   <Route path="/tombola" element={<Tombola />} />
                   <Route path="/fan-club" element={<FanClubHub />} />
                   <Route path="/federations/:fedId" element={<FederationDetail />} />

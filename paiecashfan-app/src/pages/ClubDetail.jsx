@@ -1245,8 +1245,10 @@ function MerchandiseSection({ club, apiProducts = [] }) {
   const [activeCat, setActiveCat] = useState('all');
   const [openProduct, setOpenProduct] = useState(null);
 
-  // Panier boutique GLOBAL (contexte). Le checkout se fait dans la popup navbar.
-  const { items: cart, addItem, updateQty, removeItem, totalItems, totalPrice, setCartClub, openCart } = useCart();
+  // Panier boutique GLOBAL (contexte). L'ajout déclenche un toast ; le panier
+  // et le checkout vivent sur la page /panier.
+  const { items: cart, addItem, totalItems, setCartClub } = useCart();
+  const navigate = useNavigate();
 
   // Rattache le panier global à CE club (change de club → nouveau panier).
   useEffect(() => {
@@ -1268,7 +1270,7 @@ function MerchandiseSection({ club, apiProducts = [] }) {
       unitPriceEur: p ? getProductEuroPrice(p) : (item.unitPrice || 0),
     });
     setOpenProduct(null);
-    openCart();
+    // Le toast d'ajout (global) confirme l'action ; pas de popup.
   };
 
   return (
@@ -1291,10 +1293,10 @@ function MerchandiseSection({ club, apiProducts = [] }) {
             </p>
           </div>
 
-          {/* Compteur panier — ouvre la popup mini-panier */}
+          {/* Compteur panier — vers la page /panier */}
           <button
             type="button"
-            onClick={openCart}
+            onClick={() => navigate('/panier')}
             disabled={totalItems === 0}
             title={totalItems > 0 ? 'Voir mon panier' : 'Ton panier est vide'}
             className="flex items-center gap-3 rounded-2xl p-1.5 transition hover:bg-white/[0.04] disabled:cursor-default disabled:opacity-70"
