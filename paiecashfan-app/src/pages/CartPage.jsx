@@ -135,10 +135,13 @@ export function CartPage() {
 
             {/* Solde PCC */}
             {user && balance != null && (
-              <div className="mt-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.05] p-5">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-black">Mon solde PaieCashCoin</p>
-                <p className="mt-1 font-display text-2xl font-black text-emerald-400 tabular-nums">{fmt(balance)} PCC</p>
-                <p className="text-xs text-bone-500">≈ {fmt(balance)} €</p>
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.05] p-5">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-bone-400 font-black">Mon solde PaieCashCoin</p>
+                  <p className="mt-1 font-display text-2xl font-black text-emerald-400 tabular-nums">{fmt(balance)} PCC</p>
+                  <p className="text-xs text-bone-500">≈ {fmt(balance)} €</p>
+                </div>
+                <img src="/paiecashfan-logo.webp" alt="PaieCashFan" className="h-14 w-14 shrink-0 rounded-2xl shadow-glow-emerald" />
               </div>
             )}
           </aside>
