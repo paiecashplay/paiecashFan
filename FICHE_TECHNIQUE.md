@@ -128,6 +128,15 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bk)** — **Notifications BO réelles + rattrapage des gains**.
+  (1) La cloche du BO super admin était **codée en dur** (pastille statique) →
+  remplacée par le composant réel `NotificationBell` (lit `/me/notifications`).
+  (2) Helpers `notifyAdmins` / `notifyClubStaff` (db/notifications.js) : au **tirage**
+  d'une tombola, le BO concerné (club + super admin) reçoit « Tombola tirée — lot à
+  préparer » (lien Gains & lots). (3) **Backfill** : les 2 tombolas tirées AVANT le
+  Lot A n'avaient pas de `prize_claim` (d'où « Gains & lots » vide) → rattrapées
+  (idempotent). Reste (Lot C) : relances **automatiques** (CRON) des gagnants sans
+  adresse.
 - **2026-07-21 (bj)** — **Fix : le chat gonflait la page (salons chargés, ex PSG)**.
   Cause : mon `lg:h-full lg:max-h-none` (commit ax) sur le chat retirait le plafond
   et liait sa hauteur à la ligne auto de la grille → avec beaucoup de messages, le

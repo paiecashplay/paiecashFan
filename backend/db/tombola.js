@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('./supabase');
-const { createNotification } = require('./notifications');
+const { createNotification, notifyClubStaff } = require('./notifications');
 const prizeClaims = require('./prizeClaims');
 const favorites = require('./favorites');
 
@@ -186,6 +186,14 @@ async function drawWinner(campaignId) {
     user_id: pick.user_id, type: 'tombola_win', title: `🎉 Tu as gagné : ${lot} !`,
     message: `Félicitations ! Ton ticket a été tiré au sort pour « ${lot} ». Renseigne ton adresse dans « Mes gains » pour recevoir ton lot.`,
     metadata: { campaignId, link: '/mon-compte?tab=prizes' },
+  }).catch(() => {});
+
+  // Notifie le BO concerné (club + super admin) : un lot est à préparer/expédier.
+  await notifyClubStaff(raw.tenant_id || null, {
+    type: 'admin_tombola_drawn',
+    title: `🎁 Tombola tirée : ${lot}`,
+    message: `Le tirage est fait. Prépare la remise du lot dans « Gains & lots ».`,
+    metadata: { campaignId, link: raw.tenant_id ? '/mon-club/bo' : '/admin/prizes' },
   }).catch(() => {});
 
   return { drawn: true, winnerUserId: pick.user_id, ticketId: pick.id };

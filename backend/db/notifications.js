@@ -38,4 +38,31 @@ async function markAllAsRead(userId) {
   if (error) throw new Error(`markAllAsRead: ${error.message}`);
 }
 
-module.exports = { createNotification, getNotificationsByUser, markAsRead, markAllAsRead };
+// Ids des utilisateurs d'un rôle (optionnellement scopés à un club).
+async function listUserIdsByRole(role, clubId = null) {
+  let q = supabase.from('profiles').select('id').eq('role', role);
+  if (clubId) q = q.eq('club_id', clubId);
+  const { data } = await q;
+  return (data || []).map((p) => p.id);
+}
+
+// Notifie tous les super_admins (événement plateforme).
+async function notifyAdmins(payload) {
+  const ids = await listUserIdsByRole('super_admin');
+  await Promise.all(ids.map((id) => createNotification({ ...payload, user_id: id }).catch(() => {})));
+  return ids.length;
+}
+
+// Notifie l'équipe concernée par un club : ses club_admins + tous les super_admins.
+// tenantId null → uniquement les super_admins.
+async function notifyClubStaff(tenantId, payload) {
+  const [clubIds, adminIds] = await Promise.all([
+    tenantId ? listUserIdsByRole('club_admin', tenantId) : Promise.resolve([]),
+    listUserIdsByRole('super_admin'),
+  ]);
+  const ids = [...new Set([...clubIds, ...adminIds])];
+  await Promise.all(ids.map((id) => createNotification({ ...payload, user_id: id }).catch(() => {})));
+  return ids.length;
+}
+
+module.exports = { createNotification, getNotificationsByUser, markAsRead, markAllAsRead, notifyAdmins, notifyClubStaff };

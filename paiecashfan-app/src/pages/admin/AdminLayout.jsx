@@ -2,10 +2,11 @@ import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Users, Shield, ShoppingBag,
-  Trophy, LogOut, ChevronRight, Bell, Settings, ArrowLeft, Globe, FileCheck, Receipt, Gift, Grid3x3, ShieldAlert, PackageCheck
+  Trophy, LogOut, ChevronRight, Settings, ArrowLeft, Globe, FileCheck, Receipt, Gift, Grid3x3, ShieldAlert, PackageCheck
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/cn';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const sideNav = [
   { to: '/admin',            label: 'Vue d\'ensemble', icon: LayoutDashboard, end: true },
@@ -109,10 +110,7 @@ export function AdminLayout() {
             >
               <ArrowLeft size={13} /> Voir le site
             </Link>
-            <button className="relative grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-bone-300 hover:text-bone-50">
-              <Bell size={15} />
-              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-red-400" />
-            </button>
+            <NotificationBell />
           </div>
         </header>
 

@@ -8,6 +8,10 @@ import { apiFetch } from '@/lib/api';
 const ICONS = {
   bingo_result: Grid3x3,
   tombola_win: Gift,
+  admin_tombola_drawn: Gift,
+  prize_reminder: Gift,
+  prize_shipped: Gift,
+  prize_delivered: CheckCheck,
   match_reply: MessageCircle,
   message: MessageCircle,
   chat_blocked: ShieldAlert,
