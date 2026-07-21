@@ -195,12 +195,21 @@ async function grantGameEntitlements(order) {
 // Règlement commun à la billetterie et à la boutique. Les groupes/total sont
 // déjà validés et recalculés serveur (buildGroups / buildBoutiqueGroups) ; seul
 // le `kind` change (libellé, notes de commande). Répond directement sur `res`.
+// Frais de port (PCC = EUR 1:1). Décidés SERVEUR (jamais depuis le client).
+const SHIPPING_FEES_EUR = { standard: 0, express: 12 };
+
 // Normalise/valide une adresse de livraison. Renvoie l'objet propre ou null si
 // incomplet (nom, adresse, code postal, ville obligatoires).
 function cleanShipping(raw) {
   if (!raw || typeof raw !== 'object') return null;
+  const firstName = String(raw.firstName || '').trim();
+  const lastName = String(raw.lastName || '').trim();
+  const name = String(raw.name || `${firstName} ${lastName}`).trim();
   const s = {
-    name: String(raw.name || '').trim(),
+    firstName: firstName || null,
+    lastName: lastName || null,
+    name,
+    email: String(raw.email || '').trim() || null,
     phone: String(raw.phone || '').trim() || null,
     address1: String(raw.address1 || '').trim(),
     address2: String(raw.address2 || '').trim() || null,
@@ -341,9 +350,21 @@ router.post('/boutique', async (req, res) => {
     const shipping = cleanShipping(req.body?.shipping);
     if (!shipping) return fail(res, 'Adresse de livraison requise (nom, adresse, code postal et ville).');
 
+    // Mode + frais de livraison décidés serveur.
+    const shippingMethod = req.body?.shippingMethod === 'express' ? 'express' : 'standard';
+    const shippingFeeEur = SHIPPING_FEES_EUR[shippingMethod] || 0;
+
     const built = await buildBoutiqueGroups(items, res);
     if (!built) return; // buildBoutiqueGroups a déjà répondu
-    return settleCheckout(req, res, { ...built, mode, kind: 'boutique', shipping });
+
+    // Ajoute les frais de port (boutique = un seul club → un seul groupe).
+    if (shippingFeeEur > 0 && built.groups.length) {
+      built.groups[0].totalEur = round2(built.groups[0].totalEur + shippingFeeEur);
+      built.groups[0].totalPcc = round2(built.groups[0].totalPcc + shippingFeeEur);
+      built.grandTotalEur = round2(built.grandTotalEur + shippingFeeEur);
+    }
+    const shippingFull = { ...shipping, method: shippingMethod, feeEur: shippingFeeEur };
+    return settleCheckout(req, res, { ...built, mode, kind: 'boutique', shipping: shippingFull });
   } catch (err) {
     console.error('[CHECKOUT] Erreur:', err.message);
     return fail(res, `Échec du paiement : ${err.message}`, 500);

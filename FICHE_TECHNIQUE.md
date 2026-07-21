@@ -132,6 +132,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-22 (br)** — **Checkout Modal premium (assistant 3 étapes)**. Remplace la
+  petite popup de paiement par un **grand modal centré** (1100px / 85vh, plein écran
+  mobile, fond `#090b10`, radius 28px, backdrop blur, scroll-lock, animations) —
+  `components/cart/CheckoutModal.jsx`. **Assistant 3 étapes** avec barre de
+  progression (① Livraison ② Paiement ③ Confirmation), 2 colonnes (formulaire 65% :
+  infos perso + adresse + mode de livraison ; récap sticky 35%). **Mode de
+  livraison** Standard (gratuit) / Express (**+12 PCC, frais calculés SERVEUR**).
+  Paiement PCC / Carte (PayPal affiché « bientôt »). Ouvert depuis le mini-panier
+  (« Passer commande »). Backend : `cleanShipping` accepte firstName/lastName/email ;
+  `shippingMethod` → frais serveur ajoutés au total (`SHIPPING_FEES_EUR`). CartMenu
+  simplifié en aperçu. Aucune migration.
 - **2026-07-22 (bq)** — **Mini-panier en popup + fix « produit indisponible »**.
   (1) **Popup panier** : tout le checkout (articles, mode, adresse, paiement) passe
   dans une **popup ancrée à l'icône navbar** (`components/cart/CartMenu.jsx`),

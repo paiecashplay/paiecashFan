@@ -1,6 +1,7 @@
 import { Routes, Route} from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { CheckoutModal } from '@/components/cart/CheckoutModal';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ScrollTopButton } from './components/ScrollTopButton';
 import { Navbar } from './components/Navbar';
@@ -47,6 +48,8 @@ export default function App() {
   return (
     <AuthProvider>
      <CartProvider>
+      {/* Modal de checkout premium (global, ouvert depuis le panier) */}
+      <CheckoutModal />
       {/* Gestion de la déconnexion automatique après inactivité */}
        <IdleLogout />
       {/* Remonte en haut à chaque navigation (clic sur une card, etc.) */}

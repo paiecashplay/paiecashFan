@@ -17,7 +17,8 @@ let seq = 1;
 export function CartProvider({ children }) {
   const [club, setClub] = useState(null);   // { slug, name, primaryColor }
   const [items, setItems] = useState([]);
-  const [open, setOpen] = useState(false);  // popup mini-panier
+  const [open, setOpen] = useState(false);          // popup mini-panier
+  const [checkoutOpen, setCheckoutOpen] = useState(false);  // grand modal de checkout
   const clubRef = useRef(null);
 
   // La boutique déclare son club. Changement de club → nouveau panier.
@@ -65,11 +66,16 @@ export function CartProvider({ children }) {
   const closeCart = useCallback(() => setOpen(false), []);
   const toggleCart = useCallback(() => setOpen((v) => !v), []);
 
+  // Ouvre le grand modal de checkout (et ferme la mini-popup).
+  const openCheckout = useCallback(() => { setOpen(false); setCheckoutOpen(true); }, []);
+  const closeCheckout = useCallback(() => setCheckoutOpen(false), []);
+
   return (
     <CartContext.Provider value={{
       club, items, setCartClub, addItem, updateQty, removeItem, clear,
       totalItems, totalPrice, totalEur,
       open, openCart, closeCart, toggleCart,
+      checkoutOpen, openCheckout, closeCheckout,
     }}>
       {children}
     </CartContext.Provider>
