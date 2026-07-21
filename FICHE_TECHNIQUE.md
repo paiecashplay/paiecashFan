@@ -128,6 +128,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bj)** — **Fix : le chat gonflait la page (salons chargés, ex PSG)**.
+  Cause : mon `lg:h-full lg:max-h-none` (commit ax) sur le chat retirait le plafond
+  et liait sa hauteur à la ligne auto de la grille → avec beaucoup de messages, le
+  contenu dictait la hauteur et étirait aussi la vidéo. Fix : la grille
+  streaming+chat a désormais une **hauteur définie** sur desktop
+  (`lg:h-[68vh] max-h-[680px]` + `grid-template-rows:1fr`), la vidéo **remplit**
+  (`StreamPlayer` `lg:h-full` au lieu d'`aspect-video`), donc vidéo et chat ont la
+  même hauteur bornée et le chat **scrolle** au lieu de gonfler.
 - **2026-07-21 (bi)** — **Match live (API-Football) + streaming vidéo Fan Club**.
   (1) **Bannière match réelle** : `apiFootball.getMatchForTeam` (live > prochain >
   dernier, via `metadata.api_football_id`) + cache mémoire (live 30 s / autre 1 h)

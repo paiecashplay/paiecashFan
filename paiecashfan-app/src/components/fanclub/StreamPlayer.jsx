@@ -20,7 +20,7 @@ export function StreamPlayer({ isLive, provider, id }) {
 
   if (!src) {
     return (
-      <div className="grid aspect-video place-items-center bg-ink-950 text-sm text-bone-500">
+      <div className="grid aspect-video place-items-center bg-ink-950 text-sm text-bone-500 lg:aspect-auto lg:h-full">
         <div className="text-center">
           <Video size={30} className="mx-auto mb-2 text-bone-700" />
           Aucun live en cours pour le moment.
@@ -30,7 +30,7 @@ export function StreamPlayer({ isLive, provider, id }) {
   }
 
   return (
-    <div className="aspect-video bg-black">
+    <div className="aspect-video bg-black lg:aspect-auto lg:h-full">
       <iframe
         src={src}
         title="Live officiel du club"

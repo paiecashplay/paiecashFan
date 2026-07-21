@@ -314,8 +314,8 @@ export function FanClub() {
         {/* Streaming à GAUCHE + chat à DROITE dès `lg` (1024 px). Avant, le
             côte-à-côte n'arrivait qu'à `xl` (1280 px) : sur un écran un peu
             moins large, le chat basculait sous la vidéo. */}
-        <div className="mt-6 grid gap-5 md:mt-8 lg:grid-cols-[minmax(0,1.5fr)_400px] xl:grid-cols-[minmax(0,1.5fr)_420px]">
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40">
+        <div className="mt-6 grid gap-5 md:mt-8 lg:h-[68vh] lg:min-h-[440px] lg:max-h-[680px] lg:[grid-template-rows:1fr] lg:grid-cols-[minmax(0,1.5fr)_400px] xl:grid-cols-[minmax(0,1.5fr)_420px]">
+          <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40 lg:flex lg:flex-col lg:h-full">
             <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div>
                 <h2 className="text-sm font-black uppercase tracking-[0.18em] text-bone-100">
@@ -340,7 +340,7 @@ export function FanClub() {
               )}
             </div>
 
-            <div className="relative overflow-hidden bg-ink-950">
+            <div className="relative overflow-hidden bg-ink-950 lg:flex-1 lg:min-h-0">
               <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} />
 
               {/* Réactions flottantes par-dessus la vidéo */}
