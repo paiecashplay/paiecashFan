@@ -119,9 +119,8 @@ a tout, le club_admin est **scopé à son `club_id`**.
 - **Meta par page** (react-helmet) : titres/descriptions spécifiques par club/page.
 - Nettoyage : `public/favicon.svg` (P provisoire) n'est plus référencé → peut être supprimé.
 
-### 🔴 Reporté (hors périmètre, à planifier)
-- **API-Football** : bannière de match live (`LiveMatchBanner` affiche encore un score codé en dur PSG 2-1 Marseille 85').
-- **Streaming vidéo** du Fan Club (le lecteur est un placeholder).
+### 🎥 Live / streaming — améliorations possibles (base livrée le 2026-07-21)
+- Bannière match live + section « Matchs en direct » + streaming embed = **faits**. Pistes : planning des lives par match/événement, low-latency (Mux/Cloudflare) si besoin d'un flux propre, curation fine des ligues affichées.
 
 ### Historique
 Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Resend, persistance DB panier billetterie…).
@@ -129,6 +128,20 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bi)** — **Match live (API-Football) + streaming vidéo Fan Club**.
+  (1) **Bannière match réelle** : `apiFootball.getMatchForTeam` (live > prochain >
+  dernier, via `metadata.api_football_id`) + cache mémoire (live 30 s / autre 1 h)
+  pour le quota. Route `GET /live/club/:slug`, hook `useLiveMatch` (poll 30 s si
+  LIVE), `LiveMatchBanner` réécrit (états live/à venir/terminé/aucun) — fini le
+  score PSG 2-1 codé en dur. (2) **Section « Matchs en direct »** sur le hub
+  (`getLiveFixtures` grandes ligues, `GET /live/matches`, `LiveMatchesStrip`) →
+  couvre aussi les **clubs non inscrits**. (3) **Streaming** : embed YouTube/Twitch
+  réglé au **BO club** (`StreamControl` dans MonClubBO), parsing **sécurisé**
+  whitelist (`streamEmbed.parseStreamUrl` — jamais d'iframe arbitraire), stocké
+  dans `tenant.metadata.stream`, lecteur `StreamPlayer` (`parent` Twitch dynamique)
+  remplace le placeholder. Routes `GET/PATCH /live/club/:slug/stream` (PATCH scopé
+  club_admin/super_admin). Fail-open partout (API indispo → UI neutre). Aucune
+  migration. Vérifié en réel (lives récupérés, PATCH protégé 401).
 - **2026-07-20 (bh)** — **Logo officiel PaieCashFan** (badge P + ballon, vert/or).
   Source PNG 2,1 Mo sur fond gris → **détourée avec sharp** (trim du badge + masque
   coins arrondis → fond transparent) et optimisée : `paiecashfan-logo.webp` (85 KB)

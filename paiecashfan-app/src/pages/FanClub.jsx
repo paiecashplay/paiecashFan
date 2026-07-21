@@ -19,6 +19,9 @@ import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { usePresence } from '@/hooks/usePresence';
+import { useLiveMatch } from '@/hooks/useLiveMatch';
+import { useStream } from '@/hooks/useStream';
+import { StreamPlayer } from '@/components/fanclub/StreamPlayer';
 
 
 // Club par défaut quand on arrive sur /fan-club sans slug.
@@ -43,6 +46,10 @@ export function FanClub() {
   // Présence en ligne : battement de cœur tant qu'on est dans le salon d'un club
   // (connecté). Le backend en déduit qui est « en ligne » dans ce salon.
   usePresence(slug, mode === 'club' && !!user);
+  // Vrai match du club (API-Football) : live > prochain > dernier.
+  const { match: liveMatch } = useLiveMatch(slug);
+  // Live vidéo officiel (embed YouTube/Twitch réglé au BO du club).
+  const stream = useStream(slug);
   const {
     fans,
     posts,
@@ -64,7 +71,6 @@ export function FanClub() {
     updateMessage,
     deleteMessage,
     toggleMessageReaction,
-    match,
     counters
   } = useFanFeed(slug, mode, {
     // Refus de l'IA avant publication : on explique, on ne montre pas d'erreur brute.
@@ -295,7 +301,8 @@ export function FanClub() {
         </div>
         <LiveMatchBanner
           mode={mode}
-          match={match}
+          match={liveMatch}
+          counters={counters}
         />
         <LiveQuickActions
           mode={mode}
@@ -321,29 +328,34 @@ export function FanClub() {
                 </p>
               </div>
 
-              <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                Live
-              </span>
-            </div>
-
-            <div className="relative grid aspect-video place-items-center overflow-hidden bg-ink-950 text-sm text-bone-500">
-              Lecteur vidéo officiel du club
-
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              {liveReactions.map((reaction, index) => (
-                <span
-                  key={reaction.id}
-                  className="absolute bottom-6 text-4xl animate-bounce"
-                  style={{
-                    left: `${20 + index * 14}%`
-                  }}
-                >
-                  {reaction.emoji}
+              {stream.isLive ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                  Live
                 </span>
-              ))}
+              ) : (
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-bone-500">
+                  Hors ligne
+                </span>
+              )}
             </div>
-          </div>
+
+            <div className="relative overflow-hidden bg-ink-950">
+              <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} />
+
+              {/* Réactions flottantes par-dessus la vidéo */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                {liveReactions.map((reaction, index) => (
+                  <span
+                    key={reaction.id}
+                    className="absolute bottom-6 text-4xl animate-bounce"
+                    style={{ left: `${20 + index * 14}%` }}
+                  >
+                    {reaction.emoji}
+                  </span>
+                ))}
+              </div>
+            </div>
           </section>
 
           <LiveChat

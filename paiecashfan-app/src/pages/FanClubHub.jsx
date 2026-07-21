@@ -5,6 +5,7 @@ import { Container } from '@/components/ui/Container';
 import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { getClubProfile } from '@/data/clubProfiles';
+import { LiveMatchesStrip } from '@/components/fanclub/LiveMatchesStrip';
 
 const HERO = '/images/fan-club/fan-club-home.webp';
 const nf = (n) => new Intl.NumberFormat('fr-FR').format(n || 0);
@@ -92,6 +93,11 @@ export function FanClubHub() {
             </p>
           </div>
         </header>
+
+        {/* ── Matchs en direct (API-Football, clubs inscrits ou non) ─── */}
+        <div className="mt-8">
+          <LiveMatchesStrip />
+        </div>
 
         {/* ── Accès rapide au salon favori ─────────────────── */}
         {primary && (

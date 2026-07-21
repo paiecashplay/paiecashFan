@@ -16,6 +16,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { PlayersTab, TrophiesTab, ProductsTab, TicketingTab } from '@/pages/admin/AdminClubEdit';
 import { TombolaManager } from '@/components/tombola/TombolaManager';
 import { PrizeFulfillmentPanel } from '@/components/prizes/PrizeFulfillmentPanel';
+import { StreamControl } from '@/components/fanclub/StreamControl';
 import { ModerationQueue } from '@/components/moderation/ModerationQueue';
 import { cn } from '@/lib/cn';
 
@@ -107,7 +108,12 @@ export function MonClubBO() {
         ) : (
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              {tab === 'info' && <ClubInfoForm club={club} onSaved={(c) => { setClub(c); showToast('Infos sauvegardées'); }} />}
+              {tab === 'info' && (
+                <div className="space-y-6">
+                  <ClubInfoForm club={club} onSaved={(c) => { setClub(c); showToast('Infos sauvegardées'); }} />
+                  {club?.slug && <StreamControl slug={club.slug} />}
+                </div>
+              )}
               {tab === 'players'   && <PlayersTab   tenantId={clubId} showToast={showToast} />}
               {tab === 'trophies'  && <TrophiesTab  tenantId={clubId} showToast={showToast} />}
               {tab === 'products'  && <ProductsTab  tenantId={clubId} showToast={showToast} />}
