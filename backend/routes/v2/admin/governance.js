@@ -14,6 +14,11 @@ const ok = (res, data) => res.status(200).json({ success: true, data, error: '' 
 const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: null, error: msg });
 const parseNotes = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || {}); } catch { return {}; } };
 
+// 🔒 Gouvernance = super_admin UNIQUEMENT. Ces routes exposent des données très
+// sensibles (commandes, utilisateurs, wallets, transactions, trésorerie,
+// retraits, paramètres, audit) → auth + rôle exigés sur TOUT le routeur.
+router.use(requireAuth, requireRole('super_admin'));
+
 // POST /api/v2/admin/governance/contests - create a new contest
 router.post('/contests', async (req, res) => {
   try {
@@ -233,7 +238,7 @@ router.get('/orders', async (req, res) => {
 
 // PATCH /api/v2/admin/orders/:id/fulfillment — expédition d'une commande boutique.
 // Body: { status?, carrier?, trackingNumber?, trackingUrl? }. Notifie l'acheteur.
-router.patch('/orders/:id/fulfillment', requireAuth, requireRole('super_admin'), async (req, res) => {
+router.patch('/orders/:id/fulfillment', async (req, res) => {
   try {
     const supabase = require('../../../db/supabase');
     const { data: order } = await supabase.from('orders').select('*').eq('id', req.params.id).maybeSingle();

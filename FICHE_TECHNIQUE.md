@@ -128,6 +128,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-22 (bo)** — **🔒 Fix sécurité : routes `/admin` (governance) exposées sans
+  auth**. `routes/v2/admin/governance.js` n'avait **aucune garde** au niveau routeur
+  → `GET /admin/orders`, `/users`, `/wallets`, `/transactions`, `/treasury`,
+  `/withdrawals(/:id/approve)`, `/settings/:key`, `/audit`… étaient accessibles
+  **sans authentification** (fuite de données + validation de retraits d'argent !).
+  Ajout de `router.use(requireAuth, requireRole('super_admin'))`. Audit des autres
+  routeurs : `users`/`applications`/`moderation`/`prizes` déjà protégés, `clubs-crud`
+  scopé par rôle → OK. Vérifié : ces routes renvoient désormais 401 sans token.
 - **2026-07-21 (bn)** — **Livraison boutique : adresse à la commande + expédition BO**.
   (1) **Checkout** : adresse de livraison **obligatoire** (produits physiques) —
   modale au clic « Passer commande » (`ShippingModal`), envoyée à
