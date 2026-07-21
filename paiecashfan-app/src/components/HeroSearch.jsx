@@ -46,15 +46,31 @@ export function HeroSearch() {
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleSelect = (it) => {
+  const handleSelect = (item) => {
     setOpen(false);
-    if (it.type === 'club' && it.slug) {
-      navigate(`/clubs/${it.slug}`);
-    } else if (it.type === 'federation' && it.slug) {
-      navigate(`/federations/${it.slug}`);
-    } else {
-      setQuery(it.label);
+
+    if (item.type === 'club' && item.slug) {
+      navigate(`/clubs/${item.slug}`);
+      return;
     }
+
+    if (item.type === 'federation' && item.slug) {
+      navigate(`/federations/${item.slug}`);
+      return;
+    }
+
+    if (item.type === 'product' && item.clubSlug) {
+      navigate(`/clubs/${item.clubSlug}#merchandise`, {
+        state: {
+            selectedProductId:
+            item.productId
+          }
+        }
+      );
+      return;
+    }
+
+    setQuery(item.label);
   };
 
   // Close dropdown on outside click
@@ -97,7 +113,9 @@ export function HeroSearch() {
     const seen = new Set();
     const merged = [];
     for (const it of [...apiResults, ...staticMatches]) {
-      const key = `${it.type}:${(it.label || '').toLowerCase()}`;
+      const uniqueValue = it.productId || it.slug || it.id || it.label ||'';
+
+      const key = `${it.type}:${String(uniqueValue).toLowerCase()}`;
       if (seen.has(key)) continue;
       seen.add(key);
       merged.push(it);
@@ -118,7 +136,7 @@ export function HeroSearch() {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          placeholder="Rechercher une équipe, un club, une fédération…"
+          placeholder="Rechercher une équipe, un club, une fédération un produit…"
           className="flex-1 bg-transparent border-0 outline-none px-4 text-bone-100 placeholder:text-bone-500 text-base"
         />
         <Button size="md" className="shrink-0">
@@ -198,7 +216,8 @@ function TypeBadge({ type }) {
   const map = {
     club:       { label: 'Club',       cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     league:     { label: 'Ligue',      cls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' },
-    federation: { label: 'Fédération', cls: 'bg-gold-500/15 text-gold-400 border-gold-500/30' }
+    federation: { label: 'Fédération', cls: 'bg-gold-500/15 text-gold-400 border-gold-500/30' },
+    product:    { label: 'Produit',    cls: 'border-violet-500/30 bg-violet-500/15 text-violet-300' }
   };
   const m = map[type] || map.club;
   return (
