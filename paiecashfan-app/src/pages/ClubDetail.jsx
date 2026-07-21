@@ -1493,13 +1493,9 @@ function CartFooter({ cart, products, totalPrice, totalItems, primaryColor, pers
           Votre panier · {totalItems} {totalItems > 1 ? 'articles' : 'article'}
         </div>
 
-        {persisted ? (
-          <span className="text-[9px] uppercase tracking-[0.18em] text-emerald-400/80 font-bold inline-flex items-center gap-1">
-            <Check size={10} /> Sauvegardé
-          </span>
-        ) : (
+        {!isLogged && (
           <Link to="/login" className="text-[9px] uppercase tracking-[0.18em] text-amber-400/80 hover:text-amber-300 font-bold">
-            Connecte-toi pour sauvegarder ton panier
+            Connecte-toi pour commander
           </Link>
         )}
       </div>

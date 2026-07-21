@@ -128,6 +128,11 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bm)** — **Fix : ajout au panier boutique cassé (erreur 400)**. Le hook
+  `useCart` écrivait **en direct dans Supabase** (`orders`/`order_items`) depuis le
+  navigateur → violait la règle d'archi (front → backend uniquement) et échouait
+  (RLS deny-all → 400). Réécrit en **panier de session (mémoire)**, plus aucune
+  requête Supabase directe. Persistance DB du panier via backend = reste en TODO.
 - **2026-07-21 (bl)** — **Gains Lot C : relances automatiques (CRON)**. Migration
   `prize-claims-reminders.sql` (colonnes `last_reminded_at`, `reminder_count`).
   `prizeClaims.runReminderPass` : relance le gagnant sans adresse (lot physique)
