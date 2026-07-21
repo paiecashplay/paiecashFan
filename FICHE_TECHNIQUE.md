@@ -101,10 +101,10 @@ a tout, le club_admin est **scopé à son `club_id`**.
 ## 9. TODO — reste à faire (màj 2026-07-21)
 > Le site est **en prod sur `paiecashfan.com`**. Le plus gros est fait. Backlog priorisé ci-dessous.
 
-### 🎁 Gains / lots — Lot C (suite de A+B déjà livrés)
-- **Relances automatiques** (CRON) : rappeler le gagnant qui n'a pas saisi son adresse après X jours (aujourd'hui la relance est **manuelle** depuis le BO). Réutiliser l'infra CRON existante.
+### 🎁 Gains / lots — reste du Lot C
 - **Brancher loto & bingo** sur `prize_claims` (la table est déjà générique) : d'abord **clarifier quels lots physiques** ces jeux distribuent (loto = salons gratuits temps réel, bingo = éditions à crédits) avant de câbler leurs événements de gain.
 - Optionnel : champ `prize_type` (physical/digital) sur la campagne tombola → l'admin marque un lot digital (pas d'adresse demandée).
+- ✅ **Relances automatiques (CRON)** : livré le 2026-07-21 (job `prizeReminders`, cadence 48 h puis /3 j, plafond 3, escalade BO au 3e rappel).
 
 ### 🛒 Boutique / stock
 - **Suivi du stock** : le checkout **vérifie** la dispo mais ne **décrémente pas** `products.total_sold` après paiement (pour la carte, décrémenter à la redirection compterait les paniers abandonnés → le faire sur commande **confirmée** via la réconciliation `/checkout/status`). Ajouter la **gestion/édition du stock côté BO Super Admin ET BO Club** (alerte rupture, bascule `sold_out`). Aujourd'hui la plupart des produits sont en `stock: -1` (illimité) → pas d'impact immédiat.
@@ -128,6 +128,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-21 (bl)** — **Gains Lot C : relances automatiques (CRON)**. Migration
+  `prize-claims-reminders.sql` (colonnes `last_reminded_at`, `reminder_count`).
+  `prizeClaims.runReminderPass` : relance le gagnant sans adresse (lot physique)
+  **48 h** après le gain, puis **tous les 3 j**, plafonné à **3** rappels ; au 3e
+  resté sans réponse → **alerte le BO** (club + super admin) pour relance manuelle.
+  Job `jobs/prizeReminders.js` planifié chaque heure (la cadence est gérée dans la
+  passe → pas de spam). ⚠️ **Requiert la migration** avant activation en prod.
 - **2026-07-21 (bk)** — **Notifications BO réelles + rattrapage des gains**.
   (1) La cloche du BO super admin était **codée en dur** (pastille statique) →
   remplacée par le composant réel `NotificationBell` (lit `/me/notifications`).

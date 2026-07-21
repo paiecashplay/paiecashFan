@@ -223,6 +223,10 @@ const server = httpServer.listen(PORT, () => {
   const { runTombolaDraws } = require('./jobs/tombolaDraw');
   cron.schedule('*/5 * * * *', () => { runTombolaDraws(); });
 
+  // Gains : relance automatique des gagnants sans adresse (cadence gérée dans le job, exécuté chaque heure)
+  const { runPrizeReminders } = require('./jobs/prizeReminders');
+  cron.schedule('0 * * * *', () => { runPrizeReminders(); });
+
   // Sport Bingo : sync des statuts d'édition selon l'heure serveur (chaque minute)
   const { runBingoSync, runBingoAutoSettle } = require('./jobs/bingoSync');
   runBingoSync();

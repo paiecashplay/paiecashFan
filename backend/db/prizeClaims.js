@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 const supabase = require('./supabase');
-const { createNotification } = require('./notifications');
+const { createNotification, notifyClubStaff } = require('./notifications');
 
 const SHIP_FIELDS = ['ship_name', 'ship_phone', 'ship_address1', 'ship_address2', 'ship_postal_code', 'ship_city', 'ship_country'];
 
@@ -186,7 +186,53 @@ async function remindAddress(claimId) {
   return { reminded: true };
 }
 
+// ── Relances automatiques des gagnants sans adresse (Lot C, CRON) ──
+// Cadence : 1er rappel 48 h après le gain, puis tous les 3 j, plafonné à 3.
+// Au 3e rappel resté sans réponse → alerte le BO (relance manuelle).
+const REMIND_AFTER_MS = 48 * 3600 * 1000;
+const REMIND_EVERY_MS = 72 * 3600 * 1000;
+const MAX_REMINDERS = 3;
+
+async function runReminderPass(now = Date.now()) {
+  const { data: claims } = await supabase.from('prize_claims')
+    .select('*').eq('status', 'pending_address').eq('prize_type', 'physical');
+
+  let reminded = 0, escalated = 0;
+  for (const c of claims || []) {
+    const wonMs = new Date(c.won_at).getTime();
+    if (now - wonMs < REMIND_AFTER_MS) continue;                    // trop tôt après le gain
+    if ((c.reminder_count || 0) >= MAX_REMINDERS) continue;         // plafond atteint
+    const lastMs = c.last_reminded_at ? new Date(c.last_reminded_at).getTime() : 0;
+    if (lastMs && now - lastMs < REMIND_EVERY_MS) continue;         // relancé récemment
+
+    const lot = c.prize_label || 'ton lot';
+    await createNotification({
+      user_id: c.winner_user_id, type: 'prize_reminder', title: '📮 Renseigne ton adresse',
+      message: `Pour recevoir « ${lot} », renseigne ton adresse postale dans « Mes gains ».`,
+      metadata: { link: '/mon-compte?tab=prizes' },
+    }).catch(() => {});
+
+    const count = (c.reminder_count || 0) + 1;
+    await supabase.from('prize_claims')
+      .update({ reminder_count: count, last_reminded_at: new Date(now).toISOString(), updated_at: new Date(now).toISOString() })
+      .eq('id', c.id);
+    reminded++;
+
+    // Dernier rappel sans réponse → on prévient le BO pour une relance manuelle.
+    if (count >= MAX_REMINDERS) {
+      await notifyClubStaff(c.tenant_id || null, {
+        type: 'admin_tombola_drawn',
+        title: `⚠️ Gagnant injoignable : ${lot}`,
+        message: `Le gagnant n'a pas renseigné son adresse après ${MAX_REMINDERS} rappels. Relance-le manuellement depuis « Gains & lots ».`,
+        metadata: { link: c.tenant_id ? '/mon-club/bo' : '/admin/prizes' },
+      }).catch(() => {});
+      escalated++;
+    }
+  }
+  return { reminded, escalated };
+}
+
 module.exports = {
   createClaim, listMyClaims, submitAddress, shape, SHIP_FIELDS,
-  listClaims, getClaimRaw, updateFulfillment, remindAddress, FULFILLMENT_STATUSES,
+  listClaims, getClaimRaw, updateFulfillment, remindAddress, runReminderPass, FULFILLMENT_STATUSES,
 };
