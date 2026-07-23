@@ -132,6 +132,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-23 (bt)** — **Merge stagiaire : recherche de produits dans la barre**
+  (branche `feature/navbar-product-search`). La recherche navbar/hero remonte
+  désormais aussi les **produits** (en plus des clubs/fédérations) : `search.js`
+  interroge `products` (service-role, filtre `status=active` + club actif via
+  `tenants!inner`), le terme est **échappé** (`[,()]` retirés → pas d'injection
+  PostgREST). Front : résultat `type=product` → navigue vers la boutique du club.
+  Merge sans conflit, build OK.
 - **2026-07-22 (bs)** — **Parcours panier e-commerce (page `/panier` + toast, fin du
   dropdown)**. Suppression du mini-panier flottant (redondant). Désormais : ajout →
   **toast discret** (`CartToast`, haut-droite desktop / bas mobile, auto-close 2.8s,

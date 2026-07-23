@@ -152,11 +152,8 @@ export function NavbarSearch({
       ...apiResults,
       ...staticMatches
     ]) {
-      const key = `${item.type}:${(
-        item.slug ||
-        item.label ||
-        ''
-      ).toLowerCase()}`;
+      const uniqueValue = item.productId || item.slug || item.id || item.label || '';
+      const key = `${item.type}:${String(uniqueValue).toLowerCase()}`;
 
       if (seen.has(key)) continue;
 
@@ -164,7 +161,7 @@ export function NavbarSearch({
       merged.push(item);
     }
 
-    return merged.slice(0, 10);
+    return merged.slice(0, 15);
   }, [apiResults, query]);
 
   function handleSelect(item) {
@@ -180,6 +177,13 @@ export function NavbarSearch({
       item.slug
     ) {
       navigate(`/federations/${item.slug}`);
+      return;
+    }
+
+    if (item.type === 'product' && item.clubSlug) {
+      navigate(`/clubs/${item.clubSlug}#merchandise`, {
+        state: {selectedProductId: item.productId}
+      });
       return;
     }
 
@@ -234,7 +238,7 @@ export function NavbarSearch({
                 onChange={(event) =>
                   setQuery(event.target.value)
                 }
-                placeholder="Rechercher un club ou une fédération…"
+                placeholder="Rechercher un club ou une fédération ou un produit…"
                 className="min-w-0 flex-1 bg-transparent text-sm text-bone-100 outline-none placeholder:text-bone-500 sm:text-base"
               />
 
@@ -296,7 +300,7 @@ export function NavbarSearch({
                       </p>
 
                       <p className="mt-1 text-xs text-bone-500">
-                        Aucun club ou aucune fédération ne correspond à «{' '}
+                        Aucun club ou aucune fédération ou aucun produit ne correspond à «{' '}
                         <span className="text-bone-300">
                           {query}
                         </span>
@@ -392,7 +396,13 @@ function TypeBadge({ type }) {
       label: 'Fédération',
       className:
         'border-amber-500/30 bg-amber-500/15 text-amber-300'
+    },
+    product: {
+      label: 'Produit',
+      className:
+        'border-violet-500/30 bg-violet-500/15 text-violet-300'
     }
+
   };
 
   const metadata = map[type] || map.club;
