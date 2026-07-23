@@ -113,7 +113,7 @@ export function CartPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-bone-400">Livraison</span>
-                  <span className="font-black text-emerald-400">Gratuit</span>
+                  <span className="text-xs text-bone-500">Calculée à la commande</span>
                 </div>
               </div>
               <div className="mt-4 flex items-end justify-between border-t border-white/10 pt-4">

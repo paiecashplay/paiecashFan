@@ -9,9 +9,10 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
+import { shippingFee, shippingZone, ZONE_LABEL } from '@/lib/shipping';
 
 const fmt = (n) => new Intl.NumberFormat('fr-FR').format(Number(n || 0));
-const SHIP = { standard: { label: 'Standard', delay: '4 à 6 jours ouvrés', feePcc: 0 }, express: { label: 'Express', delay: '24-48h', feePcc: 12 } };
+const SHIP = { standard: { label: 'Standard', delay: '4 à 6 jours ouvrés' }, express: { label: 'Express', delay: '24-48h' } };
 const STEPS = ['Livraison', 'Paiement', 'Confirmation'];
 
 // Grand modal de checkout premium (assistant 3 étapes).
@@ -53,7 +54,7 @@ function CheckoutInner({ cart, onClose }) {
   const [confirmed, setConfirmed] = useState(null);    // snapshot pour l'écran de confirmation
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const feePcc = SHIP[shippingMethod].feePcc;
+  const feePcc = shippingFee(form.country, shippingMethod);   // frais selon la zone (pays)
   const grandPcc = totalPrice + feePcc;
   const grandEur = totalEur + feePcc;
 
@@ -235,11 +236,20 @@ function StepLivraison({ form, set, shippingMethod, setShippingMethod }) {
       <Field label="Pays" value={form.country} onChange={set('country')} />
 
       <SectionTitle icon={Truck} title="Mode de livraison" className="mt-7" />
+      <p className="mb-2 text-[11px] text-bone-500">Zone : <span className="font-bold text-bone-300">{ZONE_LABEL[shippingZone(form.country)]}</span> (selon le pays)</p>
       <div className="grid gap-3 sm:grid-cols-2">
-        <RadioCard active={shippingMethod === 'standard'} onClick={() => setShippingMethod('standard')} icon={Truck}
-          title="Standard" desc="Livraison 4-6 jours" price="Gratuit" priceGreen />
-        <RadioCard active={shippingMethod === 'express'} onClick={() => setShippingMethod('express')} icon={Zap}
-          title="Express" desc="24-48h" price="12 PCC" />
+        {(() => {
+          const std = shippingFee(form.country, 'standard');
+          const exp = shippingFee(form.country, 'express');
+          return (
+            <>
+              <RadioCard active={shippingMethod === 'standard'} onClick={() => setShippingMethod('standard')} icon={Truck}
+                title="Standard" desc="4 à 6 jours ouvrés" price={std ? `${fmt(std)} PCC` : 'Gratuit'} priceGreen={!std} />
+              <RadioCard active={shippingMethod === 'express'} onClick={() => setShippingMethod('express')} icon={Zap}
+                title="Express" desc="24-48h" price={exp ? `${fmt(exp)} PCC` : 'Gratuit'} priceGreen={!exp} />
+            </>
+          );
+        })()}
       </div>
     </div>
   );

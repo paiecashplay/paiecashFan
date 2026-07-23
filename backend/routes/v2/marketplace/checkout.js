@@ -195,8 +195,28 @@ async function grantGameEntitlements(order) {
 // Règlement commun à la billetterie et à la boutique. Les groupes/total sont
 // déjà validés et recalculés serveur (buildGroups / buildBoutiqueGroups) ; seul
 // le `kind` change (libellé, notes de commande). Répond directement sur `res`.
-// Frais de port (PCC = EUR 1:1). Décidés SERVEUR (jamais depuis le client).
-const SHIPPING_FEES_EUR = { standard: 0, express: 12 };
+// Frais de port par ZONE (PCC = EUR 1:1). Décidés SERVEUR (jamais côté client).
+// La zone est déduite du pays de livraison.
+const SHIPPING_ZONES = {
+  france:        { standard: 5,  express: 12 },
+  europe:        { standard: 12, express: 22 },
+  international: { standard: 20, express: 35 },
+};
+// Pays d'Europe (livraison "europe"). Reconnaît nom FR (minuscules) et code ISO2.
+const EUROPE = new Set([
+  'allemagne', 'de', 'belgique', 'be', 'pays-bas', 'nl', 'luxembourg', 'lu', 'espagne', 'es',
+  'italie', 'it', 'portugal', 'pt', 'irlande', 'ie', 'autriche', 'at', 'suisse', 'ch',
+  'royaume-uni', 'gb', 'uk', 'pologne', 'pl', 'suede', 'suède', 'se', 'danemark', 'dk',
+  'finlande', 'fi', 'norvege', 'norvège', 'no', 'grece', 'grèce', 'gr', 'republique tcheque', 'cz',
+  'hongrie', 'hu', 'roumanie', 'ro', 'bulgarie', 'bg', 'croatie', 'hr', 'slovaquie', 'sk',
+  'slovenie', 'slovénie', 'si', 'lituanie', 'lt', 'lettonie', 'lv', 'estonie', 'ee', 'malte', 'mt', 'chypre', 'cy',
+]);
+function shippingZone(country) {
+  const c = String(country || '').trim().toLowerCase();
+  if (!c || c === 'france' || c === 'fr') return 'france';
+  if (EUROPE.has(c)) return 'europe';
+  return 'international';
+}
 
 // Normalise/valide une adresse de livraison. Renvoie l'objet propre ou null si
 // incomplet (nom, adresse, code postal, ville obligatoires).
@@ -350,9 +370,10 @@ router.post('/boutique', async (req, res) => {
     const shipping = cleanShipping(req.body?.shipping);
     if (!shipping) return fail(res, 'Adresse de livraison requise (nom, adresse, code postal et ville).');
 
-    // Mode + frais de livraison décidés serveur.
+    // Mode + zone + frais de livraison décidés serveur (jamais le client).
     const shippingMethod = req.body?.shippingMethod === 'express' ? 'express' : 'standard';
-    const shippingFeeEur = SHIPPING_FEES_EUR[shippingMethod] || 0;
+    const zone = shippingZone(shipping.country);
+    const shippingFeeEur = SHIPPING_ZONES[zone]?.[shippingMethod] ?? 0;
 
     const built = await buildBoutiqueGroups(items, res);
     if (!built) return; // buildBoutiqueGroups a déjà répondu
@@ -363,7 +384,7 @@ router.post('/boutique', async (req, res) => {
       built.groups[0].totalPcc = round2(built.groups[0].totalPcc + shippingFeeEur);
       built.grandTotalEur = round2(built.grandTotalEur + shippingFeeEur);
     }
-    const shippingFull = { ...shipping, method: shippingMethod, feeEur: shippingFeeEur };
+    const shippingFull = { ...shipping, method: shippingMethod, zone, feeEur: shippingFeeEur };
     return settleCheckout(req, res, { ...built, mode, kind: 'boutique', shipping: shippingFull });
   } catch (err) {
     console.error('[CHECKOUT] Erreur:', err.message);
