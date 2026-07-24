@@ -165,11 +165,15 @@ app.use('/api/v2/gaming/sessions', v2GamingSessions);
 app.use('/api/v2/betting/pools', v2BettingPools);
 
 // Platform 3: Super Admin Governance
+// ⚠️ ORDRE IMPORTANT : governance est monté sur le chemin LARGE /api/v2/admin
+// (avec un guard router-level super_admin). Les sous-routes qui doivent rester
+// accessibles au club_admin (scopées à SON club) DOIVENT être montées AVANT,
+// sinon le guard super_admin de governance les intercepte → 403 pour le club_admin.
+app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);   // club_admin (scope) + super_admin
+app.use('/api/v2/admin/prizes', v2AdminPrizes);          // club_admin (son club) + super_admin
 app.use('/api/v2/admin', v2AdminGov);
-app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);
-app.use('/api/v2/admin/prizes', v2AdminPrizes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'running', network: process.env.BLOCKCHAIN }, error: '' });

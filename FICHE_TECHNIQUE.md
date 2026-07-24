@@ -133,6 +133,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-24 (bv)** — **Fix régression : club_admin bloqué (403) sur son BO club**.
+  Le fix sécu (bo) avait ajouté `router.use(requireRole('super_admin'))` au routeur
+  **governance**, monté sur le chemin **large** `/api/v2/admin` **avant** les sous-
+  routes → son guard interceptait **tout** `/api/v2/admin/*`, dont
+  `/admin/clubs-crud/*` et `/admin/prizes/*` (qui autorisent le club_admin scopé)
+  → **403 « Accès refusé »** pour un club_admin sur SON club (produits, joueurs,
+  fiche club…). Fix : monter **clubs-crud** et **prizes AVANT** governance dans
+  `server.js` (leurs gardes scopées club_admin restent en place ; governance garde
+  ses routes sensibles). Vérifié : governance toujours 401 sans auth, clubs-crud/
+  prizes joignables.
 - **2026-07-23 (bu)** — **Frais de livraison par zone**. Zone déduite du **pays**
   de livraison : France (5 std / 12 exp), Europe (12/22), International (20/35),
   en PCC (=€ 1:1). **Calculés serveur** (`SHIPPING_ZONES` + `shippingZone` dans
