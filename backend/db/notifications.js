@@ -53,6 +53,15 @@ async function notifyAdmins(payload) {
   return ids.length;
 }
 
+// Notifie tous les fans qui SUIVENT ce club (⭐ fan_favorite_clubs).
+// Fan-out best-effort : une erreur sur un fan n'empêche pas les autres.
+async function notifyFollowers(tenantId, payload) {
+  const { data } = await supabase.from('fan_favorite_clubs').select('user_id').eq('tenant_id', tenantId);
+  const ids = [...new Set((data || []).map((r) => r.user_id).filter(Boolean))];
+  await Promise.all(ids.map((id) => createNotification({ ...payload, user_id: id }).catch(() => {})));
+  return ids.length;
+}
+
 // Notifie l'équipe concernée par un club : ses club_admins + tous les super_admins.
 // tenantId null → uniquement les super_admins.
 async function notifyClubStaff(tenantId, payload) {
@@ -65,4 +74,4 @@ async function notifyClubStaff(tenantId, payload) {
   return ids.length;
 }
 
-module.exports = { createNotification, getNotificationsByUser, markAsRead, markAllAsRead, notifyAdmins, notifyClubStaff };
+module.exports = { createNotification, getNotificationsByUser, markAsRead, markAllAsRead, notifyAdmins, notifyClubStaff, notifyFollowers };

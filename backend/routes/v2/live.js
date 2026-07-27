@@ -14,6 +14,7 @@ const { requireAuth } = require('../../middleware/auth');
 const apiFootball = require('../../services/apiFootball');
 const { parseStreamUrl } = require('../../services/streamEmbed');
 const byteplus = require('../../services/byteplus');
+const notifications = require('../../db/notifications');
 const tenants = require('../../db/tenants');
 
 const router = express.Router();
@@ -36,6 +37,27 @@ async function getOrCreateStreamName(t) {
   const stream = { ...(t.metadata?.stream || {}), streamName };
   await tenants.updateTenant(t.id, { metadata: { ...(t.metadata || {}), stream } });
   return streamName;
+}
+
+const LIVE_NOTIFY_COOLDOWN_MS = 30 * 60 * 1000; // anti-spam : 30 min entre 2 notifs du même club
+
+// Renvoie l'horodatage à persister si on doit notifier les followers (transition
+// pas-en-direct → en-direct, cooldown respecté), sinon null.
+function liveNotifyStamp(prevStream, nextLive) {
+  if (prevStream?.isLive || !nextLive) return null;             // pas une (re)mise en direct
+  const last = prevStream?.lastNotifiedAt ? new Date(prevStream.lastNotifiedAt).getTime() : 0;
+  if (Date.now() - last < LIVE_NOTIFY_COOLDOWN_MS) return null; // cooldown
+  return new Date().toISOString();
+}
+
+// Fan-out asynchrone (best-effort) : « 🔴 {Club} est en direct ! » aux followers ⭐.
+function fanOutLive(t) {
+  notifications.notifyFollowers(t.id, {
+    type: 'club_live',
+    title: `🔴 ${t.name} est en direct !`,
+    message: `${t.name} vient de lancer son live. Rejoins les supporters sur le Fan Club.`,
+    metadata: { tenantId: t.id, slug: t.slug, link: `/clubs/${t.slug}/fan-club` },
+  }).catch(() => {});
 }
 
 router.get('/matches', async (req, res) => {
@@ -99,16 +121,17 @@ router.patch('/club/:slug/stream', requireAuth, async (req, res) => {
     const isLive = !!req.body?.isLive;
 
     // URL fournie → doit être un embed YouTube/Twitch ou un flux HLS valide.
-    if (url) {
-      const parsed = parseStreamUrl(url);
-      if (!parsed) return fail(res, 'Lien non reconnu. Utilise un lien YouTube, Twitch, ou un flux HLS (.m3u8).');
-    }
-
-    // On préserve le streamName natif éventuel ; ce mode = lien externe.
-    const stream = { ...(t.metadata?.stream || {}), mode: 'external', url, isLive };
-    await tenants.updateTenant(t.id, { metadata: { ...(t.metadata || {}), stream } });
     const parsed = url ? parseStreamUrl(url) : null;
-    return ok(res, { url, isLive: isLive && !!parsed, provider: parsed?.provider || null, id: parsed?.id || null });
+    if (url && !parsed) return fail(res, 'Lien non reconnu. Utilise un lien YouTube, Twitch, ou un flux HLS (.m3u8).');
+
+    const prevStream = t.metadata?.stream || {};
+    const nextLive = isLive && !!parsed;
+    const notifyAt = liveNotifyStamp(prevStream, nextLive);
+    // On préserve le streamName natif éventuel ; ce mode = lien externe.
+    const stream = { ...prevStream, mode: 'external', url, isLive, lastNotifiedAt: notifyAt || prevStream.lastNotifiedAt || null };
+    await tenants.updateTenant(t.id, { metadata: { ...(t.metadata || {}), stream } });
+    if (notifyAt) fanOutLive(t);
+    return ok(res, { url, isLive: nextLive, provider: parsed?.provider || null, id: parsed?.id || null });
   } catch (err) {
     return fail(res, 'Enregistrement impossible : ' + err.message, 500);
   }
@@ -152,10 +175,13 @@ router.post('/club/:slug/broadcast', requireAuth, async (req, res) => {
     if (!byteplus.isConfigured()) return fail(res, 'Streaming natif non configuré côté serveur.', 503);
 
     const streamName = await getOrCreateStreamName(t);
+    const prevStream = t.metadata?.stream || {};
     const isLive = !!req.body?.isLive;
     const url = byteplus.playUrl(streamName);
-    const stream = { mode: 'byteplus', streamName, url, isLive };
+    const notifyAt = liveNotifyStamp(prevStream, isLive);
+    const stream = { mode: 'byteplus', streamName, url, isLive, lastNotifiedAt: notifyAt || prevStream.lastNotifiedAt || null };
     await tenants.updateTenant(t.id, { metadata: { ...(t.metadata || {}), stream } });
+    if (notifyAt) fanOutLive(t);
     return ok(res, { isLive, playUrl: url, streamName });
   } catch (err) {
     return fail(res, 'Changement d\'état impossible : ' + err.message, 500);

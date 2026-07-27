@@ -135,6 +135,18 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-27 (by)** — **Notification in-app « club en direct » aux followers**.
+  Quand un club **passe en direct** (mode natif OU lien externe), tous les fans qui le
+  **suivent** (⭐ `fan_favorite_clubs`) reçoivent une notif 🔔 « 🔴 {Club} est en
+  direct ! » avec **deep-link** vers sa page Fan Club. Déclenché **uniquement sur la
+  transition** pas-en-direct → en-direct, avec **cooldown 30 min** (anti-spam) stocké
+  dans `metadata.stream.lastNotifiedAt`. **Fan-out asynchrone** (best-effort) → le
+  passage en direct reste instantané même avec beaucoup de followers.
+  `db/notifications.js` : `notifyFollowers(tenantId, payload)`. `routes/v2/live.js` :
+  hook sur `POST /broadcast` (natif) et `PATCH /stream` (externe). Front : icône Radio
+  pour le type `club_live` (la cloche `NotificationBell` navigue déjà via
+  `metadata.link`). Suite possible : **version email** (mailer Resend déjà présent mais
+  dormant → poser `RESEND_API_KEY`), en opt-in.
 - **2026-07-27 (bx)** — **Streaming natif « PaieCashFan Live » automatisé (accès OBS auto par club)**.
   Un club diffuse désormais **sans toucher à BytePlus** : le BO lui génère ses accès
   **OBS** (Serveur + Clé de stream **signée**) prêts à copier + un bouton

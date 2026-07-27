@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle, ShieldAlert, Ban } from 'lucide-react';
+import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle, ShieldAlert, Ban, Radio } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 
 const ICONS = {
+  club_live: Radio,
   bingo_result: Grid3x3,
   tombola_win: Gift,
   admin_tombola_drawn: Gift,
