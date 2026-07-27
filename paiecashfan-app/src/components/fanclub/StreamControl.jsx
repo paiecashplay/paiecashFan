@@ -44,7 +44,7 @@ export function StreamControl({ slug }) {
         )}
       </div>
       <p className="mt-1.5 text-xs text-bone-400">
-        Colle un lien <b className="text-bone-200">YouTube Live</b> ou <b className="text-bone-200">Twitch</b>, puis active « En direct » quand tu diffuses.
+        Colle un lien <b className="text-bone-200">YouTube Live</b>, <b className="text-bone-200">Twitch</b>, ou un flux <b className="text-bone-200">HLS (.m3u8)</b> (ex. BytePlus Live), puis active « En direct » quand tu diffuses.
       </p>
 
       <label className="mt-4 block">
@@ -52,7 +52,7 @@ export function StreamControl({ slug }) {
         <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://www.youtube.com/watch?v=…  ou  https://twitch.tv/…"
+          placeholder="YouTube / Twitch, ou un lien .m3u8 (HLS)"
           className="mt-1 w-full rounded-xl border border-white/10 bg-ink-900/60 px-3 py-2 text-sm text-bone-100 outline-none focus:border-emerald-400/50"
         />
       </label>

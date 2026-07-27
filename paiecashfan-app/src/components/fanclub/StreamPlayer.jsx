@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import Hls from 'hls.js';
 import { Video } from 'lucide-react';
 
 // Reconstruit l'URL d'embed SÛRE à partir de { provider, id } validés côté
@@ -13,12 +15,37 @@ function embedSrc(provider, id) {
   return null;
 }
 
-// Lecteur du live officiel : iframe YouTube/Twitch quand le club diffuse,
-// sinon un état neutre « pas de live ».
-export function StreamPlayer({ isLive, provider, id }) {
-  const src = isLive ? embedSrc(provider, id) : null;
+// Lecteur HLS (flux .m3u8 — BytePlus Live ou autre) via hls.js, avec repli
+// natif Safari (qui lit le HLS sans lib).
+function HlsVideo({ src }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video || !src) return undefined;
+    // Safari / iOS : HLS natif.
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src;
+      return undefined;
+    }
+    if (Hls.isSupported()) {
+      const hls = new Hls({ lowLatencyMode: true, enableWorker: true });
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      return () => hls.destroy();
+    }
+    return undefined;
+  }, [src]);
 
-  if (!src) {
+  return <video ref={ref} controls playsInline className="h-full w-full bg-black lg:aspect-auto lg:h-full" />;
+}
+
+// Lecteur du live officiel : iframe YouTube/Twitch, lecteur HLS (BytePlus…),
+// ou état neutre « pas de live ».
+export function StreamPlayer({ isLive, provider, id, url }) {
+  const iframeSrc = isLive ? embedSrc(provider, id) : null;
+  const hlsSrc = isLive && provider === 'hls' ? url : null;
+
+  if (!isLive || (!iframeSrc && !hlsSrc)) {
     return (
       <div className="grid aspect-video place-items-center bg-ink-950 text-sm text-bone-500 lg:aspect-auto lg:h-full">
         <div className="text-center">
@@ -29,10 +56,18 @@ export function StreamPlayer({ isLive, provider, id }) {
     );
   }
 
+  if (hlsSrc) {
+    return (
+      <div className="aspect-video bg-black lg:aspect-auto lg:h-full">
+        <HlsVideo src={hlsSrc} />
+      </div>
+    );
+  }
+
   return (
     <div className="aspect-video bg-black lg:aspect-auto lg:h-full">
       <iframe
-        src={src}
+        src={iframeSrc}
         title="Live officiel du club"
         className="h-full w-full"
         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"

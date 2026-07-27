@@ -43,6 +43,12 @@ function parseStreamUrl(url) {
     if (isChannel(ch)) return { provider: 'twitch', id: ch };
   }
 
+  // ── HLS (.m3u8) ── flux vidéo direct : URL de lecture BytePlus Live, ou tout
+  // flux HLS https (lu dans une <video>, pas une iframe → pas de risque XSS).
+  if (u.protocol === 'https:' && /\.m3u8$/i.test(u.pathname)) {
+    return { provider: 'hls', id: null };
+  }
+
   return null;
 }
 

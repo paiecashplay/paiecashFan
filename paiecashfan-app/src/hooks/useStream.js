@@ -4,7 +4,7 @@ import { apiFetch } from '@/lib/api';
 // Live vidéo du club (embed réglé au BO). Re-vérifie toutes les 60 s car le
 // club peut lancer/arrêter son live à tout moment.
 export function useStream(slug) {
-  const [stream, setStream] = useState({ isLive: false, provider: null, id: null });
+  const [stream, setStream] = useState({ isLive: false, provider: null, id: null, url: '' });
   const timer = useRef(null);
 
   useEffect(() => {

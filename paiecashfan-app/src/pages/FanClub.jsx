@@ -341,7 +341,7 @@ export function FanClub() {
             </div>
 
             <div className="relative overflow-hidden bg-ink-950 lg:flex-1 lg:min-h-0">
-              <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} />
+              <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} url={stream.url} />
 
               {/* Réactions flottantes par-dessus la vidéo */}
               <div className="pointer-events-none absolute inset-0 overflow-hidden">
