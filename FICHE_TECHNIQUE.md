@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-07-20.
+> Dernière mise à jour : 2026-07-27.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -126,6 +126,7 @@ a tout, le club_admin est **scopé à son `club_id`**.
 
 ### 🎥 Live / streaming — améliorations possibles (base livrée le 2026-07-21)
 - Bannière match live + section « Matchs en direct » + streaming embed = **faits**. Pistes : planning des lives par match/événement, low-latency (Mux/Cloudflare) si besoin d'un flux propre, curation fine des ligues affichées.
+- ✅ **Streaming propre BytePlus MediaLive en HTTPS** : livré le 2026-07-27 (push RTMP → lecture HLS `.m3u8` en https sur `play-live.paiecashfan.com`, DNS migré sur Cloudflare, certificat Let's Encrypt auto-renouvelé, lecteur autoplay + auto-retry). Les clubs poussent via **OBS** (RTMP). Reste : automatiser la création de flux par club (`backend/services/byteplus.js`, AK/SK), et convention de `StreamName` par club (aujourd'hui l'URL `.m3u8` est collée à la main dans le BO).
 
 ### Historique
 Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Resend, persistance DB panier billetterie…).
@@ -133,6 +134,25 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-27 (bw)** — **Streaming live en HTTPS opérationnel + lecteur robuste + accès BO direct**.
+  Streaming **BytePlus MediaLive** finalisé de bout en bout : push **RTMP**
+  (`push-live.paiecashfan.com`) → BytePlus → lecture **HLS `.m3u8` en HTTPS**
+  (`play-live.paiecashfan.com`). Comme le site est en https et que **LWS bloquait**
+  la validation Let's Encrypt (refus de servir un enregistrement sous un CNAME), le
+  **DNS de `paiecashfan.com` a été migré de LWS vers Cloudflare** (site Vercel + mail
+  LWS **intacts**, tous les enregistrements en « DNS only »), puis un **certificat
+  Let's Encrypt** a été émis via acme.sh + **API Cloudflare** et **auto-renouvelé**
+  (uploadé dans BytePlus, HTTPS activé sur le domaine de lecture). Chaîne validée
+  (ffprobe / VLC / navigateur). Pas de token d'auth de lecture. Détails dans la
+  mémoire projet `streaming-byteplus-dns`.
+  **Code** — `StreamPlayer.jsx` : le lecteur HLS démarre en **autoplay muté**
+  (+ bouton « Activer le son ») et devient **auto-résilient** : overlay
+  « En attente du direct… » + **reprise automatique** si le flux n'est pas encore
+  poussé (404) ou se coupe → un club peut cliquer « Passer en direct » **avant** de
+  lancer OBS sans que les fans voient un écran figé.
+  `MonClub.jsx` : un `club_admin` déjà rattaché à son club est **redirigé
+  directement vers `/mon-club/bo`** (l'écran « Candidature validée » ne s'affiche
+  plus qu'**une seule fois**, juste après la validation).
 - **2026-07-24 (bv)** — **Fix régression : club_admin bloqué (403) sur son BO club**.
   Le fix sécu (bo) avait ajouté `router.use(requireRole('super_admin'))` au routeur
   **governance**, monté sur le chemin **large** `/api/v2/admin` **avant** les sous-

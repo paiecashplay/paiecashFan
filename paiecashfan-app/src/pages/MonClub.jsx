@@ -4,7 +4,7 @@
 //   • submitted / under_review             → écran « vérification en cours »
 //   • approved                             → accès au BO du club (Phase 4)
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Building2, Search, Upload, FileText, Check, X, Loader2,
@@ -90,6 +90,14 @@ function ApprovedScreen({ application }) {
   // Le rôle vient d'être mis à jour côté serveur → on rafraîchit le profil en
   // cache pour débloquer l'accès au BO (sinon le garde de route bloque).
   useEffect(() => { refreshProfile?.(); }, []); // eslint-disable-line
+
+  // Déjà club_admin rattaché à son club → accès DIRECT au BO. L'écran de
+  // bienvenue ne s'affiche donc qu'une fois (juste après validation, tant que
+  // le profil en cache n'est pas encore club_admin) ; aux visites suivantes on
+  // saute droit au back-office.
+  if (profile?.role === 'club_admin' && profile?.club_id) {
+    return <Navigate to="/mon-club/bo" replace />;
+  }
 
   async function goToBO() {
     setGoing(true);
