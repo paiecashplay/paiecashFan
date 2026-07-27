@@ -126,7 +126,8 @@ a tout, le club_admin est **scopé à son `club_id`**.
 
 ### 🎥 Live / streaming — améliorations possibles (base livrée le 2026-07-21)
 - Bannière match live + section « Matchs en direct » + streaming embed = **faits**. Pistes : planning des lives par match/événement, low-latency (Mux/Cloudflare) si besoin d'un flux propre, curation fine des ligues affichées.
-- ✅ **Streaming propre BytePlus MediaLive en HTTPS** : livré le 2026-07-27 (push RTMP → lecture HLS `.m3u8` en https sur `play-live.paiecashfan.com`, DNS migré sur Cloudflare, certificat Let's Encrypt auto-renouvelé, lecteur autoplay + auto-retry). Les clubs poussent via **OBS** (RTMP). Reste : automatiser la création de flux par club (`backend/services/byteplus.js`, AK/SK), et convention de `StreamName` par club (aujourd'hui l'URL `.m3u8` est collée à la main dans le BO).
+- ✅ **Streaming propre BytePlus MediaLive en HTTPS** : livré le 2026-07-27 (push RTMP → lecture HLS `.m3u8` en https sur `play-live.paiecashfan.com`, DNS migré sur Cloudflare, certificat Let's Encrypt auto-renouvelé, lecteur autoplay + auto-retry).
+- ✅ **Mode natif « PaieCashFan Live » automatisé** : livré le 2026-07-27 (`bx`). Accès OBS générés par club dans le BO (push signé Type B), push authentifié côté BytePlus. Pistes restantes : **pull auth** si on veut réserver la lecture aux fans connectés (aujourd'hui la lecture HLS est publique) ; planning des lives ; low-latency (LL-HLS/RTM) si besoin.
 
 ### Historique
 Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Resend, persistance DB panier billetterie…).
@@ -134,6 +135,25 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-27 (bx)** — **Streaming natif « PaieCashFan Live » automatisé (accès OBS auto par club)**.
+  Un club diffuse désormais **sans toucher à BytePlus** : le BO lui génère ses accès
+  **OBS** (Serveur + Clé de stream **signée**) prêts à copier + un bouton
+  « Passer en direct ». **Sécurité** : l'**authentification d'URL du push** est activée
+  côté BytePlus (Type B, md5) → seul le **backend** (clé secrète
+  `BYTEPLUS_PUSH_AUTH_KEY`) peut signer une URL de push valide → un tiers **ne peut pas
+  diffuser** sur la chaîne officielle d'un club, même en connaissant l'URL de lecture
+  publique.
+  **Backend** — `services/byteplus.js` : signe l'URL de push
+  (`sign = md5("/"+app+"/"+stream+key+expire)`, clé OBS valable 7 j par défaut) +
+  calcule l'URL de lecture HLS. `routes/v2/live.js` : `GET`/`POST
+  /api/v2/live/club/:slug/broadcast` (scopé club_admin/super_admin) — nom de flux
+  **unique et persistant** par club (`metadata.stream.streamName`), URL de lecture
+  **calculée serveur** (jamais fournie par le client). Le mode « Lien externe »
+  (YouTube/Twitch/HLS) reste disponible via le `PATCH …/stream`.
+  **Front** — `StreamControl` à **2 onglets** (PaieCashFan Live / Lien externe) :
+  copie des accès OBS, guide « Comment diffuser », go-live en 1 clic.
+  ⚠️ **Prod** : ajouter `BYTEPLUS_PUSH_AUTH_KEY` dans les variables **Railway** pour
+  activer le mode natif (sinon repli automatique sur « Lien externe »).
 - **2026-07-27 (bw)** — **Streaming live en HTTPS opérationnel + lecteur robuste + accès BO direct**.
   Streaming **BytePlus MediaLive** finalisé de bout en bout : push **RTMP**
   (`push-live.paiecashfan.com`) → BytePlus → lecture **HLS `.m3u8` en HTTPS**
