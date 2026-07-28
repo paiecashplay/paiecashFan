@@ -41,11 +41,14 @@ export function LiveMatchesStrip() {
 }
 
 function MatchCard({ m }) {
-  const slug = m.homeSlug || m.awaySlug || null;
-  const base = 'min-w-[230px] shrink-0 rounded-2xl border p-3';
+  const hasClub = !!(m.homeSlug || m.awaySlug);
+  const base = 'min-w-[230px] shrink-0 rounded-2xl border p-3 transition-colors';
+  const cls = hasClub
+    ? 'border-emerald-500/25 bg-ink-900/60 hover:border-emerald-400/60 hover:bg-ink-900'
+    : 'border-white/10 bg-ink-900/60 hover:border-white/25 hover:bg-ink-900';
 
-  const inner = (
-    <>
+  return (
+    <Link to={`/match/${m.fixtureId}`} className={`${base} ${cls}`}>
       <div className="flex items-center justify-between">
         <span className="truncate text-[10px] font-bold uppercase tracking-wider text-bone-500">{m.competition}</span>
         <span className="inline-flex items-center gap-1 text-[10px] font-black text-red-400">
@@ -56,21 +59,9 @@ function MatchCard({ m }) {
         <TeamRow name={m.homeTeam} logo={m.homeLogo} score={m.homeScore} highlight={!!m.homeSlug} />
         <TeamRow name={m.awayTeam} logo={m.awayLogo} score={m.awayScore} highlight={!!m.awaySlug} />
       </div>
-      {slug && (
-        <div className="mt-2 text-[10px] font-black uppercase tracking-wider text-emerald-400">Voir le Fan Club →</div>
-      )}
-    </>
+      <div className="mt-2 text-[10px] font-black uppercase tracking-wider text-bone-500">Voir le match →</div>
+    </Link>
   );
-
-  if (slug) {
-    return (
-      <Link to={`/clubs/${slug}/fan-club`}
-        className={`${base} border-emerald-500/25 bg-ink-900/60 transition-colors hover:border-emerald-400/60 hover:bg-ink-900`}>
-        {inner}
-      </Link>
-    );
-  }
-  return <div className={`${base} border-white/10 bg-ink-900/60`}>{inner}</div>;
 }
 
 function TeamRow({ name, logo, score, highlight }) {

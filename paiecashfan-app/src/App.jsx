@@ -13,6 +13,7 @@ import { Boutique } from './pages/Boutique';
 import { Tombola } from './pages/Tombola';
 import { FanClub } from './pages/FanClub';
 import { FanClubHub } from './pages/FanClubHub';
+import { MatchLive } from './pages/MatchLive';
 import { FederationDetail } from './pages/FederationDetail';
 import { ClubDetail } from './pages/ClubDetail';
 import { Login } from './pages/Login';
@@ -98,6 +99,7 @@ export default function App() {
                   <Route path="/panier" element={<CartPage />} />
                   <Route path="/tombola" element={<Tombola />} />
                   <Route path="/fan-club" element={<FanClubHub />} />
+                  <Route path="/match/:fixtureId" element={<MatchLive />} />
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />

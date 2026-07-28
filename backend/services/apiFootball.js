@@ -204,7 +204,53 @@ async function getLiveFixtures(leagueIds = DEFAULT_LIVE_LEAGUES) {
   return cached(`livefeed:${key}`, 30_000, () => fetchFixtures({ live: key }));
 }
 
+// ── Détail d'un match (page « match center ») ────────────────────
+async function getFixtureById(id) {
+  const list = await cached(`fixture:${id}`, 30_000, () => fetchFixtures({ id }));
+  return list[0] || null;
+}
+
+async function getFixtureEvents(id) {
+  return cached(`events:${id}`, 30_000, async () => {
+    const { data } = await client().get('/fixtures/events', { params: { fixture: id } });
+    check(data);
+    return (data.response || []).map((e) => ({
+      minute: e.time?.elapsed ?? null,
+      extra:  e.time?.extra ?? null,
+      teamId: e.team?.id ?? null,
+      team:   e.team?.name || null,
+      player: e.player?.name || null,
+      assist: e.assist?.name || null,
+      type:   e.type || null,      // Goal | Card | subst | Var
+      detail: e.detail || null,    // Normal Goal | Penalty | Yellow Card | Red Card | ...
+    }));
+  });
+}
+
+async function getFixtureStatistics(id) {
+  return cached(`stats:${id}`, 30_000, async () => {
+    const { data } = await client().get('/fixtures/statistics', { params: { fixture: id } });
+    check(data);
+    return (data.response || []).map((s) => ({
+      teamId:   s.team?.id ?? null,
+      teamName: s.team?.name || null,
+      stats:    (s.statistics || []).map((x) => ({ type: x.type, value: x.value })),
+    }));
+  });
+}
+
+// Détail complet : le match + les événements + les stats (best-effort sur events/stats).
+async function getFixtureDetail(id) {
+  const match = await getFixtureById(id);
+  if (!match) return null;
+  const [events, statistics] = await Promise.all([
+    getFixtureEvents(id).catch(() => []),
+    getFixtureStatistics(id).catch(() => []),
+  ]);
+  return { match, events, statistics };
+}
+
 module.exports = {
   searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getLeaguesByCountryName,
-  getTeamsByLeagueSeason, getMatchForTeam, getLiveFixtures, DEFAULT_LIVE_LEAGUES,
+  getTeamsByLeagueSeason, getMatchForTeam, getLiveFixtures, getFixtureDetail, DEFAULT_LIVE_LEAGUES,
 };

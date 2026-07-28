@@ -80,6 +80,24 @@ router.get('/matches', async (req, res) => {
   }
 });
 
+// GET /api/v2/live/match/:fixtureId — détail d'un match (page « match center »).
+// Public. Fail-soft. Enrichit avec les slugs des clubs inscrits (lien Fan Club).
+router.get('/match/:fixtureId', async (req, res) => {
+  try {
+    if (!process.env.API_FOOTBALL_KEY) return ok(res, { available: false, match: null });
+    const detail = await apiFootball.getFixtureDetail(req.params.fixtureId);
+    if (!detail?.match) return ok(res, { available: false, match: null });
+    const ids = [detail.match.homeTeamId, detail.match.awayTeamId].filter((x) => x != null);
+    const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));
+    detail.match.homeSlug = detail.match.homeTeamId != null ? (slugByAfid[String(detail.match.homeTeamId)] || null) : null;
+    detail.match.awaySlug = detail.match.awayTeamId != null ? (slugByAfid[String(detail.match.awayTeamId)] || null) : null;
+    return ok(res, { available: true, ...detail });
+  } catch (err) {
+    console.warn('[LIVE] /match indisponible:', err.message);
+    return ok(res, { available: false, match: null });
+  }
+});
+
 router.get('/club/:slug', async (req, res) => {
   try {
     const t = await tenants.getTenantBySlugFlexible(req.params.slug);

@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-28 (ca)** — **Page « Match center » (Option B — watch-along léger)**.
+  Nouvelle page **`/match/:fixtureId`** : **score, statut/minute, fil du match** (buts,
+  cartons, remplacements) et **statistiques** en direct (données API-Football,
+  rafraîchies toutes les 45 s tant que le match est live). Pour les **clubs inscrits**,
+  boutons « Discuter — {équipe} » vers leur **salon Fan Club existant** (chat déjà
+  modéré → aucune nouvelle surface à modérer). Toutes les cards « Matchs en direct »
+  pointent désormais vers cette page. Backend : `apiFootball.getFixtureDetail(id)`
+  (fixture + events + statistics, cache 30 s) + route publique
+  `GET /api/v2/live/match/:fixtureId` (enrichie des slugs clubs). ⚠️ **Toujours aucune
+  vidéo** (droits de diffusion). Le **chat de match dédié + les défis** restent un
+  chantier séparé (tables `match_rooms`/… à créer + modération) — écarté pour l'instant.
 - **2026-07-28 (bz)** — **« Matchs en direct » cliquables vers le Fan Club (Option A)**.
   Le bandeau live (API-Football) rattache chaque équipe à son **club inscrit** via
   `api_football_id` : une card impliquant un club de la plateforme devient
