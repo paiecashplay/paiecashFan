@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Radio } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 // Bandeau « Matchs en direct » (API-Football) — grandes compétitions, y compris
-// des clubs NON inscrits sur la plateforme. Se masque s'il n'y a aucun live.
+// des clubs NON inscrits. Se masque s'il n'y a aucun live. Une card dont une
+// équipe est un club INSCRIT devient cliquable → son Fan Club.
 export function LiveMatchesStrip() {
   const [matches, setMatches] = useState(null);
   const timer = useRef(null);
@@ -32,32 +34,52 @@ export function LiveMatchesStrip() {
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-        {matches.slice(0, 16).map((m) => (
-          <div key={m.fixtureId} className="min-w-[230px] shrink-0 rounded-2xl border border-white/10 bg-ink-900/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="truncate text-[10px] font-bold uppercase tracking-wider text-bone-500">{m.competition}</span>
-              <span className="inline-flex items-center gap-1 text-[10px] font-black text-red-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />{m.minute != null ? `${m.minute}'` : 'LIVE'}
-              </span>
-            </div>
-            <div className="mt-2 space-y-1.5">
-              <TeamRow name={m.homeTeam} logo={m.homeLogo} score={m.homeScore} />
-              <TeamRow name={m.awayTeam} logo={m.awayLogo} score={m.awayScore} />
-            </div>
-          </div>
-        ))}
+        {matches.slice(0, 16).map((m) => <MatchCard key={m.fixtureId} m={m} />)}
       </div>
     </section>
   );
 }
 
-function TeamRow({ name, logo, score }) {
+function MatchCard({ m }) {
+  const slug = m.homeSlug || m.awaySlug || null;
+  const base = 'min-w-[230px] shrink-0 rounded-2xl border p-3';
+
+  const inner = (
+    <>
+      <div className="flex items-center justify-between">
+        <span className="truncate text-[10px] font-bold uppercase tracking-wider text-bone-500">{m.competition}</span>
+        <span className="inline-flex items-center gap-1 text-[10px] font-black text-red-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />{m.minute != null ? `${m.minute}'` : 'LIVE'}
+        </span>
+      </div>
+      <div className="mt-2 space-y-1.5">
+        <TeamRow name={m.homeTeam} logo={m.homeLogo} score={m.homeScore} highlight={!!m.homeSlug} />
+        <TeamRow name={m.awayTeam} logo={m.awayLogo} score={m.awayScore} highlight={!!m.awaySlug} />
+      </div>
+      {slug && (
+        <div className="mt-2 text-[10px] font-black uppercase tracking-wider text-emerald-400">Voir le Fan Club →</div>
+      )}
+    </>
+  );
+
+  if (slug) {
+    return (
+      <Link to={`/clubs/${slug}/fan-club`}
+        className={`${base} border-emerald-500/25 bg-ink-900/60 transition-colors hover:border-emerald-400/60 hover:bg-ink-900`}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={`${base} border-white/10 bg-ink-900/60`}>{inner}</div>;
+}
+
+function TeamRow({ name, logo, score, highlight }) {
   return (
     <div className="flex items-center gap-2">
       {logo
         ? <img src={logo} alt="" className="h-5 w-5 shrink-0 object-contain" loading="lazy" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
         : <span className="h-5 w-5 shrink-0" />}
-      <span className="min-w-0 flex-1 truncate text-sm font-bold text-bone-100">{name}</span>
+      <span className={`min-w-0 flex-1 truncate text-sm font-bold ${highlight ? 'text-emerald-300' : 'text-bone-100'}`}>{name}</span>
       <span className="font-display text-base font-black tabular-nums text-bone-50">{score ?? 0}</span>
     </div>
   );

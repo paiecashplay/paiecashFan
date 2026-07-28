@@ -143,6 +143,26 @@ async function getTenantCount(filters = {}) {
   return count || 0;
 }
 
+// Map { api_football_id (string) : slug } pour les clubs ACTIFS correspondant à
+// ces IDs d'équipe API-Football. Sert à rendre cliquables les « matchs en direct »
+// qui impliquent un club inscrit.
+async function slugsByApiFootballIds(ids) {
+  const clean = [...new Set((ids || []).filter((x) => x != null).map(String))];
+  if (!clean.length) return {};
+  const { data, error } = await supabase
+    .from('tenants')
+    .select('slug, metadata')
+    .eq('status', 'active')
+    .in('metadata->>api_football_id', clean);
+  if (error) return {};
+  const map = {};
+  (data || []).forEach((t) => {
+    const afid = t.metadata?.api_football_id;
+    if (afid != null && t.slug) map[String(afid)] = t.slug;
+  });
+  return map;
+}
+
 module.exports = {
   createTenant,
   getTenantById,
@@ -153,5 +173,6 @@ module.exports = {
   approveTenant,
   rejectTenant,
   suspendTenant,
-  getTenantCount
+  getTenantCount,
+  slugsByApiFootballIds
 };

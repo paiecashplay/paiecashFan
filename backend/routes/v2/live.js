@@ -64,7 +64,16 @@ router.get('/matches', async (req, res) => {
   try {
     if (!process.env.API_FOOTBALL_KEY) return ok(res, { available: false, matches: [] });
     const matches = await apiFootball.getLiveFixtures();
-    return ok(res, { available: true, matches });
+    // Rattache les clubs INSCRITS (via api_football_id) → cards cliquables vers leur Fan Club.
+    const ids = [];
+    matches.forEach((m) => { if (m.homeTeamId != null) ids.push(m.homeTeamId); if (m.awayTeamId != null) ids.push(m.awayTeamId); });
+    const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));
+    const enriched = matches.map((m) => ({
+      ...m,
+      homeSlug: m.homeTeamId != null ? (slugByAfid[String(m.homeTeamId)] || null) : null,
+      awaySlug: m.awayTeamId != null ? (slugByAfid[String(m.awayTeamId)] || null) : null,
+    }));
+    return ok(res, { available: true, matches: enriched });
   } catch (err) {
     console.warn('[LIVE] /matches indisponible:', err.message);
     return ok(res, { available: false, matches: [] });

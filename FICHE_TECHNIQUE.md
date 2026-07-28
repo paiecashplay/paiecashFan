@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-28 (bz)** — **« Matchs en direct » cliquables vers le Fan Club (Option A)**.
+  Le bandeau live (API-Football) rattache chaque équipe à son **club inscrit** via
+  `api_football_id` : une card impliquant un club de la plateforme devient
+  **cliquable → sa page Fan Club** (équipe surlignée + « Voir le Fan Club → »). Les
+  matchs sans club inscrit restent informatifs. `apiFootball.mapFixture` expose
+  `homeTeamId`/`awayTeamId` ; `tenants.slugsByApiFootballIds()` mappe id→slug ; la route
+  `/api/v2/live/matches` renvoie `homeSlug`/`awaySlug`. ⚠️ **Aucune vidéo** de ces
+  matchs pro (droits de diffusion → illégal) : on n'expose que les **données** + le
+  lien vers la communauté. Suite (Option B) : page « watch-along » de match
+  (score/stats + chat/défis via le backend `/api/match-rooms` déjà écrit mais non branché).
 - **2026-07-27 (by)** — **Notification in-app « club en direct » aux followers**.
   Quand un club **passe en direct** (mode natif OU lien externe), tous les fans qui le
   **suivent** (⭐ `fan_favorite_clubs`) reçoivent une notif 🔔 « 🔴 {Club} est en

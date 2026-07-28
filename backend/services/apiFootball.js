@@ -160,6 +160,8 @@ function mapFixture(r) {
     kickoff:     r.fixture.date || null,
     competition: r.league?.name || null,
     round:       r.league?.round || null,
+    homeTeamId:  r.teams?.home?.id ?? null,
+    awayTeamId:  r.teams?.away?.id ?? null,
     homeTeam:    r.teams?.home?.name || null,
     awayTeam:    r.teams?.away?.name || null,
     homeLogo:    r.teams?.home?.logo || null,
