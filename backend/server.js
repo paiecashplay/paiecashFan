@@ -137,6 +137,7 @@ const v2AdminUsers    = require('./routes/v2/admin/users');
 const v2AdminModeration = require('./routes/v2/admin/moderation');
 const v2AdminPrizes   = require('./routes/v2/admin/prizes');
 const v2Live          = require('./routes/v2/live');
+const v2ShopLive = require('./routes/v2/shop-live');
 
 // Platform 1: Mint Engine + Wallet Super App
 app.use('/api/v2/mint/auth', v2MintAuth);
@@ -156,6 +157,7 @@ app.use('/api/v2/clubs', v2FanFeed);
 app.use('/api/v2/tombola', v2Tombola);
 app.use('/api/v2/bingo', v2Bingo);
 app.use('/api/v2/live', v2Live);
+app.use('/api/v2/shop-live', v2ShopLive);
 app.use('/api/v2/marketplace/search', v2MarketSearch);
 app.use('/api/v2/onboarding', v2Onboarding);
 app.use('/api/v2/me', v2Me);
