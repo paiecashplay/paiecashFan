@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-07-27.
+> Dernière mise à jour : 2026-07-30.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,18 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-07-30 (cb)** — **Persistance des matchs (snapshot) + section « Matchs du club »**.
+  Un match **terminé** est **figé dans notre base** (table `match_snapshots`, migration
+  **`021`**) à son premier affichage : la page `/match/:id` d'un match fini est ensuite
+  servie **depuis notre base** (permanent, instantané, **0 quota API**) — même si
+  API-Football finit par ne plus le servir. Résilient : si la migration n'est pas jouée,
+  tout **dégrade sur l'API** (aucun crash). Nouvelle route
+  `GET /api/v2/live/club/:slug/fixtures` (**résultats récents + prochains matchs** du
+  club via `api_football_id`) + section **« Matchs du club »** sur la page Fan Club
+  (`ClubFixtures`, chaque match cliquable → match center) → un fan **retrouve un match
+  passé** au lieu de dépendre du bandeau live éphémère. Back :
+  `apiFootball.getTeamFixtures`, `db/matchSnapshots.js`. ⚠️ **À jouer dans Supabase** :
+  `backend/migrations/021_match_snapshots.sql`.
 - **2026-07-28 (ca)** — **Page « Match center » (Option B — watch-along léger)**.
   Nouvelle page **`/match/:fixtureId`** : **score, statut/minute, fil du match** (buts,
   cartons, remplacements) et **statistiques** en direct (données API-Football,

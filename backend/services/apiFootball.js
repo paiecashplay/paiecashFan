@@ -239,6 +239,17 @@ async function getFixtureStatistics(id) {
   });
 }
 
+// Résultats récents + prochains matchs d'un club (page « Matchs du club »).
+async function getTeamFixtures(teamId, { last = 5, next = 3 } = {}) {
+  if (!teamId) return { recent: [], upcoming: [] };
+  const [recent, upcoming] = await Promise.all([
+    cached(`teamlast:${teamId}:${last}`, 300_000, () => fetchFixtures({ team: teamId, last })),
+    cached(`teamnext:${teamId}:${next}`, 300_000, () => fetchFixtures({ team: teamId, next })),
+  ]);
+  // API-Football renvoie « last » du plus ancien au plus récent → on remet le plus récent en tête.
+  return { recent: recent.slice().reverse(), upcoming };
+}
+
 // Détail complet : le match + les événements + les stats (best-effort sur events/stats).
 async function getFixtureDetail(id) {
   const match = await getFixtureById(id);
@@ -252,5 +263,5 @@ async function getFixtureDetail(id) {
 
 module.exports = {
   searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getLeaguesByCountryName,
-  getTeamsByLeagueSeason, getMatchForTeam, getLiveFixtures, getFixtureDetail, DEFAULT_LIVE_LEAGUES,
+  getTeamsByLeagueSeason, getMatchForTeam, getLiveFixtures, getFixtureDetail, getTeamFixtures, DEFAULT_LIVE_LEAGUES,
 };

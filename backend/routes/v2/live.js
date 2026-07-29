@@ -15,7 +15,17 @@ const apiFootball = require('../../services/apiFootball');
 const { parseStreamUrl } = require('../../services/streamEmbed');
 const byteplus = require('../../services/byteplus');
 const notifications = require('../../db/notifications');
+const matchSnapshots = require('../../db/matchSnapshots');
 const tenants = require('../../db/tenants');
+
+// Ajoute les slugs des clubs inscrits (home/away) à un objet match (lien Fan Club).
+async function attachClubSlugs(match) {
+  const ids = [match.homeTeamId, match.awayTeamId].filter((x) => x != null);
+  const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));
+  match.homeSlug = match.homeTeamId != null ? (slugByAfid[String(match.homeTeamId)] || null) : null;
+  match.awaySlug = match.awayTeamId != null ? (slugByAfid[String(match.awayTeamId)] || null) : null;
+  return match;
+}
 
 const router = express.Router();
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
@@ -81,16 +91,25 @@ router.get('/matches', async (req, res) => {
 });
 
 // GET /api/v2/live/match/:fixtureId — détail d'un match (page « match center »).
-// Public. Fail-soft. Enrichit avec les slugs des clubs inscrits (lien Fan Club).
+// Public. Fail-soft. Match FINI → servi depuis notre snapshot (permanent, 0 quota).
+// Sinon → API-Football (et on fige le match s'il est déjà terminé).
 router.get('/match/:fixtureId', async (req, res) => {
   try {
-    if (!process.env.API_FOOTBALL_KEY) return ok(res, { available: false, match: null });
-    const detail = await apiFootball.getFixtureDetail(req.params.fixtureId);
+    const id = req.params.fixtureId;
+
+    // 1) Snapshot d'un match fini : servi depuis notre base (rapide, sans quota).
+    let detail = await matchSnapshots.getSnapshot(id);
+
+    // 2) Sinon on interroge l'API, puis on fige si le match est terminé.
+    if (!detail) {
+      if (!process.env.API_FOOTBALL_KEY) return ok(res, { available: false, match: null });
+      detail = await apiFootball.getFixtureDetail(id);
+      if (detail?.match) matchSnapshots.saveSnapshot(id, detail); // best-effort (fige si FT)
+    }
     if (!detail?.match) return ok(res, { available: false, match: null });
-    const ids = [detail.match.homeTeamId, detail.match.awayTeamId].filter((x) => x != null);
-    const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));
-    detail.match.homeSlug = detail.match.homeTeamId != null ? (slugByAfid[String(detail.match.homeTeamId)] || null) : null;
-    detail.match.awaySlug = detail.match.awayTeamId != null ? (slugByAfid[String(detail.match.awayTeamId)] || null) : null;
+
+    // Slugs dérivés à la volée (un club peut s'inscrire après le snapshot).
+    await attachClubSlugs(detail.match);
     return ok(res, { available: true, ...detail });
   } catch (err) {
     console.warn('[LIVE] /match indisponible:', err.message);
@@ -110,6 +129,31 @@ router.get('/club/:slug', async (req, res) => {
   } catch (err) {
     console.warn('[LIVE] /club indisponible:', err.message);
     return ok(res, { available: false, match: null });
+  }
+});
+
+// GET /api/v2/live/club/:slug/fixtures — résultats récents + prochains matchs du club.
+// Public. Chaque match est cliquable → page « match center » (/match/:fixtureId).
+router.get('/club/:slug/fixtures', async (req, res) => {
+  try {
+    const t = await tenants.getTenantBySlugFlexible(req.params.slug);
+    if (!t) return fail(res, 'Club introuvable.', 404);
+    const teamId = t.metadata?.api_football_id || null;
+    if (!teamId || !process.env.API_FOOTBALL_KEY) return ok(res, { available: false, recent: [], upcoming: [] });
+
+    const { recent, upcoming } = await apiFootball.getTeamFixtures(teamId, { last: 5, next: 3 });
+    // Rattache les slugs des adversaires inscrits (batch, une seule requête).
+    const ids = [...recent, ...upcoming].flatMap((m) => [m.homeTeamId, m.awayTeamId]).filter((x) => x != null);
+    const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));
+    const enrich = (m) => ({
+      ...m,
+      homeSlug: m.homeTeamId != null ? (slugByAfid[String(m.homeTeamId)] || null) : null,
+      awaySlug: m.awayTeamId != null ? (slugByAfid[String(m.awayTeamId)] || null) : null,
+    });
+    return ok(res, { available: true, recent: recent.map(enrich), upcoming: upcoming.map(enrich) });
+  } catch (err) {
+    console.warn('[LIVE] /club/fixtures indisponible:', err.message);
+    return ok(res, { available: false, recent: [], upcoming: [] });
   }
 });
 

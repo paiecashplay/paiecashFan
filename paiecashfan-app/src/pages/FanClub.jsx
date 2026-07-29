@@ -15,6 +15,7 @@ import { ActiveSanctionBanner } from '@/components/fanclub/ActiveSanctionBanner'
 import { BlockedMessageModal } from '@/components/fanclub/BlockedMessageModal';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
+import { ClubFixtures } from '@/components/fanclub/ClubFixtures';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
@@ -310,6 +311,8 @@ export function FanClub() {
           onReact={handleLiveReaction}
           fanPoints={fanPoints}
         />
+
+        <ClubFixtures slug={slug} />
 
         {/* Streaming à GAUCHE + chat à DROITE dès `lg` (1024 px). Avant, le
             côte-à-côte n'arrivait qu'à `xl` (1280 px) : sur un écran un peu
