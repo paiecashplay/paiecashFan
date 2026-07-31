@@ -7,7 +7,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Info, Users, Trophy, ShoppingBag, Ticket, Upload, Save,
-  Loader2, Check, X, ExternalLink, Gift, ShieldAlert, PackageCheck
+  Loader2, Check, X, ExternalLink, Gift, ShieldAlert, PackageCheck, Radio 
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { apiFetch } from '@/lib/api';
@@ -18,6 +18,7 @@ import { TombolaManager } from '@/components/tombola/TombolaManager';
 import { PrizeFulfillmentPanel } from '@/components/prizes/PrizeFulfillmentPanel';
 import { StreamControl } from '@/components/fanclub/StreamControl';
 import { ModerationQueue } from '@/components/moderation/ModerationQueue';
+import  ShopLiveTab  from '@/components/shop-live/ShopLiveTab';
 import { cn } from '@/lib/cn';
 
 const TABS = [
@@ -25,6 +26,7 @@ const TABS = [
   { id: 'players',   label: 'Joueurs',     icon: Users },
   { id: 'trophies',  label: 'Palmarès',    icon: Trophy },
   { id: 'products',  label: 'Boutique',    icon: ShoppingBag },
+  { id: 'shop-live', label: 'Live Boutique', icon: Radio},
   { id: 'ticketing', label: 'Billetterie', icon: Ticket },
   { id: 'tombola',   label: 'Tombola',     icon: Gift },
   { id: 'prizes',    label: 'Gains',       icon: PackageCheck },
@@ -117,6 +119,7 @@ export function MonClubBO() {
               {tab === 'players'   && <PlayersTab   tenantId={clubId} showToast={showToast} />}
               {tab === 'trophies'  && <TrophiesTab  tenantId={clubId} showToast={showToast} />}
               {tab === 'products'  && <ProductsTab  tenantId={clubId} showToast={showToast} />}
+              {tab === 'shop-live' && <ShopLiveTab  club={club}  showToast={showToast} />}
               {tab === 'ticketing' && <TicketingTab tenantId={clubId} club={club} showToast={showToast} />}
               {tab === 'tombola'   && <TombolaManager clubId={clubId} title="Tombolas du club" subtitle="Lance une tombola pour tes supporters (tirage auto à la date de fin)." />}
               {tab === 'prizes'    && <PrizeFulfillmentPanel />}

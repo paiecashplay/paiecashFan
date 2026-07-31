@@ -172,6 +172,13 @@ async function markRoomEnded(
   });
 }
 
+async function cancelRoom(id) {
+  return updateRoom(id, {
+    status: 'cancelled',
+    ended_at: new Date().toISOString(),
+  });
+}
+
 async function listRoomProducts(
   liveRoomId
 ) {
@@ -380,6 +387,7 @@ module.exports = {
   markRoomFailed,
   markRoomLive,
   markRoomEnded,
+  cancelRoom,
 
   listRoomProducts,
   addRoomProduct,
