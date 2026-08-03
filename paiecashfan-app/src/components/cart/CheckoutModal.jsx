@@ -41,9 +41,17 @@ function CheckoutInner({ cart, onClose }) {
   const navigate = useNavigate();
 
   const [step, setStep] = useState(0);            // 0 Livraison · 1 Paiement · 2 Confirmation
-  const [form, setForm] = useState({
-    firstName: '', lastName: '', email: user?.email || '', phone: '',
-    address1: '', address2: '', postalCode: '', city: '', country: 'France',
+  // Pré-remplissage : on réutilise l'adresse de la dernière commande (stockée en
+  // local sur cet appareil) → plus besoin de tout resaisir à chaque fois.
+  const [form, setForm] = useState(() => {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('pcf_delivery') || '{}'); } catch { saved = {}; }
+    return {
+      firstName: saved.firstName || '', lastName: saved.lastName || '',
+      email: user?.email || saved.email || '', phone: saved.phone || '',
+      address1: saved.address1 || '', address2: saved.address2 || '',
+      postalCode: saved.postalCode || '', city: saved.city || '', country: saved.country || 'France',
+    };
   });
   const [shippingMethod, setShippingMethod] = useState('standard');
   const [payMethod, setPayMethod] = useState('pcc');   // pcc | card
@@ -82,6 +90,13 @@ function CheckoutInner({ cart, onClose }) {
           },
         }),
       });
+      // Mémorise l'adresse de livraison pour la pré-remplir la prochaine fois.
+      try {
+        localStorage.setItem('pcf_delivery', JSON.stringify({
+          firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone,
+          address1: form.address1, address2: form.address2, postalCode: form.postalCode, city: form.city, country: form.country,
+        }));
+      } catch { /* stockage indisponible → tant pis */ }
       if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
       // PCC → payé immédiatement : on fige le récap puis on vide le panier.
       setConfirmed({ items: [...items], feePcc, grandPcc, grandEur });

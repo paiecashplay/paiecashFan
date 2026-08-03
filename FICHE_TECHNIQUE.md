@@ -135,6 +135,15 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (ch)** — **Live Boutique : bouton « Regarder en plein écran » + adresse checkout pré-remplie**.
+  (1) L'iframe de visionnage BytePlus reste parfois en aperçu (restrictions d'embed) →
+  ajout d'un bouton **« Regarder en plein écran ↗ »** (ouvre la page de visionnage dans
+  un onglet, sans restriction). Rappel : dans le studio, la caméra allumée ≠ diffusion,
+  il faut **publier** le live. (2) **CheckoutModal** : l'adresse de livraison est
+  désormais **sauvegardée localement** après une commande et **pré-remplie** aux
+  suivantes (clé `pcf_delivery`, par appareil) — plus besoin de tout resaisir. **Validé
+  au test** : produits du live (image/prix/en avant) + « Acheter » → panier → checkout PCC
+  fonctionnent de bout en bout.
 - **2026-08-03 (cg)** — **Fixes Live Boutique (retours test)**. (1) **Produits BO vides** :
   `useShopLive` **aplatit** désormais les produits imbriqués (`product:products(*)`)
   → nom/image/prix affichés + boutons « Mettre en avant »/« Retirer » utilisent le

@@ -65,15 +65,25 @@ export function ClubShopLive({ slug }) {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           {/* Vidéo — page de visionnage hébergée BytePlus */}
-          <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
-            <iframe
-              src={room.viewerUrl}
-              title={room.title || 'Live Boutique'}
-              className="h-full w-full"
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              allowFullScreen
-              frameBorder="0"
-            />
+          <div>
+            <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <iframe
+                src={room.viewerUrl}
+                title={room.title || 'Live Boutique'}
+                className="h-full w-full"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowFullScreen
+                frameBorder="0"
+              />
+            </div>
+            <a
+              href={room.viewerUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-400 transition-colors hover:text-emerald-300"
+            >
+              Regarder en plein écran ↗
+            </a>
           </div>
 
           {/* Produits présentés */}
