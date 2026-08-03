@@ -135,6 +135,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (ck)** — **BO Club : écran « Live & diffusion » redessiné (prompt §9)**.
+  `StreamControl` (BO uniquement) refondu au design « Espace Club » : **segmented
+  control** PaieCashFan Live / Lien externe ; accès OBS **Serveur** + **Clé de stream**
+  en **monospace** avec **Afficher/masquer** (clé secrète), **Copier** (retour ✓) et
+  **Régénérer** (avec confirmation) ; **guide OBS en 3 étapes** numérotées ; bouton
+  Passer en direct / Arrêter ; bloc **Programmation** informatif (passage manuel, planif
+  à venir). Mêmes endpoints backend (`/stream`, `/broadcast`), aucune régression.
 - **2026-08-04 (cj)** — **BO Club : bandeau KPI réel**. Nouvel endpoint scopé
   `GET /api/v2/admin/clubs-crud/clubs/:tenantId/kpis` : **fans abonnés**
   (`fan_favorite_clubs`), **billets vendus** + **ventes boutique** (table `orders`
