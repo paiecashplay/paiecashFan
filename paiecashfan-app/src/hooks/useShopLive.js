@@ -28,7 +28,25 @@ export function useShopLive(slug) {
     try {
       const response = await apiFetch(`${BASE}/club/${encodeURIComponent(slug)}/admin`);
       setRoom(response?.data?.room || null);
-      setLiveProductsState(Array.isArray(response?.data?.products) ? response.data.products : []);
+      // Aplatit chaque produit du live (données imbriquées `product:products(*)`)
+      // vers la forme attendue par le BO. `id` = product_id (feature/retirer se
+      // font par product_id côté backend).
+      setLiveProductsState(
+        (Array.isArray(response?.data?.products) ? response.data.products : []).map((it) => {
+          const p = it.product || {};
+          return {
+            id: p.id ?? it.product_id,
+            shopLiveProductId: it.id,
+            name: p.name,
+            image: p.image_url ?? (Array.isArray(p.images) ? p.images[0] : null),
+            category: p.category_slug || null,
+            price: p.pcc_price ?? null,
+            priceEur: p.eur_price ?? null,
+            is_featured: !!it.is_featured,
+            displayOrder: it.display_order ?? 0,
+          };
+        })
+      );
       setByteplusConfigured(Boolean(response?.data?.byteplusConfigured));
     } catch (loadError) {
       setRoom(null); setLiveProductsState([]); setByteplusConfigured(false);

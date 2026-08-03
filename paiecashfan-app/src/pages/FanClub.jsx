@@ -16,6 +16,7 @@ import { BlockedMessageModal } from '@/components/fanclub/BlockedMessageModal';
 import { ParticipantsPanel } from '@/components/fanclub/ParticipantsPanel';
 import { LiveMatchBanner } from '@/components/fanclub/LiveMatchBanner';
 import { ClubFixtures } from '@/components/fanclub/ClubFixtures';
+import { ClubShopLive } from '@/components/shop-live/ClubShopLive';
 import { LiveQuickActions } from '@/components/fanclub/LiveQuickActions';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useClubDetail } from '@/hooks/useClubDetail';
@@ -311,6 +312,8 @@ export function FanClub() {
           onReact={handleLiveReaction}
           fanPoints={fanPoints}
         />
+
+        <ClubShopLive slug={slug} />
 
         <ClubFixtures slug={slug} />
 

@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (cg)** — **Fixes Live Boutique (retours test)**. (1) **Produits BO vides** :
+  `useShopLive` **aplatit** désormais les produits imbriqués (`product:products(*)`)
+  → nom/image/prix affichés + boutons « Mettre en avant »/« Retirer » utilisent le
+  bon **`product_id`** (le backend filtre par `product_id`). Highlight via `is_featured`,
+  prix libellé **PCC**. (2) **Section fan** ajoutée aussi sur la **page Fan Club**
+  (`/clubs/:slug/fan-club`) — en plus de la page club — car c'est là que le fan regarde
+  le direct. Rappel : la section n'apparaît **que pendant un direct actif** (`status=live`),
+  et les **produits s'affichent sur la page fan**, pas dans le studio BytePlus.
 - **2026-08-03 (cf)** — **Live Boutique : côté fan (visionnage embarqué + produits + Acheter)**.
   BytePlus livesaas étant un produit **hébergé**, le fan regarde via la **page de
   visionnage BytePlus** (pas de flux HLS brut — `GetStreamsAPI` reste vide). URL de

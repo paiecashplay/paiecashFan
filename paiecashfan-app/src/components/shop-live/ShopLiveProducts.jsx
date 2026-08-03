@@ -58,6 +58,7 @@ export default function ShopLiveProducts({
         <div className="mt-6 space-y-3">
           {products.map((product) => {
             const isFeatured =
+              product.is_featured ||
               featuredProductId === product.id;
 
             return (
@@ -95,7 +96,7 @@ export default function ShopLiveProducts({
 
                     {product.price != null && (
                       <p className="mt-2 text-sm font-semibold text-emerald-400">
-                        {product.price} €
+                        {product.price} PCC
                       </p>
                     )}
 
