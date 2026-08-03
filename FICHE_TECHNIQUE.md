@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-07-30.
+> Dernière mise à jour : 2026-08-03.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,20 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (cc)** — **Module « Live Boutique » (BytePlus Live Shopping) — merge après audit**.
+  Intégration de la branche `feature/byteplus-live-shopping` (travail stagiaire) : un club
+  crée un **live shopping** (BytePlus Live SaaS) depuis le BO (onglet **« Live Boutique »**),
+  associe des produits de sa boutique, met un produit en avant, démarre/arrête le live ;
+  **notifs aux followers** (réutilise `notifyFollowers`). Back : `routes/v2/shop-live.js`
+  (11 endpoints — publics `/health` + `/club/:slug/current`, gestion en `requireAuth` +
+  scope club_admin, **pas d'IDOR** : tenant résolu depuis le room), `db/shopLive.js`,
+  `services/byteplusLiveShopping/*` (**AK/SK server-side**, SDK `@volcengine/openapi`),
+  `services/shopLiveNotifications.js`. 4 tables (`shop-live-byteplus.sql`). Front sans
+  accès Supabase direct, aucun secret exposé.
+  **Audit + correctifs avant merge** : (1) **RLS deny-all ajoutée** aux 4 tables (elle
+  manquait) ; (2) devDep `supabase` (CLI) retirée de la racine. ⚠️ **Dormant** tant que
+  `BYTEPLUS_LIVE_ACCESS_KEY` / `BYTEPLUS_LIVE_SECRET_KEY` ne sont pas dans **Railway**
+  (`isConfigured=false` → endpoints « non configuré », aucun impact prod).
 - **2026-07-30 (cb)** — **Persistance des matchs (snapshot) + section « Matchs du club »**.
   Un match **terminé** est **figé dans notre base** (table `match_snapshots`, migration
   **`021`**) à son premier affichage : la page `/match/:id` d'un match fini est ensuite

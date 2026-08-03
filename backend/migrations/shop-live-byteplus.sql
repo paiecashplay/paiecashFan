@@ -291,3 +291,14 @@ create trigger trg_initialize_shop_live_stats
 after insert on public.shop_live_rooms
 for each row
 execute function public.initialize_shop_live_stats();
+
+-- ───────────────────────────────────────────────────────────────
+-- 7. Sécurité — RLS deny-all (correctif audit, 2026-08-03)
+-- Tables accédées UNIQUEMENT par le backend (service-role, qui bypasse la RLS).
+-- On active la RLS SANS aucune policy → aucun accès via la clé anon publique.
+-- Cohérent avec la convention du projet (RLS deny-all).
+-- ───────────────────────────────────────────────────────────────
+alter table public.shop_live_rooms    enable row level security;
+alter table public.shop_live_products enable row level security;
+alter table public.shop_live_events   enable row level security;
+alter table public.shop_live_stats    enable row level security;
