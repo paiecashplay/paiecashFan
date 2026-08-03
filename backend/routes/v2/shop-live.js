@@ -16,6 +16,7 @@ const shopLive = require('../../db/shopLive');
 const {
   isConfigured,
   createActivity,
+  getWebPushClientUrl,
 } = require(
   '../../services/byteplusLiveShopping'
 );
@@ -953,10 +954,34 @@ router.post(
         );
       }
 
-      const updatedRoom =
+      let updatedRoom =
         await shopLive.markRoomLive(
           room.id
         );
+
+      // Lien de diffusion NAVIGATEUR (le club passe en direct depuis sa webcam,
+      // sans login BytePlus). Best-effort : si BytePlus échoue, le live reste
+      // "live" et on renvoie broadcastError pour info.
+      let broadcastError = null;
+      try {
+        const push =
+          await getWebPushClientUrl(
+            room.byteplus_activity_id,
+            7200
+          );
+        updatedRoom =
+          await shopLive.setBroadcastUrls(
+            room.id,
+            { hostUrl: push.url }
+          );
+      } catch (webpushError) {
+        broadcastError =
+          webpushError.message;
+        console.error(
+          '[shop-live] URL de diffusion indisponible :',
+          webpushError.message
+        );
+      }
 
       await shopLive
         .addEvent({
@@ -985,6 +1010,9 @@ router.post(
 
       return ok(res, {
         room: updatedRoom,
+        broadcastUrl:
+          updatedRoom.host_url || null,
+        broadcastError,
       });
     } catch (error) {
       return fail(

@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (ce)** — **Live Boutique : front branché au backend + diffusion (le module devient réel)**.
+  Constat : le hook `useShopLive` était une **maquette** (actions simulées en local,
+  `TODO BACKEND`). **Réécrit** pour appeler les **vraies routes** : créer / démarrer /
+  arrêter / éditer / annuler + produits (associer / retirer / mettre en avant), avec
+  reload de l'état après chaque action. **Diffusion** : nouvelle fonction
+  `getWebPushClientUrl` (BytePlus `GetWebPushLiveClientWithExpiryAPI` → **lien de studio
+  navigateur**, le club passe en direct **sans login**, testé en réel), stockée en
+  `host_url` au `/start` (+ `db.setBroadcastUrls`), et **bouton « Ouvrir le studio »**
+  dans le BO (auto-ouvert au passage en direct). ⚠️ **Reste (gated)** : le **lecteur
+  fan** (URL HLS via `GetStreamsAPI`) — à finaliser **pendant un vrai live**, car l'API
+  ne renvoie l'adresse de flux **qu'en diffusion active**.
 - **2026-08-03 (cd)** — **Fix Live Boutique : défaut de latence `ultra_low` → `normal`**.
   Test réel de l'intégration : `createActivity` renvoie bien un `activityId` (**auth AK/SK
   + API OK**), mais le mode par défaut **`ultra_low`** échoue car le **compte BytePlus n'a

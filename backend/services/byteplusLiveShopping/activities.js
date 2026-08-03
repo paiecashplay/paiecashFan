@@ -478,6 +478,31 @@ async function createActivity(
   };
 }
 
+// Récupère le lien de diffusion NAVIGATEUR d'un live (le club passe en direct
+// depuis sa webcam, sans login BytePlus — le token du lien l'autorise). Le lien
+// expire après `ttlSeconds` (sécurité). Action : GetWebPushLiveClientWithExpiryAPI.
+async function getWebPushClientUrl(activityId, ttlSeconds = 7200) {
+  const id = Number(activityId);
+  if (!Number.isFinite(id) || id <= 0) {
+    const error = new Error('ActivityId BytePlus invalide.');
+    error.code = 'BYTEPLUS_INVALID_ACTIVITY_ID';
+    throw error;
+  }
+  const expireTime = Math.floor(Date.now() / 1000) + Math.max(300, Number(ttlSeconds) || 7200);
+  const response = await callBytePlusLiveApi({
+    action: 'GetWebPushLiveClientWithExpiryAPI',
+    method: 'POST',
+    data: { ActivityId: id, ExpireTime: expireTime },
+  });
+  const url = response?.Result?.Url || null;
+  if (!url) {
+    const error = new Error("BytePlus n'a pas renvoyé l'URL de diffusion.");
+    error.code = 'BYTEPLUS_WEBPUSH_URL_MISSING';
+    throw error;
+  }
+  return { url, expireAt: expireTime };
+}
+
 module.exports = {
   LIVE_MODES,
   MAX_LIVE_DURATION_SECONDS,
@@ -490,4 +515,5 @@ module.exports = {
 
   buildCreateActivityPayload,
   createActivity,
+  getWebPushClientUrl,
 };

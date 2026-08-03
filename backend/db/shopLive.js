@@ -159,6 +159,18 @@ async function markRoomLive(id) {
   });
 }
 
+// Stocke les URLs vidéo d'un live : host_url (lien de diffusion navigateur du
+// club) et/ou viewer_url (lecture HLS pour les fans). Ne touche que les champs fournis.
+async function setBroadcastUrls(
+  id,
+  { hostUrl, viewerUrl } = {}
+) {
+  const updates = {};
+  if (hostUrl !== undefined) updates.host_url = hostUrl;
+  if (viewerUrl !== undefined) updates.viewer_url = viewerUrl;
+  return updateRoom(id, updates);
+}
+
 async function markRoomEnded(
   id,
   replayUrl = null
@@ -387,6 +399,7 @@ module.exports = {
   markRoomFailed,
   markRoomLive,
   markRoomEnded,
+  setBroadcastUrls,
   cancelRoom,
 
   listRoomProducts,

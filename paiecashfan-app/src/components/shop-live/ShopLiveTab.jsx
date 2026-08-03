@@ -246,7 +246,11 @@ export default function ShopLiveTab({ club }) {
       clearActionError();
       setLoadingAction('start');
 
-      await startLive();
+      const result = await startLive();
+      // Ouvre le studio de diffusion navigateur (le club passe en direct sans login).
+      if (result?.broadcastUrl) {
+        window.open(result.broadcastUrl, '_blank', 'noopener');
+      }
     } catch {
       // useShopLive renseigne déjà actionError.
     } finally {
@@ -530,13 +534,22 @@ export default function ShopLiveTab({ club }) {
               </div>
 
               {room.status === 'live' && (
-                <div className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300">
-                  <Radio
-                    size={16}
-                    className="animate-pulse"
-                  />
+                <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+                  <div className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300">
+                    <Radio size={16} className="animate-pulse" />
+                    Diffusion en cours
+                  </div>
 
-                  Diffusion en cours
+                  {room.host_url && (
+                    <a
+                      href={room.host_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-ink-900 transition hover:bg-emerald-300"
+                    >
+                      <Radio size={16} /> Ouvrir le studio de diffusion
+                    </a>
+                  )}
                 </div>
               )}
             </div>
