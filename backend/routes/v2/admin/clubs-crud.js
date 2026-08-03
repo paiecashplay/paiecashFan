@@ -655,6 +655,59 @@ router.get('/clubs/:tenantId', async (req, res) => {
   }
 });
 
+// GET /api/v2/admin/clubs-crud/clubs/:tenantId/kpis — métriques du club (scopé).
+// Fans abonnés · billets vendus · ventes boutique · revenus nets (PCC), avec
+// variation vs les 30 j précédents. Les orders portent boutique ET billetterie
+// (distinguées par metadata.notes kind:ticketing / items[].type='ticket').
+router.get('/clubs/:tenantId/kpis', async (req, res) => {
+  try {
+    const tenantId = req.params.tenantId;
+    const now = Date.now();
+    const d30 = new Date(now - 30 * 864e5).toISOString();
+    const d60 = new Date(now - 60 * 864e5).toISOString();
+    const cnt = (q) => q.select('id', { count: 'exact', head: true });
+
+    const [fansTotal, fans30, fansPrev, ordersRes] = await Promise.all([
+      cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId),
+      cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId).gte('created_at', d30),
+      cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId).gte('created_at', d60).lt('created_at', d30),
+      supabase.from('orders').select('total_pcc, metadata, created_at').eq('tenant_id', tenantId).eq('status', 'completed'),
+    ]);
+
+    const isTicket = (o) => {
+      const notes = o.metadata?.notes;
+      if (typeof notes === 'string' && notes.includes('"kind":"ticketing"')) return true;
+      const items = o.metadata?.items;
+      return Array.isArray(items) && items.some((i) => i?.type === 'ticket');
+    };
+
+    let boutique = 0, tickets = 0, revenue = 0;
+    let b30 = 0, bPrev = 0, t30 = 0, tPrev = 0, r30 = 0, rPrev = 0;
+    for (const o of (ordersRes.data || [])) {
+      const pcc = Number(o.total_pcc || 0);
+      const last30 = o.created_at >= d30;
+      const prev30 = o.created_at >= d60 && o.created_at < d30;
+      revenue += pcc;
+      if (last30) r30 += pcc; else if (prev30) rPrev += pcc;
+      if (isTicket(o)) {
+        tickets++; if (last30) t30++; else if (prev30) tPrev++;
+      } else {
+        boutique++; if (last30) b30++; else if (prev30) bPrev++;
+      }
+    }
+
+    const delta = (a, b) => (b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : null);
+    return ok(res, {
+      fansSubscribed: { value: fansTotal.count || 0, delta: delta(fans30.count || 0, fansPrev.count || 0) },
+      ticketsSold:    { value: tickets,  delta: delta(t30, tPrev) },
+      boutiqueSales:  { value: boutique, delta: delta(b30, bPrev) },
+      netRevenue:     { value: Math.round(revenue), delta: delta(r30, rPrev) },
+    });
+  } catch (err) {
+    return fail(res, 'KPIs indisponibles : ' + err.message, 500);
+  }
+});
+
 // PUT /api/v2/admin/clubs-crud/clubs/:id — mettre à jour un club
 router.put('/clubs/:id', async (req, res) => {
   try {

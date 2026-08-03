@@ -49,6 +49,7 @@ export function MonClubBO() {
   const [tab, setTab] = useState('info');
   const [toast, setToast] = useState(null);
   const [drawer, setDrawer] = useState(false); // sidebar mobile
+  const [kpis, setKpis] = useState(null);
 
   const clubId = profile?.club_id;
   const showToast = (msg, ok = true) => { setToast({ msg, ok }); setTimeout(() => setToast(null), 3000); };
@@ -59,6 +60,13 @@ export function MonClubBO() {
       .then((j) => setClub(j.data?.club || null))
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, [clubId]);
+
+  useEffect(() => {
+    if (!clubId) return;
+    apiFetch(`/api/v2/admin/clubs-crud/clubs/${clubId}/kpis`)
+      .then((j) => setKpis(j.data || null))
+      .catch(() => {});
   }, [clubId]);
 
   if (authLoading) return null;
@@ -91,7 +99,7 @@ export function MonClubBO() {
               <div className="flex justify-center py-24"><Loader2 className="animate-spin text-emerald-400" size={28} /></div>
             ) : isInfo ? (
               <div className="space-y-6">
-                <KpiBand />
+                <KpiBand data={kpis} />
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_348px]">
                   <div className="min-w-0">
                     <IdentiteTab club={club} onSaved={setClub} showToast={showToast} />
@@ -241,24 +249,31 @@ function TopBar({ club, title, onOpenDrawer }) {
 }
 
 // ═══ KPI ═══════════════════════════════════════════════════════════════
-// Valeurs de démonstration pour l'instant (à brancher sur des métriques réelles).
-const KPIS = [
-  { label: 'Fans abonnés',   value: '—', delta: null, sub: '30 derniers jours' },
-  { label: 'Billets vendus', value: '—', delta: null, sub: 'Ce mois-ci' },
-  { label: 'Ventes boutique', value: '—', delta: null, sub: 'Commandes livrées' },
-  { label: 'Revenus nets',   value: '—', delta: null, sub: 'À venir' },
-];
-function KpiBand() {
+// Bandeau KPI réel (fetch /clubs/:id/kpis). Variation vs les 30 j précédents.
+const fmtInt = (v) => Number(v || 0).toLocaleString('fr-FR');
+function KpiBand({ data }) {
+  const cards = [
+    { label: 'Fans abonnés',    k: data?.fansSubscribed, sub: 'Total supporters', fmt: fmtInt },
+    { label: 'Billets vendus',  k: data?.ticketsSold,    sub: 'Commandes payées', fmt: fmtInt },
+    { label: 'Ventes boutique', k: data?.boutiqueSales,  sub: 'Commandes payées', fmt: fmtInt },
+    { label: 'Revenus nets',    k: data?.netRevenue,     sub: 'PCC encaissés',    fmt: (v) => `${fmtInt(v)} PCC` },
+  ];
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      {KPIS.map((k) => (
-        <div key={k.label} className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-bone-500">{k.label}</p>
+      {cards.map((c) => (
+        <div key={c.label} className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-bone-500">{c.label}</p>
           <div className="mt-2 flex items-end gap-2">
-            <span className="font-display text-2xl font-black tabular-nums text-bone-50 sm:text-3xl">{k.value}</span>
-            {k.delta != null && <span className={cn('mb-1 text-xs font-bold', k.delta >= 0 ? 'text-emerald-400' : 'text-red-400')}>{k.delta >= 0 ? '+' : ''}{k.delta}%</span>}
+            <span className="font-display text-2xl font-black tabular-nums text-bone-50 sm:text-3xl">
+              {c.k ? c.fmt(c.k.value) : '—'}
+            </span>
+            {c.k?.delta != null && (
+              <span className={cn('mb-1 text-xs font-bold', c.k.delta >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+                {c.k.delta >= 0 ? '+' : ''}{c.k.delta}%
+              </span>
+            )}
           </div>
-          <p className="mt-1 text-[11px] text-bone-600">{k.sub}</p>
+          <p className="mt-1 text-[11px] text-bone-600">{c.sub}</p>
         </div>
       ))}
     </div>

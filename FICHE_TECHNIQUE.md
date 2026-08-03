@@ -135,6 +135,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (cj)** — **BO Club : bandeau KPI réel**. Nouvel endpoint scopé
+  `GET /api/v2/admin/clubs-crud/clubs/:tenantId/kpis` : **fans abonnés**
+  (`fan_favorite_clubs`), **billets vendus** + **ventes boutique** (table `orders`
+  `status=completed`, billet vs boutique distingués par `metadata.notes` `kind:ticketing`
+  / `items[].type='ticket'`), **revenus nets** (somme `total_pcc`), chacun avec
+  **variation vs les 30 j précédents** (`created_at`). Le `KpiBand` du BO consomme ce
+  endpoint (valeurs formatées fr-FR, delta vert/rouge). Fini les placeholders.
 - **2026-08-04 (ci)** — **Refonte BO Club « Espace Club » (Phase 1 : shell + Identité)**.
   Refonte du back-office club (`MonClubBO.jsx`) d'après une maquette premium, mappée sur
   les **tokens existants** (ink/bone/emerald, pas de nouveau design system). Fini les
