@@ -85,6 +85,16 @@ export default function App() {
           <Route path="settings"            element={<AdminSettings />} />
         </Route>
 
+        {/* BO Club : app plein écran (pas de Navbar/Footer public) */}
+        <Route
+          path="/mon-club/bo"
+          element={
+            <ProtectedRoute requiredRole="club_admin">
+              <MonClubBO />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Routes publiques : avec Navbar/Footer */}
         <Route
           path="/*"
@@ -112,14 +122,6 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <MonClub />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/mon-club/bo"
-                    element={
-                      <ProtectedRoute requiredRole="club_admin">
-                        <MonClubBO />
                       </ProtectedRoute>
                     }
                   />

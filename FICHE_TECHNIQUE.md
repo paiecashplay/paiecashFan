@@ -135,6 +135,22 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (ci)** — **Refonte BO Club « Espace Club » (Phase 1 : shell + Identité)**.
+  Refonte du back-office club (`MonClubBO.jsx`) d'après une maquette premium, mappée sur
+  les **tokens existants** (ink/bone/emerald, pas de nouveau design system). Fini les
+  **onglets horizontaux** → **navigation latérale groupée** (Le club / Monétisation /
+  Engagement) avec **club switcher** (multi-club ready) + **carte abonnement** (or).
+  **Topbar sticky** (fil d'Ariane + titre + recherche ⌘K + notif + « Voir ma page
+  publique » + « Passer en direct »). **Bandeau KPI** (4 cartes, valeurs en placeholder
+  à brancher). **Layout 2 colonnes** (contenu + **rail droit** : aperçu page fan,
+  profil complété calculé, activité récente). **Page Identité** redessinée
+  (`SectionCard`/`Field`/`ColorField`/`FileDropField`, champs vides en bordure dashed) +
+  **StickySaveBar** (« Enregistrer et publier », visible seulement si dirty). **Live &
+  diffusion** extrait en onglet dédié (StreamControl). La route `/mon-club/bo` passe en
+  **plein écran** (hors Navbar/Footer public, comme `/admin`). Les onglets existants
+  (Effectif/Palmarès/Boutique/Billetterie/Tombola/Gains/Live Boutique/Modération) gardent
+  leur contenu dans le nouveau shell. Reste (phases suivantes) : KPI/activité réels,
+  écran Live redessiné (CopyField/SegmentedControl/guide OBS), responsive fin.
 - **2026-08-03 (ch)** — **Live Boutique : bouton « Regarder en plein écran » + adresse checkout pré-remplie**.
   (1) L'iframe de visionnage BytePlus reste parfois en aperçu (restrictions d'embed) →
   ajout d'un bouton **« Regarder en plein écran ↗ »** (ouvre la page de visionnage dans
