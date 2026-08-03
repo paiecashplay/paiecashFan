@@ -13,6 +13,7 @@
     "@circle-fin/smart-contract-platform": "^10.3.0",
     "@supabase/supabase-js": "^2.105.1",
     "@transak/ui-js-sdk": "^1.0.0",
+    "@volcengine/openapi": "^1.36.2",
     "axios": "^1.15.2",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.9.0",
