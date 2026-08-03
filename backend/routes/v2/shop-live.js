@@ -17,6 +17,7 @@ const {
   isConfigured,
   createActivity,
   getWebPushClientUrl,
+  buildViewerUrl,
 } = require(
   '../../services/byteplusLiveShopping'
 );
@@ -83,8 +84,11 @@ function publicRoom(room) {
     coverUrl: room.cover_url,
     status: room.status,
 
+    // URL de visionnage hébergée BytePlus, construite depuis le viewUrlPath.
     viewerUrl:
-      room.viewer_url,
+      buildViewerUrl(room.view_url_path) ||
+      room.viewer_url ||
+      null,
 
     replayUrl:
       room.replay_url,

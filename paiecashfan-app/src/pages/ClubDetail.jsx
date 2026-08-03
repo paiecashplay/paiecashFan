@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, Navigate, useNavigate} from 'react-router-dom';
+import { ClubShopLive } from '@/components/shop-live/ClubShopLive';
 import {
   motion, AnimatePresence,
   useScroll, useTransform, useReducedMotion, animate
@@ -187,6 +188,7 @@ export function ClubDetail() {
           />
         ) : (
           <>
+            <ClubShopLive slug={slug} />
             <MerchandiseSection club={club} apiProducts={products} />
             <ClubCommunitySection clubSlug={slug} club={club} primaryColor={club.primaryColor} />
           </>

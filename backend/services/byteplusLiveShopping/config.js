@@ -45,7 +45,23 @@ const config = Object.freeze({
     process.env.BYTEPLUS_LIVE_TIMEOUT_MS,
     15000
   ),
+
+  // Page de visionnage hébergée par BytePlus (les fans regardent le live) :
+  // https://{viewerBaseUrl}/{siteId}/{viewUrlPath}.
+  siteId:
+    process.env.BYTEPLUS_LIVE_SITE_ID ||
+    '1853052913781809',
+
+  viewerBaseUrl:
+    process.env.BYTEPLUS_LIVE_VIEWER_BASE ||
+    'https://live.byteplus.com',
 });
+
+// Construit l'URL de visionnage publique d'un live à partir de son viewUrlPath.
+function buildViewerUrl(viewUrlPath) {
+  if (!viewUrlPath) return null;
+  return `${config.viewerBaseUrl}/${config.siteId}/${viewUrlPath}`;
+}
 
 function getMissingConfiguration() {
   const missing = [];
@@ -116,4 +132,5 @@ module.exports = {
   assertConfigured,
   getMissingConfiguration,
   getSafeConfiguration,
+  buildViewerUrl,
 };

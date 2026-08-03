@@ -135,6 +135,19 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (cf)** — **Live Boutique : côté fan (visionnage embarqué + produits + Acheter)**.
+  BytePlus livesaas étant un produit **hébergé**, le fan regarde via la **page de
+  visionnage BytePlus** (pas de flux HLS brut — `GetStreamsAPI` reste vide). URL de
+  visionnage construite automatiquement : `https://{VIEWER_BASE}/{SITE_ID}/{viewUrlPath}`
+  (`config.buildViewerUrl`, SITE_ID du compte = `1853052913781809`, `view_url_path` déjà
+  stocké). La route publique `/club/:slug/current` renvoie désormais `viewerUrl` (via
+  `publicRoom`) + les produits (avec détails via `product:products(*)`). **Front** :
+  nouveau composant **`ClubShopLive`** injecté dans `ClubDetail` (au-dessus de la
+  boutique) — visible **uniquement quand le club est en direct** : iframe de visionnage +
+  **fiches produits** (produit en avant surligné) + **« Acheter »** → panier PCC
+  (`useCart`). Vars : `BYTEPLUS_LIVE_SITE_ID`, `BYTEPLUS_LIVE_VIEWER_BASE` (défauts en
+  dur). Le **cycle complet** (créer → produits → diffuser → fans regardent/achètent) est
+  désormais fonctionnel.
 - **2026-08-03 (ce)** — **Live Boutique : front branché au backend + diffusion (le module devient réel)**.
   Constat : le hook `useShopLive` était une **maquette** (actions simulées en local,
   `TODO BACKEND`). **Réécrit** pour appeler les **vraies routes** : créer / démarrer /
