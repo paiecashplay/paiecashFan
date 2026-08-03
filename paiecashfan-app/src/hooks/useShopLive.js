@@ -181,7 +181,7 @@ export function useShopLive(slug) {
          *       verticalCoverUrl:
          *         payload?.verticalCoverUrl || null,
          *       latencyMode:
-         *         payload?.latencyMode || 'ultra_low',
+         *         payload?.latencyMode || 'normal',
          *       releasePlayback:
          *         payload?.releasePlayback !== false,
          *     }),
@@ -235,7 +235,7 @@ export function useShopLive(slug) {
 
           latency_mode:
             payload?.latencyMode ||
-            'ultra_low',
+            'normal',
 
           release_playback:
             payload?.releasePlayback !== false,
@@ -430,7 +430,7 @@ export function useShopLive(slug) {
         ) {
           normalizedUpdates.latency_mode =
             updates?.latencyMode ||
-            'ultra_low';
+            'normal';
         }
 
         if (

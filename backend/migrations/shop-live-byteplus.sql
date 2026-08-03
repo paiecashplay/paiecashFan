@@ -41,7 +41,7 @@ create table if not exists public.shop_live_rooms (
       )
     ),
 
-  latency_mode text not null default 'ultra_low'
+  latency_mode text not null default 'normal'
     check (
       latency_mode in (
         'template_default',

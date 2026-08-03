@@ -350,7 +350,7 @@ router.post(
           latency_mode:
             req.body
               ?.latencyMode ||
-            'ultra_low',
+            'normal',
 
           release_playback:
             req.body
@@ -396,7 +396,7 @@ router.post(
           latencyMode:
             req.body
               ?.latencyMode ||
-            'ultra_low',
+            'normal',
 
           coverImage:
             req.body?.coverUrl ||

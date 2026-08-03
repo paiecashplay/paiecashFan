@@ -157,7 +157,7 @@ function validateViewUrlPath(
  * Traduit notre valeur métier vers la valeur BytePlus.
  */
 function normalizeLiveMode(
-  value = 'ultra_low'
+  value = 'normal'
 ) {
   const modes = {
     template_default:
@@ -248,7 +248,7 @@ function buildCreateActivityPayload({
   enforceStartTime = false,
   autoEnd = false,
 
-  latencyMode = 'ultra_low',
+  latencyMode = 'normal',
 
   viewUrlPath = null,
 

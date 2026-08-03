@@ -13,7 +13,7 @@ async function createRoom(data) {
     cover_url: data.cover_url || null,
 
     status: data.status || 'draft',
-    latency_mode: data.latency_mode || 'ultra_low',
+    latency_mode: data.latency_mode || 'normal',
     release_playback:
       data.release_playback !== false,
 

@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-03 (cd)** — **Fix Live Boutique : défaut de latence `ultra_low` → `normal`**.
+  Test réel de l'intégration : `createActivity` renvoie bien un `activityId` (**auth AK/SK
+  + API OK**), mais le mode par défaut **`ultra_low`** échoue car le **compte BytePlus n'a
+  pas l'ultra-faible latence activée** (`账号未开通超低延时`) → un club aurait l'erreur en
+  créant un live. Défaut passé à **`normal`** (front `CreateShopLiveModal`/`useShopLive`,
+  back `activities.js`/`shop-live.js`/`shopLive.js`, + `default` de la migration).
+  `ultra_low` **reste un mode valide** (clé du map + `CHECK` conservés) → réactivable comme
+  défaut si le forfait BytePlus l'active un jour. Testé : création OK en `normal` (liveMode 2).
 - **2026-08-03 (cc)** — **Module « Live Boutique » (BytePlus Live Shopping) — merge après audit**.
   Intégration de la branche `feature/byteplus-live-shopping` (travail stagiaire) : un club
   crée un **live shopping** (BytePlus Live SaaS) depuis le BO (onglet **« Live Boutique »**),

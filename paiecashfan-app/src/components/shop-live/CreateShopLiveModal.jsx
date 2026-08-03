@@ -91,7 +91,7 @@ export default function CreateShopLiveModal({
         description: description || null,
         scheduledAt,
         scheduledEndAt: null,
-        latencyMode: 'ultra_low',
+        latencyMode: 'normal',
         releasePlayback: true,
       });
 
