@@ -967,12 +967,17 @@ router.post(
       // sans login BytePlus). Best-effort : si BytePlus échoue, le live reste
       // "live" et on renvoie broadcastError pour info.
       let broadcastError = null;
+      let broadcastExpireAt = null;
       try {
+        // Lien web-push valable ~300 s côté BytePlus : on demande 300 s pour que
+        // le compte à rebours affiché au club soit exact. Le club peut régénérer
+        // un lien frais à tout moment via POST /:liveId/broadcast-url.
         const push =
           await getWebPushClientUrl(
             room.byteplus_activity_id,
-            7200
+            300
           );
+        broadcastExpireAt = push.expireAt;
         updatedRoom =
           await shopLive.setBroadcastUrls(
             room.id,
@@ -1016,12 +1021,86 @@ router.post(
         room: updatedRoom,
         broadcastUrl:
           updatedRoom.host_url || null,
+        broadcastExpireAt,
         broadcastError,
       });
     } catch (error) {
       return fail(
         res,
         `Démarrage impossible : ${error.message}`,
+        500
+      );
+    }
+  }
+);
+
+// POST /api/v2/shop-live/:liveId/broadcast-url
+// Régénère un lien FRAIS du studio de diffusion navigateur. Le lien BytePlus
+// n'est valable qu'environ 300 s : le club l'appelle juste avant d'ouvrir le
+// studio (ou s'il a expiré) pour repartir d'un lien valide.
+router.post(
+  '/:liveId/broadcast-url',
+  requireAuth,
+  async (req, res) => {
+    try {
+      const room =
+        await shopLive.getRoomById(
+          req.params.liveId
+        );
+
+      if (!room) {
+        return fail(res, 'Live introuvable.', 404);
+      }
+
+      const tenant =
+        await tenants.getTenantById(
+          room.tenant_id
+        );
+
+      if (
+        !tenant ||
+        !canManage(req.authUser, tenant)
+      ) {
+        return fail(res, 'Accès refusé.', 403);
+      }
+
+      if (room.status !== 'live') {
+        return fail(
+          res,
+          'Le studio n’est disponible que pendant un live en cours.',
+          409
+        );
+      }
+
+      if (!room.byteplus_activity_id) {
+        return fail(
+          res,
+          'Le live BytePlus n’est pas encore prêt.',
+          409
+        );
+      }
+
+      const push =
+        await getWebPushClientUrl(
+          room.byteplus_activity_id,
+          300
+        );
+
+      const updatedRoom =
+        await shopLive.setBroadcastUrls(
+          room.id,
+          { hostUrl: push.url }
+        );
+
+      return ok(res, {
+        broadcastUrl:
+          updatedRoom.host_url || push.url,
+        broadcastExpireAt: push.expireAt,
+      });
+    } catch (error) {
+      return fail(
+        res,
+        `Lien de diffusion indisponible : ${error.message}`,
         500
       );
     }

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   AlertCircle,
   CalendarDays,
+  Clock,
+  Info,
   Loader2,
   Plus,
   Radio,
@@ -108,6 +110,7 @@ export default function ShopLiveTab({ club }) {
     updateLive,
     cancelLive,
     startLive,
+    refreshBroadcastUrl,
     endLive,
 
     setLiveProducts,
@@ -141,6 +144,27 @@ export default function ShopLiveTab({ club }) {
   const [loadingAction,
     setLoadingAction] =
     useState('');
+
+  // Compte à rebours de validité du lien studio (BytePlus : ~300 s).
+  const [studioExpireAt, setStudioExpireAt] =
+    useState(null); // timestamp Unix (s)
+
+  const [nowTs, setNowTs] = useState(() =>
+    Math.floor(Date.now() / 1000)
+  );
+
+  useEffect(() => {
+    if (!studioExpireAt) return undefined;
+    const t = setInterval(
+      () => setNowTs(Math.floor(Date.now() / 1000)),
+      1000
+    );
+    return () => clearInterval(t);
+  }, [studioExpireAt]);
+
+  const studioSecondsLeft = studioExpireAt
+    ? Math.max(0, studioExpireAt - nowTs)
+    : null;
 
   const status =
     STATUS_CONFIG[room?.status] || {
@@ -248,8 +272,31 @@ export default function ShopLiveTab({ club }) {
 
       const result = await startLive();
       // Ouvre le studio de diffusion navigateur (le club passe en direct sans login).
+      if (result?.broadcastExpireAt) {
+        setStudioExpireAt(result.broadcastExpireAt);
+      }
       if (result?.broadcastUrl) {
         window.open(result.broadcastUrl, '_blank', 'noopener');
+      }
+    } catch {
+      // useShopLive renseigne déjà actionError.
+    } finally {
+      setLoadingAction('');
+    }
+  }
+
+  // Régénère un lien FRAIS puis ouvre le studio (le lien BytePlus expire vite).
+  async function handleOpenStudio() {
+    try {
+      clearActionError();
+      setLoadingAction('studio');
+
+      const res = await refreshBroadcastUrl();
+      if (res?.broadcastExpireAt) {
+        setStudioExpireAt(res.broadcastExpireAt);
+      }
+      if (res?.broadcastUrl) {
+        window.open(res.broadcastUrl, '_blank', 'noopener');
       }
     } catch {
       // useShopLive renseigne déjà actionError.
@@ -540,15 +587,33 @@ export default function ShopLiveTab({ club }) {
                     Diffusion en cours
                   </div>
 
-                  {room.host_url && (
-                    <a
-                      href={room.host_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-ink-900 transition hover:bg-emerald-300"
+                  <button
+                    type="button"
+                    onClick={handleOpenStudio}
+                    disabled={isBusy}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-ink-900 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loadingAction === 'studio' ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Radio size={16} />
+                    )}
+                    Ouvrir le studio de diffusion
+                  </button>
+
+                  {studioSecondsLeft !== null && (
+                    <p
+                      className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
+                        studioSecondsLeft > 0
+                          ? 'text-bone-500'
+                          : 'text-amber-400'
+                      }`}
                     >
-                      <Radio size={16} /> Ouvrir le studio de diffusion
-                    </a>
+                      <Clock size={12} />
+                      {studioSecondsLeft > 0
+                        ? `Lien valable encore ${studioSecondsLeft}s`
+                        : 'Lien expiré — recliquez pour un lien frais'}
+                    </p>
                   )}
                 </div>
               )}
@@ -621,6 +686,42 @@ export default function ShopLiveTab({ club }) {
             </div>
           </div>
         </section>
+
+        {/* Consignes de diffusion (le lien studio BytePlus expire en ~5 min) */}
+        {room.status === 'live' && (
+          <section className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.05] p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <Info size={18} className="mt-0.5 shrink-0 text-amber-400" />
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-amber-200">
+                  Pour que le direct s’affiche chez les supporters
+                </h3>
+                <p className="mt-1 text-xs leading-5 text-bone-400">
+                  Le lien du studio n’est valable qu’environ <b className="text-bone-200">5 minutes</b>.
+                  Dès qu’il s’ouvre, enchaînez sans attendre :
+                </p>
+                <ol className="mt-3 space-y-1.5 text-xs leading-5 text-bone-300">
+                  <li>
+                    <b className="text-bone-100">1.</b> Cliquez sur
+                    <b className="text-bone-100"> « Ouvrir le studio de diffusion »</b> (un onglet BytePlus s’ouvre).
+                  </li>
+                  <li>
+                    <b className="text-bone-100">2.</b> Autorisez la
+                    <b className="text-bone-100"> caméra et le micro</b> dans le navigateur.
+                  </li>
+                  <li>
+                    <b className="text-bone-100">3.</b> Dans le studio, cliquez sur
+                    <b className="text-bone-100"> « Start / Go Live »</b> pour lancer réellement la diffusion.
+                  </li>
+                </ol>
+                <p className="mt-3 text-[11px] leading-5 text-bone-500">
+                  Si l’écran reste sur « preview » ou que le lien a expiré, recliquez sur
+                  « Ouvrir le studio de diffusion » : un lien frais est généré à chaque fois.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Erreur d’action */}
         {actionError && (

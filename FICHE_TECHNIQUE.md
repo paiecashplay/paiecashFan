@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-08-03.
+> Dernière mise à jour : 2026-08-04.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (cm)** — **Live Boutique : fiabilisation du lien de diffusion (web-push 300 s)**.
+  Diagnostic BytePlus (sonde `ListActivityAPI`) : nos activités avaient `Status=2` mais
+  `StreamStartTime=0` / `OnlineStatus=0` et `GetStreamsAPI.LineDetails=[]` → **aucun flux
+  vidéo n'atteignait l'ingestion** (studio web-push « micromode », lien valable ~300 s).
+  Correctifs sans regret : le **lien du studio est régénéré à la demande** (nouvelle route
+  `POST /api/v2/shop-live/:liveId/broadcast-url`, ttl 300 s + `expireAt`) au lieu d'un lien
+  périmé ; bouton **« Ouvrir le studio »** = lien frais à chaque clic ; **compte à rebours**
+  de validité ; **encart de consignes** (autoriser caméra/micro + cliquer « Start » dans le
+  studio dans les 5 min). `/start` demande désormais 300 s (au lieu de 7200) pour un
+  compte à rebours exact. Piste `UpdateActivityStatusAPI` écartée (le statut n'était pas le
+  blocage). **Push RTMP/OBS** = piste cible en attente de confirmation BytePlus (question 2).
 - **2026-08-04 (cl)** — **BO Club : activité récente réelle + finitions (fin refonte)**.
   Rail droit : le flux **« Activité récente »** est branché sur un nouvel endpoint scopé
   `GET /api/v2/admin/clubs-crud/clubs/:tenantId/activity` — **ventes récentes** (orders

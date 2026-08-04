@@ -124,9 +124,29 @@ export function useShopLive(slug) {
     return {
       room: r?.data?.room || null,
       broadcastUrl: r?.data?.broadcastUrl || null,
+      broadcastExpireAt: r?.data?.broadcastExpireAt || null,
       broadcastError: r?.data?.broadcastError || null,
     };
   }), [room, run]);
+
+  // Régénère un lien FRAIS du studio (valable ~300 s côté BytePlus). Léger : pas
+  // de reload complet ni de spinner global, on met juste à jour room.host_url.
+  const refreshBroadcastUrl = useCallback(async () => {
+    if (!room?.id) throw new Error('Aucun live actif.');
+    setActionError('');
+    try {
+      const r = await apiFetch(`${BASE}/${encodeURIComponent(room.id)}/broadcast-url`, { method: 'POST' });
+      const url = r?.data?.broadcastUrl || null;
+      if (url) setRoom((prev) => (prev ? { ...prev, host_url: url } : prev));
+      return {
+        broadcastUrl: url,
+        broadcastExpireAt: r?.data?.broadcastExpireAt || null,
+      };
+    } catch (e) {
+      setActionError(e?.message || 'Lien de diffusion indisponible.');
+      throw e;
+    }
+  }, [room]);
 
   const endLive = useCallback((payload = {}) => run(async () => {
     if (!room?.id) throw new Error('Aucun live à arrêter.');
@@ -185,6 +205,7 @@ export function useShopLive(slug) {
     updateLive,
     cancelLive,
     startLive,
+    refreshBroadcastUrl,
     endLive,
 
     setLiveProducts,
