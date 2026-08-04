@@ -708,6 +708,45 @@ router.get('/clubs/:tenantId/kpis', async (req, res) => {
   }
 });
 
+// GET /api/v2/admin/clubs-crud/clubs/:tenantId/activity — flux d'activité récente (scopé).
+// Ventes récentes + tombolas + nb de signalements en attente de modération.
+router.get('/clubs/:tenantId/activity', async (req, res) => {
+  try {
+    const tenantId = req.params.tenantId;
+    const [ordersRes, tombolaRes, reportsRes] = await Promise.all([
+      supabase.from('orders').select('total_pcc, metadata, created_at').eq('tenant_id', tenantId).eq('status', 'completed').order('created_at', { ascending: false }).limit(5),
+      supabase.from('tombola_campaigns').select('title, status, created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(2),
+      supabase.from('chat_reports').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).is('reviewed_at', null),
+    ]);
+
+    const isTicket = (o) => {
+      const n = o.metadata?.notes;
+      if (typeof n === 'string' && n.includes('"kind":"ticketing"')) return true;
+      const it = o.metadata?.items;
+      return Array.isArray(it) && it.some((i) => i?.type === 'ticket');
+    };
+
+    const items = [];
+    for (const o of (ordersRes.data || [])) {
+      const t = isTicket(o);
+      items.push({
+        type: t ? 'ticket' : 'shop', tone: 'emerald', at: o.created_at,
+        label: `${t ? 'Billet vendu' : 'Vente boutique'} — ${Number(o.total_pcc || 0).toLocaleString('fr-FR')} PCC`,
+        sub: o.metadata?.items?.[0]?.name || null,
+      });
+    }
+    for (const c of (tombolaRes.data || [])) {
+      const done = ['completed', 'drawn', 'ended'].includes(c.status);
+      items.push({ type: 'tombola', tone: done ? 'default' : 'emerald', at: c.created_at, label: `Tombola « ${c.title} »`, sub: done ? 'Terminée' : 'En cours' });
+    }
+    items.sort((a, b) => new Date(b.at) - new Date(a.at));
+
+    return ok(res, { activity: items.slice(0, 6), pendingReports: reportsRes.count || 0 });
+  } catch (err) {
+    return fail(res, 'Activité indisponible : ' + err.message, 500);
+  }
+});
+
 // PUT /api/v2/admin/clubs-crud/clubs/:id — mettre à jour un club
 router.put('/clubs/:id', async (req, res) => {
   try {

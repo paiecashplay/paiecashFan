@@ -92,6 +92,7 @@ export function MonClubBO() {
             club={club}
             title={TAB_META[tab]?.label || 'Espace Club'}
             onOpenDrawer={() => setDrawer(true)}
+            onGoLive={() => setTab('stream')}
           />
 
           <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
@@ -215,7 +216,7 @@ function SubscriptionCard() {
 }
 
 // ═══ Topbar ════════════════════════════════════════════════════════════
-function TopBar({ club, title, onOpenDrawer }) {
+function TopBar({ club, title, onOpenDrawer, onGoLive }) {
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-white/8 bg-ink-950/85 px-4 backdrop-blur sm:px-6 lg:px-8">
       <button onClick={onOpenDrawer} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-bone-300 lg:hidden">
@@ -237,12 +238,10 @@ function TopBar({ club, title, onOpenDrawer }) {
             <ExternalLink size={13} /> Voir ma page publique
           </a>
         )}
-        {club?.slug && (
-          <a href={`/clubs/${club.slug}/fan-club`} target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 px-3 py-2 text-xs font-black text-ink-900 transition hover:bg-emerald-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-ink-900/70" /> Passer en direct
-          </a>
-        )}
+        <button onClick={onGoLive}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 px-3 py-2 text-xs font-black text-ink-900 transition hover:bg-emerald-300">
+          <Radio size={14} /> <span className="hidden sm:inline">Passer en direct</span>
+        </button>
       </div>
     </header>
   );
@@ -282,6 +281,14 @@ function KpiBand({ data }) {
 
 // ═══ Rail droit ════════════════════════════════════════════════════════
 function RightRail({ club }) {
+  const [activity, setActivity] = useState(null);
+  useEffect(() => {
+    if (!club?.id) return;
+    apiFetch(`/api/v2/admin/clubs-crud/clubs/${club.id}/activity`)
+      .then((j) => setActivity(j.data || null))
+      .catch(() => {});
+  }, [club?.id]);
+
   const checklist = useMemo(() => ([
     { label: 'Logo et couleurs', done: !!(club?.logo_url && club?.primary_color) },
     { label: 'Effectif', done: false },
@@ -333,13 +340,52 @@ function RightRail({ club }) {
         </ul>
       </div>
 
-      {/* Activité récente (placeholder) */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-bone-400">Activité récente</p>
-        <p className="text-xs text-bone-600">Le flux d'activité s'affichera ici (tombolas, modération, versements…).</p>
-      </div>
+      {/* Activité récente */}
+      <RecentActivity data={activity} />
     </div>
   );
+}
+
+function RecentActivity({ data }) {
+  const items = data?.activity || [];
+  const pending = data?.pendingReports || 0;
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-bone-400">Activité récente</p>
+      {pending > 0 && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-xs font-semibold text-amber-300">
+          <ShieldAlert size={14} /> {pending} signalement{pending > 1 ? 's' : ''} en attente de modération
+        </div>
+      )}
+      {items.length === 0 && pending === 0 ? (
+        <p className="text-xs text-bone-600">Aucune activité récente pour le moment.</p>
+      ) : (
+        <ul className="space-y-3">
+          {items.map((it, i) => (
+            <li key={i} className="flex gap-2.5">
+              <span className={cn('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', it.tone === 'emerald' ? 'bg-emerald-400' : 'bg-bone-600')} />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-bone-200">{it.label}</p>
+                <p className="text-[11px] text-bone-600">
+                  {[it.sub, timeAgo(it.at)].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "à l'instant";
+  const m = Math.floor(s / 60); if (m < 60) return `il y a ${m} min`;
+  const h = Math.floor(m / 60); if (h < 24) return `il y a ${h} h`;
+  const d = Math.floor(h / 24); if (d < 7) return `il y a ${d} j`;
+  try { return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }); } catch { return ''; }
 }
 
 // ═══ Onglet Identité (formulaire redessiné + save bar sticky) ══════════

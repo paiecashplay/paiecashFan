@@ -135,6 +135,15 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (cl)** — **BO Club : activité récente réelle + finitions (fin refonte)**.
+  Rail droit : le flux **« Activité récente »** est branché sur un nouvel endpoint scopé
+  `GET /api/v2/admin/clubs-crud/clubs/:tenantId/activity` — **ventes récentes** (orders
+  `completed`, boutique/billet), **tombolas** (`tombola_campaigns`), et **nb de
+  signalements en attente** (`chat_reports` non revus, encart ambre). Topbar : le CTA
+  **« Passer en direct »** ouvre désormais l'onglet **Live & diffusion** (au lieu de la
+  page publique) et passe en icône seule sur mobile. **Responsive** conforme au spec
+  (rail sous le contenu < 1280 via `xl:`, sidebar en tiroir < 1024 via `lg:` +
+  hamburger). **Refonte BO « Espace Club » terminée.**
 - **2026-08-04 (ck)** — **BO Club : écran « Live & diffusion » redessiné (prompt §9)**.
   `StreamControl` (BO uniquement) refondu au design « Espace Club » : **segmented
   control** PaieCashFan Live / Lien externe ; accès OBS **Serveur** + **Clé de stream**
