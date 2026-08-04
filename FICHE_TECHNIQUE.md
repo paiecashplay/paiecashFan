@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-04 (cn)** — **Live Boutique : déblocage « Preview » + plein écran fan avec chat**.
+  Cause du blocage vidéo trouvée (sonde `ListActivityAPI`) : les activités programmées
+  avaient `LiveTime` **dans le futur** + `IsBeginLiveEnable=1` → BytePlus **interdit de
+  passer en direct avant l'heure** (studio bloqué en « Preview » avec compte à rebours, ex.
+  « 01:56:18 »). Correctif : `enforceStartTime: false` à la création — l'horaire programmé
+  ne sert plus qu'à **annoncer** le live (teaser côté fans), le club diffuse quand il veut.
+  Côté fan (`ClubShopLive`) : le lien « Regarder en plein écran » (qui ouvrait BytePlus dans
+  un onglet sans retour possible et coupait le chat) est remplacé par un **plein écran
+  in-app** — overlay large (**chat BytePlus visible**), bouton **Fermer (✕)** + touche Échap,
+  bouton bien visible pour tous ; lien « Ouvrir dans un onglet » conservé en secondaire.
 - **2026-08-04 (cm)** — **Live Boutique : fiabilisation du lien de diffusion (web-push 300 s)**.
   Diagnostic BytePlus (sonde `ListActivityAPI`) : nos activités avaient `Status=2` mais
   `StreamStartTime=0` / `OnlineStatus=0` et `GetStreamsAPI.LineDetails=[]` → **aucun flux

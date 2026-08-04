@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ShoppingBag, Star } from 'lucide-react';
+import { Maximize2, ShoppingBag, Star, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { Container } from '@/components/ui/Container';
@@ -13,8 +13,22 @@ const imgOf = (p) => p?.image_url ?? (Array.isArray(p?.images) ? p.images[0] : n
 // (produit en avant mis en valeur) avec « Acheter » → panier PCC. Masquée hors direct.
 export function ClubShopLive({ slug }) {
   const [data, setData] = useState(null);
+  const [fs, setFs] = useState(false); // plein écran in-app (overlay)
   const timer = useRef(null);
   const { addItem } = useCart();
+
+  // Plein écran : fermeture au clavier (Échap) + blocage du scroll de fond.
+  useEffect(() => {
+    if (!fs) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setFs(false); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [fs]);
 
   useEffect(() => {
     if (!slug) return undefined;
@@ -76,14 +90,23 @@ export function ClubShopLive({ slug }) {
                 frameBorder="0"
               />
             </div>
-            <a
-              href={room.viewerUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-400 transition-colors hover:text-emerald-300"
-            >
-              Regarder en plein écran ↗
-            </a>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setFs(true)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"
+              >
+                <Maximize2 size={13} /> Plein écran &amp; chat
+              </button>
+              <a
+                href={room.viewerUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-bone-500 transition-colors hover:text-bone-300"
+              >
+                Ouvrir dans un onglet ↗
+              </a>
+            </div>
           </div>
 
           {/* Produits présentés */}
@@ -137,6 +160,38 @@ export function ClubShopLive({ slug }) {
           </div>
         </div>
       </Container>
+
+      {/* Plein écran in-app : large (chat BytePlus visible) + bouton Fermer. */}
+      {fs && (
+        <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-red-500/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-red-400">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" /> En direct
+              </span>
+              <p className="truncate text-sm font-bold text-bone-100">{room.title || 'Live Boutique'}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFs(false)}
+              aria-label="Fermer le plein écran"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-xs font-bold text-bone-100 transition hover:bg-white/10"
+            >
+              <X size={16} /> Fermer
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 px-2 pb-2 sm:px-4 sm:pb-4">
+            <iframe
+              src={room.viewerUrl}
+              title={room.title || 'Live Boutique'}
+              className="h-full w-full rounded-xl border border-white/10 bg-black"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+              allowFullScreen
+              frameBorder="0"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

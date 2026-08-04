@@ -388,10 +388,12 @@ router.post(
 
           scheduledEndAt,
 
-          enforceStartTime:
-            Boolean(
-              scheduledAt
-            ),
+          // IsBeginLiveEnable=1 verrouille la diffusion AVANT l'heure programmée
+          // (le studio reste bloqué en « Preview » avec un compte à rebours). On
+          // le laisse à false : l'horaire programmé ne sert qu'à annoncer le live
+          // (teaser/compte à rebours côté fans), le club passe en direct quand il
+          // veut via « Démarrer le live ».
+          enforceStartTime: false,
 
           autoEnd:
             Boolean(
