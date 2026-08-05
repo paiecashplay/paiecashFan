@@ -19,15 +19,39 @@ const nav = [
 ];
 
 export function Navbar() {
+  const { user, loading } = useAuth();
+
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  /**
+   * La billetterie générale est visible uniquement
+   * pour les visiteurs non connectés.
+   *
+   * Un utilisateur connecté accédera à la billetterie
+   * depuis la page du club concerné.
+   */
+  const visibleNav = nav.filter((item) => {
+    if (item.to !== '/billetterie') {
+      return true;
+    }
+
+    return !loading && !user;
+  });
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
+
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    window.addEventListener('scroll', onScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   return (
@@ -58,7 +82,7 @@ export function Navbar() {
 
         {/* Centered pill nav desktop */}
         <nav className="hidden lg:flex items-center gap-1 rounded-full border border-white/10 bg-ink-800/60 backdrop-blur-xl px-2 py-1.5">
-          {nav.map(item => (
+          {visibleNav.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -124,7 +148,7 @@ export function Navbar() {
             className="lg:hidden overflow-hidden bg-ink-800 border-t border-white/5"
           >
             <Container className="py-4 flex flex-col gap-1">
-              {nav.map(item => (
+              {visibleNav.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
