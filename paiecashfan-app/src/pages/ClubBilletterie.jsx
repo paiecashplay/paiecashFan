@@ -416,9 +416,9 @@ export function ClubBilletterie() {
 
                     <ul className="mt-5 space-y-2">
                       {(offer.benefits || []).map(
-                        (benefit) => (
+                        (benefit, benefitIndex) => (
                           <li
-                            key={benefit}
+                            key={`benefit-${benefitIndex}`}
                             className="flex items-center gap-2 text-xs text-bone-300"
                           >
                             <Check
@@ -444,9 +444,9 @@ export function ClubBilletterie() {
 
                       <ul className="mt-3 space-y-1.5">
                         {(offer.conditions || []).map(
-                          (condition) => (
+                          (condition, conditionIndex) => (
                             <li
-                              key={condition}
+                              key={`condition-${conditionIndex}`}
                               className="text-xs text-bone-400"
                             >
                               • {condition}
@@ -602,9 +602,9 @@ function TicketingOfferModal({
 
           <ul className="space-y-2">
             {(offer.benefits || []).map(
-              (benefit) => (
+              (benefit, benefitIndex) => (
                 <li
-                  key={benefit}
+                  key={`benefit-${benefitIndex}`}
                   className="flex gap-2 text-sm text-bone-300"
                 >
                   <Check
@@ -626,9 +626,9 @@ function TicketingOfferModal({
 
           <ul className="space-y-2">
             {(offer.conditions || []).map(
-              (condition) => (
+              (condition, conditionIndex) => (
                 <li
-                  key={condition}
+                  key={`condition-${conditionIndex}`}
                   className="flex gap-2 text-sm text-bone-300"
                 >
                   <Check

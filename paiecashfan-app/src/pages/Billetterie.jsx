@@ -794,6 +794,22 @@ export function Billetterie() {
     );
   }, [clubs, serverSearch]);
 
+  // Nombre de cartes réellement rendues dans l'onglet actif : la grille n'affiche
+  // que `club[activeTab]`, donc l'état vide doit se baser là-dessus (et pas sur le
+  // nombre de clubs, qui peuvent n'avoir d'offres que dans l'autre onglet).
+  const visibleOfferCount = useMemo(
+    () =>
+      displayedClubs.reduce(
+        (total, club) =>
+          total +
+          (Array.isArray(club?.[activeTab])
+            ? club[activeTab].length
+            : 0),
+        0
+      ),
+    [displayedClubs, activeTab]
+  );
+
   const tabs = [
     {
       id: 'subscriptions',
@@ -931,7 +947,7 @@ export function Billetterie() {
         )}
 
         {!loadingList &&
-          displayedClubs.length === 0 && (
+          visibleOfferCount === 0 && (
             <div className="rounded-3xl border border-white/10 bg-white/[0.025] px-6 py-14 text-center">
               <Ticket
                 size={32}
@@ -1145,9 +1161,9 @@ export function Billetterie() {
                           {/* Avantages */}
                           <ul className="mt-5 min-h-[76px] space-y-2">
                             {visibleBenefits.map(
-                              (benefit) => (
+                              (benefit, benefitIndex) => (
                                 <li
-                                  key={benefit}
+                                  key={`benefit-${benefitIndex}`}
                                   className="flex items-start gap-2 text-[13px] leading-5 text-bone-300"
                                 >
                                   <Check
@@ -1176,9 +1192,9 @@ export function Billetterie() {
 
                             <ul className="mt-3 space-y-1.5">
                               {visibleConditions.map(
-                                (condition) => (
+                                (condition, conditionIndex) => (
                                   <li
-                                    key={condition}
+                                    key={`condition-${conditionIndex}`}
                                     className="text-[13px] leading-5 text-bone-500"
                                   >
                                     • {condition}
