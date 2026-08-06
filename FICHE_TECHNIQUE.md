@@ -135,6 +135,9 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-06 (cp)** — **BO Club : suppression de l'encart « Abonnement / Club Pro »**.
+  Les clubs s'inscrivent gratuitement → retrait du composant `SubscriptionCard` (bas de la
+  sidebar de l'Espace Club) et de son usage. Aucun autre impact.
 - **2026-08-06 (co)** — **Billetterie : refonte stagiaire (page générale + club) — revue & merge**.
   Merge de `feature/ticketing-improvements` après audit : **onglet Billetterie masqué** dans
   la nav si connecté (accès via la page du club), **page générale** listant billets +

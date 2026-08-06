@@ -159,8 +159,6 @@ function SidebarNav({ club, tab, onSelect, drawer, onCloseDrawer }) {
             </div>
           ))}
         </nav>
-
-        <SubscriptionCard />
       </aside>
     </>
   );
@@ -198,19 +196,6 @@ function ClubSwitcher({ club }) {
         </p>
       </div>
       <ChevronDown size={15} className="shrink-0 text-bone-600" />
-    </div>
-  );
-}
-
-function SubscriptionCard() {
-  return (
-    <div className="m-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.05] p-3.5">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-400/90">Abonnement</p>
-      <p className="mt-1 text-sm font-bold text-bone-100">Club Pro — annuel</p>
-      <p className="mt-0.5 text-[11px] text-bone-500">Renouvellement le 12 mars 2027</p>
-      <button className="mt-3 w-full rounded-lg border border-amber-400/25 bg-amber-400/10 py-1.5 text-[11px] font-black uppercase tracking-wider text-amber-300 transition hover:bg-amber-400/15">
-        Gérer la facturation
-      </button>
     </div>
   );
 }
