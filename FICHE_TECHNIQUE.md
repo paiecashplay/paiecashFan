@@ -135,6 +135,15 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-06 (co)** — **Billetterie : refonte stagiaire (page générale + club) — revue & merge**.
+  Merge de `feature/ticketing-improvements` après audit : **onglet Billetterie masqué** dans
+  la nav si connecté (accès via la page du club), **page générale** listant billets +
+  abonnements de tous les clubs (recherche serveur + filtre client), **prix PCC & €**
+  harmonisés avec `ClubBilletterie`, refonte des cartes. Contrôles OK : build, **aucun accès
+  Supabase direct** (tout via `apiFetch`), aucun secret, endpoints **pré-existants**
+  (`marketplace/clubs`, `checkout/ticketing`), **0 changement backend**, flux d'achat
+  identique à main. Correctifs de revue ajoutés : **état vide par onglet actif**
+  (`visibleOfferCount`) + **clés React indexées** (avantages/conditions) au lieu du texte brut.
 - **2026-08-04 (cn)** — **Live Boutique : déblocage « Preview » + plein écran fan avec chat**.
   Cause du blocage vidéo trouvée (sonde `ListActivityAPI`) : les activités programmées
   avaient `LiveTime` **dans le futur** + `IsBeginLiveEnable=1` → BytePlus **interdit de
