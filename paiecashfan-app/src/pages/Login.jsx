@@ -98,10 +98,48 @@ export function Login() {
 
   async function handleGoogle() {
     setError('');
+
     try {
-      await signInWithGoogle();
+      const redirectUrl = new URL(
+        window.location.origin
+      );
+
+      // Conserve la destination initiale.
+      redirectUrl.searchParams.set(
+        'oauth_next',
+        next
+      );
+
+      // Le choix du rôle n'est pris en compte
+      // que pendant une inscription.
+      if (
+        tab === 'register' &&
+        form.roleRequest === 'club_admin'
+      ) {
+        sessionStorage.setItem(
+          'google_auth_role_request',
+          'club_admin'
+        );
+      } else {
+        sessionStorage.removeItem(
+          'google_auth_role_request'
+        );
+      }
+
+      await signInWithGoogle(
+        redirectUrl.toString()
+      );
     } catch (err) {
-      setError(err.message);
+      sessionStorage.removeItem(
+        'google_auth_role_request'
+      );
+
+      setError(
+        translateError(
+          err?.message ||
+            'Impossible de continuer avec Google.'
+        )
+      );
     }
   }
 

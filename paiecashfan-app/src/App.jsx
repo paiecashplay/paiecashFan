@@ -1,4 +1,5 @@
-import { Routes, Route} from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { CheckoutModal } from '@/components/cart/CheckoutModal';
@@ -46,8 +47,167 @@ import { MonCompte } from './pages/MonCompte';
 import { Parametres } from './pages/Parametres';
 import { CheckoutReturn } from './pages/CheckoutReturn';
 import { IdleLogout } from './components/IdleLogout';
+import { supabase } from '@/lib/supabase';
 
 export default function App() {
+
+  // Gestion des erreurs OAuth (Google, etc.) et redirection vers la page appropriée
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // Gestion du retour OAuth après la connexion Google
+    async function handleOAuthReturn() {
+      const searchParams =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const hashParams =
+        new URLSearchParams(
+          window.location.hash.replace(
+            /^#/,
+            ''
+          )
+        );
+
+      const oauthError =
+        searchParams.get('error') ||
+        hashParams.get('error');
+
+      const oauthNext =
+        searchParams.get('oauth_next');
+
+      const pendingRoleRequest =
+        sessionStorage.getItem(
+          'google_auth_role_request'
+        );
+
+      // Annulation / refus Google.
+      if (oauthError) {
+        sessionStorage.removeItem(
+          'google_auth_role_request'
+        );
+
+        if (oauthError === 'access_denied') {
+          console.info(
+            'Connexion Google annulée par l’utilisateur.'
+          );
+        } else {
+          console.error(
+            'Erreur lors de la connexion Google :',
+            oauthError
+          );
+        }
+
+        navigate('/', {
+          replace: true,
+        });
+
+        return;
+      }
+
+      // Aucun retour OAuth à traiter.
+      if (
+        !oauthNext &&
+        pendingRoleRequest !== 'club_admin'
+      ) {
+        return;
+      }
+
+      // Récupération de l’utilisateur connecté après le retour OAuth.
+      try {
+        const {
+          data: { user },
+          error: userError,
+        } =
+          await supabase.auth.getUser();
+
+        if (userError) {
+          throw userError;
+        }
+
+        if (!user || cancelled) {
+          return;
+        }
+
+        // Représentant de club :
+        // il reste fan tant que sa candidature
+        // n'est pas validée.
+        if (
+          pendingRoleRequest === 'club_admin'
+        ) {
+          const {
+            error: profileError,
+          } = await supabase
+            .from('profiles')
+            .update({
+              role_request: 'club_admin',
+            })
+            .eq('id', user.id);
+
+          if (profileError) {
+            throw profileError;
+          }
+
+          sessionStorage.removeItem(
+            'google_auth_role_request'
+          );
+
+          await supabase.auth.refreshSession();
+
+          if (!cancelled) {
+            navigate('/mon-club', {
+              replace: true,
+            });
+          }
+
+          return;
+        }
+
+        // Fan ou connexion Google classique.
+        sessionStorage.removeItem(
+          'google_auth_role_request'
+        );
+
+        const safeNext =
+          oauthNext &&
+          oauthNext.startsWith('/') &&
+          !oauthNext.startsWith('//')
+            ? oauthNext
+            : '/';
+
+        if (!cancelled) {
+          navigate(safeNext, {
+            replace: true,
+          });
+        }
+      } catch (error) {
+        sessionStorage.removeItem(
+          'google_auth_role_request'
+        );
+
+        console.error(
+          'Erreur lors de la finalisation Google :',
+          error
+        );
+
+        if (!cancelled) {
+          navigate('/', {
+            replace: true,
+          });
+        }
+      }
+    }
+
+    handleOAuthReturn();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate]);
+
   return (
     <AuthProvider>
      <CartProvider>
