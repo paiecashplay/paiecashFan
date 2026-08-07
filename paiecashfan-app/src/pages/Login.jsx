@@ -131,7 +131,7 @@ export function Login() {
         {/* Fond : image stade + repli dégradé si l'image est absente */}
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_70%_0%,rgba(16,185,129,0.18),transparent_55%),linear-gradient(160deg,#04120c_0%,#020806_60%,#010403_100%)]">
           <img
-            src="/images/login-bg.jpg"
+            src="/images/login-bg.webp"
             alt=""
             aria-hidden
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
