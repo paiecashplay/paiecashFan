@@ -128,16 +128,18 @@ export function Login() {
     <div className="relative grid min-h-[calc(100vh-80px)] lg:grid-cols-2">
       {/* ══ Panneau gauche — hero (masqué en mobile) ══ */}
       <aside className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:px-12 xl:px-16">
-        {/* Fond : image stade + repli dégradé si l'image est absente */}
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_70%_0%,rgba(16,185,129,0.18),transparent_55%),linear-gradient(160deg,#04120c_0%,#020806_60%,#010403_100%)]">
+        {/* Fond : image stade (repli sombre si l'image est absente) */}
+        <div className="absolute inset-0 -z-10 bg-ink-950">
           <img
             src="/images/login-bg.webp"
             alt=""
             aria-hidden
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            className="h-full w-full object-cover opacity-70"
+            className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-ink-950/70 via-ink-950/55 to-ink-950/85" />
+          {/* Voile léger pour la lisibilité du texte : sombre à gauche, clair à
+              droite pour laisser voir le stade + le flare vert. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink-950/85 via-ink-950/40 to-ink-950/15" />
         </div>
 
         {/* Logo centré */}
