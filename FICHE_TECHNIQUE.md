@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-08 (cr)** — **Login/Inscription refondus (maquette) + linking Google manuel**.
+  **Page login** (`Login.jsx`) refaite en **2 colonnes** : panneau gauche hero (logo centré sur
+  fond stade + « Plus qu'une plateforme, une communauté » + 3 atouts Sécurisé/PCC/Communauté ;
+  bloc « avis » retiré), panneau droit carte auth (onglets Connexion/Inscription soulignés,
+  bouton Google multicolore, « Mot de passe oublié ? » sous le mot de passe, bascule
+  connexion↔inscription). Toute la logique conservée (rôles, OAuth, reset). Fond attendu :
+  `paiecashfan-app/public/images/login-bg.jpg` (repli dégradé si absent). **Linking Google
+  manuel** : `AuthContext` gagne `getIdentities` / `linkGoogle` / `unlinkGoogle`
+  (`supabase.auth.linkIdentity` / `unlinkIdentity`), et **Paramètres** une carte « Comptes
+  connectés » (lier/délier Google ; délier refusé si seule méthode). ⚠️ nécessite **Manual
+  linking activé** dans Supabase Auth.
 - **2026-08-07 (cq)** — **Auth Google (OAuth) — revue & merge (branche stagiaire)**.
   Merge de `feature/google-auth` après audit. Fonctionnel : bouton « Continuer avec Google »,
   synchro nom/avatar Google dans `profiles`, respect du rôle à l'inscription (fan → `role='fan'`

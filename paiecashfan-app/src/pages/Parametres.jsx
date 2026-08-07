@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Camera, Check, Loader2, User, Mail, KeyRound, ArrowRight, Trash2, ShieldCheck
+  Camera, Check, Loader2, User, Mail, KeyRound, ArrowRight, Trash2, ShieldCheck, Link2, Unlink
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -13,7 +13,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 const MAX_AVATAR_MB = 5;
 
 export function Parametres() {
-  const { user, profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, getIdentities, linkGoogle, unlinkGoogle } = useAuth();
   const { uploadImage, uploading } = useImageUpload();
   const fileRef = useRef(null);
 
@@ -22,6 +22,50 @@ export function Parametres() {
   const [nameMsg, setNameMsg] = useState('');
   const [avatarMsg, setAvatarMsg] = useState('');
   const [avatarErr, setAvatarErr] = useState('');
+
+  // Comptes connectés (linking Google)
+  const [identities, setIdentities] = useState(null); // null = en cours de chargement
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkMsg, setLinkMsg] = useState('');
+  const [linkErr, setLinkErr] = useState('');
+
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    let alive = true;
+    getIdentities()
+      .then((ids) => { if (alive) setIdentities(ids); })
+      .catch(() => { if (alive) setIdentities([]); });
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const googleLinked = Array.isArray(identities) && identities.some((i) => i.provider === 'google');
+  const canUnlink = Array.isArray(identities) && identities.length > 1;
+
+  async function handleLinkGoogle() {
+    setLinkBusy(true); setLinkErr(''); setLinkMsg('');
+    try {
+      await linkGoogle(); // redirige vers Google puis revient sur /parametres
+    } catch (err) {
+      const m = err?.message || '';
+      setLinkErr(/manual linking.*disabl|not enabled/i.test(m)
+        ? 'Le linking manuel doit être activé dans Supabase (Authentication → Sign In / Providers).'
+        : (m || 'Impossible de lier Google.'));
+      setLinkBusy(false);
+    }
+  }
+
+  async function handleUnlinkGoogle() {
+    setLinkBusy(true); setLinkErr(''); setLinkMsg('');
+    try {
+      await unlinkGoogle();
+      setIdentities(await getIdentities());
+      setLinkMsg('Compte Google délié.');
+    } catch (err) {
+      setLinkErr(err?.message || 'Impossible de délier Google.');
+    } finally {
+      setLinkBusy(false);
+    }
+  }
 
   const initial = (profile?.display_name || user?.email || 'F')[0].toUpperCase();
 
@@ -150,6 +194,49 @@ export function Parametres() {
           </div>
         </GlassCard>
 
+        {/* ── Comptes connectés ───────────────────────────── */}
+        <GlassCard className="mt-6 p-6">
+          <h2 className="font-display text-sm font-black uppercase tracking-wider text-bone-100">Comptes connectés</h2>
+          <p className="mt-1 text-[11px] text-bone-500">Connecte-toi aussi avec Google, en plus de ton email et ton mot de passe.</p>
+
+          <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+            <div className="flex items-center gap-3">
+              <GoogleIcon />
+              <div>
+                <p className="text-sm font-semibold text-bone-100">Google</p>
+                <p className="text-[11px] text-bone-500">
+                  {identities === null ? 'Chargement…' : googleLinked ? 'Lié à ton compte' : 'Non lié'}
+                </p>
+              </div>
+            </div>
+
+            {identities !== null && (
+              googleLinked ? (
+                canUnlink ? (
+                  <button
+                    onClick={handleUnlinkGoogle}
+                    disabled={linkBusy}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition hover:bg-red-500/20 disabled:opacity-50"
+                  >
+                    {linkBusy ? <Loader2 size={13} className="animate-spin" /> : <Unlink size={13} />} Délier
+                  </button>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-400">
+                    <Check size={13} /> Lié
+                  </span>
+                )
+              ) : (
+                <Button variant="primary" size="sm" onClick={handleLinkGoogle} disabled={linkBusy}>
+                  {linkBusy ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />} Lier Google
+                </Button>
+              )
+            )}
+          </div>
+
+          {linkMsg && <p className="mt-3 text-xs text-emerald-400">{linkMsg}</p>}
+          {linkErr && <p className="mt-3 text-xs text-red-400">{linkErr}</p>}
+        </GlassCard>
+
         {/* ── Sécurité ────────────────────────────────────── */}
         <GlassCard className="mt-6 p-6">
           <h2 className="font-display text-sm font-black uppercase tracking-wider text-bone-100">Sécurité</h2>
@@ -170,5 +257,17 @@ export function Parametres() {
         </div>
       </Container>
     </div>
+  );
+}
+
+// Icône Google (multicolore)
+function GoogleIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden className="shrink-0">
+      <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+      <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+      <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+      <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+    </svg>
   );
 }

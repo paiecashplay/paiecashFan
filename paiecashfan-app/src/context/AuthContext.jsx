@@ -338,6 +338,63 @@ export function AuthProvider({ children }) {
     setProfile(null);
   }
 
+  // Retourne les identités (méthodes de connexion) liées au compte courant.
+  async function getIdentities() {
+    const { data, error } =
+      await supabase.auth.getUserIdentities();
+
+    if (error) {
+      throw error;
+    }
+
+    return data?.identities || [];
+  }
+
+  // Lie un compte Google au compte actuellement connecté (linking manuel).
+  // Déclenche une redirection OAuth ; au retour, l'identité est rattachée.
+  async function linkGoogle(
+    redirectTo = `${window.location.origin}/parametres`
+  ) {
+    const { data, error } =
+      await supabase.auth.linkIdentity({
+        provider: 'google',
+        options: { redirectTo },
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  // Délie le compte Google. Refuse si c'est la seule méthode de connexion
+  // (sinon l'utilisateur ne pourrait plus se connecter).
+  async function unlinkGoogle() {
+    const identities = await getIdentities();
+
+    const google = identities.find(
+      (identity) => identity.provider === 'google'
+    );
+
+    if (!google) {
+      throw new Error('Aucun compte Google lié.');
+    }
+
+    if (identities.length <= 1) {
+      throw new Error(
+        'Impossible de délier votre seule méthode de connexion.'
+      );
+    }
+
+    const { error } =
+      await supabase.auth.unlinkIdentity(google);
+
+    if (error) {
+      throw error;
+    }
+  }
+
   async function updateProfile(updates) {
     if (!user) {
       throw new Error(
@@ -392,6 +449,9 @@ export function AuthProvider({ children }) {
       signOut,
       updateProfile,
       refreshProfile,
+      getIdentities,
+      linkGoogle,
+      unlinkGoogle,
     }),
     [
       user,
