@@ -135,6 +135,15 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-08 (cv)** — **Login : le panneau formulaire se met à l'échelle pour tenir dans la fenêtre**.
+  Le filet « max-h + overflow » de (cu) coupait le panneau (haut ET bas) au lieu de le laisser
+  voir → remplacé par un **auto-scale** : un `useLayoutEffect` mesure la hauteur naturelle du
+  panneau vs la hauteur dispo (fenêtre − header) et applique un `transform: scale()` proportionnel
+  (origine top center) quand ça dépasse, avec `wrap` borné + `overflow:hidden` **seulement** en
+  cas de réduction (l'ombre reste intacte à taille réelle). Recalcul via `ResizeObserver` +
+  `resize` + changement d'onglet (l'inscription, plus longue, se réduit un peu plus). Aucun
+  scaling < lg (mobile défile normalement). Le panneau garde les proportions de la maquette,
+  juste plus petit → **plus jamais coupé ni de scroll de page**.
 - **2026-08-08 (cu)** — **Login : hauteur vraiment responsive (clamp vh + panel borné)**.
   Les tailles/espacements verticaux (emblème, onglets, titre, inputs, CTA, Google, marges)
   passent en `clamp(min, vh, max)` → les éléments **rapetissent sur les petits écrans**, gardent

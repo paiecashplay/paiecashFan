@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Shield, Users, Check, ArrowRight } from 'lucide-react';
@@ -42,6 +42,36 @@ export function Login() {
   });
 
   const isLogin = tab === 'login';
+
+  // Auto-ajustement : le panneau se met à l'échelle pour toujours tenir dans la
+  // hauteur disponible (desktop). Il garde ses proportions (maquette en plus petit)
+  // plutôt que de déborder ou d'être coupé.
+  const panelRef = useRef(null);
+  const panelWrapRef = useRef(null);
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const wrap = panelWrapRef.current;
+    if (!panel || !wrap) return undefined;
+    let raf = 0;
+    const fit = () => {
+      if (window.innerWidth < 1024) { panel.style.transform = ''; wrap.style.height = ''; wrap.style.overflow = ''; return; }
+      panel.style.transform = 'none';
+      const natural = panel.offsetHeight;
+      const avail = window.innerHeight - 80 - 16; // header + petite marge
+      const s = Math.min(1, avail / natural);
+      panel.style.transformOrigin = 'top center';
+      panel.style.transform = s < 1 ? `scale(${s})` : 'none';
+      // Quand on réduit, on borne la hauteur du conteneur et on masque le
+      // débordement de mise en page (le rendu, lui, est déjà scalé pour tenir).
+      wrap.style.height = s < 1 ? `${Math.ceil(natural * s)}px` : '';
+      wrap.style.overflow = s < 1 ? 'hidden' : '';
+    };
+    fit();
+    const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
+    ro.observe(panel);
+    window.addEventListener('resize', fit);
+    return () => { ro.disconnect(); window.removeEventListener('resize', fit); cancelAnimationFrame(raf); };
+  }, [tab]);
 
   function set(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -112,7 +142,7 @@ export function Login() {
   function switchTab(t) { setTab(t); setError(''); setSuccess(''); }
 
   return (
-    <div className="relative min-h-[calc(100dvh-80px)] bg-[#04080d] lg:h-[calc(100dvh-80px)] lg:overflow-hidden">
+    <div className="relative min-h-[calc(100dvh-80px)] overflow-hidden bg-[#04080d]">
       {/* Glow radial vert très discret (global) */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_45%,rgba(16,185,129,0.08),transparent_45%)]" />
 
@@ -124,7 +154,7 @@ export function Login() {
       </div>
 
       {/* ══ Grille principale ══ */}
-      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-8 px-5 py-8 sm:px-8 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(500px,0.9fr)] lg:gap-[clamp(24px,4vw,60px)] lg:px-14 lg:py-[clamp(8px,2.2vh,28px)]">
+      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(500px,0.9fr)] lg:gap-[clamp(24px,4vw,60px)] lg:px-14 lg:py-[clamp(12px,2.2vh,28px)]">
 
         {/* ══════════ COLONNE GAUCHE — HERO ══════════ */}
         {/* L'arc + l'étoile font partie de l'image de fond (login-bg.webp). */}
@@ -157,14 +187,15 @@ export function Login() {
         </section>
 
         {/* ══════════ COLONNE DROITE — AUTH PANEL ══════════ */}
-        <section className="flex w-full flex-col items-center lg:h-full lg:justify-center">
+        <section className="flex w-full flex-col items-center">
           {/* Branding mobile (le hero est masqué < lg) */}
           <div className="mb-6 flex items-center gap-2 lg:hidden">
             <img src="/paiecashfan-logo.webp" alt="" className="h-10 w-10 object-contain" aria-hidden />
             <span className="font-display text-lg font-black text-white">PaieCash<span className="text-emerald-400">Fan</span></span>
           </div>
 
-          <div className="scrollbar-hide relative w-full max-w-[600px] rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-[clamp(16px,3vh,32px)] shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)] lg:max-h-full lg:overflow-y-auto">
+          <div ref={panelWrapRef} className="w-full max-w-[600px]">
+          <div ref={panelRef} className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-[clamp(16px,3vh,32px)] shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)]">
             {/* Onglets */}
             <div className="grid grid-cols-2 border-b border-white/10" role="tablist" aria-label="Connexion ou inscription">
               {['login', 'register'].map((t) => {
@@ -345,6 +376,7 @@ export function Login() {
                 </button>
               </p>
             </div>
+          </div>
           </div>
         </section>
       </div>
