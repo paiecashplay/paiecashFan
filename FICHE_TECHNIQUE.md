@@ -135,6 +135,12 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-08 (cu)** — **Login : hauteur vraiment responsive (clamp vh + panel borné)**.
+  Les tailles/espacements verticaux (emblème, onglets, titre, inputs, CTA, Google, marges)
+  passent en `clamp(min, vh, max)` → les éléments **rapetissent sur les petits écrans**, gardent
+  leur taille max sur les grands. Filet de sécurité : `lg:h-[calc(100dvh-80px)]` + panel
+  `lg:max-h-full lg:overflow-y-auto` (scroll interne du panel plutôt que scroll de page).
+  Corrige le cas « tenait à 80% mais débordait à 100% ».
 - **2026-08-08 (ct)** — **Login : ajustements (tient dans la fenêtre, image non zoomée, social proof retiré)**.
   Suite au retour cliente : page **compactée pour tenir dans le viewport sans scroll** (emblème
   150px, onglets 64px, espacements/paddings réduits). **Image de fond en `object-contain` calée
