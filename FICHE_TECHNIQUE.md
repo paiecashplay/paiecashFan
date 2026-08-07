@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-08 (cs)** — **Login : reproduction fidèle de la maquette (grande compo 2 colonnes)**.
+  Réécriture de `Login.jsx` selon la spec design (source de vérité) : fond `#04080d` + glow
+  discret ; **hero gauche** immersif (image stade plein-cadre pondérée à gauche + double
+  voile, **arc vert fin + point lumineux**, emblème ~180px, slogan blanc/vert en sans-serif,
+  description, 3 bénéfices, **social proof réintégré** — avatars + « 12 000 fans » + 4,9/5) ;
+  **panel droit large** (max 600px, min-h 680px, bordures très fines, glow vert) avec onglets
+  Connexion/Inscription soulignés, **inputs larges (58px)**, CTA vert 60px flèche à droite,
+  séparateur « OU », bouton Google, bascule. Responsive (2 col ≥ lg, 1 col + branding en
+  mobile, hero masqué). Accessibilité (labels/for, aria, autocomplete, focus-visible).
+  **Logique auth 100% inchangée** (OAuth, signIn/signUp, rôles, reset).
 - **2026-08-08 (cr)** — **Login/Inscription refondus (maquette) + linking Google manuel**.
   **Page login** (`Login.jsx`) refaite en **2 colonnes** : panneau gauche hero (logo centré sur
   fond stade + « Plus qu'une plateforme, une communauté » + 3 atouts Sécurisé/PCC/Communauté ;

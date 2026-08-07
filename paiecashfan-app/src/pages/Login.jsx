@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, User, Shield, Coins, Users, Check, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Shield, Users, Check, ArrowRight, Star } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/cn';
 
-// Choix de rôle à l'inscription
+// Choix de rôle à l'inscription (logique conservée à l'identique).
 const ROLE_OPTIONS = [
   {
     value: 'fan',
@@ -23,20 +23,12 @@ const ROLE_OPTIONS = [
   },
 ];
 
-// Points forts affichés sur le panneau de gauche (maquette).
-const FEATURES = [
-  { icon: Shield, title: 'Sécurisé', text: 'Vos données sont protégées' },
-  { icon: Coins, title: 'PCC officiel', text: 'La monnaie des supporters' },
-  { icon: Users, title: 'Communauté', text: 'Des fans comme vous' },
-];
-
 export function Login() {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const next = location.state?.next || '/';
 
-  // Onglet initial : ?tab=register ou state.tab (depuis les boutons du header).
   const params = new URLSearchParams(location.search);
   const initialTab = (location.state?.tab === 'register' || params.get('tab') === 'register') ? 'register' : 'login';
   const [tab, setTab]           = useState(initialTab);
@@ -49,6 +41,8 @@ export function Login() {
     email: '', password: '', displayName: '', roleRequest: 'fan'
   });
 
+  const isLogin = tab === 'login';
+
   function set(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
   }
@@ -59,20 +53,17 @@ export function Login() {
     setSuccess('');
     setLoading(true);
     try {
-      if (tab === 'login') {
+      if (isLogin) {
         await signIn({ email: form.email, password: form.password });
         navigate(next, { replace: true });
       } else {
         if (!form.displayName.trim()) { setError('Ton prénom est requis.'); setLoading(false); return; }
-        // signUp renvoie directement { user, session }
         const data = await signUp({
           email: form.email,
           password: form.password,
           displayName: form.displayName
         });
 
-        // Demande club_admin → on pose role_request sur le profil
-        // (le trigger crée le profil, on attend un tick puis on update).
         const isClub = form.roleRequest === 'club_admin';
         if (isClub && data?.user) {
           await new Promise((r) => setTimeout(r, 800));
@@ -83,11 +74,8 @@ export function Login() {
         }
 
         if (data?.session) {
-          // Auto-connecté (confirmation email désactivée) → on redirige :
-          // club → espace onboarding, fan → destination initiale.
           navigate(isClub ? '/mon-club' : next, { replace: true });
         } else {
-          // Confirmation email requise (session null tant que non confirmé).
           setSuccess(
             isClub
               ? 'Compte créé ! Confirme ton email, puis connecte-toi pour finaliser ta demande d\'accès club.'
@@ -104,14 +92,11 @@ export function Login() {
 
   async function handleGoogle() {
     setError('');
-
     try {
       const redirectUrl = new URL(window.location.origin);
-      // Conserve la destination initiale.
       redirectUrl.searchParams.set('oauth_next', next);
 
-      // Le choix du rôle n'est pris en compte que pendant une inscription.
-      if (tab === 'register' && form.roleRequest === 'club_admin') {
+      if (!isLogin && form.roleRequest === 'club_admin') {
         sessionStorage.setItem('google_auth_role_request', 'club_admin');
       } else {
         sessionStorage.removeItem('google_auth_role_request');
@@ -124,268 +109,311 @@ export function Login() {
     }
   }
 
+  function switchTab(t) { setTab(t); setError(''); setSuccess(''); }
+
   return (
-    <div className="relative grid min-h-[calc(100vh-80px)] lg:grid-cols-2">
-      {/* ══ Panneau gauche — hero (masqué en mobile) ══ */}
-      <aside className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:px-12 xl:px-16">
-        {/* Fond : image stade (repli sombre si l'image est absente) */}
-        <div className="absolute inset-0 -z-10 bg-ink-950">
-          <img
-            src="/images/login-bg.webp"
-            alt=""
+    <div className="relative min-h-[calc(100dvh-80px)] overflow-hidden bg-[#04080d]">
+      {/* Glow radial vert très discret (global) */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_45%,rgba(16,185,129,0.08),transparent_45%)]" />
+
+      {/* Fond stade plein-cadre, pondéré à gauche (desktop uniquement) */}
+      <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden>
+        <img src="/images/login-bg.webp" alt="" className="h-full w-full object-cover object-left" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(4,8,13,.10) 0%, rgba(4,8,13,.05) 42%, rgba(4,8,13,.82) 66%, #04080d 82%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, #04080d 0%, transparent 35%)' }} />
+      </div>
+
+      {/* ══ Grille principale ══ */}
+      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.92fr)] lg:gap-[70px] lg:px-14 lg:py-12">
+
+        {/* ══════════ COLONNE GAUCHE — HERO ══════════ */}
+        <section className="relative hidden lg:block">
+          {/* Arc vert fin + point lumineux */}
+          <div className="pointer-events-none absolute -left-24 -top-28 h-[720px] w-[720px] rounded-full border border-emerald-500/60" aria-hidden />
+          <div
+            className="pointer-events-none absolute left-[352px] top-[-96px] h-2 w-2 rounded-full bg-emerald-400"
+            style={{ boxShadow: '0 0 8px #10b981, 0 0 20px rgba(16,185,129,.7), 0 0 40px rgba(16,185,129,.35)' }}
             aria-hidden
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            className="h-full w-full object-cover"
           />
-          {/* Voile léger pour la lisibilité du texte : sombre à gauche, clair à
-              droite pour laisser voir le stade + le flare vert. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-ink-950/85 via-ink-950/40 to-ink-950/15" />
-        </div>
 
-        {/* Logo centré */}
-        <img
-          src="/paiecashfan-logo.webp"
-          alt="PaieCashFan"
-          className="mx-auto mb-10 h-28 w-28 rounded-3xl shadow-glow-emerald xl:h-32 xl:w-32"
-        />
-
-        <h2 className="font-display text-4xl font-black uppercase leading-[1.05] tracking-tight text-bone-50 xl:text-5xl">
-          Plus qu'une plateforme,<br />
-          <span className="text-emerald-400">une communauté.</span>
-        </h2>
-
-        <p className="mt-5 max-w-md text-sm leading-relaxed text-bone-300">
-          PaieCashFan réunit tous les supporters autour de leur passion. Achats, jeux,
-          fan club, événements et PaieCashCoin (PCC).
-        </p>
-
-        <div className="mt-9 grid max-w-lg grid-cols-3 gap-6">
-          {FEATURES.map(({ icon: Icon, title, text }) => (
-            <div key={title}>
-              <span className="grid h-11 w-11 place-items-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-400">
-                <Icon size={20} />
-              </span>
-              <p className="mt-3 text-[11px] font-black uppercase tracking-wider text-emerald-400">{title}</p>
-              <p className="mt-0.5 text-[11px] leading-snug text-bone-400">{text}</p>
-            </div>
-          ))}
-        </div>
-      </aside>
-
-      {/* ══ Panneau droit — carte auth ══ */}
-      <div className="relative flex items-center justify-center px-4 py-12 sm:px-8">
-        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-ink-800/60 p-7 backdrop-blur-xl sm:p-9">
-          {/* Onglets */}
-          <div className="mb-7 flex gap-8 border-b border-white/10">
-            {['login', 'register'].map((t) => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); setError(''); setSuccess(''); }}
-                className={cn(
-                  'relative -mb-px pb-3 text-xs font-black uppercase tracking-[0.14em] transition-colors',
-                  tab === t ? 'text-emerald-400' : 'text-bone-500 hover:text-bone-300'
-                )}
-              >
-                {t === 'login' ? 'Connexion' : 'Inscription'}
-                {tab === t && (
-                  <motion.span layoutId="login-tab-underline" className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-emerald-400" />
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Titre */}
-          <h1 className="font-display text-2xl font-black text-bone-50">
-            {tab === 'login' ? 'Bon retour ! 👋' : 'Rejoins PaieCashFan 🎉'}
-          </h1>
-          <p className="mt-1 text-xs text-bone-400">
-            {tab === 'login' ? 'Connecte-toi à ton compte fan' : 'Crée ton compte en quelques secondes'}
-          </p>
-
-          {/* Message succès */}
-          <AnimatePresence>
-            {success && (
-              <motion.div
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="mt-5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-xs text-emerald-400"
-              >
-                {success}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <AnimatePresence mode="wait">
-              {tab === 'register' && (
-                <motion.div
-                  key="register-fields"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4 overflow-hidden"
-                >
-                  <Field
-                    label="Prénom / Pseudo"
-                    icon={<User size={15} />}
-                    type="text"
-                    placeholder="Ex : Mohamed"
-                    value={form.displayName}
-                    onChange={set('displayName')}
-                    required
-                  />
-
-                  {/* Sélecteur de rôle */}
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold text-bone-300">Je m'inscris en tant que</label>
-                    <div className="space-y-2">
-                      {ROLE_OPTIONS.map(({ value, label, description, icon: Icon, badge }) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setForm((f) => ({ ...f, roleRequest: value }))}
-                          className={cn(
-                            'flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all',
-                            form.roleRequest === value
-                              ? 'border-emerald-500/50 bg-emerald-500/10'
-                              : 'border-white/10 bg-white/[0.02] hover:border-white/20'
-                          )}
-                        >
-                          <div className={cn(
-                            'mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg',
-                            form.roleRequest === value ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-bone-400'
-                          )}>
-                            <Icon size={15} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className={cn('text-xs font-bold', form.roleRequest === value ? 'text-emerald-400' : 'text-bone-200')}>
-                                {label}
-                              </span>
-                              {badge && (
-                                <span className="rounded border border-amber-500/20 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-400">
-                                  {badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="mt-0.5 text-[11px] leading-relaxed text-bone-500">{description}</p>
-                          </div>
-                          {form.roleRequest === value && (
-                            <Check size={14} className="mt-1 shrink-0 text-emerald-400" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <Field
-              label="Adresse e-mail"
-              icon={<Mail size={15} />}
-              type="email"
-              placeholder="toi@exemple.com"
-              value={form.email}
-              onChange={set('email')}
-              required
+          <div className="relative">
+            {/* Emblème */}
+            <img
+              src="/paiecashfan-logo.webp"
+              alt="PaieCashFan"
+              className="mx-auto mb-9 h-[180px] w-[180px] object-contain drop-shadow-[0_10px_40px_rgba(16,185,129,0.25)]"
             />
 
-            <div>
-              <div className="relative">
-                <Field
-                  label="Mot de passe"
-                  icon={<Lock size={15} />}
-                  type={showPwd ? 'text' : 'password'}
-                  placeholder={tab === 'register' ? 'Min. 8 caractères' : '••••••••'}
-                  value={form.password}
-                  onChange={set('password')}
-                  minLength={8}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPwd((v) => !v)}
-                  className="absolute right-3 top-[34px] text-bone-400 transition-colors hover:text-bone-100"
-                  tabIndex={-1}
-                >
-                  {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
-              </div>
-              {tab === 'login' && (
-                <div className="mt-2 text-right">
-                  <button
-                    type="button"
-                    onClick={() => handleForgotPassword(form.email)}
-                    className="text-xs font-semibold text-emerald-400 transition-colors hover:text-emerald-300"
-                  >
-                    Mot de passe oublié ?
-                  </button>
-                </div>
-              )}
+            {/* Slogan (sans-serif premium, PAS la police condensée) */}
+            <h2 className="max-w-[480px] font-sans font-extrabold uppercase leading-[1.08] tracking-[-0.02em] text-white [font-size:clamp(30px,2.2vw,40px)]">
+              Plus qu'une plateforme,<br />
+              <span className="text-emerald-400">une communauté.</span>
+            </h2>
+
+            {/* Description */}
+            <p className="mt-5 max-w-[500px] text-[17px] leading-[1.5] text-white/[0.65]">
+              PaieCashFan réunit tous les supporters autour de leur passion.
+              Achats, jeux, fan club, événements et PaieCashCoin (PCC).
+            </p>
+
+            {/* 3 bénéfices */}
+            <div className="mt-9 grid max-w-[560px] grid-cols-3 gap-6">
+              <Benefit icon="shield" title="Sécurisé" text="Vos données sont protégées" />
+              <Benefit icon="pcc" title="PCC officiel" text="La monnaie des supporters" />
+              <Benefit icon="users" title="Communauté" text="Des fans comme vous" />
             </div>
 
-            {/* Erreur */}
-            <AnimatePresence>
-              {error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400"
-                >
-                  {error}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {/* Social proof */}
+            <div className="mt-9 flex h-[92px] w-full max-w-[500px] items-center gap-5 rounded-[18px] border border-white/[0.12] bg-[rgba(10,16,22,0.75)] px-5">
+              <div className="flex items-center">
+                <div className="flex -space-x-3">
+                  {['from-emerald-400 to-cyan-500', 'from-amber-400 to-orange-500', 'from-fuchsia-400 to-violet-500'].map((g, i) => (
+                    <span key={i} className={cn('h-9 w-9 rounded-full border-2 border-[#0a1016] bg-gradient-to-br', g)} aria-hidden />
+                  ))}
+                </div>
+                <span className="-ml-2 grid h-9 min-w-9 place-items-center rounded-full border-2 border-[#0a1016] bg-emerald-500 px-1.5 text-[10px] font-black text-ink-950">12K+</span>
+              </div>
+              <p className="text-[13px] leading-snug text-white/80">
+                Plus de <b className="text-white">12 000 fans</b><br />nous font déjà confiance
+              </p>
+              <span className="ml-auto h-10 w-px bg-white/10" aria-hidden />
+              <div className="pr-1 text-right">
+                <div className="flex items-center justify-end gap-1.5">
+                  <span className="flex gap-0.5 text-emerald-400" aria-hidden>
+                    {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={13} fill="currentColor" strokeWidth={0} />)}
+                  </span>
+                  <span className="text-[13px] font-black text-white">4,9/5</span>
+                </div>
+                <p className="mt-0.5 text-[11px] text-white/55">Avis vérifiés</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-hero text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-[.98] disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  {tab === 'login' ? 'Se connecter' : 'Créer mon compte'}
-                  <ArrowRight size={17} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Divider + OAuth */}
-          <div className="my-5 flex items-center gap-3">
-            <span className="h-px flex-1 bg-white/10" />
-            <span className="text-[10px] uppercase tracking-widest text-bone-500">ou</span>
-            <span className="h-px flex-1 bg-white/10" />
+        {/* ══════════ COLONNE DROITE — AUTH PANEL ══════════ */}
+        <section className="flex w-full flex-col items-center">
+          {/* Branding mobile (le hero est masqué < lg) */}
+          <div className="mb-6 flex items-center gap-2 lg:hidden">
+            <img src="/paiecashfan-logo.webp" alt="" className="h-10 w-10 object-contain" aria-hidden />
+            <span className="font-display text-lg font-black text-white">PaieCash<span className="text-emerald-400">Fan</span></span>
           </div>
 
-          <button
-            onClick={handleGoogle}
-            className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] text-sm font-semibold text-bone-100 transition-colors hover:bg-white/10"
-          >
-            <GoogleIcon />
-            Continuer avec Google
-          </button>
+          <div className="relative w-full max-w-[600px] overflow-hidden rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-10 shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)] lg:min-h-[680px]">
+            {/* Onglets */}
+            <div className="grid grid-cols-2 border-b border-white/10" role="tablist" aria-label="Connexion ou inscription">
+              {['login', 'register'].map((t) => {
+                const active = tab === t;
+                return (
+                  <button
+                    key={t}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => switchTab(t)}
+                    className={cn(
+                      'relative flex h-[76px] items-center justify-center text-sm font-bold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none',
+                      active ? 'text-emerald-400' : 'text-white/45 hover:text-white/70'
+                    )}
+                  >
+                    {t === 'login' ? 'Connexion' : 'Inscription'}
+                    {active && (
+                      <motion.span layoutId="auth-tab-underline" className="absolute inset-x-0 -bottom-px h-0.5 bg-emerald-500" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Bascule connexion / inscription */}
-          <p className="mt-6 text-center text-xs text-bone-500">
-            {tab === 'login' ? 'Pas encore de compte ? ' : 'Déjà un compte ? '}
-            <button
-              type="button"
-              onClick={() => { setTab(tab === 'login' ? 'register' : 'login'); setError(''); setSuccess(''); }}
-              className="font-bold text-emerald-400 transition-colors hover:text-emerald-300"
-            >
-              {tab === 'login' ? "S'inscrire" : 'Se connecter'}
-            </button>
-          </p>
-        </div>
+            {/* Contenu */}
+            <div className="px-6 pt-12 sm:px-[46px]">
+              <h1 className="text-[30px] font-extrabold leading-tight text-white sm:text-[32px]">
+                {isLogin ? 'Bon retour ! 👋' : 'Rejoins la communauté ⚽'}
+              </h1>
+              <p className="mt-2 text-[17px] text-white/[0.58]">
+                {isLogin ? 'Connecte-toi à ton compte fan' : 'Crée ton compte fan PaieCashFan.'}
+              </p>
+
+              <AnimatePresence>
+                {success && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="mt-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400"
+                  >
+                    {success}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+                <AnimatePresence mode="wait">
+                  {!isLogin && (
+                    <motion.div
+                      key="register-fields"
+                      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-5 overflow-hidden"
+                    >
+                      <Field
+                        id="displayName" label="Prénom / Pseudo" icon={<User size={18} />}
+                        type="text" placeholder="Ex : Mohamed" autoComplete="nickname"
+                        value={form.displayName} onChange={set('displayName')} required
+                      />
+
+                      <div>
+                        <span className="mb-2.5 block text-sm font-medium text-white/[0.78]">Je m'inscris en tant que</span>
+                        <div className="space-y-2.5">
+                          {ROLE_OPTIONS.map(({ value, label, description, icon: Icon, badge }) => {
+                            const selected = form.roleRequest === value;
+                            return (
+                              <button
+                                key={value} type="button"
+                                onClick={() => setForm((f) => ({ ...f, roleRequest: value }))}
+                                aria-pressed={selected}
+                                className={cn(
+                                  'flex w-full items-start gap-3 rounded-2xl border p-3.5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
+                                  selected ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/10 bg-white/[0.02] hover:border-white/20'
+                                )}
+                              >
+                                <span className={cn('mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl', selected ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/50')}>
+                                  <Icon size={16} />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                  <span className="flex items-center gap-2">
+                                    <span className={cn('text-sm font-bold', selected ? 'text-emerald-400' : 'text-white/90')}>{label}</span>
+                                    {badge && (
+                                      <span className="rounded border border-amber-500/20 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-400">{badge}</span>
+                                    )}
+                                  </span>
+                                  <span className="mt-0.5 block text-[12px] leading-relaxed text-white/50">{description}</span>
+                                </span>
+                                {selected && <Check size={15} className="mt-1 shrink-0 text-emerald-400" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <Field
+                  id="email" label="Adresse e-mail" icon={<Mail size={18} />}
+                  type="email" placeholder="toi@exemple.com" autoComplete="email"
+                  value={form.email} onChange={set('email')} required
+                />
+
+                <div>
+                  <Field
+                    id="password" label="Mot de passe" icon={<Lock size={18} />}
+                    type={showPwd ? 'text' : 'password'}
+                    placeholder={isLogin ? '••••••••' : 'Min. 8 caractères'}
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    value={form.password} onChange={set('password')} minLength={8} required
+                    rightSlot={
+                      <button
+                        type="button" onClick={() => setShowPwd((v) => !v)} tabIndex={-1}
+                        aria-label={showPwd ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white/80"
+                      >
+                        {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    }
+                  />
+                  {isLogin && (
+                    <div className="mt-2.5 flex justify-end">
+                      <button type="button" onClick={() => handleForgotPassword(form.email)} className="text-sm font-semibold text-[#18df8a] transition-colors hover:text-emerald-300">
+                        Mot de passe oublié ?
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <AnimatePresence>
+                  {error && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      role="alert"
+                      className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                    >
+                      {error}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
+                {/* CTA principal */}
+                <button
+                  type="submit" disabled={loading}
+                  className="relative mt-9 flex h-[60px] w-full items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#10b981,#22d981)] text-[16px] font-bold text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(16,185,129,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 disabled:opacity-60"
+                >
+                  {loading ? (
+                    <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      {isLogin ? 'Se connecter' : 'Créer mon compte'}
+                      <ArrowRight size={18} className="absolute right-6 top-1/2 -translate-y-1/2" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Séparateur */}
+              <div className="my-[30px] flex items-center gap-4">
+                <span className="h-px flex-1 bg-white/[0.12]" />
+                <span className="text-xs uppercase tracking-widest text-white/45">ou</span>
+                <span className="h-px flex-1 bg-white/[0.12]" />
+              </div>
+
+              {/* Google */}
+              <button
+                onClick={handleGoogle}
+                className="flex h-[60px] w-full items-center justify-center gap-3 rounded-[14px] border border-white/[0.22] bg-white/[0.035] text-[15px] font-semibold text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40"
+              >
+                <GoogleIcon />
+                Continuer avec Google
+              </button>
+
+              {/* Bascule */}
+              <p className="mt-6 text-center text-sm text-white/55">
+                {isLogin ? 'Pas encore de compte ? ' : 'Déjà un compte ? '}
+                <button type="button" onClick={() => switchTab(isLogin ? 'register' : 'login')} className="font-bold text-[#18df8a] transition-colors hover:text-emerald-300">
+                  {isLogin ? "S'inscrire" : 'Se connecter'}
+                </button>
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+// ─── Bénéfice (icône + titre + texte, sans card) ─────────────
+function Benefit({ icon, title, text }) {
+  return (
+    <div>
+      <span className="grid h-12 w-12 place-items-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-400">
+        {icon === 'shield' && <Shield size={21} />}
+        {icon === 'users' && <Users size={21} />}
+        {icon === 'pcc' && <span className="font-display text-lg font-black leading-none">P</span>}
+      </span>
+      <p className="mt-3 text-[13px] font-bold uppercase tracking-wide text-emerald-400">{title}</p>
+      <p className="mt-1 text-[13px] leading-snug text-white/55">{text}</p>
+    </div>
+  );
+}
+
+// ─── Champ de formulaire (large, accessible) ─────────────────
+function Field({ id, label, icon, rightSlot, ...inputProps }) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2.5 block text-sm font-medium text-white/[0.78]">{label}</label>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" aria-hidden>{icon}</span>
+        <input
+          id={id}
+          {...inputProps}
+          className="h-[58px] w-full rounded-[14px] border border-white/[0.16] bg-[rgba(12,18,24,0.82)] pl-12 pr-12 text-[16px] text-white outline-none transition placeholder:text-white/35 focus:border-emerald-500/75 focus:ring-[3px] focus:ring-emerald-500/10"
+        />
+        {rightSlot}
       </div>
     </div>
   );
@@ -402,26 +430,10 @@ async function handleForgotPassword(email) {
   else alert('Un lien de réinitialisation t\'a été envoyé par email !');
 }
 
-// ─── Composant Field ──────────────────────────────────────────
-function Field({ label, icon, ...inputProps }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-xs font-semibold text-bone-300">{label}</label>
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-500">{icon}</span>
-        <input
-          {...inputProps}
-          className="h-12 w-full rounded-xl border border-white/10 bg-ink-900/60 pl-9 pr-4 text-sm text-bone-100 transition-colors placeholder:text-bone-600 focus:border-emerald-500/60 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
-        />
-      </div>
-    </div>
-  );
-}
-
 // ─── Icône Google (multicolore) ───────────────────────────────
 function GoogleIcon() {
   return (
-    <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
       <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
       <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
       <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
@@ -436,7 +448,6 @@ function translateError(msg = '') {
   if (msg.includes('Email not confirmed'))         return 'Vérifie ta boîte mail pour confirmer ton compte.';
   if (msg.includes('User already registered'))     return 'Cet email est déjà utilisé. Connecte-toi.';
   if (msg.includes('Password should be'))          return 'Le mot de passe doit faire au moins 8 caractères.';
-  // Rate-limit Supabase (envoi d'emails de confirmation)
   if (/for security purposes.*after (\d+) seconds/i.test(msg)) {
     const s = msg.match(/after (\d+) seconds/i)?.[1] || 'quelques';
     return `Trop de tentatives rapprochées. Réessaie dans ${s} secondes.`;
