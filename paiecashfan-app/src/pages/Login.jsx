@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, User, Shield, Users, Check, ArrowRight, Star } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Shield, Users, Check, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/cn';
@@ -116,77 +116,43 @@ export function Login() {
       {/* Glow radial vert très discret (global) */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_45%,rgba(16,185,129,0.08),transparent_45%)]" />
 
-      {/* Fond stade plein-cadre, pondéré à gauche (desktop uniquement) */}
+      {/* Fond stade (contient déjà l'arc + l'étoile) — non zoomé, calé à gauche */}
       <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden>
-        <img src="/images/login-bg.webp" alt="" className="h-full w-full object-cover object-left" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(4,8,13,.10) 0%, rgba(4,8,13,.05) 42%, rgba(4,8,13,.82) 66%, #04080d 82%)' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, #04080d 0%, transparent 35%)' }} />
+        <img src="/images/login-bg.webp" alt="" className="h-full w-full object-contain object-left" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, transparent 0%, transparent 46%, rgba(4,8,13,.55) 62%, #04080d 76%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(4,8,13,.5) 0%, transparent 28%)' }} />
       </div>
 
       {/* ══ Grille principale ══ */}
-      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.92fr)] lg:gap-[70px] lg:px-14 lg:py-12">
+      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(500px,0.9fr)] lg:gap-[60px] lg:px-14 lg:py-8">
 
         {/* ══════════ COLONNE GAUCHE — HERO ══════════ */}
-        <section className="relative hidden lg:block">
-          {/* Arc vert fin + point lumineux */}
-          <div className="pointer-events-none absolute -left-24 -top-28 h-[720px] w-[720px] rounded-full border border-emerald-500/60" aria-hidden />
-          <div
-            className="pointer-events-none absolute left-[352px] top-[-96px] h-2 w-2 rounded-full bg-emerald-400"
-            style={{ boxShadow: '0 0 8px #10b981, 0 0 20px rgba(16,185,129,.7), 0 0 40px rgba(16,185,129,.35)' }}
-            aria-hidden
+        {/* L'arc + l'étoile font partie de l'image de fond (login-bg.webp). */}
+        <section className="relative hidden text-center lg:block">
+          {/* Emblème */}
+          <img
+            src="/paiecashfan-logo.webp"
+            alt="PaieCashFan"
+            className="mx-auto mb-8 h-[150px] w-[150px] object-contain drop-shadow-[0_10px_40px_rgba(16,185,129,0.25)]"
           />
 
-          <div className="relative">
-            {/* Emblème */}
-            <img
-              src="/paiecashfan-logo.webp"
-              alt="PaieCashFan"
-              className="mx-auto mb-9 h-[180px] w-[180px] object-contain drop-shadow-[0_10px_40px_rgba(16,185,129,0.25)]"
-            />
+          {/* Slogan (sans-serif premium, PAS la police condensée) */}
+          <h2 className="mx-auto max-w-[520px] font-sans font-extrabold uppercase leading-[1.08] tracking-[-0.02em] text-white [font-size:clamp(28px,2vw,38px)]">
+            Plus qu'une plateforme,<br />
+            <span className="text-emerald-400">une communauté.</span>
+          </h2>
 
-            {/* Slogan (sans-serif premium, PAS la police condensée) */}
-            <h2 className="max-w-[480px] font-sans font-extrabold uppercase leading-[1.08] tracking-[-0.02em] text-white [font-size:clamp(30px,2.2vw,40px)]">
-              Plus qu'une plateforme,<br />
-              <span className="text-emerald-400">une communauté.</span>
-            </h2>
+          {/* Description */}
+          <p className="mx-auto mt-6 max-w-[500px] text-[16px] leading-[1.5] text-white/[0.65]">
+            PaieCashFan réunit tous les supporters autour de leur passion.
+            Achats, jeux, fan club, événements et PaieCashCoin (PCC).
+          </p>
 
-            {/* Description */}
-            <p className="mt-5 max-w-[500px] text-[17px] leading-[1.5] text-white/[0.65]">
-              PaieCashFan réunit tous les supporters autour de leur passion.
-              Achats, jeux, fan club, événements et PaieCashCoin (PCC).
-            </p>
-
-            {/* 3 bénéfices */}
-            <div className="mt-9 grid max-w-[560px] grid-cols-3 gap-6">
-              <Benefit icon="shield" title="Sécurisé" text="Vos données sont protégées" />
-              <Benefit icon="pcc" title="PCC officiel" text="La monnaie des supporters" />
-              <Benefit icon="users" title="Communauté" text="Des fans comme vous" />
-            </div>
-
-            {/* Social proof */}
-            <div className="mt-9 flex h-[92px] w-full max-w-[500px] items-center gap-5 rounded-[18px] border border-white/[0.12] bg-[rgba(10,16,22,0.75)] px-5">
-              <div className="flex items-center">
-                <div className="flex -space-x-3">
-                  {['from-emerald-400 to-cyan-500', 'from-amber-400 to-orange-500', 'from-fuchsia-400 to-violet-500'].map((g, i) => (
-                    <span key={i} className={cn('h-9 w-9 rounded-full border-2 border-[#0a1016] bg-gradient-to-br', g)} aria-hidden />
-                  ))}
-                </div>
-                <span className="-ml-2 grid h-9 min-w-9 place-items-center rounded-full border-2 border-[#0a1016] bg-emerald-500 px-1.5 text-[10px] font-black text-ink-950">12K+</span>
-              </div>
-              <p className="text-[13px] leading-snug text-white/80">
-                Plus de <b className="text-white">12 000 fans</b><br />nous font déjà confiance
-              </p>
-              <span className="ml-auto h-10 w-px bg-white/10" aria-hidden />
-              <div className="pr-1 text-right">
-                <div className="flex items-center justify-end gap-1.5">
-                  <span className="flex gap-0.5 text-emerald-400" aria-hidden>
-                    {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={13} fill="currentColor" strokeWidth={0} />)}
-                  </span>
-                  <span className="text-[13px] font-black text-white">4,9/5</span>
-                </div>
-                <p className="mt-0.5 text-[11px] text-white/55">Avis vérifiés</p>
-              </div>
-            </div>
+          {/* 3 bénéfices (centrés) */}
+          <div className="mx-auto mt-10 grid max-w-[560px] grid-cols-3 gap-6">
+            <Benefit icon="shield" title="Sécurisé" text="Vos données sont protégées" />
+            <Benefit icon="pcc" title="PCC officiel" text="La monnaie des supporters" />
+            <Benefit icon="users" title="Communauté" text="Des fans comme vous" />
           </div>
         </section>
 
@@ -198,7 +164,7 @@ export function Login() {
             <span className="font-display text-lg font-black text-white">PaieCash<span className="text-emerald-400">Fan</span></span>
           </div>
 
-          <div className="relative w-full max-w-[600px] overflow-hidden rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-10 shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)] lg:min-h-[680px]">
+          <div className="relative w-full max-w-[600px] overflow-hidden rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-8 shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)]">
             {/* Onglets */}
             <div className="grid grid-cols-2 border-b border-white/10" role="tablist" aria-label="Connexion ou inscription">
               {['login', 'register'].map((t) => {
@@ -210,7 +176,7 @@ export function Login() {
                     aria-selected={active}
                     onClick={() => switchTab(t)}
                     className={cn(
-                      'relative flex h-[76px] items-center justify-center text-sm font-bold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none',
+                      'relative flex h-[64px] items-center justify-center text-sm font-bold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none',
                       active ? 'text-emerald-400' : 'text-white/45 hover:text-white/70'
                     )}
                   >
@@ -224,7 +190,7 @@ export function Login() {
             </div>
 
             {/* Contenu */}
-            <div className="px-6 pt-12 sm:px-[46px]">
+            <div className="px-6 pt-8 sm:px-[46px]">
               <h1 className="text-[30px] font-extrabold leading-tight text-white sm:text-[32px]">
                 {isLogin ? 'Bon retour ! 👋' : 'Rejoins la communauté ⚽'}
               </h1>
@@ -243,14 +209,14 @@ export function Login() {
                 )}
               </AnimatePresence>
 
-              <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <AnimatePresence mode="wait">
                   {!isLogin && (
                     <motion.div
                       key="register-fields"
                       initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="space-y-5 overflow-hidden"
+                      className="space-y-4 overflow-hidden"
                     >
                       <Field
                         id="displayName" label="Prénom / Pseudo" icon={<User size={18} />}
@@ -342,7 +308,7 @@ export function Login() {
                 {/* CTA principal */}
                 <button
                   type="submit" disabled={loading}
-                  className="relative mt-9 flex h-[60px] w-full items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#10b981,#22d981)] text-[16px] font-bold text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(16,185,129,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 disabled:opacity-60"
+                  className="relative mt-6 flex h-[58px] w-full items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#10b981,#22d981)] text-[16px] font-bold text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(16,185,129,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 disabled:opacity-60"
                 >
                   {loading ? (
                     <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -356,7 +322,7 @@ export function Login() {
               </form>
 
               {/* Séparateur */}
-              <div className="my-[30px] flex items-center gap-4">
+              <div className="my-5 flex items-center gap-4">
                 <span className="h-px flex-1 bg-white/[0.12]" />
                 <span className="text-xs uppercase tracking-widest text-white/45">ou</span>
                 <span className="h-px flex-1 bg-white/[0.12]" />
@@ -365,14 +331,14 @@ export function Login() {
               {/* Google */}
               <button
                 onClick={handleGoogle}
-                className="flex h-[60px] w-full items-center justify-center gap-3 rounded-[14px] border border-white/[0.22] bg-white/[0.035] text-[15px] font-semibold text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40"
+                className="flex h-[56px] w-full items-center justify-center gap-3 rounded-[14px] border border-white/[0.22] bg-white/[0.035] text-[15px] font-semibold text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40"
               >
                 <GoogleIcon />
                 Continuer avec Google
               </button>
 
               {/* Bascule */}
-              <p className="mt-6 text-center text-sm text-white/55">
+              <p className="mt-5 text-center text-sm text-white/55">
                 {isLogin ? 'Pas encore de compte ? ' : 'Déjà un compte ? '}
                 <button type="button" onClick={() => switchTab(isLogin ? 'register' : 'login')} className="font-bold text-[#18df8a] transition-colors hover:text-emerald-300">
                   {isLogin ? "S'inscrire" : 'Se connecter'}
@@ -389,8 +355,8 @@ export function Login() {
 // ─── Bénéfice (icône + titre + texte, sans card) ─────────────
 function Benefit({ icon, title, text }) {
   return (
-    <div>
-      <span className="grid h-12 w-12 place-items-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-400">
+    <div className="text-center">
+      <span className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-400">
         {icon === 'shield' && <Shield size={21} />}
         {icon === 'users' && <Users size={21} />}
         {icon === 'pcc' && <span className="font-display text-lg font-black leading-none">P</span>}

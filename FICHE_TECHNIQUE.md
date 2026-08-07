@@ -135,6 +135,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-08 (ct)** — **Login : ajustements (tient dans la fenêtre, image non zoomée, social proof retiré)**.
+  Suite au retour cliente : page **compactée pour tenir dans le viewport sans scroll** (emblème
+  150px, onglets 64px, espacements/paddings réduits). **Image de fond en `object-contain` calée
+  à gauche** (l'arc + l'étoile sont DANS `login-bg.webp`) au lieu de `object-cover` qui la
+  zoomait ; **arc CSS en doublon supprimé**. **Social proof retiré** (avis/note/nb de fans non
+  réels — à remettre avec de vraies données). **Bénéfices centrés** (icône au-dessus du texte).
+  Espacements du hero gauche légèrement aérés.
 - **2026-08-08 (cs)** — **Login : reproduction fidèle de la maquette (grande compo 2 colonnes)**.
   Réécriture de `Login.jsx` selon la spec design (source de vérité) : fond `#04080d` + glow
   discret ; **hero gauche** immersif (image stade plein-cadre pondérée à gauche + double
