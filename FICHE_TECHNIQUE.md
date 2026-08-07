@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-07 (cq)** — **Auth Google (OAuth) — revue & merge (branche stagiaire)**.
+  Merge de `feature/google-auth` après audit. Fonctionnel : bouton « Continuer avec Google »,
+  synchro nom/avatar Google dans `profiles`, respect du rôle à l'inscription (fan → `role='fan'`
+  par défaut DB ; représentant club → `role_request='club_admin'` puis redirection `/mon-club`),
+  conservation de la page demandée (`oauth_next`), gestion du refus de consentement, nettoyage
+  des params OAuth. **Contrôles sécurité** : aucun secret commité (`.env.local` ignoré) ; le code
+  n'écrit **jamais** `role` (uniquement `role_request` = candidature) ; **RLS profiles** bloque
+  toute auto-promotion (`WITH CHECK role inchangé`) ; garde anti-open-redirect (`safeNext`).
+  Le bug « tous les rôles à `user` » signalé en test venait de la **base staging au schéma
+  incomplet** (la contrainte prod n'autorise que `fan/club_admin/super_admin`) — **pas du code** ;
+  prod vérifiée conforme. Aucun correctif nécessaire.
 - **2026-08-06 (cp)** — **BO Club : suppression de l'encart « Abonnement / Club Pro »**.
   Les clubs s'inscrivent gratuitement → retrait du composant `SubscriptionCard` (bas de la
   sidebar de l'Espace Club) et de son usage. Aucun autre impact.
