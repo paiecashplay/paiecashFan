@@ -112,7 +112,7 @@ export function Login() {
   function switchTab(t) { setTab(t); setError(''); setSuccess(''); }
 
   return (
-    <div className="relative min-h-[calc(100dvh-80px)] overflow-hidden bg-[#04080d]">
+    <div className="relative min-h-[calc(100dvh-80px)] bg-[#04080d] lg:h-[calc(100dvh-80px)] lg:overflow-hidden">
       {/* Glow radial vert très discret (global) */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_45%,rgba(16,185,129,0.08),transparent_45%)]" />
 
@@ -124,7 +124,7 @@ export function Login() {
       </div>
 
       {/* ══ Grille principale ══ */}
-      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(500px,0.9fr)] lg:gap-[60px] lg:px-14 lg:py-8">
+      <div className="relative mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1440px] items-center gap-8 px-5 py-8 sm:px-8 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(500px,0.9fr)] lg:gap-[clamp(24px,4vw,60px)] lg:px-14 lg:py-[clamp(8px,2.2vh,28px)]">
 
         {/* ══════════ COLONNE GAUCHE — HERO ══════════ */}
         {/* L'arc + l'étoile font partie de l'image de fond (login-bg.webp). */}
@@ -133,7 +133,7 @@ export function Login() {
           <img
             src="/paiecashfan-logo.webp"
             alt="PaieCashFan"
-            className="mx-auto mb-8 h-[150px] w-[150px] object-contain drop-shadow-[0_10px_40px_rgba(16,185,129,0.25)]"
+            className="mx-auto mb-[clamp(14px,3vh,32px)] h-[clamp(96px,15vh,150px)] w-[clamp(96px,15vh,150px)] object-contain drop-shadow-[0_10px_40px_rgba(16,185,129,0.25)]"
           />
 
           {/* Slogan (sans-serif premium, PAS la police condensée) */}
@@ -143,13 +143,13 @@ export function Login() {
           </h2>
 
           {/* Description */}
-          <p className="mx-auto mt-6 max-w-[500px] text-[16px] leading-[1.5] text-white/[0.65]">
+          <p className="mx-auto mt-[clamp(12px,2.5vh,24px)] max-w-[500px] text-[16px] leading-[1.5] text-white/[0.65]">
             PaieCashFan réunit tous les supporters autour de leur passion.
             Achats, jeux, fan club, événements et PaieCashCoin (PCC).
           </p>
 
           {/* 3 bénéfices (centrés) */}
-          <div className="mx-auto mt-10 grid max-w-[560px] grid-cols-3 gap-6">
+          <div className="mx-auto mt-[clamp(16px,3.5vh,40px)] grid max-w-[560px] grid-cols-3 gap-6">
             <Benefit icon="shield" title="Sécurisé" text="Vos données sont protégées" />
             <Benefit icon="pcc" title="PCC officiel" text="La monnaie des supporters" />
             <Benefit icon="users" title="Communauté" text="Des fans comme vous" />
@@ -157,14 +157,14 @@ export function Login() {
         </section>
 
         {/* ══════════ COLONNE DROITE — AUTH PANEL ══════════ */}
-        <section className="flex w-full flex-col items-center">
+        <section className="flex w-full flex-col items-center lg:h-full lg:justify-center">
           {/* Branding mobile (le hero est masqué < lg) */}
           <div className="mb-6 flex items-center gap-2 lg:hidden">
             <img src="/paiecashfan-logo.webp" alt="" className="h-10 w-10 object-contain" aria-hidden />
             <span className="font-display text-lg font-black text-white">PaieCash<span className="text-emerald-400">Fan</span></span>
           </div>
 
-          <div className="relative w-full max-w-[600px] overflow-hidden rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-8 shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)]">
+          <div className="scrollbar-hide relative w-full max-w-[600px] rounded-[28px] border border-white/[0.16] bg-[linear-gradient(145deg,rgba(12,20,27,0.92),rgba(5,10,15,0.97))] pb-[clamp(16px,3vh,32px)] shadow-[0_25px_80px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.03),0_0_60px_rgba(16,185,129,0.08)] lg:max-h-full lg:overflow-y-auto">
             {/* Onglets */}
             <div className="grid grid-cols-2 border-b border-white/10" role="tablist" aria-label="Connexion ou inscription">
               {['login', 'register'].map((t) => {
@@ -176,7 +176,7 @@ export function Login() {
                     aria-selected={active}
                     onClick={() => switchTab(t)}
                     className={cn(
-                      'relative flex h-[64px] items-center justify-center text-sm font-bold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none',
+                      'relative flex h-[clamp(52px,7vh,64px)] items-center justify-center text-sm font-bold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none',
                       active ? 'text-emerald-400' : 'text-white/45 hover:text-white/70'
                     )}
                   >
@@ -190,8 +190,8 @@ export function Login() {
             </div>
 
             {/* Contenu */}
-            <div className="px-6 pt-8 sm:px-[46px]">
-              <h1 className="text-[30px] font-extrabold leading-tight text-white sm:text-[32px]">
+            <div className="px-6 pt-[clamp(16px,3vh,32px)] sm:px-[46px]">
+              <h1 className="text-[clamp(24px,3.2vh,32px)] font-extrabold leading-tight text-white">
                 {isLogin ? 'Bon retour ! 👋' : 'Rejoins la communauté ⚽'}
               </h1>
               <p className="mt-2 text-[17px] text-white/[0.58]">
@@ -209,14 +209,14 @@ export function Login() {
                 )}
               </AnimatePresence>
 
-              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <form onSubmit={handleSubmit} className="mt-[clamp(14px,2.5vh,24px)] space-y-[clamp(12px,2vh,16px)]">
                 <AnimatePresence mode="wait">
                   {!isLogin && (
                     <motion.div
                       key="register-fields"
                       initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="space-y-4 overflow-hidden"
+                      className="space-y-[clamp(12px,2vh,16px)] overflow-hidden"
                     >
                       <Field
                         id="displayName" label="Prénom / Pseudo" icon={<User size={18} />}
@@ -308,7 +308,7 @@ export function Login() {
                 {/* CTA principal */}
                 <button
                   type="submit" disabled={loading}
-                  className="relative mt-6 flex h-[58px] w-full items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#10b981,#22d981)] text-[16px] font-bold text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(16,185,129,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 disabled:opacity-60"
+                  className="relative mt-[clamp(14px,2.5vh,24px)] flex h-[clamp(50px,6.4vh,58px)] w-full items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#10b981,#22d981)] text-[16px] font-bold text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(16,185,129,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 disabled:opacity-60"
                 >
                   {loading ? (
                     <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -322,7 +322,7 @@ export function Login() {
               </form>
 
               {/* Séparateur */}
-              <div className="my-5 flex items-center gap-4">
+              <div className="my-[clamp(12px,2.2vh,20px)] flex items-center gap-4">
                 <span className="h-px flex-1 bg-white/[0.12]" />
                 <span className="text-xs uppercase tracking-widest text-white/45">ou</span>
                 <span className="h-px flex-1 bg-white/[0.12]" />
@@ -331,14 +331,14 @@ export function Login() {
               {/* Google */}
               <button
                 onClick={handleGoogle}
-                className="flex h-[56px] w-full items-center justify-center gap-3 rounded-[14px] border border-white/[0.22] bg-white/[0.035] text-[15px] font-semibold text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40"
+                className="flex h-[clamp(48px,6vh,56px)] w-full items-center justify-center gap-3 rounded-[14px] border border-white/[0.22] bg-white/[0.035] text-[15px] font-semibold text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40"
               >
                 <GoogleIcon />
                 Continuer avec Google
               </button>
 
               {/* Bascule */}
-              <p className="mt-5 text-center text-sm text-white/55">
+              <p className="mt-[clamp(12px,2vh,20px)] text-center text-sm text-white/55">
                 {isLogin ? 'Pas encore de compte ? ' : 'Déjà un compte ? '}
                 <button type="button" onClick={() => switchTab(isLogin ? 'register' : 'login')} className="font-bold text-[#18df8a] transition-colors hover:text-emerald-300">
                   {isLogin ? "S'inscrire" : 'Se connecter'}
@@ -377,7 +377,7 @@ function Field({ id, label, icon, rightSlot, ...inputProps }) {
         <input
           id={id}
           {...inputProps}
-          className="h-[58px] w-full rounded-[14px] border border-white/[0.16] bg-[rgba(12,18,24,0.82)] pl-12 pr-12 text-[16px] text-white outline-none transition placeholder:text-white/35 focus:border-emerald-500/75 focus:ring-[3px] focus:ring-emerald-500/10"
+          className="h-[clamp(50px,6.4vh,58px)] w-full rounded-[14px] border border-white/[0.16] bg-[rgba(12,18,24,0.82)] pl-12 pr-12 text-[16px] text-white outline-none transition placeholder:text-white/35 focus:border-emerald-500/75 focus:ring-[3px] focus:ring-emerald-500/10"
         />
         {rightSlot}
       </div>
