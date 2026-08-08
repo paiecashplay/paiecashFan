@@ -203,7 +203,7 @@ const SHIP_FAN = {
   cancelled: { l: 'Annulé',         c: 'text-bone-400 border-white/10 bg-white/5' },
 };
 
-function OrderCard({ order, onViewTicket }) {
+export function OrderCard({ order, onViewTicket }) {
   const Icon = order.kind === 'ticketing' ? Ticket : ShoppingBag;
   const st = STATUS_LABEL[order.status] || { label: order.status, cls: 'text-bone-400 bg-white/5 border-white/10' };
   const isTicket = order.kind === 'ticketing' && order.status === 'completed';
@@ -273,7 +273,7 @@ function OrderCard({ order, onViewTicket }) {
 }
 
 // ── Billet numérique (QR) + impression PDF ─────────────────────
-function TicketModal({ order, buyer, onClose }) {
+export function TicketModal({ order, buyer, onClose }) {
   const qrValue = `PCF-TKT:${order.id}:${order.reference || ''}`;
   const itemsLabel = (order.items || []).map((i) => `${i.quantity > 1 ? `${i.quantity}× ` : ''}${i.name}`).join(' · ');
 
@@ -290,7 +290,7 @@ function TicketModal({ order, buyer, onClose }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto"
       >
         {/* Billet — thème clair pour un rendu "vrai billet" + impression */}
         <div id="ticket-printable" className="relative rounded-3xl bg-white text-ink-900 overflow-hidden shadow-2xl">
@@ -356,7 +356,7 @@ function TicketModal({ order, buyer, onClose }) {
 }
 
 // ── Historique PCC (paiements côté PaieCashCoin) ───────────────
-function PccHistory({ loading, transactions }) {
+export function PccHistory({ loading, transactions }) {
   if (loading) {
     return (
       <div className="space-y-3">
@@ -412,7 +412,7 @@ function bingoStatus(card) {
   return { label: card.status, cls: 'text-bone-400 border-white/10 bg-white/5' };
 }
 
-function BingoCards({ loading, cards }) {
+export function BingoCards({ loading, cards }) {
   if (loading) return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}</div>;
   if (!cards?.length) return (
     <GlassCard className="p-10 text-center">
@@ -491,7 +491,7 @@ function MiniStat({ label, value, accent = 'text-bone-50' }) {
 }
 
 // ── Mes clubs suivis (⭐) ────────────────────────────────────
-function FavoriteClubs() {
+export function FavoriteClubs() {
   const [favs, setFavs] = useState(null);
   const [busy, setBusy] = useState(null);
 
@@ -509,48 +509,60 @@ function FavoriteClubs() {
     setBusy(null);
   }
 
-  return (
-    <GlassCard className="p-5">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-bone-500 font-bold">Mes clubs</p>
-        <Star size={13} className="text-gold-400" />
+  if (favs === null) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-2xl" />)}
       </div>
-
-      {favs === null ? (
-        <div className="mt-3 space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}</div>
-      ) : favs.length === 0 ? (
-        <div className="mt-3 text-center">
-          <p className="text-xs text-bone-400">Tu ne suis aucun club pour l'instant.</p>
-          <p className="mt-1 text-[11px] text-bone-500">Ouvre la fiche d'un club et clique sur ⭐ pour recevoir ses tombolas et actus.</p>
-          <Link to="/fan-club"><Button variant="primary" size="sm" className="mt-4">Découvrir les clubs</Button></Link>
-        </div>
-      ) : (
-        <div className="mt-3 space-y-2">
-          {favs.map((f) => (
-            <div key={f.club.id} className={`rounded-xl border p-3 ${f.isPrimary ? 'border-gold-400/40 bg-gold-400/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
-              <div className="flex items-center justify-between gap-2">
-                <Link to={`/clubs/${f.club.slug}`} className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-bone-100 truncate hover:text-emerald-400">{f.club.name}</p>
-                  <p className="text-[10px] text-bone-500 truncate">{[f.club.city, f.club.league_name].filter(Boolean).join(' · ') || f.club.sport}</p>
+    );
+  }
+  if (favs.length === 0) {
+    return (
+      <GlassCard className="p-10 text-center">
+        <Star className="mx-auto text-bone-600" size={34} />
+        <p className="mt-4 text-sm text-bone-300">Tu ne suis aucun club pour l'instant.</p>
+        <p className="mt-1 text-[12px] text-bone-500">Ouvre la fiche d'un club et clique sur ⭐ pour recevoir ses tombolas et actus.</p>
+        <Link to="/fan-club"><Button variant="primary" size="sm" className="mt-5">Découvrir les clubs</Button></Link>
+      </GlassCard>
+    );
+  }
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {favs.map((f) => (
+        <GlassCard key={f.club.id} className={`p-5 ${f.isPrimary ? 'border-gold-400/40' : ''}`}>
+          <div className="flex items-start gap-3">
+            <span
+              className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10"
+              style={f.club.primary_color ? { background: `${f.club.primary_color}18` } : { background: 'rgba(255,255,255,0.04)' }}
+            >
+              {f.club.logo
+                ? <img src={f.club.logo} alt="" className="max-h-8 max-w-8 object-contain" />
+                : <span className="font-display text-lg font-black text-bone-400">{(f.club.name || '?')[0]}</span>}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <Link to={`/clubs/${f.club.slug}`} className="min-w-0">
+                  <p className="truncate font-display text-base font-black text-bone-50 hover:text-emerald-400">{f.club.name}</p>
+                  <p className="truncate text-[11px] text-bone-500">{[f.club.city, f.club.league_name].filter(Boolean).join(' · ') || f.club.sport}</p>
                 </Link>
                 {f.isPrimary && <span className="shrink-0 rounded-full bg-gold-400/15 border border-gold-400/30 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-gold-400">Principal</span>}
               </div>
-              <div className="mt-2 flex items-center gap-3">
-                <Link to={`/clubs/${f.club.slug}/fan-club`} className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300">Communauté</Link>
-                {!f.isPrimary && (
-                  <button onClick={() => makePrimary(f.club.id)} disabled={busy === f.club.id} className="text-[11px] font-bold text-bone-400 hover:text-gold-400 disabled:opacity-50">
-                    Définir principal
-                  </button>
-                )}
-                <button onClick={() => remove(f.club.id)} disabled={busy === f.club.id} className="ml-auto text-[11px] font-bold text-bone-500 hover:text-red-400 disabled:opacity-50">
-                  Retirer
-                </button>
-              </div>
             </div>
-          ))}
-        </div>
-      )}
-    </GlassCard>
+          </div>
+          <div className="mt-4 flex items-center gap-3 border-t border-white/5 pt-3">
+            <Link to={`/clubs/${f.club.slug}/fan-club`} className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300">Communauté</Link>
+            {!f.isPrimary && (
+              <button onClick={() => makePrimary(f.club.id)} disabled={busy === f.club.id} className="text-[11px] font-bold text-bone-400 hover:text-gold-400 disabled:opacity-50">
+                Définir principal
+              </button>
+            )}
+            <button onClick={() => remove(f.club.id)} disabled={busy === f.club.id} className="ml-auto text-[11px] font-bold text-bone-500 hover:text-red-400 disabled:opacity-50">
+              Retirer
+            </button>
+          </div>
+        </GlassCard>
+      ))}
+    </div>
   );
 }
 

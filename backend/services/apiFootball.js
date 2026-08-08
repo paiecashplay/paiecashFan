@@ -158,6 +158,7 @@ function mapFixture(r) {
     statusLong:  r.fixture.status?.long || null,
     minute:      r.fixture.status?.elapsed ?? null,
     kickoff:     r.fixture.date || null,
+    venue:       r.fixture.venue?.name || null,
     competition: r.league?.name || null,
     round:       r.league?.round || null,
     homeTeamId:  r.teams?.home?.id ?? null,

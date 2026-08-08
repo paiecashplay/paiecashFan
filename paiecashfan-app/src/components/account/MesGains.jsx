@@ -128,7 +128,7 @@ function AddressModal({ prize, onClose, onSaved }) {
   return (
     <div className="fixed inset-0 z-[80] grid place-items-center bg-black/80 p-4" onClick={onClose}>
       <motion.div onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.28em] font-black text-emerald-400">Livraison du lot</p>

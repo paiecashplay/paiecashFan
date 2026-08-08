@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { CheckoutModal } from '@/components/cart/CheckoutModal';
@@ -45,6 +45,12 @@ import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
 import { MonCompte } from './pages/MonCompte';
 import { Parametres } from './pages/Parametres';
+import { FanDashboardLayout } from './pages/mon-compte/FanDashboardLayout';
+import { FanOverview } from './pages/mon-compte/FanOverview';
+import {
+  FanCommandes, FanPccPage, FanGainsPage, FanActivitesPage, FanModerationPage,
+  FanClubsPage, FanAmisPage, FanClassementsPage, FanProfilPage, FanSecuritePage, FanParametresPage,
+} from './pages/mon-compte/FanPages';
 import { CheckoutReturn } from './pages/CheckoutReturn';
 import { IdleLogout } from './components/IdleLogout';
 import { supabase } from '@/lib/supabase';
@@ -255,6 +261,31 @@ export default function App() {
           }
         />
 
+        {/* Espace Fan : dashboard plein écran (pas de Navbar/Footer public) */}
+        <Route
+          path="/mon-compte"
+          element={
+            <ProtectedRoute>
+              <FanDashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index               element={<FanOverview />} />
+          <Route path="commandes"     element={<FanCommandes />} />
+          <Route path="favoris"       element={<FanClubsPage />} />
+          <Route path="pcc"           element={<FanPccPage />} />
+          <Route path="gains"         element={<FanGainsPage />} />
+          <Route path="clubs"         element={<FanClubsPage />} />
+          <Route path="amis"          element={<FanAmisPage />} />
+          <Route path="activites"     element={<FanActivitesPage />} />
+          <Route path="classements"   element={<FanClassementsPage />} />
+          <Route path="moderation"    element={<FanModerationPage />} />
+          <Route path="profil"        element={<FanProfilPage />} />
+          <Route path="securite"      element={<FanSecuritePage />} />
+          <Route path="parametres"    element={<FanParametresPage />} />
+          <Route path="*"             element={<Navigate to="/mon-compte" replace />} />
+        </Route>
+
         {/* Routes publiques : avec Navbar/Footer */}
         <Route
           path="/*"
@@ -296,22 +327,8 @@ export default function App() {
                   />
                   <Route path="/login" element={<Login />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route
-                    path="/mon-compte"
-                    element={
-                      <ProtectedRoute>
-                        <MonCompte />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/parametres"
-                    element={
-                      <ProtectedRoute>
-                        <Parametres />
-                      </ProtectedRoute>
-                    }
-                  />
+                  {/* Anciennes URLs → nouveau dashboard Fan (compat) */}
+                  <Route path="/parametres" element={<Navigate to="/mon-compte/parametres" replace />} />
                   <Route path="*" element={<Home />} />
                   <Route path="/billetterie" element={<Billetterie />} />
                 </Routes>

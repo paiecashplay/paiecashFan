@@ -26,7 +26,7 @@ export function AppealModal({ target, onClose, onDone }) {
     <div className="fixed inset-0 z-[70] grid place-items-center bg-black/80 p-4" onClick={onClose}>
       <motion.div onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-sky-400/30 bg-sky-400/10 text-sky-300"><Scale size={20} /></div>

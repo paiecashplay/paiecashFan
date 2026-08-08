@@ -12,12 +12,124 @@ const favorites_db = require('../../db/favorites');
 const chatMod = require('../../db/chatModeration');
 const chatAppeals = require('../../db/chatAppeals');
 const prizeClaims = require('../../db/prizeClaims');
+const notifications_db = require('../../db/notifications');
 
 const router = express.Router();
 router.use(requireAuth);
 
+const isUuid = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(s || ''));
+
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400) => res.status(s).json({ success: false, data: null, error: msg });
+
+// GET /api/v2/me/search-users?q= — recherche de supporters inscrits (invitations d'amis).
+// Sécurisé : ne renvoie que des champs publics (id, display_name, avatar_url) — jamais l'email.
+router.get('/search-users', async (req, res) => {
+  try {
+    const q = String(req.query.q || '').trim();
+    if (q.length < 2) return ok(res, { users: [] });
+    // Normalise (minuscule + sans accents) pour une recherche permissive.
+    const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const nq = norm(q);
+    // On récupère les profils (id/nom/avatar seulement) et on filtre côté service :
+    // insensible casse ET accents. Pour un très gros volume d'utilisateurs, basculer
+    // vers une fonction SQL unaccent() (RPC).
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, display_name, avatar_url')
+      .not('display_name', 'is', null)
+      .neq('id', req.authUser.id)
+      .limit(1000);
+    if (error) throw error;
+    const users = (data || []).filter((u) => norm(u.display_name).includes(nq)).slice(0, 12);
+    return ok(res, { users });
+  } catch (err) { return fail(res, 'Recherche : ' + err.message, 500); }
+});
+
+// ── Amis (friend_requests + jointure profiles) ───────────────
+// POST /api/v2/me/friends/request — envoyer une demande d'ami.
+router.post('/friends/request', async (req, res) => {
+  try {
+    const me = req.authUser.id;
+    const receiverId = String(req.body?.receiverId || '');
+    if (!isUuid(receiverId)) return fail(res, 'Destinataire invalide.', 400);
+    if (receiverId === me) return fail(res, "Impossible de s'ajouter soi-même.", 400);
+
+    const { data: existing } = await supabase.from('friend_requests')
+      .select('id, status')
+      .or(`and(sender_id.eq.${me},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${me})`)
+      .maybeSingle();
+    if (existing) {
+      return fail(res, existing.status === 'accepted' ? 'Vous êtes déjà amis.' : 'Invitation déjà en attente.', 409);
+    }
+
+    const { data, error } = await supabase.from('friend_requests')
+      .insert({ sender_id: me, receiver_id: receiverId, status: 'pending' }).select().single();
+    if (error) throw error;
+
+    // Notification au destinataire (best-effort).
+    const senderName = req.authUser.display_name || 'Un supporter';
+    notifications_db.createNotification({
+      user_id: receiverId, type: 'friend_request',
+      title: "Nouvelle demande d'ami",
+      message: `${senderName} souhaite devenir ton ami sur PaieCashFan.`,
+      metadata: { requestId: data.id, senderId: me, link: '/mon-compte/amis' },
+    }).catch(() => {});
+
+    return ok(res, { request: data });
+  } catch (err) { return fail(res, 'Demande : ' + err.message, 500); }
+});
+
+// GET /api/v2/me/friends/requests — demandes reçues en attente (+ profil expéditeur).
+router.get('/friends/requests', async (req, res) => {
+  try {
+    const me = req.authUser.id;
+    const { data: reqs, error } = await supabase.from('friend_requests')
+      .select('id, sender_id, created_at')
+      .eq('receiver_id', me).eq('status', 'pending')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const ids = [...new Set((reqs || []).map((r) => r.sender_id))];
+    const { data: profs } = ids.length
+      ? await supabase.from('profiles').select('id, display_name, avatar_url').in('id', ids)
+      : { data: [] };
+    const pMap = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+    const rows = (reqs || []).map((r) => ({ id: r.id, createdAt: r.created_at, user: pMap[r.sender_id] || { id: r.sender_id, display_name: 'Supporter', avatar_url: null } }));
+    return ok(res, { requests: rows });
+  } catch (err) { return fail(res, 'Demandes : ' + err.message, 500); }
+});
+
+// PATCH /api/v2/me/friends/request/:id — accepter/décliner (je dois être le destinataire).
+router.patch('/friends/request/:id', async (req, res) => {
+  try {
+    const me = req.authUser.id;
+    const action = req.body?.action;
+    if (!['accept', 'decline'].includes(action)) return fail(res, 'Action invalide.', 400);
+    const { data: fr } = await supabase.from('friend_requests').select('id, receiver_id, status').eq('id', req.params.id).maybeSingle();
+    if (!fr || fr.receiver_id !== me) return fail(res, 'Demande introuvable.', 404);
+    const status = action === 'accept' ? 'accepted' : 'declined';
+    const { error } = await supabase.from('friend_requests')
+      .update({ status, updated_at: new Date().toISOString() }).eq('id', req.params.id);
+    if (error) throw error;
+    return ok(res, { status });
+  } catch (err) { return fail(res, 'Mise à jour : ' + err.message, 500); }
+});
+
+// GET /api/v2/me/friends — mes amis (demandes acceptées) + profils.
+router.get('/friends', async (req, res) => {
+  try {
+    const me = req.authUser.id;
+    const { data: rows, error } = await supabase.from('friend_requests')
+      .select('sender_id, receiver_id')
+      .or(`sender_id.eq.${me},receiver_id.eq.${me}`).eq('status', 'accepted');
+    if (error) throw error;
+    const friendIds = [...new Set((rows || []).map((r) => (r.sender_id === me ? r.receiver_id : r.sender_id)))];
+    const { data: profs } = friendIds.length
+      ? await supabase.from('profiles').select('id, display_name, avatar_url').in('id', friendIds)
+      : { data: [] };
+    return ok(res, { friends: profs || [] });
+  } catch (err) { return fail(res, 'Amis : ' + err.message, 500); }
+});
 
 // GET /api/v2/me/orders — commandes du fan (hors panier), enrichies club.
 router.get('/orders', async (req, res) => {

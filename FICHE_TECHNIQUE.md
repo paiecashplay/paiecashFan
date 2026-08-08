@@ -135,6 +135,24 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-09 (cw)** — **Refonte de l'espace Fan `/mon-compte` en dashboard + système d'amis + notifications**.
+  **Dashboard Fan plein écran** (hors Navbar publique, branche routing dédiée `FanDashboardLayout`
+  + `<Outlet>`, sidebar identité/nav groupée/déconnexion, topbar recherche+notifs+avatar, drawer
+  & bottom-nav mobile). **Vue d'ensemble** : hero « Bienvenue » + **solde PCC en carte « lingot
+  d'or »** (`.pcc-gold-card` : contour lumineux orbital + reflet, via `@property`), 4 KPI réels,
+  activité récente agrégée, right rail (clubs favoris avec **logos**, prochains événements
+  API-Football + CTA billet, teaser Sport Bingo). **Pages enfants** `/mon-compte/{commandes,
+  favoris, pcc, gains, clubs, amis, activites, classements, moderation, profil, securite,
+  parametres}` réutilisant les composants existants (`MesGains`, `MaModeration`, `OrderCard`…).
+  Redirections des anciens `?tab=` et de `/parametres`. **Système d'amis** (branché sur
+  `friend_requests`, migration `008` appliquée) : recherche **permissive** (casse+accents) de
+  supporters (`GET /api/v2/me/search-users`), envoi (`POST /friends/request` + notification),
+  **demandes reçues accepter/décliner** (`GET /friends/requests`, `PATCH /friends/request/:id`),
+  liste d'amis (`GET /friends`) — le tout scopé `req.authUser`, jointure `profiles`, sans email.
+  **Partage externe** (WhatsApp/lien/Web Share). **Notifications** : clic → navigation par
+  `metadata.link`/type, pastille **vidée à l'ouverture** (mark-all-read). **Backend** : `+venue`
+  sur les fixtures, `+logo_url` sur `/me/favorites`, endpoints amis. Modals bornés à la fenêtre
+  (`max-h + overflow-y-auto`). Testé en local (front+back) puis déployé.
 - **2026-08-08 (cv)** — **Login : le panneau formulaire se met à l'échelle pour tenir dans la fenêtre**.
   Le filet « max-h + overflow » de (cu) coupait le panneau (haut ET bas) au lieu de le laisser
   voir → remplacé par un **auto-scale** : un `useLayoutEffect` mesure la hauteur naturelle du

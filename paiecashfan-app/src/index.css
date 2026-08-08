@@ -123,3 +123,72 @@
     background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 }
+
+/* ── Carte PCC "lingot d'or" : reflets + point lumineux orbital ── */
+@property --pcc-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.pcc-gold-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, #201908 0%, #3b2f0e 42%, #241c09 56%, #17120a 100%);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(253, 224, 118, 0.12);
+}
+/* Anneau lumineux qui parcourt le contour */
+.pcc-gold-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--pcc-angle),
+    transparent 0deg,
+    rgba(252, 211, 77, 0.12) 40deg,
+    #fcd34d 66deg,
+    #fff7e0 78deg,
+    #fcd34d 90deg,
+    rgba(252, 211, 77, 0.12) 116deg,
+    transparent 150deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: pcc-orbit 4.5s linear infinite;
+  pointer-events: none;
+}
+/* Reflet diagonal type "lingot brillant" qui balaie la carte */
+.pcc-gold-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 244, 214, 0.10) 46%,
+    rgba(255, 248, 230, 0.22) 50%,
+    rgba(255, 244, 214, 0.10) 54%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  animation: pcc-shine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pcc-orbit {
+  to { --pcc-angle: 360deg; }
+}
+@keyframes pcc-shine {
+  0%, 55% { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pcc-gold-card::before,
+  .pcc-gold-card::after { animation: none; }
+}

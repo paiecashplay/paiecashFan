@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle, ShieldAlert, Ban, Radio } from 'lucide-react';
+import { Bell, Loader2, CheckCheck, Trophy, Grid3x3, Gift, MessageCircle, ShieldAlert, Ban, Radio, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
@@ -18,8 +18,14 @@ const ICONS = {
   chat_blocked: ShieldAlert,
   chat_sanction: Ban,
   chat_sanction_revoked: CheckCheck,
+  friend_request: UserPlus,
 };
 const iconFor = (type) => ICONS[type] || Trophy;
+
+// Destination au clic selon le type (repli si la notif n'a pas de metadata.link).
+const LINKS = {
+  friend_request: '/mon-compte/amis',
+};
 
 function timeAgo(iso) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -64,7 +70,16 @@ export function NotificationBell() {
     if (next) {
       setItems(null);
       apiFetch('/api/v2/me/notifications')
-        .then((j) => { setItems(j.data?.notifications || []); setUnread(j.data?.unread || 0); })
+        .then((j) => {
+          setItems(j.data?.notifications || []);
+          // Dès l'ouverture, on marque tout comme lu côté serveur → la pastille se
+          // vide « au fil de l'eau » (les nouvelles restent mises en évidence pour
+          // cette consultation, puis seront lues à la prochaine ouverture).
+          if ((j.data?.unread || 0) > 0) {
+            apiFetch('/api/v2/me/notifications/read-all', { method: 'POST' }).catch(() => {});
+          }
+          setUnread(0);
+        })
         .catch(() => setItems([]));
     }
   }
@@ -83,7 +98,7 @@ export function NotificationBell() {
       setUnread((u) => Math.max(0, u - 1));
     }
     setOpen(false);
-    const link = n.metadata?.link;
+    const link = n.metadata?.link || LINKS[n.type];
     if (link) navigate(link);
   }
 

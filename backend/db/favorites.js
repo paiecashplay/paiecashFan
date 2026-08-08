@@ -7,7 +7,7 @@
 
 const supabase = require('./supabase');
 
-const CLUB_FIELDS = 'id, slug, name, short_code, sport, country, city, league_name';
+const CLUB_FIELDS = 'id, slug, name, short_code, sport, country, city, league_name, logo_url, primary_color';
 
 // Mes clubs favoris, enrichis des infos club. Le principal en premier.
 async function listFavorites(userId) {
@@ -18,8 +18,10 @@ async function listFavorites(userId) {
   const ids = favs.map((f) => f.tenant_id);
   const { data: clubs } = await supabase.from('tenants').select(CLUB_FIELDS).in('id', ids);
   const byId = Object.fromEntries((clubs || []).map((c) => [c.id, c]));
-  return favs.map((f) => ({ id: f.id, isPrimary: f.is_primary, since: f.created_at, club: byId[f.tenant_id] || null }))
-    .filter((f) => f.club);
+  return favs.map((f) => {
+    const c = byId[f.tenant_id];
+    return { id: f.id, isPrimary: f.is_primary, since: f.created_at, club: c ? { ...c, logo: c.logo_url || null } : null };
+  }).filter((f) => f.club);
 }
 
 // Ids des clubs suivis (léger — pour l'état ⭐ côté front).
