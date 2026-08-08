@@ -65,9 +65,9 @@ export function FanOverview() {
       {/* ══ HERO ══ */}
       <FanCard className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
-          <img src="/images/login-bg.webp" alt="" aria-hidden className="h-full w-full object-cover object-right opacity-[0.14]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#0a1016_10%,rgba(10,16,22,0.75)_45%,rgba(10,16,22,0.35)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_50%,rgba(16,185,129,0.12),transparent_50%)]" />
+          <img src="/images/heroBOfan.webp" alt="" aria-hidden className="h-full w-full object-cover object-center opacity-60" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,11,16,0.94)_0%,rgba(6,11,16,0.74)_40%,rgba(6,11,16,0.42)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(6,11,16,0.55)_0%,transparent_45%)]" />
         </div>
 
         <div className="relative flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-7">
