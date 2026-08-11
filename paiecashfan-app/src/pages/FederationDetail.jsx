@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart, UsersRound } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -14,6 +14,7 @@ import { uefaMembers } from '@/data/uefa-members';
 import { conmebolMembers } from '@/data/conmebol-members';
 import { concacafMembers } from '@/data/concacaf-members';
 import { afcMembers } from '@/data/afc-members';
+import NationalTeamsSection from '@/components/federation/NationalTeamsSection';
 import { cn } from '@/lib/cn';
 
 // ── Registry des datasets par fédération ───────────────────────────
@@ -87,7 +88,7 @@ export function FederationDetail() {
   const isStaticConfed = Boolean(datasets[fedId]);
 
   // API-first uniquement pour les autres slugs (fédérations nationales en base)
-  const { federation: dbFed, members: dbMembers, loading } =
+  const { federation: dbFed, members: dbMembers, nationalTeams, loading } =
     useFederationDetail(isStaticConfed ? null : fedId);
 
   // 1) Confédération statique → inchangé
@@ -98,7 +99,7 @@ export function FederationDetail() {
 
   // 2) Fédération nationale en base → vue dynamique
   if (loading) return <FedLoading />;
-  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} />;
+  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} nationalTeams={nationalTeams} />;
 
   // 3) Repli : entrée statique sans dataset, ou inconnue
   const federation = federations.find((f) => f.id === fedId);
@@ -129,7 +130,12 @@ const DIVISION_RANK = {
 };
 const divisionRank = (name) => DIVISION_RANK[name] ?? 50;
 
-function DynamicFederationView({ federation, members }) {
+function DynamicFederationView({ federation, members, nationalTeams}) {
+  const safeNationalTeams = {
+    men: nationalTeams?.men || [],
+    women: nationalTeams?.women || [],
+    youth: nationalTeams?.youth || [],
+  };
   const reduce = useReducedMotion();
   const color = federation.primary_color || '#10b981';
   const clubs = (members || []).map((m) => ({
@@ -242,21 +248,28 @@ function DynamicFederationView({ federation, members }) {
 
       {/* Contenu sous le hero : voie réservée à gauche (md→2xl) pour le rail. */}
       <div className="md:pl-24 2xl:pl-0">
-        {clubs.length > 0 ? (
-          groups.map((g) => (
-            <FederationClubsGrid
-              key={g.name}
-              clubs={g.list}
-              federationColor={color}
-              leagueName={g.name}
-              cardBackground={federation.stadium_image_url}
-            />
-          ))
-        ) : (
-          <Container className="py-20 text-center text-sm text-bone-400">
-            Aucun club rattaché à cette fédération pour le moment.
-          </Container>
-        )}
+        {/* ═══ ÉQUIPES NATIONALES ═══════════════════════════ */}
+        <NationalTeamsSection
+          teams={safeNationalTeams}
+          federationColor={color}
+        />
+        <div id="clubs">
+          {clubs.length > 0 ? (
+            groups.map((g) => (
+              <FederationClubsGrid
+                key={g.name}
+                clubs={g.list}
+                federationColor={color}
+                leagueName={g.name}
+                cardBackground={federation.stadium_image_url}
+              />
+            ))
+          ) : (
+            <Container className="py-20 text-center text-sm text-bone-400">
+              Aucun club rattaché à cette fédération pour le moment.
+            </Container>
+          )}
+        </div> 
       </div>
 
       {/* Espace bas pour le dock mobile (barre flottante en bas < md) */}
@@ -316,6 +329,7 @@ function FedSideActions({ primaryColor }) {
   };
 
   const actions = [
+    {key: 'national-teams', icon: UsersRound, label: 'Sélections', onClick: () => scrollTo('national-teams'),},
     { key: 'clubs', icon: Volleyball, label: 'Clubs',      onClick: () => scrollTo('clubs') },
     { key: 'play',  icon: Trophy,     label: 'Palmarès',   onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices,      label: 'Effectif',   onClick: () => scrollTo('squad') },

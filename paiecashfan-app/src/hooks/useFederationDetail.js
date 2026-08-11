@@ -20,12 +20,14 @@ export function useFederationDetail(slug) {
   const [hub, setHub]               = useState(null);
   const [loading, setLoading]       = useState(Boolean(slug));
   const [fromApi, setFromApi]       = useState(false);
+  const [nationalTeams, setNationalTeams] = useState({men: [], women: [], youth: []});
 
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
     let cancelled = false;
     setLoading(true); setFromApi(false);
     setFederation(null); setMembers([]); setHub(null);
+    setNationalTeams({men: [], women: [], youth: []});
 
     apiFetch(`/api/v2/marketplace/federations/${slug}`)
       .then((json) => {
@@ -33,6 +35,7 @@ export function useFederationDetail(slug) {
         setFederation(json.data.federation);
         setMembers(json.data.members || []);
         setHub(json.data.hub || null);
+        setNationalTeams(json.data.nationalTeams || {men: [], women: [], youth: []});
         setFromApi(true);
       })
       .catch(() => { /* pas en base → repli statique */ })
@@ -41,5 +44,5 @@ export function useFederationDetail(slug) {
     return () => { cancelled = true; };
   }, [slug]);
 
-  return { federation, members, hub, loading, fromApi };
+  return { federation, members, hub, nationalTeams, loading, fromApi };
 }
