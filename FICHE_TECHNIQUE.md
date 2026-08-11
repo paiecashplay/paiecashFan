@@ -135,6 +135,20 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-11 (cy)** — **Live Boutique : chat en direct + likes façon Whatnot**.
+  Les acheteurs peuvent enfin **interagir avec le vendeur** pendant le live shopping.
+  **BDD** (migration `shop-live-chat.sql`, appliquée en prod) : `shop_live_messages`
+  (id, live_room_id, author_id, content, moderation_status, deleted_at) +
+  `shop_live_message_reactions` (miroir du chat Fan Club, palette 6 emojis, RLS deny-all)
+  + colonne `like_count` sur `shop_live_rooms` + fonction `shop_live_increment_like` (incrément
+  atomique). **Backend** (`routes/v2/shop-live.js` + `db/shopLive.js`) : `GET /:id/chat`
+  (public, messages + likeCount), `POST /:id/chat/messages` (connecté, **filtre IA `prepublish`**
+  anti-abus, pas de charte), `DELETE` d'un message (auteur, ou club via `canManage`),
+  `POST .../reactions` (bascule emoji), `POST /:id/like` (cœur → total). **Front** : hook
+  `useShopLiveChat` (polling 5 s, écritures optimistes, réactions, likes), panneau `ShopLiveChat`
+  (questions + auto-scroll + réactions + suppression + CTA connexion), `LiveHearts` (cœurs
+  flottants sur la vidéo à chaque incrément de like, soi **et** autres viewers) + bouton ❤️.
+  Intégré à `ClubShopLive` (panneau sous les produits, et rail droit en plein écran). Testé local.
 - **2026-08-11 (cx)** — **Live Boutique : migration de BytePlus livesaas → MediaLive (RTMP/HLS)**.
   Le module *live shopping* réutilise désormais **le même pipeline que le Live Fan Club**
   (`services/byteplus.js`, push RTMP signé → pull HLS) au lieu de l'API livesaas (bloquée en

@@ -7,7 +7,11 @@ const express = require('express');
 
 const {
   requireAuth,
+  optionalAuth,
 } = require('../../middleware/auth');
+
+// Filtre IA anti-abus du chat (même moteur que le Fan Club).
+const prepublish = require('../../services/moderation/prepublish');
 
 const tenants = require('../../db/tenants');
 const products = require('../../db/products');
@@ -1389,5 +1393,104 @@ router.patch(
     }
   }
 );
+
+// ═══════════════════════════════════════════════════════════════
+// Chat en direct du Live Boutique (façon Whatnot).
+// Lecture publique (optionalAuth) ; écriture réservée aux connectés,
+// filtrée par l'IA anti-abus (pas de charte — accès simplifié boutique).
+// ═══════════════════════════════════════════════════════════════
+
+// Filtre IA avant publication d'un message. Renvoie la réponse 422 (et true)
+// si le message est bloqué ; null si autorisé. Fail-open si le service est
+// indisponible (ne bloque jamais une vente pour une panne de modération).
+async function chatPublishGate(res, { tenantId, authorId, content }) {
+  const v = await prepublish
+    .screenBeforePublish({ contentType: 'message', tenantId, authorId, content })
+    .catch(() => ({ allowed: true, degraded: true }));
+  if (v.allowed) return null;
+  res.status(422).json({
+    success: false,
+    data: { moderation: { status: 'blocked', reason: v.reason, categories: v.ai?.categories || [] } },
+    error: v.reason || 'Message refusé par la modération.',
+  });
+  return true;
+}
+
+// GET /api/v2/shop-live/:liveId/chat — messages + likeCount (public).
+router.get('/:liveId/chat', optionalAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const data = await shopLive.getChat(room.id, req.authUser?.id || null);
+    return ok(res, data);
+  } catch (err) {
+    // Fail-open : le chat ne doit jamais casser l'affichage du live.
+    return ok(res, { messages: [], likeCount: 0 });
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/chat/messages — poster une question (connecté).
+router.post('/:liveId/chat/messages', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+
+    const content = String(req.body?.content || '').trim();
+    if (!content) return fail(res, 'Message vide.', 400);
+    if (content.length > 2000) return fail(res, 'Message trop long (2000 max).', 400);
+
+    const blocked = await chatPublishGate(res, {
+      tenantId: room.tenant_id, authorId: req.authUser.id, content,
+    });
+    if (blocked) return; // 422 déjà renvoyé
+
+    const message = await shopLive.createChatMessage(room.id, req.authUser.id, content);
+    return ok(res, { message }, 201);
+  } catch (err) {
+    return fail(res, 'Envoi impossible : ' + err.message, 500);
+  }
+});
+
+// DELETE /api/v2/shop-live/:liveId/chat/messages/:messageId — auteur, ou club (modération).
+router.delete('/:liveId/chat/messages/:messageId', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const tenant = await tenants.getTenantById(room.tenant_id).catch(() => null);
+    const force = tenant ? canManage(req.authUser, tenant) : false;
+
+    const result = await shopLive.deleteChatMessage(room.id, req.params.messageId, req.authUser.id, { force });
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'MSG_NOT_FOUND') return fail(res, err.message, 404);
+    if (err.code === 'MSG_FORBIDDEN') return fail(res, err.message, 403);
+    return fail(res, 'Suppression impossible : ' + err.message, 500);
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/chat/messages/:messageId/reactions — bascule un emoji.
+router.post('/:liveId/chat/messages/:messageId/reactions', requireAuth, async (req, res) => {
+  try {
+    const emoji = String(req.body?.emoji || '');
+    const result = await shopLive.toggleChatReaction(req.params.messageId, req.authUser.id, emoji);
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_EMOJI') return fail(res, err.message, 400);
+    return fail(res, 'Réaction impossible : ' + err.message, 500);
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/like — un « like » (cœur flottant). Renvoie le total.
+router.post('/:liveId/like', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const by = Number(req.body?.count) || 1;
+    const likeCount = await shopLive.incrementLike(room.id, by);
+    return ok(res, { likeCount });
+  } catch (err) {
+    return fail(res, 'Like impossible : ' + err.message, 500);
+  }
+});
 
 module.exports = router;
