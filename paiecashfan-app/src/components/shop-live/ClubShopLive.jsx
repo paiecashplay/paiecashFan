@@ -3,6 +3,7 @@ import { Maximize2, ShoppingBag, Star, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { Container } from '@/components/ui/Container';
+import { StreamPlayer } from '@/components/fanclub/StreamPlayer';
 
 const pccOf = (p) => Number(p?.pcc_price ?? p?.price_pcc ?? 0);
 const eurOf = (p) => Number(p?.eur_price ?? 0);
@@ -45,8 +46,8 @@ export function ClubShopLive({ slug }) {
   }, [slug]);
 
   const room = data?.room || null;
-  // On n'affiche la section QUE si un live est réellement en cours.
-  if (!room || room.status !== 'live' || !room.viewerUrl) return null;
+  // On n'affiche la section QUE si un live est réellement en cours (flux HLS présent).
+  if (!room || room.status !== 'live' || !room.streamUrl) return null;
 
   const products = Array.isArray(data.products) ? data.products : [];
   const featuredId = room.featuredProductId || null;
@@ -78,17 +79,10 @@ export function ClubShopLive({ slug }) {
         {room.title && <p className="mb-6 text-sm text-bone-400">{room.title}</p>}
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-          {/* Vidéo — page de visionnage hébergée BytePlus */}
+          {/* Vidéo — lecteur HLS natif (MediaLive) */}
           <div>
-            <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
-              <iframe
-                src={room.viewerUrl}
-                title={room.title || 'Live Boutique'}
-                className="h-full w-full"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowFullScreen
-                frameBorder="0"
-              />
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <StreamPlayer isLive provider="hls" url={room.streamUrl} />
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <button
@@ -96,16 +90,8 @@ export function ClubShopLive({ slug }) {
                 onClick={() => setFs(true)}
                 className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"
               >
-                <Maximize2 size={13} /> Plein écran &amp; chat
+                <Maximize2 size={13} /> Plein écran
               </button>
-              <a
-                href={room.viewerUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-bone-500 transition-colors hover:text-bone-300"
-              >
-                Ouvrir dans un onglet ↗
-              </a>
             </div>
           </div>
 
@@ -181,14 +167,9 @@ export function ClubShopLive({ slug }) {
             </button>
           </div>
           <div className="min-h-0 flex-1 px-2 pb-2 sm:px-4 sm:pb-4">
-            <iframe
-              src={room.viewerUrl}
-              title={room.title || 'Live Boutique'}
-              className="h-full w-full rounded-xl border border-white/10 bg-black"
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              allowFullScreen
-              frameBorder="0"
-            />
+            <div className="h-full overflow-hidden rounded-xl border border-white/10 bg-black">
+              <StreamPlayer isLive provider="hls" url={room.streamUrl} />
+            </div>
           </div>
         </div>
       )}

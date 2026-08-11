@@ -242,17 +242,16 @@ export default function CreateShopLiveModal({
           {/* Informations techniques */}
           <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4">
             <p className="text-xs font-semibold text-bone-300">
-              Configuration de diffusion
+              Diffusion
             </p>
 
             <div className="mt-3 space-y-2 text-[11px] leading-5 text-bone-500">
               <p>
-                Mode de latence : ultra-faible
+                Tu diffuseras via <b className="text-bone-300">OBS</b> (Serveur + clé
+                générés automatiquement une fois le live créé).
               </p>
-
               <p>
-                Replay : activé automatiquement après la fin du
-                live.
+                Le direct s'affiche chez les supporters dès que tu lances le flux.
               </p>
             </div>
           </div>

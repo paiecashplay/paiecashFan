@@ -104,6 +104,22 @@ async function updateRoom(
   return room;
 }
 
+// Enregistre les identifiants OBS (push stream) du live dans metadata.obs.
+// ⚠️ La clé de stream est secrète : ne jamais l'exposer via publicRoom / aux fans.
+async function saveObsCredentials(id, { server, streamKey } = {}) {
+  const room = await getRoomById(id);
+  return updateRoom(id, {
+    metadata: {
+      ...(room?.metadata || {}),
+      obs: {
+        server: server || null,
+        streamKey: streamKey || null,
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  });
+}
+
 async function saveBytePlusActivity(
   id,
   {
@@ -395,6 +411,7 @@ module.exports = {
   getRoomById,
   getCurrentRoomByTenant,
   updateRoom,
+  saveObsCredentials,
   saveBytePlusActivity,
   markRoomFailed,
   markRoomLive,

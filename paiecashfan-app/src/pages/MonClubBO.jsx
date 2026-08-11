@@ -141,9 +141,9 @@ function SidebarNav({ club, tab, onSelect, drawer, onCloseDrawer }) {
       )}>
         {/* Logo (retour au site) */}
         <Link to="/" className="flex items-center gap-2.5 px-5 py-4 transition-opacity hover:opacity-80" title="Retour au site">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-400 font-display text-lg font-black text-ink-900">P</span>
+          <img src="/paiecashfan-logo.webp" alt="PaieCashFan" className="h-8 w-8 shrink-0 object-contain" />
           <div className="leading-tight">
-            <p className="font-display text-sm font-black text-bone-50">PaieCashFan</p>
+            <p className="font-display text-sm font-black text-bone-50">PaieCash<span className="text-emerald-400">Fan</span></p>
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-bone-500">Espace Club</p>
           </div>
         </Link>

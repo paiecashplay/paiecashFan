@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-08-04.
+> Dernière mise à jour : 2026-08-11.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,21 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-11 (cx)** — **Live Boutique : migration de BytePlus livesaas → MediaLive (RTMP/HLS)**.
+  Le module *live shopping* réutilise désormais **le même pipeline que le Live Fan Club**
+  (`services/byteplus.js`, push RTMP signé → pull HLS) au lieu de l'API livesaas (bloquée en
+  « Preview » côté console). **Backend** (`routes/v2/shop-live.js`) : `getOrCreateRoomStreamName`
+  attribue à chaque room un **`streamName` stable** (`{slug}-shop-{id8}`, stocké en `metadata`),
+  nouvel endpoint **BO-only `GET /shop-live/:id/broadcast`** (auth `canManage`) qui renvoie les
+  **accès OBS auto-générés** (`server` + `streamKey` signée md5, valable ~7 j via `pushTtl`) —
+  jamais exposés aux fans ; `publicRoom` expose seulement `streamUrl` (HLS public). Création et
+  `/start` nettoyés de l'ancien code livesaas (`createActivity`/webpush). **Front** : nouveau
+  panneau `ShopLiveObs.jsx` (Serveur + Clé auto, copier/révéler/régénérer, **guide diffusion
+  complet** démarrer/arrêter + anti-écho + rappel clé) ; viewer fan `ClubShopLive.jsx` passe de
+  l'iframe livesaas au **`StreamPlayer` HLS** de l'app ; retrait du studio navigateur livesaas du
+  BO. **Vrai logo PaieCashFan** dans la sidebar du BO club (`MonClubBO.jsx`). Process en 2 temps
+  (OBS « Démarrer le streaming » → BO « Démarrer le live »). Testé en local (OBS → caméra → viewer
+  HLS + produits + chat). ⚠️ Prod : ajouter `BYTEPLUS_PUSH_AUTH_KEY` sur Railway.
 - **2026-08-09 (cw)** — **Refonte de l'espace Fan `/mon-compte` en dashboard + système d'amis + notifications**.
   **Dashboard Fan plein écran** (hors Navbar publique, branche routing dédiée `FanDashboardLayout`
   + `<Outlet>`, sidebar identité/nav groupée/déconnexion, topbar recherche+notifs+avatar, drawer
