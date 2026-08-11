@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS public.shop_live_messages (
   author_id         uuid NOT NULL,                    -- profiles.id (= session Supabase Auth)
   content           text NOT NULL,
   moderation_status text NOT NULL DEFAULT 'published',
+  is_host           boolean NOT NULL DEFAULT false,   -- message du club / modérateur (badge)
+  reply_to          uuid REFERENCES public.shop_live_messages(id) ON DELETE SET NULL, -- citation d'une question
   deleted_at        timestamptz,                      -- suppression douce
   created_at        timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT shop_live_messages_moderation_check

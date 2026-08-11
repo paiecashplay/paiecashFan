@@ -15,6 +15,7 @@ export function useShopLiveChat(liveId, { enabled = true } = {}) {
 
   const [messages, setMessages] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
+  const [canModerate, setCanModerate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -39,6 +40,7 @@ export function useShopLiveChat(liveId, { enabled = true } = {}) {
         // On n'écrase pas la liste si une écriture optimiste est en vol.
         if (pendingRef.current === 0) setMessages(Array.isArray(d.messages) ? d.messages : []);
         setLikeCount((prev) => Math.max(prev, Number(d.likeCount || 0)));
+        setCanModerate(!!d.canModerate);
         setError('');
       } catch (e) {
         if (aliveRef.current && !silent) setError(e.message || 'Chat indisponible.');
@@ -66,21 +68,22 @@ export function useShopLiveChat(liveId, { enabled = true } = {}) {
   }, [liveId, enabled, load]);
 
   const sendMessage = useCallback(
-    async (raw) => {
+    async (raw, { replyTo = null } = {}) => {
       const content = String(raw || '').trim();
       if (!content || !currentUserId) return false;
 
       const tempId = `tmp-${currentUserId}-${content.length}-${messages.length}`;
       const optimistic = {
         id: tempId, authorId: currentUserId, author: me.name, avatar: me.avatar,
-        content, createdAt: new Date().toISOString(), reactions: [], pending: true,
+        content, createdAt: new Date().toISOString(), reactions: [],
+        isHost: canModerate, replyTo: replyTo || null, pending: true,
       };
       pendingRef.current += 1;
       setMessages((prev) => [...prev, optimistic]);
 
       try {
         const j = await apiFetch(`/api/v2/shop-live/${liveId}/chat/messages`, {
-          method: 'POST', body: JSON.stringify({ content }),
+          method: 'POST', body: JSON.stringify({ content, replyTo: replyTo?.id || null }),
         });
         const saved = j?.data?.message;
         setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...saved } : m)));
@@ -94,7 +97,7 @@ export function useShopLiveChat(liveId, { enabled = true } = {}) {
         pendingRef.current = Math.max(0, pendingRef.current - 1);
       }
     },
-    [liveId, currentUserId, me.name, me.avatar, messages.length]
+    [liveId, currentUserId, me.name, me.avatar, messages.length, canModerate]
   );
 
   const toggleReaction = useCallback(
@@ -147,7 +150,7 @@ export function useShopLiveChat(liveId, { enabled = true } = {}) {
   }, [liveId, currentUserId]);
 
   return {
-    messages, likeCount, loading, error,
+    messages, likeCount, loading, error, canModerate,
     isLoggedIn: !!currentUserId, currentUserId,
     sendMessage, toggleReaction, deleteMessage, sendLike,
     clearError: () => setError(''),

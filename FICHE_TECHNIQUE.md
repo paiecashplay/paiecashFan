@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-11 (cz)** — **Live Boutique : modération du chat façon Whatnot (le club répond aux questions)**.
+  **BDD** (migration `shop-live-chat-moderation.sql`, appliquée en prod) : colonnes `is_host`
+  (message du club/modérateur → badge) et `reply_to` (citation d'une question, `ON DELETE SET NULL`)
+  sur `shop_live_messages`. **Backend** : `POST /chat/messages` marque `is_host` si l'auteur
+  `canManage` le club et accepte `replyTo` (validé même salle) ; `GET /chat` renvoie `isHost`,
+  `replyTo` (extrait auteur+contenu, même supprimé) et `canModerate` ; suppression déjà ouverte au
+  club via `canManage`. **Front** : `ShopLiveChat` gagne le **badge « Club »** (doré) + fond
+  distinct sur les messages hôte, le rendu de **citation**, et un bouton **« Répondre »** (bandeau
+  « Réponse à… » au-dessus de la saisie) ; le hook `useShopLiveChat` porte `canModerate` + `replyTo`.
+  Nouveau **panneau « Modération du chat » dans le BO** (`ShopLiveTab`) : le club répond depuis le
+  back-office pendant la présentation caméra. Testé local. NB « modérateur » = compte gérant le club.
 - **2026-08-11 (cy)** — **Live Boutique : chat en direct + likes façon Whatnot**.
   Les acheteurs peuvent enfin **interagir avec le vendeur** pendant le live shopping.
   **BDD** (migration `shop-live-chat.sql`, appliquée en prod) : `shop_live_messages`

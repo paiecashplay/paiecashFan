@@ -451,13 +451,41 @@ async function chatReactionsFor(messageIds, currentUserId) {
   );
 }
 
+// Résout les extraits de citation (reply_to) : { [id]: { id, author, content } }.
+// On lit même les messages supprimés pour que la citation reste lisible.
+async function resolveQuotes(replyIds, knownById) {
+  const wanted = [...new Set(replyIds.filter(Boolean))];
+  if (!wanted.length) return {};
+  const missing = wanted.filter((id) => !knownById[id]);
+  let extra = [];
+  if (missing.length) {
+    const { data } = await supabase
+      .from('shop_live_messages')
+      .select('id, author_id, content')
+      .in('id', missing);
+    extra = data || [];
+  }
+  const all = [...Object.values(knownById), ...extra];
+  const profiles = await fetchChatProfiles(all.map((m) => m.author_id));
+  const map = {};
+  for (const m of all) {
+    if (!wanted.includes(m.id)) continue;
+    map[m.id] = {
+      id: m.id,
+      author: profiles[m.author_id]?.name || 'Supporter',
+      content: (m.content || '').slice(0, 140),
+    };
+  }
+  return map;
+}
+
 // Les messages publiés d'une salle (chrono), enrichis auteur + réactions + likeCount.
 async function getChat(liveRoomId, currentUserId) {
   const [{ data: room }, { data: messages, error }] = await Promise.all([
     supabase.from('shop_live_rooms').select('like_count').eq('id', liveRoomId).maybeSingle(),
     supabase
       .from('shop_live_messages')
-      .select('id, author_id, content, created_at')
+      .select('id, author_id, content, created_at, is_host, reply_to')
       .eq('live_room_id', liveRoomId)
       .eq('moderation_status', 'published')
       .is('deleted_at', null)
@@ -470,6 +498,8 @@ async function getChat(liveRoomId, currentUserId) {
   const rows = messages || [];
   const profiles = await fetchChatProfiles(rows.map((m) => m.author_id));
   const reactions = await chatReactionsFor(rows.map((m) => m.id), currentUserId);
+  const knownById = Object.fromEntries(rows.map((m) => [m.id, m]));
+  const quotes = await resolveQuotes(rows.map((m) => m.reply_to), knownById);
 
   return {
     likeCount: Number(room?.like_count || 0),
@@ -480,20 +510,34 @@ async function getChat(liveRoomId, currentUserId) {
       avatar: profiles[m.author_id]?.avatar || null,
       content: m.content,
       createdAt: m.created_at,
+      isHost: !!m.is_host,
+      replyTo: m.reply_to ? quotes[m.reply_to] || null : null,
       reactions: reactions[m.id] || [],
     })),
   };
 }
 
-async function createChatMessage(liveRoomId, authorId, content) {
+async function createChatMessage(liveRoomId, authorId, content, { isHost = false, replyTo = null } = {}) {
+  // La citation doit appartenir à la même salle (anti-usurpation).
+  let validReplyTo = null;
+  if (replyTo) {
+    const { data: target } = await supabase
+      .from('shop_live_messages')
+      .select('id, author_id, content')
+      .eq('id', replyTo)
+      .eq('live_room_id', liveRoomId)
+      .maybeSingle();
+    if (target) validReplyTo = target;
+  }
+
   const { data, error } = await supabase
     .from('shop_live_messages')
-    .insert({ live_room_id: liveRoomId, author_id: authorId, content })
-    .select('id, author_id, content, created_at')
+    .insert({ live_room_id: liveRoomId, author_id: authorId, content, is_host: !!isHost, reply_to: validReplyTo?.id || null })
+    .select('id, author_id, content, created_at, is_host, reply_to')
     .single();
   if (error) throw new Error(`createShopLiveMessage: ${error.message}`);
 
-  const profiles = await fetchChatProfiles([authorId]);
+  const profiles = await fetchChatProfiles([authorId, validReplyTo?.author_id].filter(Boolean));
   return {
     id: data.id,
     authorId: data.author_id,
@@ -501,6 +545,10 @@ async function createChatMessage(liveRoomId, authorId, content) {
     avatar: profiles[authorId]?.avatar || null,
     content: data.content,
     createdAt: data.created_at,
+    isHost: !!data.is_host,
+    replyTo: validReplyTo
+      ? { id: validReplyTo.id, author: profiles[validReplyTo.author_id]?.name || 'Supporter', content: (validReplyTo.content || '').slice(0, 140) }
+      : null,
     reactions: [],
   };
 }

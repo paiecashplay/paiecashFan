@@ -1416,20 +1416,28 @@ async function chatPublishGate(res, { tenantId, authorId, content }) {
   return true;
 }
 
-// GET /api/v2/shop-live/:liveId/chat — messages + likeCount (public).
+// Le membre connecté est-il modérateur de ce live (= gère le club) ?
+async function isRoomModerator(authUser, room) {
+  if (!authUser) return false;
+  const tenant = await tenants.getTenantById(room.tenant_id).catch(() => null);
+  return tenant ? canManage(authUser, tenant) : false;
+}
+
+// GET /api/v2/shop-live/:liveId/chat — messages + likeCount + canModerate (public).
 router.get('/:liveId/chat', optionalAuth, async (req, res) => {
   try {
     const room = await shopLive.getRoomById(req.params.liveId);
     if (!room) return fail(res, 'Live introuvable.', 404);
     const data = await shopLive.getChat(room.id, req.authUser?.id || null);
-    return ok(res, data);
+    const canModerate = await isRoomModerator(req.authUser, room);
+    return ok(res, { ...data, canModerate });
   } catch (err) {
     // Fail-open : le chat ne doit jamais casser l'affichage du live.
-    return ok(res, { messages: [], likeCount: 0 });
+    return ok(res, { messages: [], likeCount: 0, canModerate: false });
   }
 });
 
-// POST /api/v2/shop-live/:liveId/chat/messages — poster une question (connecté).
+// POST /api/v2/shop-live/:liveId/chat/messages — poster une question ou une réponse (connecté).
 router.post('/:liveId/chat/messages', requireAuth, async (req, res) => {
   try {
     const room = await shopLive.getRoomById(req.params.liveId);
@@ -1444,7 +1452,11 @@ router.post('/:liveId/chat/messages', requireAuth, async (req, res) => {
     });
     if (blocked) return; // 422 déjà renvoyé
 
-    const message = await shopLive.createChatMessage(room.id, req.authUser.id, content);
+    // Un message du club/modérateur porte le badge « Club ».
+    const isHost = await isRoomModerator(req.authUser, room);
+    const replyTo = req.body?.replyTo ? String(req.body.replyTo) : null;
+
+    const message = await shopLive.createChatMessage(room.id, req.authUser.id, content, { isHost, replyTo });
     return ok(res, { message }, 201);
   } catch (err) {
     return fail(res, 'Envoi impossible : ' + err.message, 500);

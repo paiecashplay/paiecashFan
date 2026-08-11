@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import ShopLiveObs from './ShopLiveObs';
+import { ShopLiveChat } from './ShopLiveChat';
+import { useShopLiveChat } from '@/hooks/useShopLiveChat';
 
 import {
   AlertCircle,
@@ -128,6 +130,11 @@ export default function ShopLiveTab({ club }) {
 
     error: productsError,
   } = useClubProducts(tenantId);
+
+  // Chat en direct pour la modération (le club répond aux questions depuis le BO).
+  const liveChat = useShopLiveChat(room?.id || null, {
+    enabled: ['ready', 'live'].includes(room?.status),
+  });
     const [createOpen, setCreateOpen] =
     useState(false);
 
@@ -662,6 +669,20 @@ export default function ShopLiveTab({ club }) {
         {/* Diffusion OBS (MediaLive) — accès générés automatiquement */}
         {['ready', 'live'].includes(room.status) && (
           <ShopLiveObs liveId={room.id} />
+        )}
+
+        {/* Modération du chat : le club répond aux questions des supporters */}
+        {['ready', 'live'].includes(room.status) && (
+          <section className="space-y-2">
+            <div>
+              <h3 className="font-display text-base font-bold text-bone-50">Modération du chat</h3>
+              <p className="text-xs text-bone-500">
+                Réponds aux questions des supporters (ton message porte le badge « Club »). Utilise
+                « Répondre » pour citer une question précise.
+              </p>
+            </div>
+            <ShopLiveChat chat={liveChat} className="h-[480px]" />
+          </section>
         )}
 
         {/* Erreur d’action */}
