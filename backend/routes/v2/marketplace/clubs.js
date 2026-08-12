@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
       .from('tenants')
       .select(`
         id, slug, name, country, city, sport, logo_url, primary_color,
-        stadium, founded_year, is_federation_hub, status,
+        stadium, founded_year, is_federation_hub, status, metadata,
         federation:federations(id, slug, name, logo_url)
       `)
       .eq('status', 'active')
@@ -38,7 +38,9 @@ router.get('/', async (req, res) => {
     const { data: clubs, error } = await query;
     if (error) throw error;
 
-    return ok(res, { clubs: clubs || [], total: clubs?.length ?? 0 });
+    // Exclut le tenant caché « PaieCash Store » (marchand des produits plateforme).
+    const visible = (clubs || []).filter((c) => !c.metadata?.platformStore);
+    return ok(res, { clubs: visible, total: visible.length });
   } catch (err) {
     console.error('[clubs] GET / error:', err.message);
     return fail(res, 'Failed to fetch clubs', 500);
@@ -70,8 +72,10 @@ router.get('/:slugOrId', async (req, res) => {
     // Masque côté public les clubs non actifs (suspendus / rejetés / en
     // attente). Seuls les clubs 'active' sont visibles sur le site.
     if (club.status && club.status !== 'active') return fail(res, 'Club not found', 404);
+    // Le tenant caché « PaieCash Store » n'a pas de page publique.
+    if (club.metadata?.platformStore) return fail(res, 'Club not found', 404);
 
-    const [players, starPlayer, trophies, productsRes] = await Promise.all([
+    const [players, starPlayer, trophies, productsRes, globalRes] = await Promise.all([
       getPlayersByTenant(club.id),
       getStarPlayer(club.id),
       getTrophiesByTenant(club.id),
@@ -80,10 +84,23 @@ router.get('/:slugOrId', async (req, res) => {
         .select('id, name, description, eur_price, pcc_price, images, sizes, category_slug, display_order, status')
         .eq('tenant_id', club.id)
         .eq('status', 'active')
+        .order('display_order', { ascending: true }),
+      // Produits « plateforme » (ex. Aivora) : affichés dans TOUTES les boutiques.
+      supabase
+        .from('products')
+        .select('id, name, description, eur_price, pcc_price, images, sizes, category_slug, display_order, status, is_global')
+        .eq('is_global', true)
+        .eq('status', 'active')
         .order('display_order', { ascending: true })
     ]);
 
     if (productsRes.error) throw productsRes.error;
+
+    // Fusionne : produits du club + produits plateforme (badgés, en tête).
+    const clubProducts = productsRes.data || [];
+    const globalProducts = (club.is_federation_hub ? [] : (globalRes.data || []))
+      .map((p) => ({ ...p, isGlobal: true }));
+    const allProducts = [...globalProducts, ...clubProducts];
 
     // Page fédération : si ce tenant est un hub, on récupère les clubs membres
     // (mêmes federation_id, hors hub, actifs) pour afficher la grille Équipes.
@@ -104,7 +121,7 @@ router.get('/:slugOrId', async (req, res) => {
       starPlayer,
       players,
       trophies,
-      products: productsRes.data || [],
+      products: allProducts,
       members
     });
   } catch (err) {

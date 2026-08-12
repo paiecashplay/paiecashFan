@@ -136,6 +136,7 @@ const v2AdminCrudClubs = require('./routes/v2/admin/clubs-crud');
 const v2AdminUsers    = require('./routes/v2/admin/users');
 const v2AdminModeration = require('./routes/v2/admin/moderation');
 const v2AdminPrizes   = require('./routes/v2/admin/prizes');
+const v2AdminPlatform = require('./routes/v2/admin/platform');
 const v2Live          = require('./routes/v2/live');
 const v2ShopLive = require('./routes/v2/shop-live');
 
@@ -173,6 +174,7 @@ app.use('/api/v2/betting/pools', v2BettingPools);
 // sinon le guard super_admin de governance les intercepte → 403 pour le club_admin.
 app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);   // club_admin (scope) + super_admin
 app.use('/api/v2/admin/prizes', v2AdminPrizes);          // club_admin (son club) + super_admin
+app.use('/api/v2/admin/platform', v2AdminPlatform);      // super_admin : produits plateforme + reversements
 app.use('/api/v2/admin', v2AdminGov);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);

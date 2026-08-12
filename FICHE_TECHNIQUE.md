@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-08-11.
+> Dernière mise à jour : 2026-08-13.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,20 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-13 (da)** — **Produits « plateforme » (ex. lunettes Aivora) dans toutes les boutiques + commission clubs**.
+  Un produit marqué `is_global` (possédé par le tenant caché **PaieCash Store**, slug `paiecash-store`)
+  s'affiche automatiquement dans **toutes** les boutiques de clubs (**union dynamique** dans
+  `marketplace/clubs.js` : produits du club + produits globaux actifs ; badge doré « Partenaire » ;
+  pas de copie → les clubs créés plus tard sont alimentés d'office). **Paiement réparti** au checkout
+  (`checkout.js`) : sur une ligne plateforme, `(100-taux)%` → PaieCash Store, `taux%` (défaut 10,
+  via `products.metadata.commissionPct`) → **club de la boutique** (`boutiqueSlug`), le fan paie le
+  même total (2 `pcc.execute`) ; commission tracée dans **`platform_commissions`** (statut `paid`, ou
+  `pending` si la 2ᵉ patte échoue / paiement carte). **Migration `platform-products.sql`** :
+  `products.is_global`, tenant PaieCash Store, table `platform_commissions` (RLS deny-all). **BO
+  super-admin `/admin/platform`** (route `admin/platform.js`, `AdminPlatform.jsx`) : onglet
+  « Produits plateforme » (CRUD + case « Afficher dans toutes les boutiques » + taux %) et onglet
+  « Reversements » (totaux + par club + historique). Le store est masqué du listing public des clubs.
+  ⚠️ Prérequis prod : créer le marchand `paiecash-store` côté PaieCashCoin (sinon l'achat échoue).
 - **2026-08-11 (cz)** — **Live Boutique : modération du chat façon Whatnot (le club répond aux questions)**.
   **BDD** (migration `shop-live-chat-moderation.sql`, appliquée en prod) : colonnes `is_host`
   (message du club/modérateur → badge) et `reply_to` (citation d'une question, `ON DELETE SET NULL`)

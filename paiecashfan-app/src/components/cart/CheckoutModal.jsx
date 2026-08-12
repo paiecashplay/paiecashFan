@@ -36,7 +36,7 @@ export function CheckoutModal() {
 }
 
 function CheckoutInner({ cart, onClose }) {
-  const { items, totalPrice, totalEur, clear } = cart;
+  const { items, totalPrice, totalEur, clear, club } = cart;
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -81,6 +81,8 @@ function CheckoutInner({ cart, onClose }) {
         method: 'POST',
         body: JSON.stringify({
           items: items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null })),
+          // Club de la boutique visitée → reversement des 10% sur les produits plateforme.
+          boutiqueSlug: club?.slug || null,
           mode: payMethod === 'card' ? 'card_full' : 'pcc_full',
           shippingMethod,
           origin: window.location.origin,

@@ -9,7 +9,7 @@ import {
   ArrowLeft, Globe, Wallet, CreditCard, Search,
   ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
   Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio,
-  Layers, CalendarClock, Loader2, MapPin
+  Layers, CalendarClock, Loader2, MapPin, Sparkles
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
@@ -1238,7 +1238,8 @@ function MerchandiseSection({ club, apiProducts = [] }) {
           image:    cover,                                       // vignette de la card
           images:   imgs.length ? imgs : (cover ? [cover] : []), // slider de la modale
           sizes:    p.sizes || [],
-          description: p.description || ''
+          description: p.description || '',
+          isGlobal: !!p.isGlobal,                                // produit plateforme (ex. Aivora) → badge « Partenaire »
         };
       });
     }
@@ -1730,9 +1731,17 @@ function ProductCard({ product, index, primaryColor, inCart, onOpen }) {
         boxShadow: hovered ? `0 0 40px -8px ${primaryColor}66` : undefined
       }}
     >
-      {/* Badge catégorie en haut à gauche */}
-      <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-ink-900/80 backdrop-blur-sm text-[9px] uppercase tracking-[0.22em] font-bold text-bone-200">
-        {labelOf(product.category)}
+      {/* Badge en haut à gauche : « Partenaire » (produit plateforme) OU la catégorie */}
+      <div className="absolute top-3 left-3 z-10">
+        {product.isGlobal ? (
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold-500/90 text-ink-900 text-[9px] uppercase tracking-[0.18em] font-black shadow">
+            <Sparkles size={10} strokeWidth={3} /> Partenaire
+          </div>
+        ) : (
+          <div className="px-2.5 py-1 rounded-full bg-ink-900/80 backdrop-blur-sm text-[9px] uppercase tracking-[0.22em] font-bold text-bone-200">
+            {labelOf(product.category)}
+          </div>
+        )}
       </div>
 
       {/* Tag "Déjà dans le panier" si applicable */}
