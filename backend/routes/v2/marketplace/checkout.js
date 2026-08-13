@@ -21,7 +21,12 @@ const ordersDb = require('../../../db/orders');
 const productsDb = require('../../../db/products');
 const tombolaDb = require('../../../db/tombola');
 const commissionsDb = require('../../../db/commissions');
+const revshareDb = require('../../../db/revshare');
+const revshareProcessor = require('../../../services/revshareProcessor');
 const pcc = require('../../../services/paiecashcoin');
+
+// Handle PaieCashCoin du compte encaisseur plateforme (reçoit la vente Aivora).
+const STORE_SLUG = process.env.PAIECASH_STORE_SLUG || 'paiecashstore';
 
 // Taux de commission par défaut reversé au club sur un produit plateforme (%).
 const DEFAULT_COMMISSION_PCT = 10;
@@ -160,6 +165,7 @@ async function buildBoutiqueGroups(items, res, originSlug = null) {
       }
       group.commission = {
         originTenantId: originTenant.id,
+        originSlug: originTenant.slug,             // = public_slug PCC du club (reversement)
         merchantRef: `paiecashfan:${originTenant.slug}`,
         originName: originTenant.name,
         productId: g._global[0].productId,
@@ -297,14 +303,63 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
 
     const results = [];
     for (const g of groups) {
-      // Produit plateforme (Aivora) : on RÉPARTIT le paiement — la part club
-      // (commission) est débitée au club marchand, le reste au PaieCash Store.
-      // Le fan paie le même total (storeLeg + commission = g.totalEur).
       const commission = g.commission || null;
-      const storeLegEur = commission ? round2(g.totalEur - commission.commissionEur) : g.totalEur;
 
+      // ── Produit plateforme (Aivora) : OPTION A — charge UNIQUE au PaieCash
+      //    Store (montant plein), puis reversement PCC de la commission au club
+      //    (async, fiable). Le fan n'est débité qu'une fois.
+      if (commission) {
+        // Commande d'abord → id stable (merchantRef + idempotence revshare).
+        let order;
+        try {
+          order = await ordersDb.createOrder({
+            user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
+            items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
+            notes: JSON.stringify({ kind, mode: 'pcc_full', pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+          });
+        } catch (e) {
+          console.error('[CHECKOUT] platform createOrder:', e.message);
+          return fail(res, 'Commande impossible, réessaie.', 500, { partial: results });
+        }
+
+        const pay = await pcc.execute({
+          userEmail: email, userAuthId: authId, amountEur: g.totalEur,
+          description: describe(kind, g.tenant, g.orderItems),
+          merchantRef: `paiecashfan:${STORE_SLUG}:${order.id}`, recipientSlug: STORE_SLUG,
+          merchantName: 'PaieCash Store', preferredMode: 'pcc_full', idempotencyKey: String(order.id),
+        });
+        if (!pay?.success || pay.mode !== 'pcc_full' || (pay.status && pay.status !== 'completed')) {
+          await ordersDb.updateOrderStatus(order.id, 'cancelled').catch(() => {});
+          return fail(res, pay?.error || 'Paiement PCC non abouti. Ton solde a peut-être changé, réessaie.', 402, { needTopUp: true, partial: results });
+        }
+        await ordersDb.updateOrderStatus(order.id, 'completed');
+        await mergeNotes(order, { pending: false, pccReference: pay.reference, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), commission: { clubTenantId: commission.originTenantId, rate: commission.rate, commissionEur: commission.commissionEur } }).catch(() => {});
+
+        // Commission tracée 'pending' → reversement PCC au club (best-effort
+        // immédiat ; le cron + le webhook rattrapent en cas d'échec).
+        let commissionStatus = 'pending';
+        if (commission.commissionEur > 0) {
+          const crow = await commissionsDb.recordCommission({
+            orderId: order.id, clubTenantId: commission.originTenantId, productId: commission.productId, buyerUserId: authId,
+            grossPcc: commission.grossPcc, grossEur: commission.grossEur, rate: commission.rate,
+            commissionPcc: commission.commissionPcc, commissionEur: commission.commissionEur,
+            reference: pay.reference, status: 'pending',
+          }).catch((e) => { console.error('[CHECKOUT] recordCommission:', e.message); return null; });
+          try {
+            const rev = await revshareDb.enqueue({
+              orderId: order.id, commissionId: crow?.id || null, clubSlug: commission.originSlug, clubTenantId: commission.originTenantId,
+              amountEur: commission.commissionEur, saleReference: pay.reference, idempotencyKey: `revshare-${order.id}`,
+            });
+            if (rev && (await revshareProcessor.processRow(rev)) === 'done') commissionStatus = 'paid';
+          } catch (e) { console.error('[CHECKOUT] revshare:', e.message); }
+        }
+        results.push({ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId: order.id, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc, pccUsed: pay.pccUsed, commission: { to: commission.originName, eur: commission.commissionEur, status: commissionStatus } });
+        continue;
+      }
+
+      // ── Groupe club normal ──
       const pay = await pcc.execute({
-        userEmail: email, userAuthId: authId, amountEur: storeLegEur,
+        userEmail: email, userAuthId: authId, amountEur: g.totalEur,
         description: describe(kind, g.tenant, g.orderItems), merchantRef: g.merchantRef,
         merchantName: g.tenant.name || 'PaieCashFan', preferredMode: 'pcc_full',
       });
@@ -313,48 +368,20 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
       if (!pay?.success || pay.mode !== 'pcc_full' || (pay.status && pay.status !== 'completed')) {
         return fail(res, pay?.error || 'Paiement PCC non abouti. Ton solde a peut-être changé, réessaie.', 402, { needTopUp: true, partial: results });
       }
-
-      // Deuxième débit : les 10% directement au club de la boutique.
-      let commissionStatus = null;
-      if (commission && commission.commissionEur > 0) {
-        try {
-          const clubPay = await pcc.execute({
-            userEmail: email, userAuthId: authId, amountEur: commission.commissionEur,
-            description: `Commission ${commission.originName} — ${describe(kind, g.tenant, g.orderItems)}`,
-            merchantRef: commission.merchantRef, merchantName: commission.originName || 'Club', preferredMode: 'pcc_full',
-          });
-          const clubOk = clubPay?.success && (!clubPay.status || clubPay.status === 'completed');
-          commissionStatus = clubOk ? 'paid' : 'pending';
-          if (!clubOk) console.warn(`[CHECKOUT] commission club NON aboutie (${commission.merchantRef}) → à régulariser`);
-        } catch (e) {
-          commissionStatus = 'pending';
-          console.error(`[CHECKOUT] commission club échec (${commission.merchantRef}):`, e.message);
-        }
-      }
-
       let orderId = null;
       try {
         const order = await ordersDb.createOrder({
           user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
           items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-          notes: JSON.stringify({ kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined, commission: commission ? { clubTenantId: commission.originTenantId, rate: commission.rate, commissionEur: commission.commissionEur, status: commissionStatus } : undefined }),
+          notes: JSON.stringify({ kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
         });
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
         await grantGameEntitlements(order);   // tombola : crée le(s) ticket(s)
-        // Trace la commission reversée (vue BO « Reversements »).
-        if (commission && commission.commissionEur > 0) {
-          await commissionsDb.recordCommission({
-            orderId, clubTenantId: commission.originTenantId, productId: commission.productId, buyerUserId: authId,
-            grossPcc: commission.grossPcc, grossEur: commission.grossEur, rate: commission.rate,
-            commissionPcc: commission.commissionPcc, commissionEur: commission.commissionEur,
-            reference: pay.reference, status: commissionStatus || 'paid',
-          }).catch((e) => console.error('[CHECKOUT] recordCommission:', e.message));
-        }
       } catch (e) {
         console.error(`[CHECKOUT] pcc_full: paiement OK mais échec createOrder (${g.tenant.slug}):`, e.message);
       }
-      results.push({ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc, pccUsed: pay.pccUsed, commission: commission ? { to: commission.originName, eur: commission.commissionEur, status: commissionStatus } : undefined });
+      results.push({ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc, pccUsed: pay.pccUsed });
     }
     console.log(`[CHECKOUT] ${kind} PCC full payé — user=${email} | clubs=${results.length} | total=${grandTotalEur}€`);
     return ok(res, { paid: true, mode: 'pcc_full', totalEur: grandTotalEur, totalPcc: grandTotalEur, orders: results });
@@ -387,12 +414,17 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
   }
 
   // 2. Exécution → Stripe Checkout URL.
+  // Produit plateforme : le paiement est crédité au PaieCash Store (recipientSlug),
+  // et le reversement au club sera déclenché par le webhook payment.completed.
+  const isPlatform = !!g.commission;
   let pay;
   try {
     pay = await pcc.execute({
       userEmail: email, userAuthId: authId, amountEur: g.totalEur,
-      description: describe(kind, g.tenant, g.orderItems), merchantRef: g.merchantRef,
-      merchantName: g.tenant.name || 'PaieCashFan', preferredMode: mode,
+      description: describe(kind, g.tenant, g.orderItems),
+      merchantRef: isPlatform ? `paiecashfan:${STORE_SLUG}:${order.id}` : g.merchantRef,
+      recipientSlug: isPlatform ? STORE_SLUG : undefined,
+      merchantName: isPlatform ? 'PaieCash Store' : (g.tenant.name || 'PaieCashFan'), preferredMode: mode,
       bnplInstallments: req.body?.bnplInstallments,
       successUrl: `${origin}/checkout/success?order=${order.id}`,
       cancelUrl: `${origin}/checkout/cancel?order=${order.id}`,

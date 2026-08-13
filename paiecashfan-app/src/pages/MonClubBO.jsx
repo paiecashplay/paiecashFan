@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   Info, Users, Trophy, ShoppingBag, Ticket, Gift, PackageCheck, ShieldAlert,
   Radio, Tv, Upload, Loader2, Check, X, ExternalLink, Search, Bell, ChevronDown,
-  Menu, CreditCard,
+  Menu, CreditCard, HandCoins, Sparkles,
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -101,6 +101,7 @@ export function MonClubBO() {
             ) : isInfo ? (
               <div className="space-y-6">
                 <KpiBand data={kpis} />
+                <ClubPayoutsCard clubId={clubId} />
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_348px]">
                   <div className="min-w-0">
                     <IdentiteTab club={club} onSaved={setClub} showToast={showToast} />
@@ -467,6 +468,71 @@ function TabContent({ tab, club, clubId, showToast }) {
       : <EmptyState text="Salon indisponible." />;
   }
   return null;
+}
+
+// ═══ Reversements reçus (commissions produits plateforme) ══════════════
+function ClubPayoutsCard({ clubId }) {
+  const [data, setData] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!clubId) return;
+    apiFetch(`/api/v2/admin/clubs-crud/clubs/${clubId}/commissions`)
+      .then((j) => setData(j.data || { totals: { paidPcc: 0, pendingPcc: 0, count: 0 }, recent: [] }))
+      .catch(() => setData({ totals: { paidPcc: 0, pendingPcc: 0, count: 0 }, recent: [] }));
+  }, [clubId]);
+
+  const t = data?.totals || { paidPcc: 0, pendingPcc: 0, count: 0 };
+  const recent = data?.recent || [];
+  const fmtPcc = (n) => Number(n || 0).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+  const dateStr = (iso) => { try { return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }); } catch { return ''; } };
+
+  // Rien à afficher tant qu'il n'y a aucune vente partenaire pour ce club.
+  if (data && t.count === 0) return null;
+
+  return (
+    <section className="overflow-hidden rounded-[20px] border border-gold-500/20 bg-gradient-to-br from-gold-500/[0.06] to-emerald-500/[0.03]">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-xl border border-gold-500/25 bg-gold-500/10 text-gold-400"><HandCoins size={22} /></span>
+          <div>
+            <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-bone-500 font-bold"><Sparkles size={11} className="text-gold-400" /> Reversements reçus (produits partenaires)</p>
+            <p className="mt-1 font-display text-2xl font-black text-emerald-400">{data ? `${fmtPcc(t.paidPcc)} PCC` : <Loader2 size={18} className="animate-spin text-bone-500" />}</p>
+            <p className="text-xs text-bone-400">{t.count} vente(s){t.pendingPcc > 0 ? <> · <span className="text-amber-400">{fmtPcc(t.pendingPcc)} PCC en attente</span></> : ''}</p>
+          </div>
+        </div>
+        {recent.length > 0 && (
+          <button onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-bold text-bone-200 transition hover:bg-white/10">
+            {open ? 'Masquer' : 'Voir le détail'} <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />
+          </button>
+        )}
+      </div>
+      {open && recent.length > 0 && (
+        <div className="overflow-x-auto border-t border-white/10">
+          <table className="w-full min-w-[420px] text-sm">
+            <thead>
+              <tr className="text-[10px] uppercase tracking-widest text-bone-500">
+                <th className="px-5 py-2 text-left font-semibold">Date</th>
+                <th className="px-5 py-2 text-left font-semibold">Produit</th>
+                <th className="px-5 py-2 text-left font-semibold">Commission</th>
+                <th className="px-5 py-2 text-left font-semibold">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((r) => (
+                <tr key={r.id} className="border-t border-white/5">
+                  <td className="whitespace-nowrap px-5 py-2.5 text-xs text-bone-400">{dateStr(r.created_at)}</td>
+                  <td className="px-5 py-2.5 text-bone-200">{r.product?.name || '—'}</td>
+                  <td className="px-5 py-2.5 font-mono text-emerald-400">{fmtPcc(r.commission_pcc)} PCC <span className="text-bone-600">({Number(r.rate)}%)</span></td>
+                  <td className="px-5 py-2.5"><span className={cn('inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold', r.status === 'paid' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400' : 'border-amber-500/20 bg-amber-500/10 text-amber-400')}>{r.status === 'paid' ? 'Reversé' : 'En attente'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
 }
 
 // ═══ Primitives UI ═════════════════════════════════════════════════════

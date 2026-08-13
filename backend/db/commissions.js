@@ -77,4 +77,22 @@ async function totals() {
   return t;
 }
 
-module.exports = { recordCommission, summaryByClub, listCommissions, totals };
+// Reversements REÇUS par UN club (vue BO club) : totaux + détail des ventes.
+async function forClub(clubTenantId, { limit = 100 } = {}) {
+  const { data, error } = await supabase
+    .from('platform_commissions')
+    .select('id, commission_pcc, commission_eur, gross_pcc, rate, status, created_at, product:products(name)')
+    .eq('club_tenant_id', clubTenantId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`commissionsForClub: ${error.message}`);
+  const rows = data || [];
+  const t = { paidPcc: 0, pendingPcc: 0, count: rows.length };
+  for (const r of rows) {
+    if (r.status === 'paid') t.paidPcc += Number(r.commission_pcc || 0);
+    else t.pendingPcc += Number(r.commission_pcc || 0);
+  }
+  return { totals: t, recent: rows };
+}
+
+module.exports = { recordCommission, summaryByClub, listCommissions, totals, forClub };

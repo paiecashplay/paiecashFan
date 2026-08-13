@@ -55,6 +55,19 @@ app.use('/api/crypto/webhooks', (req, res, next) => {
 // ─── Webhooks ──────────────────────────────────────────────
 app.use('/webhook', webhooksRoutes);
 
+// Webhook PaieCashCoin : capture le body BRUT (vérif HMAC) AVANT express.json.
+const v2PccWebhook = require('./routes/v2/webhooks/paiecashcoin');
+app.use('/api/v2/webhooks/paiecashcoin', (req, res, next) => {
+  let data = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) => { data += chunk; });
+  req.on('end', () => {
+    req.rawBody = data;
+    try { req.body = data ? JSON.parse(data) : {}; } catch { req.body = {}; }
+    next();
+  });
+}, v2PccWebhook);
+
 // ─── Middleware ────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -230,6 +243,10 @@ const server = httpServer.listen(PORT, () => {
   // Tombola : tirage automatique des campagnes arrivées à échéance (toutes les 5 min)
   const { runTombolaDraws } = require('./jobs/tombolaDraw');
   cron.schedule('*/5 * * * *', () => { runTombolaDraws(); });
+
+  // Revshare : rattrape les reversements de commission plateforme en attente/échec (toutes les 5 min)
+  const revshareProcessor = require('./services/revshareProcessor');
+  cron.schedule('*/5 * * * *', () => { revshareProcessor.processPending().catch(() => {}); });
 
   // Gains : relance automatique des gagnants sans adresse (cadence gérée dans le job, exécuté chaque heure)
   const { runPrizeReminders } = require('./jobs/prizeReminders');

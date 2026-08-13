@@ -211,3 +211,15 @@
 @media (prefers-reduced-motion: reduce) {
   .pcf-heart { animation-duration: 0.01s; opacity: 0; }
 }
+
+/* ── Confettis de la page de confirmation de commande ─────────────── */
+@keyframes pcf-confetti-fall {
+  0%   { transform: translateY(-12vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(88vh) rotate(720deg);  opacity: 0; }
+}
+.pcf-confetti-piece {
+  position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px;
+  will-change: transform, opacity; pointer-events: none;
+  animation: pcf-confetti-fall var(--pcf-dur, 3s) linear var(--pcf-delay, 0s) forwards;
+}
+@media (prefers-reduced-motion: reduce) { .pcf-confetti-piece { display: none; } }

@@ -667,11 +667,13 @@ router.get('/clubs/:tenantId/kpis', async (req, res) => {
     const d60 = new Date(now - 60 * 864e5).toISOString();
     const cnt = (q) => q.select('id', { count: 'exact', head: true });
 
-    const [fansTotal, fans30, fansPrev, ordersRes] = await Promise.all([
+    const [fansTotal, fans30, fansPrev, ordersRes, commRes] = await Promise.all([
       cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId),
       cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId).gte('created_at', d30),
       cnt(supabase.from('fan_favorite_clubs')).eq('tenant_id', tenantId).gte('created_at', d60).lt('created_at', d30),
       supabase.from('orders').select('total_pcc, metadata, created_at').eq('tenant_id', tenantId).eq('status', 'completed'),
+      // Reversements reçus (commissions produits plateforme) = revenu du club.
+      supabase.from('platform_commissions').select('commission_pcc, created_at').eq('club_tenant_id', tenantId).eq('status', 'paid'),
     ]);
 
     const isTicket = (o) => {
@@ -696,7 +698,17 @@ router.get('/clubs/:tenantId/kpis', async (req, res) => {
       }
     }
 
-    const delta = (a, b) => (b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : null);
+    // Reversements reçus (commissions) = revenu du club → comptés dans "Revenus nets".
+    for (const c of (commRes.data || [])) {
+      const pcc = Number(c.commission_pcc || 0);
+      revenue += pcc;
+      if (c.created_at >= d30) r30 += pcc;
+      else if (c.created_at >= d60 && c.created_at < d30) rPrev += pcc;
+    }
+
+    // Variation vs 30 j précédents — masquée quand il n'y a pas d'activité récente
+    // (évite un "-100%" trompeur sur une valeur cumulée).
+    const delta = (a, b) => (a > 0 && b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : null);
     return ok(res, {
       fansSubscribed: { value: fansTotal.count || 0, delta: delta(fans30.count || 0, fansPrev.count || 0) },
       ticketsSold:    { value: tickets,  delta: delta(t30, tPrev) },
@@ -1100,6 +1112,22 @@ router.delete('/trophies/:id', async (req, res) => {
     const { error } = await supabase.from('trophies').delete().eq('id', req.params.id);
     if (error) throw error;
     return ok(res, { deleted: true });
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// REVERSEMENTS (commissions produits plateforme reçues par le club)
+// Scopé par requireClubScope (club_admin de CE club + super_admin).
+// ═══════════════════════════════════════════════════════════════
+
+// GET /api/v2/admin/clubs-crud/clubs/:tenantId/commissions
+router.get('/clubs/:tenantId/commissions', async (req, res) => {
+  try {
+    const commissionsDb = require('../../../db/commissions');
+    const data = await commissionsDb.forClub(req.params.tenantId);
+    return ok(res, data);
   } catch (err) {
     return fail(res, err.message, 500);
   }

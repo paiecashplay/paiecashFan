@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, X, ShieldCheck, Truck, Zap, Wallet, CreditCard, Loader2,
   CheckCircle2, ShoppingBag, Lock, User, MapPin, PackageCheck,
+  Star, RotateCw, LifeBuoy, ArrowRight, XCircle, CalendarDays, Hash, Award,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
+import { OrderSuccessView, OrderFailureView } from './CheckoutResult';
 import { shippingFee, shippingZone, ZONE_LABEL } from '@/lib/shipping';
 
 const fmt = (n) => new Intl.NumberFormat('fr-FR').format(Number(n || 0));
@@ -60,6 +62,7 @@ function CheckoutInner({ cart, onClose }) {
   const [topUp, setTopUp] = useState(null);
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(null);    // snapshot pour l'écran de confirmation
+  const [failed, setFailed] = useState(null);          // { message } → écran d'échec plein écran
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const feePcc = shippingFee(form.country, shippingMethod);   // frais selon la zone (pays)
@@ -75,7 +78,9 @@ function CheckoutInner({ cart, onClose }) {
   }
 
   async function submitOrder() {
-    setError(''); setTopUp(null); setPaying(true);
+    setError(''); setTopUp(null); setFailed(null); setPaying(true);
+    // Mémorise la boutique en cours pour y revenir après le retour Stripe (carte).
+    try { if (club?.slug) sessionStorage.setItem('pcf_return_boutique', club.slug); } catch { /* noop */ }
     try {
       const res = await apiFetch('/api/v2/checkout/boutique', {
         method: 'POST',
@@ -101,13 +106,14 @@ function CheckoutInner({ cart, onClose }) {
       } catch { /* stockage indisponible → tant pis */ }
       if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
       // PCC → payé immédiatement : on fige le récap puis on vide le panier.
-      setConfirmed({ items: [...items], feePcc, grandPcc, grandEur });
+      setConfirmed({ items: [...items], feePcc, grandPcc, grandEur, order: res?.data?.orders?.[0] || null });
       await clear();
       setStep(2); setPaying(false);
     } catch (err) {
       const msg = err?.message || 'Paiement impossible pour le moment.';
+      // Solde insuffisant → parcours de recharge (plus actionnable) ; sinon écran d'échec.
       if (/insuffisant|wallet|recharge/i.test(msg)) setTopUp({ message: msg, found: err?.data?.found });
-      else setError(msg);
+      else setFailed({ message: msg });
       setPaying(false);
     }
   }
@@ -135,26 +141,54 @@ function CheckoutInner({ cart, onClose }) {
           </button>
           <div className="text-center">
             <h2 className="font-display text-base font-black uppercase tracking-tight text-bone-50 sm:text-lg">Finaliser votre commande</h2>
-            <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-emerald-400 font-bold"><Lock size={10} /> Commande sécurisée</p>
+            {failed ? (
+              <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-rose-400 font-bold"><Lock size={10} /> Paiement échoué</p>
+            ) : (
+              <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-emerald-400 font-bold"><Lock size={10} /> Commande sécurisée</p>
+            )}
           </div>
           <button onClick={onClose} disabled={paying} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-bone-400 hover:text-bone-100 disabled:opacity-50"><X size={16} /></button>
         </div>
 
         {/* Progression */}
-        <ProgressSteps step={step} />
+        <ProgressSteps step={failed ? 2 : step} />
 
-        {/* Corps 2 colonnes */}
+        {/* Écran d'échec plein écran */}
+        {failed ? (
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <OrderFailureView
+              amountPcc={grandPcc} message={failed.message}
+              onRetry={() => { setFailed(null); setStep(1); }}
+              onSupport={() => { window.location.href = 'mailto:contact@paiecashfan.com'; }}
+              actions={<>
+                <button onClick={() => { setFailed(null); setStep(0); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-bone-200 transition hover:text-bone-50"><ArrowLeft size={15} /> Retour au panier</button>
+                <button onClick={() => { onClose(); navigate('/mon-compte'); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3.5 text-xs font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"><PackageCheck size={15} /> Voir mes commandes</button>
+              </>}
+            />
+          </div>
+        ) : step === 2 ? (
+          /* Écran de confirmation plein écran (confettis) */
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <OrderSuccessView
+              email={form.email} amountPcc={confirmed?.grandPcc ?? grandPcc} order={confirmed?.order || null}
+              actions={<>
+                <button onClick={() => { onClose(); navigate('/mon-compte'); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3.5 text-xs font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"><PackageCheck size={15} /> Voir ma commande <ArrowRight size={14} /></button>
+                <button onClick={onClose} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-bone-200 transition hover:text-bone-50"><ShoppingBag size={15} /> Continuer mes achats</button>
+              </>}
+            />
+          </div>
+        ) : (
+        /* Corps 2 colonnes */
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
           {/* Gauche (formulaire / confirmation) */}
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 lg:w-[65%]">
             {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} />}
             {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} />}
-            {step === 2 && <StepConfirmation onViewOrder={() => { onClose(); navigate('/mon-compte'); }} onContinue={onClose} email={form.email} />}
             {error && <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
           </div>
 
           {/* Droite (récap sticky) */}
-          {step !== 2 && (
+          {(
             <aside className="shrink-0 border-t border-white/[0.06] bg-white/[0.02] px-5 py-6 sm:px-6 lg:w-[35%] lg:border-l lg:border-t-0">
               <h3 className="text-[10px] uppercase tracking-[0.24em] text-bone-400 font-black">Votre commande</h3>
               <div className="mt-4 space-y-3 max-h-[26vh] overflow-y-auto pr-1">
@@ -200,6 +234,7 @@ function CheckoutInner({ cart, onClose }) {
             </aside>
           )}
         </div>
+        )}
       </motion.div>
 
       {rechargeOpen && (
@@ -290,23 +325,6 @@ function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge }) {
           <button onClick={onRecharge} className="mt-2 inline-flex items-center gap-2 rounded-full bg-amber-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-amber-300"><Wallet size={13} /> Recharger mon wallet</button>
         </div>
       )}
-    </div>
-  );
-}
-
-function StepConfirmation({ onViewOrder, onContinue, email }) {
-  return (
-    <div className="flex h-full flex-col items-center justify-center py-10 text-center">
-      <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-        className="grid h-20 w-20 place-items-center rounded-full bg-emerald-400/15 text-emerald-400">
-        <PackageCheck size={44} />
-      </motion.div>
-      <h3 className="mt-6 font-display text-2xl font-black uppercase text-bone-50">Commande confirmée !</h3>
-      <p className="mt-3 max-w-sm text-sm text-bone-300">Merci ! Ta commande est enregistrée. Tu recevras le suivi de livraison dans « Mes commandes »{email ? ` et par email (${email})` : ''}.</p>
-      <div className="mt-7 flex flex-col gap-2 sm:flex-row">
-        <button onClick={onViewOrder} className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300"><PackageCheck size={14} /> Voir ma commande</button>
-        <button onClick={onContinue} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-xs font-black uppercase tracking-wider text-bone-200 hover:text-bone-50"><ShoppingBag size={14} /> Continuer mes achats</button>
-      </div>
     </div>
   );
 }

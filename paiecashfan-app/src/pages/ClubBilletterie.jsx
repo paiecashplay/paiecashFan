@@ -462,6 +462,7 @@ export function ClubBilletterie() {
                       variant="primary"
                       size="md"
                       className="min-w-[150px] justify-center"
+                      onClick={() => setSelectedOffer(offer)}
                     >
                       <ShoppingBag size={15} />
 

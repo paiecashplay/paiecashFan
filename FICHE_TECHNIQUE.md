@@ -135,6 +135,21 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-13 (db)** — **Reversement plateforme Option A (charge unique + revshare async) + pages paiement + vues reversements**.
+  **Paiement** (`checkout.js`) refondu selon PaieCashCoin : la vente d'un produit plateforme est
+  **débitée UNE fois** vers le compte `paiecashstore` (`recipientSlug`), puis la commission (10%) est
+  **reversée au club en PCC pur** de façon asynchrone (`services/paiecashcoin.payoutToClub` avec
+  `PAIECASH_STORE_API_KEY`). File **`revshare_pending`** + **`webhook_events`** (migration
+  `revshare-pending.sql`), processeur `services/revshareProcessor` (déclenché après la vente pcc_full,
+  par le **webhook** `payment.completed` — `routes/v2/webhooks/paiecashcoin.js`, HMAC `X-PCC-Signature`
+  + idempotence `event.id` — et par un **cron 5 min**). **Pages paiement** partagées (`CheckoutResult.jsx`,
+  utilisées par le modal PCC ET le retour Stripe `CheckoutReturn`) : **succès** (fond stade + confettis +
+  fidélité) et **échec** (pistes de résolution), tous modes. **Reversements** : card sur le **dashboard
+  super-admin** (`AdminOverview` → `/admin/platform`) et **BO club** (`MonClubBO` : `ClubPayoutsCard` +
+  endpoint scopé `clubs-crud/clubs/:id/commissions`) ; le **KPI « Revenus nets »** du club inclut les
+  reversements reçus (et masque le « -100% » trompeur). **Fixes** : bouton « Acheter » de la billetterie
+  (onClick manquant), « Continuer mes achats » revient à la boutique du club. ⚠️ Prod : appliquer
+  `revshare-pending.sql` ; env Railway store/webhook déjà posés.
 - **2026-08-13 (da)** — **Produits « plateforme » (ex. lunettes Aivora) dans toutes les boutiques + commission clubs**.
   Un produit marqué `is_global` (possédé par le tenant caché **PaieCash Store**, slug `paiecash-store`)
   s'affiche automatiquement dans **toutes** les boutiques de clubs (**union dynamique** dans
