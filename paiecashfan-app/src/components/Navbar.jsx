@@ -12,7 +12,8 @@ import { NavbarSearch } from './NavbarSearch';
 
 const nav = [
   { label: 'Accueil',   to: '/' },
-  { label: 'Boutique',  to: '/boutique' },
+  // Boutique temporairement masquée tant que la page n'a pas de contenu
+  // { label: 'Boutique',  to: '/boutique' },
   { label: 'Jeux',      to: '/tombola' },
   { label: 'Fan club',  to: '/fan-club' },
   { label: 'Billetterie', to: '/billetterie' }

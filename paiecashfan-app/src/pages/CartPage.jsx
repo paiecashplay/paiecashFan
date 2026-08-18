@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ShoppingBag, Minus, Plus, Trash2, ArrowLeft, ArrowRight, ShieldCheck, Truck,
-  BadgeCheck, RotateCcw, Lock, Ticket, Headphones, Tag,
+  BadgeCheck, RotateCcw, Lock, Ticket, Headphones, Tag, X
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { useCart } from '@/context/CartContext';
@@ -20,6 +20,7 @@ export function CartPage() {
   const [promo, setPromo] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [balance, setBalance] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -65,9 +66,30 @@ export function CartPage() {
               <div className="divide-y divide-white/5">
                 {items.map((it) => (
                   <div key={it.id} className="flex items-center gap-4 p-3">
-                    <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
-                      {it.image ? <img src={it.image} alt="" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <ShoppingBag size={20} className="text-bone-500" />}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => it.image && setPreviewImage({
+                        src: it.image,
+                        name: it.name || 'Article',
+                      })}
+                      disabled={!it.image}
+                      aria-label={it.image ? `Agrandir ${it.name || 'le produit'}` : undefined}
+                      className={`grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] ${
+                        it.image ? 'cursor-zoom-in transition hover:border-emerald-400/50' : ''
+                      }`}>
+                      {it.image ? (
+                        <img
+                          src={it.image}
+                          alt={it.name || 'Produit'}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <ShoppingBag size={20} className="text-bone-500" />
+                      )}
+                    </button>
                     <div className="min-w-0 flex-1">
                       <p className="font-display text-base font-black text-bone-50 truncate">{it.name || 'Article'}</p>
                       {it.size && <p className="mt-0.5 text-xs text-bone-400">Taille : {it.size}</p>}
@@ -154,6 +176,44 @@ export function CartPage() {
           <Engage icon={Headphones} title="Support dédié" text="À votre écoute 7j/7" />
         </div>
       </Container>
+        <AnimatePresence>
+          {previewImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4"
+              onClick={() => setPreviewImage(null)}
+            >
+              <button
+                type="button"
+                onClick={() => setPreviewImage(null)}
+                aria-label="Fermer l'image"
+                className="absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-ink-950/80 text-bone-100 transition hover:bg-white/10"
+              >
+                <X size={20} />
+              </button>
+
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.92, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="flex max-h-[92vh] max-w-[95vw] flex-col items-center"
+              >
+                <img
+                  src={previewImage.src}
+                  alt={previewImage.name}
+                  className="max-h-[82vh] max-w-[95vw] rounded-2xl object-contain"
+                />
+
+                <p className="mt-4 text-center text-sm font-bold text-bone-100">
+                  {previewImage.name}
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
     </section>
   );
 }

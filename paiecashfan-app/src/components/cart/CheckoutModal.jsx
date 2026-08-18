@@ -15,7 +15,8 @@ import { shippingFee, shippingZone, ZONE_LABEL } from '@/lib/shipping';
 
 const fmt = (n) => new Intl.NumberFormat('fr-FR').format(Number(n || 0));
 const SHIP = { standard: { label: 'Standard', delay: '4 à 6 jours ouvrés' }, express: { label: 'Express', delay: '24-48h' } };
-const STEPS = ['Livraison', 'Paiement', 'Confirmation'];
+//const STEPS = ['Livraison', 'Paiement', 'Confirmation'];
+const STEPS = ['Livraison', 'Paiement', 'Récapitulatif'];
 
 // Grand modal de checkout premium (assistant 3 étapes).
 export function CheckoutModal() {
@@ -42,7 +43,7 @@ function CheckoutInner({ cart, onClose }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(0);            // 0 Livraison · 1 Paiement · 2 Confirmation
+  const [step, setStep] = useState(0);            // 0 Livraison · 1 Paiement · 2 Récapitulatif · 3 Succès
   // Pré-remplissage : on réutilise l'adresse de la dernière commande (stockée en
   // local sur cet appareil) → plus besoin de tout resaisir à chaque fois.
   const [form, setForm] = useState(() => {
@@ -59,21 +60,53 @@ function CheckoutInner({ cart, onClose }) {
   const [payMethod, setPayMethod] = useState('pcc');   // pcc | card
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [validationPopup, setValidationPopup] = useState(false);
   const [topUp, setTopUp] = useState(null);
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(null);    // snapshot pour l'écran de confirmation
   const [failed, setFailed] = useState(null);          // { message } → écran d'échec plein écran
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k) => (e) => { const value = e.target.value;
+    setForm((f) => ({
+      ...f,
+      [k]: value,
+    }));
+
+    if (value.trim()) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[k];
+        return next;
+      });
+    }
+  };
   const feePcc = shippingFee(form.country, shippingMethod);   // frais selon la zone (pays)
   const grandPcc = totalPrice + feePcc;
   const grandEur = totalEur + feePcc;
 
-  const infoOk = form.firstName && form.lastName && form.email && form.address1 && form.postalCode && form.city;
+  //const infoOk = form.firstName && form.lastName && form.email && form.address1 && form.postalCode && form.city;
 
   function goNext() {
     setError('');
-    if (!infoOk) { setError('Renseigne tes informations et ton adresse (champs *).'); return; }
+
+    const errors = {};
+
+    if (!form.firstName.trim()) errors.firstName = true;
+    if (!form.lastName.trim()) errors.lastName = true;
+    if (!form.email.trim()) errors.email = true;
+    if (!form.address1.trim()) errors.address1 = true;
+    if (!form.postalCode.trim()) errors.postalCode = true;
+    if (!form.city.trim()) errors.city = true;
+
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setValidationPopup(true);
+      return;
+    }
+
+    setValidationPopup(false);
     setStep(1);
   }
 
@@ -108,7 +141,7 @@ function CheckoutInner({ cart, onClose }) {
       // PCC → payé immédiatement : on fige le récap puis on vide le panier.
       setConfirmed({ items: [...items], feePcc, grandPcc, grandEur, order: res?.data?.orders?.[0] || null });
       await clear();
-      setStep(2); setPaying(false);
+      setStep(3); setPaying(false);
     } catch (err) {
       const msg = err?.message || 'Paiement impossible pour le moment.';
       // Solde insuffisant → parcours de recharge (plus actionnable) ; sinon écran d'échec.
@@ -122,6 +155,42 @@ function CheckoutInner({ cart, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-6">
+      <AnimatePresence>
+        {validationPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: -15, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -15, scale: 0.96 }}
+            className="fixed inset-x-4 top-6 z-[150] mx-auto max-w-md rounded-2xl border border-rose-500/30 bg-[#160b0d] p-4 shadow-2xl sm:top-10"
+          >
+            <div className="flex items-start gap-3">
+              <XCircle
+                size={22}
+                className="mt-0.5 shrink-0 text-rose-400"
+              />
+
+              <div className="min-w-0 flex-1">
+                <p className="font-black text-bone-50">
+                  Informations manquantes
+                </p>
+
+                <p className="mt-1 text-sm text-bone-300">
+                  Certains champs obligatoires doivent être renseignés avant de continuer.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setValidationPopup(false)}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-bone-400 transition hover:bg-white/10 hover:text-bone-100"
+                aria-label="Fermer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Backdrop */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={paying ? undefined : onClose}
@@ -151,14 +220,14 @@ function CheckoutInner({ cart, onClose }) {
         </div>
 
         {/* Progression */}
-        <ProgressSteps step={failed ? 2 : step} />
+        <ProgressSteps step={failed ? 2 : Math.min(step, 2)} />
 
         {/* Écran d'échec plein écran */}
         {failed ? (
           <div className="min-h-0 flex-1 overflow-y-auto">
             <OrderFailureView
               amountPcc={grandPcc} message={failed.message}
-              onRetry={() => { setFailed(null); setStep(1); }}
+              onRetry={() => { setFailed(null); setStep(2); }}
               onSupport={() => { window.location.href = 'mailto:contact@paiecashfan.com'; }}
               actions={<>
                 <button onClick={() => { setFailed(null); setStep(0); }} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3.5 text-xs font-black uppercase tracking-wider text-bone-200 transition hover:text-bone-50"><ArrowLeft size={15} /> Retour au panier</button>
@@ -166,7 +235,7 @@ function CheckoutInner({ cart, onClose }) {
               </>}
             />
           </div>
-        ) : step === 2 ? (
+        ) : step === 3 ? (
           /* Écran de confirmation plein écran (confettis) */
           <div className="min-h-0 flex-1 overflow-y-auto">
             <OrderSuccessView
@@ -179,18 +248,56 @@ function CheckoutInner({ cart, onClose }) {
           </div>
         ) : (
         /* Corps 2 colonnes */
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <div className={`min-h-0 flex-1 flex-col lg:flex-row ${step === 2 ? 'flex overflow-y-auto' : 'flex overflow-hidden'}`}>
           {/* Gauche (formulaire / confirmation) */}
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 lg:w-[65%]">
-            {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} />}
+          <div className={`flex-1 px-5 py-6 sm:px-8 ${step === 2 ? 'overflow-visible lg:w-[65%]' : 'min-h-0 overflow-y-auto lg:w-full'}`}>
+            {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} fieldErrors={fieldErrors} />}
             {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} />}
+            {step === 2 && <StepRecap form={form} shippingMethod={shippingMethod} payMethod={payMethod} setStep={setStep} />}
             {error && <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
+            {step < 2 && <div className="mt-7 border-t border-white/[0.08] pt-5">
+                <button
+                  type="button"
+                  onClick={step === 0 ? goNext : () => setStep(2)}
+                  disabled={
+                    step === 1 &&
+                    payMethod !== 'pcc' &&
+                    payMethod !== 'card'
+                  }
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-ink-900 transition hover:bg-emerald-300 disabled:opacity-60">
+                  Continuer
+                  <ArrowRight size={15} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={
+                    step === 0
+                      ? onClose
+                      : () => setStep(0)
+                  }
+                  className="mt-2 w-full text-center text-[11px] font-bold uppercase tracking-wider text-bone-500 hover:text-bone-300"
+                >
+                  {step === 0
+                    ? 'Retour au panier'
+                    : 'Modifier la livraison'}
+                </button>
+              </div>
+            }
           </div>
 
           {/* Droite (récap sticky) */}
-          {(
-            <aside className="shrink-0 border-t border-white/[0.06] bg-white/[0.02] px-5 py-6 sm:px-6 lg:w-[35%] lg:border-l lg:border-t-0">
-              <h3 className="text-[10px] uppercase tracking-[0.24em] text-bone-400 font-black">Votre commande</h3>
+          {step === 2 && (
+            <aside className="shrink-0 border-t border-white/[0.06] bg-gradient-to-b from-white/[0.025] to-transparent px-5 py-6 sm:px-6 lg:w-[35%] lg:border-l lg:border-t-0">
+              <div className="mb-5">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
+                    Récapitulatif
+                </p>
+
+                <h3 className="mt-1 font-display text-lg font-black text-bone-50">
+                  Votre commande
+                </h3>
+              </div>
               <div className="mt-4 space-y-3 max-h-[26vh] overflow-y-auto pr-1">
                 {summaryItems.map((it) => (
                   <div key={it.id} className="flex items-center gap-3">
@@ -210,27 +317,40 @@ function CheckoutInner({ cart, onClose }) {
                 <Row label={`Sous-total (${cart.totalItems} art.)`} value={`${fmt(totalPrice)} PCC`} sub={`${fmt(totalEur)} €`} />
                 <Row label="Livraison" value={feePcc ? `${fmt(feePcc)} PCC` : 'Gratuit'} valueCls={feePcc ? '' : 'text-emerald-400'} />
               </div>
-              <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4">
+              <div className="mt-5 flex items-end justify-between rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.05] p-4">
                 <span className="text-xs uppercase tracking-[0.2em] text-bone-400 font-black">Total</span>
                 <div className="text-right">
                   <p className="font-display text-2xl font-black text-emerald-400 tabular-nums leading-none">{fmt(grandPcc)} PCC</p>
                   <p className="mt-1 text-xs text-bone-500">{fmt(grandEur)} €</p>
                 </div>
               </div>
-
-              <button
-                onClick={step === 0 ? goNext : submitOrder}
-                disabled={paying || (step === 1 && payMethod !== 'pcc' && payMethod !== 'card')}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-ink-900 transition hover:bg-emerald-300 disabled:opacity-60"
-              >
-                {paying ? <><Loader2 size={15} className="animate-spin" /> {payMethod === 'card' ? 'Redirection…' : 'Paiement…'}</>
-                  : step === 0 ? <>Continuer <ArrowLeft size={15} className="rotate-180" /></>
-                  : <><Lock size={14} /> Confirmer ma commande</>}
-              </button>
-              <button onClick={step === 0 ? onClose : () => setStep(0)} className="mt-2 w-full text-center text-[11px] font-bold uppercase tracking-wider text-bone-500 hover:text-bone-300">
-                {step === 0 ? 'Retour au panier' : 'Modifier la livraison'}
-              </button>
-              <p className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-[10px] text-bone-600"><ShieldCheck size={12} className="text-emerald-400" /> Paiement 100% sécurisé</p>
+              <div className="mt-5 pb-6">
+                <button
+                  onClick={submitOrder}
+                  disabled={paying || (step === 1 && payMethod !== 'pcc' && payMethod !== 'card')}
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-ink-900 transition hover:bg-emerald-300 disabled:opacity-60">
+                  {paying ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      {payMethod === 'card'
+                        ? 'Redirection…'
+                        : 'Paiement…'}
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={14} />
+                      Valider la commande
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="mt-2 w-full text-center text-[11px] font-bold uppercase tracking-wider text-bone-500 hover:text-bone-300">
+                  Modifier le paiement
+                </button>
+                <p className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-[10px] text-bone-600"><ShieldCheck size={12} className="text-emerald-400" /> Paiement 100% sécurisé</p>
+              </div>
             </aside>
           )}
         </div>
@@ -267,23 +387,217 @@ function ProgressSteps({ step }) {
   );
 }
 
-function StepLivraison({ form, set, shippingMethod, setShippingMethod }) {
+function StepRecap({ form, shippingMethod, payMethod, setStep }) {
+  const recapCards = [
+    {
+      icon: MapPin,
+      title: 'Livraison',
+      content: (
+        <>
+          <p className="font-black text-bone-50">
+            {form.firstName} {form.lastName}
+          </p>
+
+          <p className="mt-1 text-bone-400">
+            {form.address1}
+          </p>
+
+          {form.address2 && (
+            <p className="text-bone-400">
+              {form.address2}
+            </p>
+          )}
+
+          <p className="text-bone-400">
+            {form.postalCode} {form.city}
+          </p>
+
+          <p className="text-bone-400">
+            {form.country}
+          </p>
+
+          <p className="mt-2 text-xs text-bone-500">
+            {form.email}
+          </p>
+        </>
+      ),
+    },
+
+    {
+      icon: Truck,
+      title: 'Mode de livraison',
+      content: (
+        <>
+          <p className="font-black text-bone-50">
+            {shippingMethod === 'express'
+              ? 'Express'
+              : 'Standard'}
+          </p>
+
+          <p className="mt-1 text-sm text-bone-500">
+            {shippingMethod === 'express'
+              ? 'Livraison estimée sous 24-48h'
+              : 'Livraison estimée sous 4 à 6 jours ouvrés'}
+          </p>
+        </>
+      ),
+    },
+
+    {
+      icon: payMethod === 'card' ? CreditCard : Wallet,
+      title: 'Paiement',
+      content: (
+        <>
+          <p className="font-black text-bone-50">
+            {payMethod === 'card'
+              ? 'Carte bancaire'
+              : 'PaieCashCoin (PCC)'}
+          </p>
+
+          <p className="mt-1 text-sm text-bone-500">
+            {payMethod === 'card'
+              ? 'Paiement sécurisé par carte bancaire'
+              : 'Paiement avec votre solde PCC'}
+          </p>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <div className="mb-6">
+        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
+          Dernière étape
+        </p>
+
+        <h3 className="mt-1 font-display text-2xl font-black text-bone-50">
+          Vérifiez votre commande
+        </h3>
+
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-bone-500">
+          Vérifiez vos informations avant de confirmer définitivement votre commande.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {recapCards.map(({ icon: Icon, title, content }) => (
+          <div
+            key={title}
+            className="
+              group
+              rounded-[22px]
+              border border-white/[0.08]
+              bg-gradient-to-br
+              from-white/[0.035]
+              to-white/[0.015]
+              p-5
+              transition
+              hover:border-emerald-400/20
+              hover:bg-emerald-400/[0.02]
+            "
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="
+                  grid h-11 w-11 shrink-0 place-items-center
+                  rounded-2xl
+                  border border-emerald-400/15
+                  bg-emerald-400/[0.08]
+                  text-emerald-400
+                "
+              >
+                <Icon size={19} />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-bone-500">
+                  {title}
+                </p>
+
+                <div className="mt-2 text-sm leading-relaxed">
+                  {content}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (title === 'Paiement') {
+                    setStep(1);
+                  } else {
+                    setStep(0);
+                  }
+                }}
+                className="
+                  hidden
+                  rounded-full
+                  border border-white/10
+                  px-3 py-1.5
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-wider
+                  text-bone-500
+                  transition
+                  hover:border-emerald-400/30
+                  hover:text-emerald-400
+                  sm:block
+                "
+              >
+                Modifier
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div
+        className="
+          mt-5
+          flex items-start gap-3
+          rounded-[20px]
+          border border-emerald-400/15
+          bg-emerald-400/[0.05]
+          p-4
+        "
+      >
+        <ShieldCheck
+          size={19}
+          className="mt-0.5 shrink-0 text-emerald-400"
+        />
+
+        <div>
+          <p className="text-sm font-black text-bone-100">
+            Commande sécurisée
+          </p>
+
+          <p className="mt-1 text-xs leading-relaxed text-bone-500">
+            Vos informations sont protégées et votre paiement est sécurisé.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepLivraison({ form, set, shippingMethod, setShippingMethod, fieldErrors}) {
   return (
     <div>
       <SectionTitle icon={User} title="Informations personnelles" />
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Prénom *" value={form.firstName} onChange={set('firstName')} />
-        <Field label="Nom *" value={form.lastName} onChange={set('lastName')} />
+        <Field label="Prénom *" value={form.firstName} onChange={set('firstName')} error={fieldErrors.firstName} />
+        <Field label="Nom *" value={form.lastName} onChange={set('lastName')} error={fieldErrors.lastName}/>
       </div>
-      <Field label="Adresse mail *" type="email" value={form.email} onChange={set('email')} />
+      <Field label="Adresse mail *" type="email" value={form.email} onChange={set('email')} error={fieldErrors.email}/>
       <Field label="Téléphone" value={form.phone} onChange={set('phone')} />
 
       <SectionTitle icon={MapPin} title="Adresse de livraison" className="mt-7" />
-      <Field label="Adresse *" value={form.address1} onChange={set('address1')} />
+      <Field label="Adresse *" value={form.address1} onChange={set('address1')} error={fieldErrors.address1}/>
       <Field label="Complément" value={form.address2} onChange={set('address2')} />
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Code postal *" value={form.postalCode} onChange={set('postalCode')} />
-        <Field label="Ville *" value={form.city} onChange={set('city')} />
+        <Field label="Code postal *" value={form.postalCode} onChange={set('postalCode')}  error={fieldErrors.postalCode}/>
+        <Field label="Ville *" value={form.city} onChange={set('city')} error={fieldErrors.city}/>
       </div>
       <Field label="Pays" value={form.country} onChange={set('country')} />
 
@@ -339,14 +653,23 @@ function SectionTitle({ icon: Icon, title, className = '' }) {
   );
 }
 
-function Field({ label, value, onChange, type = 'text' }) {
+function Field({ label, value, onChange, type = 'text', error = false }) {
   return (
     <label className="mb-3 block">
       <span className="text-[10px] uppercase tracking-[0.18em] text-bone-400 font-bold">{label}</span>
       <input
         type={type} value={value} onChange={onChange}
-        className="mt-1.5 h-[58px] w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 text-sm text-bone-100 outline-none transition placeholder:text-bone-600 focus:border-emerald-400/60 focus:bg-emerald-400/[0.03] focus:ring-1 focus:ring-emerald-400/40"
+        className={`mt-1.5 h-[58px] w-full rounded-2xl border bg-white/[0.02] px-4 text-sm text-bone-100 outline-none transition placeholder:text-bone-600 ${
+        error
+          ? 'border-rose-500 bg-rose-500/[0.05] ring-1 ring-rose-500/40 focus:border-rose-500 focus:ring-rose-500/50'
+          : 'border-white/[0.08] focus:border-emerald-400/60 focus:bg-emerald-400/[0.03] focus:ring-1 focus:ring-emerald-400/40'
+        }`}
       />
+      {error && (
+        <span className="mt-1.5 block text-xs font-medium text-rose-400">
+          Ce champ est obligatoire.
+        </span>
+      )}
     </label>
   );
 }
