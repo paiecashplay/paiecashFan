@@ -126,20 +126,34 @@ export function HeroSearch() {
   return (
     <div ref={containerRef} className="relative w-full max-w-2xl">
       <div className={cn(
-        'glass-strong rounded-full flex items-center pl-6 pr-2 h-16',
+        // Mobile
+        'glass-strong rounded-3xl flex flex-col gap-3 p-3',
+
+        // Desktop : comportement d'origine inchangé
+        'sm:rounded-full sm:flex-row sm:items-center sm:gap-0 sm:pl-6 sm:pr-2 sm:py-0 sm:h-16',
+
         'transition-shadow duration-300',
         open && query ? 'shadow-glow-emerald' : 'shadow-glow-emerald/30'
       )}>
-        <Search size={18} className="text-bone-400 shrink-0" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          placeholder="Rechercher une équipe, un club, une fédération un produit…"
-          className="flex-1 bg-transparent border-0 outline-none px-4 text-bone-100 placeholder:text-bone-500 text-base"
-        />
-        <Button size="md" className="shrink-0">
+        <div className="flex h-14 w-full items-center sm:h-full sm:min-w-0 sm:flex-1">
+          <Search size={18} className="text-bone-400 shrink-0" />
+
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            placeholder="Rechercher une équipe, un club, une fédération un produit…"
+            className="min-w-0 flex-1 bg-transparent border-0 outline-none px-4 text-bone-100 placeholder:text-bone-500 text-base"
+          />
+        </div>
+
+        <Button
+          size="md"
+          className="w-full shrink-0 justify-center sm:w-auto">
           Chercher
           <ArrowRight size={16} />
         </Button>
