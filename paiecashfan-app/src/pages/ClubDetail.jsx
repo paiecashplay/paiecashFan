@@ -1221,7 +1221,7 @@ function getProductEuroPrice(product) {
 //
 // Panier persisté via useCart : items au format order_items
 //   { id, product_id, size, quantity, unit_price_pcc, total_pcc }
-function MerchandiseSection({ club, apiProducts = [] }) {
+export function MerchandiseSection({ club, apiProducts = [] }) {
   const products = useMemo(() => {
     // Priorité : produits Supabase si disponibles, sinon données statiques
     if (apiProducts.length > 0) {
