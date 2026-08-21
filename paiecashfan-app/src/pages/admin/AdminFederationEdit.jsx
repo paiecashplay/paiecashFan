@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Loader2, Check, X, Globe, Plus, Pencil,
-  Star, ExternalLink, Download, Trash2
+  Star, ExternalLink, Download, Trash2, Users, Shield
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -38,6 +38,161 @@ export function AdminFederationEdit() {
   const [members, setMembers] = useState([]);
   const [toast, setToast] = useState(null);
 
+  const [tab, setTab] = useState('info');
+
+  const [nationalTeams, setNationalTeams] = useState({
+    men: [],
+    women: [],
+    youth: [],
+  });
+
+  const [teamsLoading, setTeamsLoading] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+
+  const [teamPlayers, setTeamPlayers] = useState([]);
+  const [playersLoading, setPlayersLoading] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+
+  async function loadNationalTeams() {
+    setTeamsLoading(true);
+
+    try {
+      const json = await apiFetch(
+        `/api/v2/admin/clubs-crud/federations/${id}/national-teams`
+      );
+
+      if (!json.success) {
+        throw new Error(json.error);
+      }
+
+      setNationalTeams(
+        json.data?.nationalTeams || {
+          men: [],
+          women: [],
+          youth: [],
+        }
+      );
+    } catch (e) {
+      showToast(
+        'Erreur sélections : ' + e.message,
+        false
+      );
+    } finally {
+      setTeamsLoading(false);
+    }
+  }
+
+  async function loadTeamPlayers(team) {
+    setSelectedTeam(team);
+    setPlayersLoading(true);
+
+    try {
+      const json = await apiFetch(
+        `/api/v2/admin/clubs-crud/federations/${id}/national-teams/${team.id}/players`
+      );
+
+      if (!json.success) {
+        throw new Error(json.error);
+      }
+
+      setTeamPlayers(
+        json.data?.players || []
+      );
+    } catch (e) {
+      showToast(
+        'Erreur effectif : ' + e.message,
+        false
+      );
+
+      setTeamPlayers([]);
+    } finally {
+      setPlayersLoading(false);
+    }
+  }
+
+  async function savePlayer(playerId, form) {
+    try {
+      const json = await apiFetch(
+        `/api/v2/admin/clubs-crud/federations/${id}/national-teams/${selectedTeam.id}/players/${playerId}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(form),
+        }
+      );
+
+      if (!json.success) {
+        throw new Error(json.error);
+      }
+
+      showToast('Joueur mis à jour');
+      setEditingPlayer(null);
+
+      await loadTeamPlayers(selectedTeam);
+    } catch (e) {
+      showToast(
+        'Erreur : ' + e.message,
+        false
+      );
+    }
+  }
+
+  async function deletePlayer(player) {
+    const confirmed = confirm(
+      `Supprimer « ${player.name} » de cette sélection ?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const json = await apiFetch(
+        `/api/v2/admin/clubs-crud/federations/${id}/national-teams/${selectedTeam.id}/players/${player.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!json.success) {
+        throw new Error(json.error);
+      }
+
+      showToast('Joueur supprimé');
+
+      await loadTeamPlayers(selectedTeam);
+    } catch (e) {
+      showToast(
+        'Erreur : ' + e.message,
+        false
+      );
+    }
+  }
+
+  async function addManualPlayer(form) {
+    try {
+      const json = await apiFetch(
+        `/api/v2/admin/clubs-crud/federations/${id}/national-teams/${selectedTeam.id}/players`,
+        {
+          method: 'POST',
+          body: JSON.stringify(form),
+        }
+      );
+
+      if (!json.success) {
+        throw new Error(json.error);
+      }
+
+      showToast('Joueur ajouté');
+      setEditingPlayer(null);
+
+      await loadTeamPlayers(selectedTeam);
+    } catch (e) {
+      showToast(
+        'Erreur : ' + e.message,
+        false
+      );
+    }
+  }
+
   function showToast(msg, ok = true) { setToast({ msg, ok }); setTimeout(() => setToast(null), 3000); }
 
   async function loadAll() {
@@ -50,6 +205,12 @@ export function AdminFederationEdit() {
     setLoading(false);
   }
   useEffect(() => { loadAll(); }, [id]);
+
+  useEffect(() => {
+    if (tab === 'national-teams') {
+      loadNationalTeams();
+    }
+  }, [tab]);
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 size={28} className="text-emerald-400 animate-spin" /></div>;
   if (!fed) return <div className="py-12 text-center text-sm text-bone-500">Fédération introuvable.</div>;
@@ -321,6 +482,225 @@ function MembersSection({ fed, members, hub, navigate, onCreateHub, onImportClub
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NationalTeamsAdminSection({
+  teams,
+  loading,
+  onEditTeam,
+  onOpenPlayers,
+  selectedTeam,
+  players,
+  playersLoading,
+  onEditPlayer,
+  onDeletePlayer,
+  onAddPlayer,
+}) {
+  const allTeams = [
+    ...(teams?.men || []),
+    ...(teams?.women || []),
+    ...(teams?.youth || []),
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5">
+        <div className="mb-5">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+            Sélections nationales
+          </h2>
+
+          <p className="mt-1 text-xs text-bone-400">
+            {allTeams.length} sélection
+            {allTeams.length > 1 ? 's' : ''} détectée
+            {allTeams.length > 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-sm text-bone-500">
+            <Loader2
+              size={20}
+              className="mx-auto mb-3 animate-spin"
+            />
+
+            Chargement des sélections…
+          </div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {allTeams.map((team) => (
+              <div
+                key={team.id}
+                className="rounded-xl border border-white/8 bg-white/[0.02] p-4"
+              >
+                <div className="flex items-start gap-3">
+                  {team.logo ? (
+                    <img
+                      src={team.logo}
+                      alt=""
+                      className="h-12 w-12 shrink-0 object-contain"
+                    />
+                  ) : (
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/5">
+                      <Shield size={18} />
+                    </div>
+                  )}
+
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-bone-100">
+                      {team.name}
+                    </p>
+
+                    <p className="mt-1 text-[10px] uppercase tracking-wider text-bone-500">
+                      {team.category} · {team.gender}
+                    </p>
+
+                    <p className="mt-1 text-[10px] font-mono text-bone-600">
+                      API #{team.id}
+                    </p>
+                  </div>
+
+                  <span
+                    className={cn(
+                      'rounded-full border px-2 py-1 text-[9px] font-bold uppercase',
+                      team.enabled === false
+                        ? 'border-red-500/20 bg-red-500/10 text-red-400'
+                        : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                    )}
+                  >
+                    {team.enabled === false
+                      ? 'Masquée'
+                      : 'Active'}
+                  </span>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => onEditTeam(team)}
+                    className="flex h-8 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-bold text-bone-300 hover:text-emerald-400"
+                  >
+                    <Pencil size={12} />
+                    Modifier
+                  </button>
+
+                  <button
+                    onClick={() => onOpenPlayers(team)}
+                    className="flex h-8 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-bold text-bone-300 hover:text-emerald-400"
+                  >
+                    <Users size={12} />
+                    Effectif
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedTeam && (
+        <div className="rounded-2xl border border-white/8 bg-ink-800/40 p-5">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                Effectif
+              </h2>
+
+              <p className="mt-1 text-sm font-semibold text-bone-100">
+                {selectedTeam.name}
+              </p>
+            </div>
+
+            <button
+              onClick={onAddPlayer}
+              className="flex h-9 items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/15 px-4 text-xs font-bold text-emerald-400"
+            >
+              <Plus size={13} />
+              Ajouter un joueur
+            </button>
+          </div>
+
+          {playersLoading ? (
+            <div className="py-10 text-center">
+              <Loader2
+                size={20}
+                className="mx-auto animate-spin text-emerald-400"
+              />
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-white/8">
+              <table className="w-full text-sm">
+                <tbody>
+                  {players.map((player) => (
+                    <tr
+                      key={player.id}
+                      className="border-b border-white/5 last:border-0"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {player.photo && (
+                            <img
+                              src={player.photo}
+                              alt=""
+                              className="h-9 w-9 rounded-full object-cover"
+                            />
+                          )}
+
+                          <div>
+                            <p className="font-semibold text-bone-100">
+                              {player.name}
+                            </p>
+
+                            <p className="text-[10px] text-bone-500">
+                              {player.source === 'manual'
+                                ? 'Ajout manuel'
+                                : 'API-Football'}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-3 text-xs text-bone-400">
+                        {player.number ?? '—'}
+                      </td>
+
+                      <td className="px-4 py-3 text-xs text-bone-400">
+                        {player.position || '—'}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() =>
+                              onEditPlayer({
+                                ...player,
+                                mode: 'edit',
+                              })
+                            }
+                            className="grid h-7 w-7 place-items-center rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-emerald-400"
+                          >
+                            <Pencil size={12} />
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              onDeletePlayer(player)
+                            }
+                            className="grid h-7 w-7 place-items-center rounded-lg border border-red-500/20 bg-red-500/5 text-red-400"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -381,6 +381,774 @@ router.get('/federations/:id/members', async (req, res) => {
   }
 });
 
+// GET /api/v2/admin/clubs-crud/federations/:id/national-teams
+router.get('/federations/:id/national-teams', async (req, res) => {
+  try {
+    const { data: federation, error } = await supabase
+      .from('federations')
+      .select(`
+        id,
+        name,
+        country,
+        country_code,
+        metadata
+      `)
+      .eq('id', req.params.id)
+      .single();
+
+    if (error || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const apiTeams = await apiFootball.getNationalTeamsByCountry(
+      federation.country,
+      federation.country_code
+    );
+
+    const config =
+      federation.metadata?.nationalTeams?.teams || {};
+
+    const applyOverrides = (teams = []) =>
+      teams.map((team) => {
+        const override = config[String(team.id)] || {};
+
+        return {
+          ...team,
+
+          // Valeurs originales API conservées
+          apiName: team.name,
+          apiLogo: team.logo,
+
+          // Personnalisation PaieCashFan
+          name:
+            override.displayName ||
+            team.name,
+
+          logo:
+            override.logo ||
+            team.logo,
+
+          gender:
+            override.gender ||
+            team.gender,
+
+          category:
+            override.category ||
+            team.category,
+
+          enabled:
+            override.enabled !== false,
+
+          displayOrder:
+            Number(
+              override.displayOrder ?? 0
+            ),
+        };
+      });
+
+    const nationalTeams = {
+      men: applyOverrides(apiTeams.men),
+      women: applyOverrides(apiTeams.women),
+      youth: applyOverrides(apiTeams.youth),
+    };
+
+    return ok(res, {
+      federation: {
+        id: federation.id,
+        name: federation.name,
+      },
+      nationalTeams,
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] GET error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.response?.data?.message ||
+        err.message,
+      500
+    );
+  }
+});
+
+// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
+router.put('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
+  try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+      const playerId = String(req.params.playerId);
+
+      const {
+        name,
+        number,
+        position,
+        photo,
+        hidden,
+      } = req.body || {};
+
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      const metadata = {
+        ...(federation.metadata || {}),
+      };
+
+      const nationalTeams = {
+        ...(metadata.nationalTeams || {}),
+      };
+
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const overrides = {
+        ...(playersConfig.overrides || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const isManual = playerId.startsWith('local-');
+
+      // ─────────────────────────────────────
+      // JOUEUR MANUEL
+      // ─────────────────────────────────────
+      if (isManual) {
+        const index = localPlayers.findIndex(
+          (player) => String(player.id) === playerId
+        );
+
+        if (index === -1) {
+          return fail(res, 'Joueur manuel introuvable', 404);
+        }
+
+        const previous = localPlayers[index];
+
+        const updatedPlayer = {
+          ...previous,
+
+          ...(name !== undefined
+            ? { name: String(name).trim() }
+            : {}),
+
+          ...(number !== undefined
+            ? {
+                number:
+                  number === '' || number === null
+                    ? null
+                    : Number(number),
+              }
+            : {}),
+
+          ...(position !== undefined
+            ? { position: position || null }
+            : {}),
+
+          ...(photo !== undefined
+            ? { photo: photo || null }
+            : {}),
+
+          ...(hidden !== undefined
+            ? { hidden: Boolean(hidden) }
+            : {}),
+        };
+
+        if (!updatedPlayer.name) {
+          return fail(res, 'Le nom du joueur est obligatoire', 400);
+        }
+
+        localPlayers[index] = updatedPlayer;
+
+        playersConfig.local = localPlayers;
+      }
+
+      // ─────────────────────────────────────
+      // JOUEUR API-FOOTBALL
+      // ─────────────────────────────────────
+      else {
+        const previous = {
+          ...(overrides[playerId] || {}),
+        };
+
+        overrides[playerId] = {
+          ...previous,
+
+          ...(name !== undefined
+            ? { name: String(name).trim() }
+            : {}),
+
+          ...(number !== undefined
+            ? {
+                number:
+                  number === '' || number === null
+                    ? null
+                    : Number(number),
+              }
+            : {}),
+
+          ...(position !== undefined
+            ? { position: position || null }
+            : {}),
+
+          ...(photo !== undefined
+            ? { photo: photo || null }
+            : {}),
+
+          ...(hidden !== undefined
+            ? { hidden: Boolean(hidden) }
+            : {}),
+        };
+
+        playersConfig.overrides = overrides;
+      }
+
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+
+      const { error: updateError } = await supabase
+        .from('federations')
+        .update({ metadata })
+        .eq('id', federationId);
+
+      if (updateError) throw updateError;
+
+      return ok(res, {
+        teamId,
+        playerId,
+        source: isManual ? 'manual' : 'api',
+        updated: true,
+      });
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] PUT player error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || 'Impossible de modifier le joueur',
+        500
+      );
+    }
+  }
+);
+
+// POST /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
+router.post('/federations/:id/national-teams/:teamId/players', async (req, res) => {
+  try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+
+      const {
+        name,
+        number,
+        position,
+        photo,
+      } = req.body || {};
+
+      // ── Validation minimale ──────────────────────────────
+      if (!name || !String(name).trim()) {
+        return fail(res, 'Le nom du joueur est obligatoire', 400);
+      }
+
+      // ── Récupération de la fédération ───────────────────
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      // ── Préserver tout le metadata existant ─────────────
+      const metadata = {
+        ...(federation.metadata || {}),
+      };
+
+      const nationalTeams = {
+        ...(metadata.nationalTeams || {}),
+      };
+
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      // ID local indépendant des IDs API-Football
+      const localId = `local-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+
+      const newPlayer = {
+        id: localId,
+        name: String(name).trim(),
+
+        number:
+          number === '' ||
+          number === null ||
+          number === undefined
+            ? null
+            : Number(number),
+
+        position:
+          position || null,
+
+        photo:
+          photo || null,
+
+        hidden: false,
+      };
+
+      localPlayers.push(newPlayer);
+
+      playersConfig.local = localPlayers;
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+
+      // ── Sauvegarde ──────────────────────────────────────
+      const { error: updateError } = await supabase
+        .from('federations')
+        .update({ metadata })
+        .eq('id', federationId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return ok(
+        res,
+        {
+          teamId,
+          player: {
+            ...newPlayer,
+            source: 'manual',
+          },
+        },
+        201
+      );
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] POST player error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || 'Impossible d’ajouter le joueur',
+        500
+      );
+    }
+  }
+);
+
+// GET /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
+router.get('/federations/:id/national-teams/:teamId/players', async (req, res) => {
+  try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      // Récupère l'effectif officiel depuis API-Football
+      const apiTeam = await apiFootball.getTeam(Number(teamId));
+
+      if (!apiTeam) {
+        return fail(res, 'Sélection introuvable', 404);
+      }
+
+      const enrichedTeam = await apiFootball.enrichNationalTeamWithPlayers(apiTeam);
+
+      const apiPlayers = enrichedTeam?.players || [];
+
+      const teamConfig = federation.metadata?.nationalTeams?.teams?.[teamId] || {};
+
+      const playerConfig = teamConfig.players || {};
+
+      const overrides = playerConfig.overrides || {};
+
+      const localPlayers = playerConfig.local || [];
+
+      // Fusion API + personnalisations admin
+      const players = apiPlayers
+        .map((entry) => {
+          const rawPlayer = entry?.player || entry;
+
+          const playerId = String(rawPlayer?.id);
+
+          const override =
+            overrides[playerId] || {};
+
+          return {
+            ...entry,
+
+            player: entry?.player
+              ? {
+                  ...entry.player,
+                  name:
+                    override.name ??
+                    entry.player.name,
+
+                  photo:
+                    override.photo ??
+                    entry.player.photo,
+                }
+              : undefined,
+
+            id:
+              rawPlayer?.id,
+
+            name:
+              override.name ??
+              rawPlayer?.name,
+
+            number:
+              override.number ??
+              entry?.number ??
+              entry?.statistics?.[0]?.games?.number ??
+              null,
+
+            position:
+              override.position ??
+              entry?.position ??
+              entry?.statistics?.[0]?.games?.position ??
+              null,
+
+            photo:
+              override.photo ??
+              rawPlayer?.photo ??
+              null,
+
+            hidden:
+              override.hidden === true,
+
+            source: 'api',
+          };
+        })
+        .filter((p) => !p.hidden);
+
+      // Joueurs ajoutés manuellement
+      const manualPlayers = localPlayers
+        .filter((p) => p.hidden !== true)
+        .map((p) => ({
+          ...p,
+          source: 'manual',
+        }));
+
+      return ok(res, {
+        team: {
+          id: enrichedTeam.id || Number(teamId),
+          name:
+            teamConfig.displayName ||
+            enrichedTeam.name,
+        },
+
+        players: [
+          ...players,
+          ...manualPlayers,
+        ],
+      });
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] GET players error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || "Impossible de récupérer l'effectif",
+        500
+      );
+    }
+  }
+);
+
+// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
+router.put('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
+  try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+      const playerId = String(req.params.playerId);
+
+      const {
+        name,
+        number,
+        position,
+        photo,
+        hidden,
+      } = req.body || {};
+
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      const metadata = {
+        ...(federation.metadata || {}),
+      };
+
+      const nationalTeams = {
+        ...(metadata.nationalTeams || {}),
+      };
+
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const overrides = {
+        ...(playersConfig.overrides || {}),
+      };
+
+      const previous = {
+        ...(overrides[playerId] || {}),
+      };
+
+      overrides[playerId] = {
+        ...previous,
+
+        ...(name !== undefined
+          ? { name: String(name).trim() }
+          : {}),
+
+        ...(number !== undefined
+          ? {
+              number:
+                number === '' || number === null
+                  ? null
+                  : Number(number),
+            }
+          : {}),
+
+        ...(position !== undefined
+          ? { position: position || null }
+          : {}),
+
+        ...(photo !== undefined
+          ? { photo: photo || null }
+          : {}),
+
+        ...(hidden !== undefined
+          ? { hidden: Boolean(hidden) }
+          : {}),
+      };
+
+      playersConfig.overrides = overrides;
+
+      teamConfig.players = playersConfig;
+
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+
+      const { data: updatedFederation, error: updateError } = await supabase
+        .from('federations')
+        .update({ metadata })
+        .eq('id', federationId)
+        .select('id, name, metadata')
+        .single();
+
+      if (updateError) throw updateError;
+
+      return ok(res, {
+        federation: updatedFederation,
+        teamId,
+        playerId,
+        config: overrides[playerId],
+      });
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] PUT player error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || 'Impossible de modifier le joueur',
+        500
+      );
+    }
+  }
+);
+
+// DELETE /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
+router.delete('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
+    try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+      const playerId = String(req.params.playerId);
+
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      const metadata = {
+        ...(federation.metadata || {}),
+      };
+
+      const nationalTeams = {
+        ...(metadata.nationalTeams || {}),
+      };
+
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const overrides = {
+        ...(playersConfig.overrides || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const isManual = playerId.startsWith('local-');
+
+      // Joueur manuel : suppression réelle du metadata
+      if (isManual) {
+        const exists = localPlayers.some(
+          (player) => String(player.id) === playerId
+        );
+
+        if (!exists) {
+          return fail(res, 'Joueur manuel introuvable', 404);
+        }
+
+        playersConfig.local = localPlayers.filter(
+          (player) => String(player.id) !== playerId
+        );
+      }
+
+      // Joueur API : on le masque
+      else {
+        overrides[playerId] = {
+          ...(overrides[playerId] || {}),
+          hidden: true,
+        };
+
+        playersConfig.overrides = overrides;
+      }
+
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+
+      const { error: updateError } = await supabase
+        .from('federations')
+        .update({ metadata })
+        .eq('id', federationId);
+
+      if (updateError) throw updateError;
+
+      return ok(res, {
+        teamId,
+        playerId,
+        source: isManual ? 'manual' : 'api',
+        deleted: true,
+      });
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] DELETE player error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || 'Impossible de supprimer le joueur',
+        500
+      );
+    }
+  }
+);
+
 // POST /api/v2/admin/clubs-crud/federations — créer une fédération (hero complet)
 router.post('/federations', async (req, res) => {
   try {
