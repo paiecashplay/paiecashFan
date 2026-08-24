@@ -7,8 +7,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Save, Upload, Loader2, Check, X, Globe, Plus, Pencil,
-  Star, ExternalLink, Download, Trash2
+  Star, ExternalLink, Download, Trash2, ShoppingBag
 } from 'lucide-react';
+import { ProductsTab } from '@/pages/admin/AdminClubEdit';
 import { apiFetch } from '@/lib/api';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { cn } from '@/lib/cn';
@@ -37,6 +38,7 @@ export function AdminFederationEdit() {
   const [fed, setFed] = useState(null);
   const [members, setMembers] = useState([]);
   const [toast, setToast] = useState(null);
+  const [tab, setTab] = useState('info');
 
   function showToast(msg, ok = true) { setToast({ msg, ok }); setTimeout(() => setToast(null), 3000); }
 
@@ -76,10 +78,61 @@ export function AdminFederationEdit() {
         )}
       </div>
 
-      {/* ─── Infos hero ─────────────────────────────────────────── */}
-      <FederationInfoForm fed={fed} onSaved={(f) => { setFed(f); showToast('Fédération sauvegardée'); }} />
+      <div className="flex w-fit gap-1 rounded-xl border border-white/8 bg-ink-800/40 p-1">
+        <button
+          onClick={() => setTab('info')}
+          className={cn(
+            'flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all',
+            tab === 'info'
+              ? 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-400'
+              : 'text-bone-400 hover:text-bone-200'
+          )}
+        >
+          <Globe size={13} />
+          Infos
+        </button>
 
-      {/* ─── Clubs membres ──────────────────────────────────────── */}
+        <button
+          onClick={() => setTab('members')}
+          className={cn(
+            'flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all',
+            tab === 'members'
+              ? 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-400'
+              : 'text-bone-400 hover:text-bone-200'
+          )}
+        >
+          <Star size={13} />
+          Clubs membres
+        </button>
+
+        <button
+          onClick={() => setTab('products')}
+          disabled={!hub}
+          title={!hub ? 'Créez d’abord le hub de cette fédération' : 'Gérer la boutique'}
+          className={cn(
+            'flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all',
+            'disabled:cursor-not-allowed disabled:opacity-40',
+            tab === 'products'
+              ? 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-400'
+              : 'text-bone-400 hover:text-bone-200'
+          )}
+        >
+          <ShoppingBag size={13} />
+          Boutique
+        </button>
+      </div>
+
+      {tab === 'info' && (
+        <FederationInfoForm
+          fed={fed}
+          onSaved={(f) => {
+            setFed(f);
+            showToast('Fédération sauvegardée');
+          }}
+        />
+      )}
+
+     {tab === 'members' && (
       <MembersSection
         fed={fed}
         members={members}
@@ -87,27 +140,66 @@ export function AdminFederationEdit() {
         navigate={navigate}
         onCreateHub={async () => {
           try {
-            const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${fed.id}/create-hub`, { method: 'POST' });
+            const json = await apiFetch(
+              `/api/v2/admin/clubs-crud/federations/${fed.id}/create-hub`,
+              { method: 'POST' }
+            );
+
             if (!json.success) throw new Error(json.error);
-            showToast(json.data.created ? 'Hub créé' : 'Hub déjà existant');
+
+            showToast(
+              json.data.created
+                ? 'Hub créé'
+                : 'Hub déjà existant'
+            );
+
             loadAll();
-          } catch (e) { showToast('Erreur : ' + e.message, false); }
+          } catch (e) {
+            showToast('Erreur : ' + e.message, false);
+          }
         }}
         onImportClubs={async () => {
-          const json = await apiFetch(`/api/v2/admin/clubs-crud/federations/${fed.id}/import-clubs`, { method: 'POST' });
+          const json = await apiFetch(
+            `/api/v2/admin/clubs-crud/federations/${fed.id}/import-clubs`,
+            { method: 'POST' }
+          );
+
           if (!json.success) throw new Error(json.error);
+
           const { added, skipped, found } = json.data;
-          showToast(`${added} club(s) importé(s)${skipped ? `, ${skipped} déjà présent(s)` : ''} sur ${found}`);
+
+          showToast(
+            `${added} club(s) importé(s)${
+              skipped ? `, ${skipped} déjà présent(s)` : ''
+            } sur ${found}`
+          );
+
           loadAll();
           return json.data;
         }}
         onDeleteClub={async (club) => {
-          const json = await apiFetch(`/api/v2/admin/clubs-crud/clubs/${club.id}`, { method: 'DELETE' });
+          const json = await apiFetch(
+            `/api/v2/admin/clubs-crud/clubs/${club.id}`,
+            { method: 'DELETE' }
+          );
+
           if (!json.success) throw new Error(json.error);
+
           showToast(`« ${club.name} » supprimé`);
-          setMembers((ms) => ms.filter((m) => m.id !== club.id));
+
+          setMembers((ms) =>
+            ms.filter((m) => m.id !== club.id)
+          );
         }}
       />
+     )}
+
+     {tab === 'products' && hub && (
+        <ProductsTab
+          tenantId={hub.id}
+          showToast={showToast}
+        />
+      )}
 
       <AnimatePresence>
         {toast && (

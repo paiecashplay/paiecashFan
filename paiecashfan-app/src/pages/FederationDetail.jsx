@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart, ShoppingBag } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -15,6 +15,7 @@ import { conmebolMembers } from '@/data/conmebol-members';
 import { concacafMembers } from '@/data/concacaf-members';
 import { afcMembers } from '@/data/afc-members';
 import { cn } from '@/lib/cn';
+import { MerchandiseSection } from '@/pages/ClubDetail';
 
 // ── Registry des datasets par fédération ───────────────────────────
 // Chaque entrée : { members, founded, heroVideo?, heroGradient? }
@@ -87,7 +88,7 @@ export function FederationDetail() {
   const isStaticConfed = Boolean(datasets[fedId]);
 
   // API-first uniquement pour les autres slugs (fédérations nationales en base)
-  const { federation: dbFed, members: dbMembers, loading } =
+  const { federation: dbFed, members: dbMembers, hub: dbHub, products: dbProducts, loading } =
     useFederationDetail(isStaticConfed ? null : fedId);
 
   // 1) Confédération statique → inchangé
@@ -98,7 +99,8 @@ export function FederationDetail() {
 
   // 2) Fédération nationale en base → vue dynamique
   if (loading) return <FedLoading />;
-  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} />;
+  if (dbFed) return <DynamicFederationView federation={dbFed} 
+      members={dbMembers} hub={dbHub} products={dbProducts}/>;
 
   // 3) Repli : entrée statique sans dataset, ou inconnue
   const federation = federations.find((f) => f.id === fedId);
@@ -129,7 +131,7 @@ const DIVISION_RANK = {
 };
 const divisionRank = (name) => DIVISION_RANK[name] ?? 50;
 
-function DynamicFederationView({ federation, members }) {
+function DynamicFederationView({ federation, members, hub, products }) {
   const reduce = useReducedMotion();
   const color = federation.primary_color || '#10b981';
   const clubs = (members || []).map((m) => ({
@@ -176,7 +178,7 @@ function DynamicFederationView({ federation, members }) {
   return (
     <>
       {/* Dock d'actions flottant (bas centré, ou rail gauche sur très grand écran) */}
-      <FedSideActions primaryColor={color} />
+      <FedSideActions primaryColor={color} hasProducts={products?.length > 0} />
 
       {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
       <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
@@ -242,6 +244,7 @@ function DynamicFederationView({ federation, members }) {
 
       {/* Contenu sous le hero : voie réservée à gauche (md→2xl) pour le rail. */}
       <div className="md:pl-24 2xl:pl-0">
+        {/* Clubs membres */}
         {clubs.length > 0 ? (
           groups.map((g) => (
             <FederationClubsGrid
@@ -256,6 +259,22 @@ function DynamicFederationView({ federation, members }) {
           <Container className="py-20 text-center text-sm text-bone-400">
             Aucun club rattaché à cette fédération pour le moment.
           </Container>
+        )}
+
+        {/* Boutique de la fédération */}
+        {products?.length > 0 && hub && (
+          <MerchandiseSection
+            club={{
+              slug: hub.slug,
+              name: federation.name,
+              primaryColor:
+                federation.primary_color ||
+                hub.primary_color ||
+                '#10b981',
+              merchandise: []
+            }}
+            apiProducts={products}
+          />
         )}
       </div>
 
@@ -301,7 +320,7 @@ function FedStat({ value, label, accent = '#10b981', reduce = false }) {
 // Réutilise le dock partagé (SideDock). Le bouton « Boutique » des clubs est
 // remplacé par « Clubs » (ballon) placé EN PREMIER : une fédération liste des
 // clubs, pas des produits.
-function FedSideActions({ primaryColor }) {
+function FedSideActions({ primaryColor, hasProducts = false }) {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -317,6 +336,9 @@ function FedSideActions({ primaryColor }) {
 
   const actions = [
     { key: 'clubs', icon: Volleyball, label: 'Clubs',      onClick: () => scrollTo('clubs') },
+    ...(hasProducts
+    ? [{key: 'shop', icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise')}]
+    : []),
     { key: 'play',  icon: Trophy,     label: 'Palmarès',   onClick: () => scrollTo('trophies') },
     { key: 'games', icon: Dices,      label: 'Effectif',   onClick: () => scrollTo('squad') },
     { key: 'like',  icon: Heart,      label: 'J\'aime' },

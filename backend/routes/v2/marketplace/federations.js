@@ -73,13 +73,43 @@ router.get('/:slugOrId', async (req, res) => {
     ]);
 
     if (membersRes.error) throw membersRes.error;
+    if (hubRes.error) throw hubRes.error;
+
+    const hub = hubRes.data || null;
+
+    let products = [];
+
+    if (hub?.id) {
+      const { data: hubProducts, error: productsErr } = await supabase
+        .from('products')
+        .select(`
+          id,
+          name,
+          description,
+          eur_price,
+          pcc_price,
+          images,
+          sizes,
+          category_slug,
+          display_order,
+          status
+        `)
+        .eq('tenant_id', hub.id)
+        .eq('status', 'active')
+        .order('display_order', { ascending: true });
+
+      if (productsErr) throw productsErr;
+
+      products = hubProducts || [];
+    }
 
     return ok(res, {
       federation,
-      hub:     hubRes.data || null,
+      hub,
       members: membersRes.data || [],
       players,
-      trophies
+      trophies,
+      products
     });
   } catch (err) {
     console.error('[federations] GET /:slugOrId error:', err.message);
