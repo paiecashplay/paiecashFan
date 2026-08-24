@@ -475,9 +475,246 @@ router.get('/federations/:id/national-teams', async (req, res) => {
   }
 });
 
+// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId
+router.put('/federations/:id/national-teams/:teamId', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+
+    const {
+      displayName,
+      gender,
+      category,
+      logo,
+      enabled,
+      displayOrder,
+    } = req.body || {};
+
+    // 1. Récupérer la fédération + metadata actuel
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    // 2. Préserver tout le metadata existant
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const teams = {
+      ...(nationalTeams.teams || {}),
+    };
+
+    const previous = {
+      ...(teams[teamId] || {}),
+    };
+
+    // 3. Sauvegarder uniquement la configuration PaieCashFan
+    teams[teamId] = {
+      ...previous,
+
+      ...(displayName !== undefined
+        ? { displayName: String(displayName).trim() }
+        : {}),
+
+      ...(gender !== undefined
+        ? { gender }
+        : {}),
+
+      ...(category !== undefined
+        ? { category }
+        : {}),
+
+      ...(logo !== undefined
+        ? { logo: logo || null }
+        : {}),
+
+      ...(enabled !== undefined
+        ? { enabled: Boolean(enabled) }
+        : {}),
+
+      ...(displayOrder !== undefined
+        ? { displayOrder: Number(displayOrder) || 0 }
+        : {}),
+    };
+
+    metadata.nationalTeams = {
+      ...nationalTeams,
+      teams,
+    };
+
+    // 4. Mettre à jour uniquement metadata
+    const { data: updatedFederation, error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId)
+      .select('id, name, metadata')
+      .single();
+
+    if (updateError) throw updateError;
+
+    return ok(res, {
+      federation: updatedFederation,
+      teamId,
+      config: teams[teamId],
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] PUT team error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible de modifier la sélection',
+      500
+    );
+  }
+});
+
+// GET /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
+router.get('/federations/:id/national-teams/:teamId/players', async (req, res) => {
+  try {
+      const federationId = req.params.id;
+      const teamId = String(req.params.teamId);
+
+      const { data: federation, error: fedError } = await supabase
+        .from('federations')
+        .select('id, metadata')
+        .eq('id', federationId)
+        .single();
+
+      if (fedError || !federation) {
+        return fail(res, 'Fédération introuvable', 404);
+      }
+
+      // Récupère l'effectif officiel depuis API-Football
+      const apiTeam = await apiFootball.getTeam(Number(teamId));
+
+      if (!apiTeam) {
+        return fail(res, 'Sélection introuvable', 404);
+      }
+
+      const enrichedTeam = await apiFootball.enrichNationalTeamWithPlayers(apiTeam);
+
+      const apiPlayers = enrichedTeam?.players || [];
+
+      const teamConfig = federation.metadata?.nationalTeams?.teams?.[teamId] || {};
+
+      const playerConfig = teamConfig.players || {};
+
+      const overrides = playerConfig.overrides || {};
+
+      const localPlayers = playerConfig.local || [];
+
+      // Fusion API + personnalisations admin
+      const players = apiPlayers
+        .map((entry) => {
+          const rawPlayer = entry?.player || entry;
+
+          const playerId = String(rawPlayer?.id);
+
+          const override =
+            overrides[playerId] || {};
+
+          return {
+            ...entry,
+
+            player: entry?.player
+              ? {
+                  ...entry.player,
+                  name:
+                    override.name ??
+                    entry.player.name,
+
+                  photo:
+                    override.photo ??
+                    entry.player.photo,
+                }
+              : undefined,
+
+            id:
+              rawPlayer?.id,
+
+            name:
+              override.name ??
+              rawPlayer?.name,
+
+            number:
+              override.number ??
+              entry?.number ??
+              entry?.statistics?.[0]?.games?.number ??
+              null,
+
+            position:
+              override.position ??
+              entry?.position ??
+              entry?.statistics?.[0]?.games?.position ??
+              null,
+
+            photo:
+              override.photo ??
+              rawPlayer?.photo ??
+              null,
+
+            hidden:
+              override.hidden === true,
+
+            source: 'api',
+          };
+        })
+        .filter((p) => !p.hidden);
+
+      // Joueurs ajoutés manuellement
+      const manualPlayers = localPlayers
+        .filter((p) => p.hidden !== true)
+        .map((p) => ({
+          ...p,
+          source: 'manual',
+        }));
+
+      return ok(res, {
+        team: {
+          id: enrichedTeam.id || Number(teamId),
+          name:
+            teamConfig.displayName ||
+            enrichedTeam.name,
+        },
+
+        players: [
+          ...players,
+          ...manualPlayers,
+        ],
+      });
+
+    } catch (err) {
+      console.error(
+        '[admin national-teams] GET players error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        err.message || "Impossible de récupérer l'effectif",
+        500
+      );
+    }
+  }
+);
+
 // PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
 router.put('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
-  try {
+    try {
       const federationId = req.params.id;
       const teamId = String(req.params.teamId);
       const playerId = String(req.params.playerId);
@@ -780,260 +1017,6 @@ router.post('/federations/:id/national-teams/:teamId/players', async (req, res) 
       return fail(
         res,
         err.message || 'Impossible d’ajouter le joueur',
-        500
-      );
-    }
-  }
-);
-
-// GET /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
-router.get('/federations/:id/national-teams/:teamId/players', async (req, res) => {
-  try {
-      const federationId = req.params.id;
-      const teamId = String(req.params.teamId);
-
-      const { data: federation, error: fedError } = await supabase
-        .from('federations')
-        .select('id, metadata')
-        .eq('id', federationId)
-        .single();
-
-      if (fedError || !federation) {
-        return fail(res, 'Fédération introuvable', 404);
-      }
-
-      // Récupère l'effectif officiel depuis API-Football
-      const apiTeam = await apiFootball.getTeam(Number(teamId));
-
-      if (!apiTeam) {
-        return fail(res, 'Sélection introuvable', 404);
-      }
-
-      const enrichedTeam = await apiFootball.enrichNationalTeamWithPlayers(apiTeam);
-
-      const apiPlayers = enrichedTeam?.players || [];
-
-      const teamConfig = federation.metadata?.nationalTeams?.teams?.[teamId] || {};
-
-      const playerConfig = teamConfig.players || {};
-
-      const overrides = playerConfig.overrides || {};
-
-      const localPlayers = playerConfig.local || [];
-
-      // Fusion API + personnalisations admin
-      const players = apiPlayers
-        .map((entry) => {
-          const rawPlayer = entry?.player || entry;
-
-          const playerId = String(rawPlayer?.id);
-
-          const override =
-            overrides[playerId] || {};
-
-          return {
-            ...entry,
-
-            player: entry?.player
-              ? {
-                  ...entry.player,
-                  name:
-                    override.name ??
-                    entry.player.name,
-
-                  photo:
-                    override.photo ??
-                    entry.player.photo,
-                }
-              : undefined,
-
-            id:
-              rawPlayer?.id,
-
-            name:
-              override.name ??
-              rawPlayer?.name,
-
-            number:
-              override.number ??
-              entry?.number ??
-              entry?.statistics?.[0]?.games?.number ??
-              null,
-
-            position:
-              override.position ??
-              entry?.position ??
-              entry?.statistics?.[0]?.games?.position ??
-              null,
-
-            photo:
-              override.photo ??
-              rawPlayer?.photo ??
-              null,
-
-            hidden:
-              override.hidden === true,
-
-            source: 'api',
-          };
-        })
-        .filter((p) => !p.hidden);
-
-      // Joueurs ajoutés manuellement
-      const manualPlayers = localPlayers
-        .filter((p) => p.hidden !== true)
-        .map((p) => ({
-          ...p,
-          source: 'manual',
-        }));
-
-      return ok(res, {
-        team: {
-          id: enrichedTeam.id || Number(teamId),
-          name:
-            teamConfig.displayName ||
-            enrichedTeam.name,
-        },
-
-        players: [
-          ...players,
-          ...manualPlayers,
-        ],
-      });
-
-    } catch (err) {
-      console.error(
-        '[admin national-teams] GET players error:',
-        err.message
-      );
-
-      return fail(
-        res,
-        err.message || "Impossible de récupérer l'effectif",
-        500
-      );
-    }
-  }
-);
-
-// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
-router.put('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
-  try {
-      const federationId = req.params.id;
-      const teamId = String(req.params.teamId);
-      const playerId = String(req.params.playerId);
-
-      const {
-        name,
-        number,
-        position,
-        photo,
-        hidden,
-      } = req.body || {};
-
-      const { data: federation, error: fedError } = await supabase
-        .from('federations')
-        .select('id, metadata')
-        .eq('id', federationId)
-        .single();
-
-      if (fedError || !federation) {
-        return fail(res, 'Fédération introuvable', 404);
-      }
-
-      const metadata = {
-        ...(federation.metadata || {}),
-      };
-
-      const nationalTeams = {
-        ...(metadata.nationalTeams || {}),
-      };
-
-      const teams = {
-        ...(nationalTeams.teams || {}),
-      };
-
-      const teamConfig = {
-        ...(teams[teamId] || {}),
-      };
-
-      const playersConfig = {
-        ...(teamConfig.players || {}),
-      };
-
-      const overrides = {
-        ...(playersConfig.overrides || {}),
-      };
-
-      const previous = {
-        ...(overrides[playerId] || {}),
-      };
-
-      overrides[playerId] = {
-        ...previous,
-
-        ...(name !== undefined
-          ? { name: String(name).trim() }
-          : {}),
-
-        ...(number !== undefined
-          ? {
-              number:
-                number === '' || number === null
-                  ? null
-                  : Number(number),
-            }
-          : {}),
-
-        ...(position !== undefined
-          ? { position: position || null }
-          : {}),
-
-        ...(photo !== undefined
-          ? { photo: photo || null }
-          : {}),
-
-        ...(hidden !== undefined
-          ? { hidden: Boolean(hidden) }
-          : {}),
-      };
-
-      playersConfig.overrides = overrides;
-
-      teamConfig.players = playersConfig;
-
-      teams[teamId] = teamConfig;
-
-      metadata.nationalTeams = {
-        ...nationalTeams,
-        teams,
-      };
-
-      const { data: updatedFederation, error: updateError } = await supabase
-        .from('federations')
-        .update({ metadata })
-        .eq('id', federationId)
-        .select('id, name, metadata')
-        .single();
-
-      if (updateError) throw updateError;
-
-      return ok(res, {
-        federation: updatedFederation,
-        teamId,
-        playerId,
-        config: overrides[playerId],
-      });
-
-    } catch (err) {
-      console.error(
-        '[admin national-teams] PUT player error:',
-        err.message
-      );
-
-      return fail(
-        res,
-        err.message || 'Impossible de modifier le joueur',
         500
       );
     }
