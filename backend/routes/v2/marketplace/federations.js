@@ -6,6 +6,7 @@ const express = require('express');
 const supabase = require('../../../db/supabase');
 const { getPlayersByFederation } = require('../../../db/players');
 const { getTrophiesByFederation } = require('../../../db/trophies');
+const apiFootball = require('../../../services/apiFootball');
 const router = express.Router();
 
 const ok   = (res, data, s = 200) => res.status(s).json({ success: true,  data,  error: '' });
@@ -27,6 +28,55 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/v2/marketplace/federations/national-teams/:teamId/players ───
+router.get(
+  '/national-teams/:teamId/players',
+  async (req, res) => {
+    try {
+      const teamId = Number(req.params.teamId);
+
+      if (!Number.isInteger(teamId) || teamId <= 0) {
+        return fail(
+          res,
+          'Invalid national team id',
+          400
+        );
+      }
+
+      const team =
+        await apiFootball.getTeam(teamId);
+
+      if (!team) {
+        return fail(
+          res,
+          'National team not found',
+          404
+        );
+      }
+
+      const enrichedTeam =
+        await apiFootball.enrichNationalTeamWithPlayers(
+          team
+        );
+
+      return ok(res, {
+        team: enrichedTeam,
+      });
+    } catch (err) {
+      console.error(
+        '[federations] national team players error:',
+        err.message
+      );
+
+      return fail(
+        res,
+        'Failed to fetch national team players',
+        500
+      );
+    }
+  }
+);
+
 // ─── GET /api/v2/marketplace/federations/:slugOrId ───────────
 // Détail d'une fédération + clubs membres + hub tenant + joueurs séléction nationale
 router.get('/:slugOrId', async (req, res) => {
@@ -47,6 +97,21 @@ router.get('/:slugOrId', async (req, res) => {
 
     if (fedErr) throw fedErr;
     if (!federation) return fail(res, 'Federation not found', 404);
+
+    // Récupération des sélections nationales avec leurs joueurs via API-Football
+    let nationalTeams = {
+      men: [],
+      women: [],
+      youth: [],
+    };
+
+    try {
+      if (federation.country) {
+        nationalTeams = await apiFootball.getNationalTeamsByCountry(federation.country, federation.country_code);
+      }
+    } catch (apiFootballError) {
+      console.error('[federations] API-Football national teams error:', apiFootballError.message);
+    }
 
     // Clubs membres + hub de la fédération en parallèle
     const [membersRes, hubRes, players, trophies] = await Promise.all([
@@ -109,12 +174,15 @@ router.get('/:slugOrId', async (req, res) => {
       members: membersRes.data || [],
       players,
       trophies,
-      products
+      products,
+      nationalTeams,
     });
   } catch (err) {
     console.error('[federations] GET /:slugOrId error:', err.message);
     return fail(res, 'Federation fetch failed', 500);
   }
 });
+
+
 
 module.exports = router;

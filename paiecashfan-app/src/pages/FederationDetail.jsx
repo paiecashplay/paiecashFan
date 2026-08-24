@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Search, Globe, Loader2, Volleyball, Share2, Trophy, Dices, Heart, ShoppingBag, UsersRound } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FederationMemberCard } from '@/components/FederationMemberCard';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
@@ -14,6 +14,7 @@ import { uefaMembers } from '@/data/uefa-members';
 import { conmebolMembers } from '@/data/conmebol-members';
 import { concacafMembers } from '@/data/concacaf-members';
 import { afcMembers } from '@/data/afc-members';
+import NationalTeamsSection from '@/components/federation/NationalTeamsSection';
 import { cn } from '@/lib/cn';
 import { MerchandiseSection } from '@/pages/ClubDetail';
 
@@ -88,7 +89,7 @@ export function FederationDetail() {
   const isStaticConfed = Boolean(datasets[fedId]);
 
   // API-first uniquement pour les autres slugs (fédérations nationales en base)
-  const { federation: dbFed, members: dbMembers, hub: dbHub, products: dbProducts, loading } =
+  const { federation: dbFed, members: dbMembers, hub: dbHub, products: dbProducts, nationalTeams, loading } =
     useFederationDetail(isStaticConfed ? null : fedId);
 
   // 1) Confédération statique → inchangé
@@ -99,8 +100,7 @@ export function FederationDetail() {
 
   // 2) Fédération nationale en base → vue dynamique
   if (loading) return <FedLoading />;
-  if (dbFed) return <DynamicFederationView federation={dbFed} 
-      members={dbMembers} hub={dbHub} products={dbProducts}/>;
+  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} hub={dbHub} products={dbProducts} nationalTeams={nationalTeams} />;
 
   // 3) Repli : entrée statique sans dataset, ou inconnue
   const federation = federations.find((f) => f.id === fedId);
@@ -131,7 +131,12 @@ const DIVISION_RANK = {
 };
 const divisionRank = (name) => DIVISION_RANK[name] ?? 50;
 
-function DynamicFederationView({ federation, members, hub, products }) {
+function DynamicFederationView({ federation, members, hub, products, nationalTeams }) {
+  const safeNationalTeams = {
+    men: nationalTeams?.men || [],
+    women: nationalTeams?.women || [],
+    youth: nationalTeams?.youth || [],
+  };
   const reduce = useReducedMotion();
   const color = federation.primary_color || '#10b981';
   const clubs = (members || []).map((m) => ({
@@ -244,22 +249,30 @@ function DynamicFederationView({ federation, members, hub, products }) {
 
       {/* Contenu sous le hero : voie réservée à gauche (md→2xl) pour le rail. */}
       <div className="md:pl-24 2xl:pl-0">
+        {/* ═══ ÉQUIPES NATIONALES ═══════════════════════════ */}
+        <NationalTeamsSection
+          teams={safeNationalTeams}
+          federationColor={color}
+        />
+
         {/* Clubs membres */}
-        {clubs.length > 0 ? (
-          groups.map((g) => (
-            <FederationClubsGrid
-              key={g.name}
-              clubs={g.list}
-              federationColor={color}
-              leagueName={g.name}
-              cardBackground={federation.stadium_image_url}
-            />
-          ))
-        ) : (
-          <Container className="py-20 text-center text-sm text-bone-400">
-            Aucun club rattaché à cette fédération pour le moment.
-          </Container>
-        )}
+        <div id="clubs">
+          {clubs.length > 0 ? (
+            groups.map((g) => (
+              <FederationClubsGrid
+                key={g.name}
+                clubs={g.list}
+                federationColor={color}
+                leagueName={g.name}
+                cardBackground={federation.stadium_image_url}
+              />
+            ))
+          ) : (
+            <Container className="py-20 text-center text-sm text-bone-400">
+              Aucun club rattaché à cette fédération pour le moment.
+            </Container>
+          )}
+        </div>
 
         {/* Boutique de la fédération */}
         {products?.length > 0 && hub && (
@@ -335,6 +348,7 @@ function FedSideActions({ primaryColor, hasProducts = false }) {
   };
 
   const actions = [
+    {key: 'national-teams', icon: UsersRound, label: 'Sélections', onClick: () => scrollTo('national-teams'),},
     { key: 'clubs', icon: Volleyball, label: 'Clubs',      onClick: () => scrollTo('clubs') },
     ...(hasProducts
     ? [{key: 'shop', icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise')}]

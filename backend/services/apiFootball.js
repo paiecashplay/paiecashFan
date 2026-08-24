@@ -119,6 +119,613 @@ async function getTeamsByLeagueSeason(leagueId, season) {
   return (data.response || []).map(mapTeam).filter(Boolean);
 }
 
+// ── Résolution automatique du nom de pays API-Football ───────────────
+//
+// Exemple :
+// Supabase : country = "Tanzanie", country_code = "TZ"
+// API-Football : { name: "Tanzania", code: "TZ" }
+//
+// On utilise donc le code pays pour retrouver automatiquement
+// le nom attendu par API-Football.
+//
+// La liste /teams/countries change peu : cache 24 h pour éviter
+// de consommer inutilement le quota API.
+//
+const TEAMS_COUNTRIES_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+let teamsCountriesCache = {
+  data: null,
+  expiresAt: 0,
+};
+
+async function getApiFootballTeamCountries() {
+  const now = Date.now();
+
+  if (
+    Array.isArray(teamsCountriesCache.data) &&
+    teamsCountriesCache.expiresAt > now
+  ) {
+    return teamsCountriesCache.data;
+  }
+
+  const { data } = await client().get('/teams/countries');
+
+  check(data);
+
+  const countries = data.response || [];
+
+  teamsCountriesCache = {
+    data: countries,
+    expiresAt: now + TEAMS_COUNTRIES_CACHE_TTL,
+  };
+
+  return countries;
+}
+
+/**
+ * Retrouve le nom de pays utilisé par API-Football.
+ *
+ * Exemples :
+ * TZ + "Tanzanie" → "Tanzania"
+ * FR + "France"   → "France"
+ * NE + "Niger"    → "Niger"
+ *
+ * Si aucun pays ne correspond au code, on conserve le nom
+ * d'origine afin de ne pas casser les données existantes.
+ */
+async function resolveApiFootballCountry(country, countryCode = null) {
+  const fallbackCountry =
+    String(country || '').trim();
+
+  const normalizedCode =
+    String(countryCode || '')
+      .trim()
+      .toUpperCase();
+
+  if (!normalizedCode) {
+    return fallbackCountry;
+  }
+
+  try {
+    const countries =
+      await getApiFootballTeamCountries();
+
+    const match = countries.find((item) => {
+      const apiCode =
+        String(item?.code || '')
+          .trim()
+          .toUpperCase();
+
+      return apiCode === normalizedCode;
+    });
+
+    if (match?.name) {
+      return String(match.name).trim();
+    }
+  } catch (error) {
+    console.error(
+      `[apiFootball] country resolution error for ${normalizedCode}:`,
+      error.message
+    );
+  }
+
+  return fallbackCountry;
+}
+
+// GET /teams?country= — toutes les équipes d'un pays
+// GET /teams?country= — toutes les équipes d'un pays
+async function getTeamsByCountry(country, countryCode = null) {
+  const apiCountry =
+    await resolveApiFootballCountry(
+      country,
+      countryCode
+    );
+
+  if (!apiCountry) {
+    return [];
+  }
+
+  const { data } = await client().get('/teams', {
+    params: {
+      country: apiCountry,
+    },
+  });
+
+  check(data);
+
+  return (data.response || [])
+    .map(mapTeam)
+    .filter(Boolean);
+}
+
+/**
+ * Identifie une sélection nationale à partir du nom retourné
+ * par API-Football.
+ *
+ * Exemples acceptés :
+ * - France
+ * - France W
+ * - France U23
+ * - France U20 W
+ *
+ * Exemples rejetés :
+ * - Lyon W
+ * - Paris Saint Germain W
+ */
+function parseNationalTeam(team, country) {
+  if (!team?.name || !country) {
+    return null;
+  }
+
+  const teamName = String(team.name).trim();
+  const countryName = String(country).trim();
+
+  const normalizedTeamName = teamName.toLowerCase();
+  const normalizedCountryName = countryName.toLowerCase();
+
+  if (
+    normalizedTeamName !== normalizedCountryName &&
+    !normalizedTeamName.startsWith(
+      `${normalizedCountryName} `
+    )
+  ) {
+    return null;
+  }
+
+  const suffix = teamName
+    .slice(countryName.length)
+    .trim();
+
+  // Équipe senior masculine
+  if (!suffix) {
+    return {
+      ...team,
+      gender: 'male',
+      category: 'senior',
+    };
+  }
+
+  // Équipe senior féminine
+  if (/^w$/i.test(suffix)) {
+    return {
+      ...team,
+      gender: 'female',
+      category: 'senior',
+    };
+  }
+
+  // Équipes jeunes :
+  // U17, U18, U20, U23, U17 W, U20 W...
+  const youthMatch = suffix.match(
+    /^u(\d{2})(?:\s+w)?$/i
+  );
+
+  if (!youthMatch) {
+    return null;
+  }
+
+  const isWomen = /\s+w$/i.test(suffix);
+
+  return {
+    ...team,
+    gender: isWomen ? 'female' : 'male',
+    category: `U${youthMatch[1]}`,
+  };
+}
+
+async function hasCurrentSquad(teamId) {
+  if (!teamId) {
+    return false;
+  }
+
+  try {
+    const { data } = await client().get('/players/squads', {
+      params: {
+        team: teamId,
+      },
+    });
+
+    check(data);
+
+    const squad = data.response?.[0];
+
+    return Array.isArray(squad?.players) &&
+      squad.players.length > 0;
+  } catch (error) {
+    console.error(
+      `[apiFootball] squad availability error for team ${teamId}:`,
+      error.message
+    );
+
+    return false;
+  }
+}
+
+async function addSquadAvailability(team) {
+  if (!team?.id) {
+    return team;
+  }
+
+  const hasPlayers =
+    await hasCurrentSquad(team.id);
+
+  return {
+    ...team,
+    hasPlayers,
+  };
+}
+
+
+/**
+ * Retourne les sélections nationales d'un pays,
+ * classées pour le frontend.
+ *
+ * Le countryCode permet de retrouver automatiquement
+ * le nom utilisé par API-Football.
+ */
+async function getNationalTeamsByCountry(country, countryCode = null) {
+  /*
+   * Exemple :
+   * country = "Tanzanie"
+   * countryCode = "TZ"
+   *
+   * devient :
+   * apiCountry = "Tanzania"
+   */
+  const apiCountry = await resolveApiFootballCountry(country, countryCode);
+
+  if (!apiCountry) {
+    return {
+      men: [],
+      women: [],
+      youth: [],
+    };
+  }
+
+  /*
+   * On utilise directement le nom résolu afin
+   * de ne pas appeler deux fois /teams/countries.
+   */
+  const { data } = await client().get('/teams', {
+    params: {
+      country: apiCountry,
+    },
+  });
+
+  check(data);
+
+  const teams = (data.response || [])
+    .map(mapTeam)
+    .filter(Boolean);
+
+  /*
+   * IMPORTANT :
+   * parseNationalTeam reçoit apiCountry,
+   * donc "Tanzania" et non "Tanzanie".
+   */
+  const nationalTeams = teams
+    .map((team) =>
+      parseNationalTeam(
+        team,
+        apiCountry
+      )
+    )
+    .filter(Boolean);
+
+    
+  const men = nationalTeams.filter(
+  (team) =>
+    team.gender === 'male' &&
+    team.category === 'senior'
+);
+
+const women = nationalTeams.filter(
+  (team) =>
+    team.gender === 'female' &&
+    team.category === 'senior'
+);
+
+const youth = nationalTeams.filter(
+  (team) =>
+    team.category !== 'senior'
+);
+
+const enrichAvailability = async (teams) =>
+  Promise.all(
+    teams.map((team) =>
+      addSquadAvailability(team)
+    )
+  );
+
+  const [menWithAvailability, womenWithAvailability, youthWithAvailability] = await Promise.all([
+    enrichAvailability(men),
+    enrichAvailability(women),
+    enrichAvailability(youth),
+  ]);
+
+  return {
+    men: menWithAvailability,
+    women: womenWithAvailability,
+    youth: youthWithAvailability,
+  };
+}
+
+// ── Effectif d'une équipe (page « Effectif ») ─────────────────────
+async function getCurrentSquad(teamId) {
+  const { data } = await client().get('/players/squads', {
+    params: { team: teamId },
+  });
+
+  check(data);
+
+  const squad = data.response?.[0];
+
+  if (!squad) {
+    return [];
+  }
+
+  return squad.players || [];
+}
+
+// ── Joueurs d'une équipe pour une compétition (ex: Ligue 1 2023-2024) ─────
+async function getPlayersByCompetition({teamId, leagueId, season}) {
+  let page = 1;
+  let totalPages = 1;
+  const players = [];
+
+  do {
+    const { data } = await client().get('/players', {
+      params: {
+        team: teamId,
+        league: leagueId,
+        season,
+        page,
+      },
+    });
+
+    check(data);
+
+    players.push(...(data.response || []));
+
+    totalPages = data.paging?.total || 1;
+    page += 1;
+  } while (page <= totalPages);
+
+  return players;
+}
+
+// ── Récupère la compétition la plus récente pour une équipe ─────────
+async function getRecentCompetitionForTeam(teamId) {
+  if (!teamId) {
+    return null;
+  }
+
+  try {
+    const { data } = await client().get('/leagues', {
+      params: {
+        team: teamId,
+        current: true,
+      },
+    });
+
+    check(data);
+
+    const competitions = [];
+
+    for (const item of data.response || []) {
+      const league = item.league;
+
+      for (const season of item.seasons || []) {
+        competitions.push({
+          leagueId: league.id,
+          leagueName: league.name,
+          leagueType: league.type,
+
+          season: season.year,
+          start: season.start,
+          end: season.end,
+
+          current: season.current === true,
+
+          players:
+            season.coverage?.players === true,
+
+          statisticsPlayers:
+            season.coverage?.fixtures
+              ?.statistics_players === true,
+        });
+      }
+    }
+
+    /*
+     * On privilégie :
+     * 1. les compétitions ayant une couverture joueurs ;
+     * 2. les saisons les plus récentes ;
+     * 3. les compétitions avec statistiques joueurs.
+     *
+     * ATTENTION :
+     * players=true ne garantit pas que /players retournera
+     * réellement des joueurs. Le fallback current_squad
+     * reste donc indispensable.
+     */
+    const usableCompetitions = competitions
+      .filter((competition) => competition.players)
+      .sort((a, b) => {
+        if (
+          a.statisticsPlayers !==
+          b.statisticsPlayers
+        ) {
+          return Number(b.statisticsPlayers) -
+            Number(a.statisticsPlayers);
+        }
+
+        const dateA = new Date(
+          a.start || `${a.season}-01-01`
+        ).getTime();
+
+        const dateB = new Date(
+          b.start || `${b.season}-01-01`
+        ).getTime();
+
+        return dateB - dateA;
+      });
+
+    return usableCompetitions[0] || null;
+  } catch (error) {
+    console.error(
+      `[apiFootball] recent competition error for team ${teamId}:`,
+      error.message
+    );
+
+    return null;
+  }
+}
+
+// ── Récupère les joueurs d'une fédération (tous les clubs membres) ─────
+async function getRecentPlayersForTeam(teamId, competition = null) {
+  let selectedCompetition = competition;
+
+  /*
+   * Si aucune compétition n'est fournie,
+   * on cherche automatiquement la plus récente.
+   */
+  if (!selectedCompetition) {
+    selectedCompetition = await getRecentCompetitionForTeam(teamId);
+  }
+
+  if (
+    selectedCompetition?.leagueId &&
+    selectedCompetition?.season
+  ) {
+    try {
+      const competitionPlayers =
+        await getPlayersByCompetition({
+          teamId,
+          leagueId:
+            selectedCompetition.leagueId,
+          season:
+            selectedCompetition.season,
+        });
+
+      if (competitionPlayers.length > 0) {
+        return {
+          source: 'competition',
+
+          leagueId:
+            selectedCompetition.leagueId,
+
+          leagueName:
+            selectedCompetition.leagueName ||
+            null,
+
+          season:
+            selectedCompetition.season,
+
+          players: competitionPlayers,
+        };
+      }
+    } catch (error) {
+      console.error(
+        `[apiFootball] competition players error for team ${teamId}:`,
+        error.message
+      );
+    }
+  }
+
+  /*
+   * FALLBACK :
+   * si la compétition ne contient aucun joueur,
+   * on récupère l'effectif actuel.
+   */
+  try {
+    const squad = await getCurrentSquad(teamId);
+
+    if (squad.length > 0) {
+      return {
+        source: 'current_squad',
+        leagueId: null,
+        leagueName: null,
+        season: null,
+        players: squad,
+      };
+    }
+
+    return {
+      source: 'none',
+      leagueId: null,
+      leagueName: null,
+      season: null,
+      players: [],
+    };
+  } catch (error) {
+    console.error(`[apiFootball] current squad error for team ${teamId}:`, error.message);
+
+    return {
+      source: 'none',
+      leagueId: null,
+      leagueName: null,
+      season: null,
+      players: [],
+    };
+  }
+}
+
+// ── Enrichit une sélection nationale avec ses joueurs récents ─────────
+async function enrichNationalTeamWithPlayers(team) {
+  if (!team?.id) {
+    return team;
+  }
+
+  const playerData =
+    await getRecentPlayersForTeam(team.id);
+
+  return {
+    ...team,
+
+    playersSource:
+      playerData.source,
+
+    playersCompetition: {
+      leagueId:
+        playerData.leagueId,
+
+      leagueName:
+        playerData.leagueName,
+
+      season:
+        playerData.season,
+    },
+
+    players:
+      playerData.players,
+  };
+}
+
+// ── Récupère les sélections nationales d'un pays avec leurs joueurs ─────
+async function getNationalTeamsWithPlayers(country, countryCode = null) {
+  const nationalTeams = await getNationalTeamsByCountry(country, countryCode);
+
+  const enrichTeams = async (teams) =>
+    Promise.all(
+      (teams || []).map((team) =>
+        enrichNationalTeamWithPlayers(team)
+      )
+    );
+
+  const [men, women, youth] =
+    await Promise.all([
+      enrichTeams(nationalTeams.men),
+      enrichTeams(nationalTeams.women),
+      enrichTeams(nationalTeams.youth),
+    ]);
+
+  return {
+    men,
+    women,
+    youth,
+  };
+}
+
 async function getSquad(teamId) {
   const { data } = await client().get('/players/squads', { params: { team: teamId } });
   check(data);
@@ -262,7 +869,13 @@ async function getFixtureDetail(id) {
   return { match, events, statistics };
 }
 
+
+
 module.exports = {
   searchTeams, getTeam, getSquad, getLeaguesByCountryCode, getLeaguesByCountryName,
-  getTeamsByLeagueSeason, getMatchForTeam, getLiveFixtures, getFixtureDetail, getTeamFixtures, DEFAULT_LIVE_LEAGUES,
+  getTeamsByLeagueSeason, getApiFootballTeamCountries,resolveApiFootballCountry,getTeamsByCountry,
+  hasCurrentSquad, addSquadAvailability,
+  getNationalTeamsByCountry, getCurrentSquad, getPlayersByCompetition, getRecentPlayersForTeam,
+  getRecentCompetitionForTeam, enrichNationalTeamWithPlayers, getNationalTeamsWithPlayers,
+  getMatchForTeam, getLiveFixtures, getFixtureDetail, getTeamFixtures, DEFAULT_LIVE_LEAGUES,
 };

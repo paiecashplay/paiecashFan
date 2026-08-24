@@ -21,6 +21,7 @@ export function useFederationDetail(slug) {
   const [loading, setLoading]       = useState(Boolean(slug));
   const [fromApi, setFromApi]       = useState(false);
   const [products, setProducts] = useState([]);
+  const [nationalTeams, setNationalTeams] = useState({men: [], women: [], youth: []});
 
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
@@ -28,6 +29,7 @@ export function useFederationDetail(slug) {
     setLoading(true); setFromApi(false);
     setFederation(null); setMembers([]); setHub(null);
     setProducts([]);
+    setNationalTeams({men: [], women: [], youth: []});
 
     apiFetch(`/api/v2/marketplace/federations/${slug}`)
       .then((json) => {
@@ -36,6 +38,7 @@ export function useFederationDetail(slug) {
         setMembers(json.data.members || []);
         setHub(json.data.hub || null);
         setProducts(json.data.products || []);
+        setNationalTeams(json.data.nationalTeams || {men: [], women: [], youth: []});
         setFromApi(true);
       })
       .catch(() => { /* pas en base → repli statique */ })
@@ -44,5 +47,5 @@ export function useFederationDetail(slug) {
     return () => { cancelled = true; };
   }, [slug]);
 
-  return { federation, members, hub, products, loading, fromApi };
+  return { federation, members, hub, products, nationalTeams, loading, fromApi };
 }

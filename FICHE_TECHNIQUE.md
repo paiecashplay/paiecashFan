@@ -141,8 +141,12 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
   succès en `step 3`) — + **recherche mobile responsive** (`HeroSearch`). `feature/federation-features` :
   **boutique + gestion produits de fédération** (`marketplace/federations.js`, `FederationDetail`,
   `AdminFederationEdit`, `FederationClubsGrid`). Vérifié : builds OK, aucun de nos fichiers plateforme/
-  commissions/shop-live touché. NB : `feature/shop-ux-improvements` ignorée (sous-ensemble de ux) ;
-  `feature/federation-national-teams` en attente (base ancienne + chevauchement fédération à résoudre + revue apiFootball).
+  commissions/shop-live touché. NB : `feature/shop-ux-improvements` ignorée (sous-ensemble de ux).
+  Puis `feature/federation-national-teams` mergée : **équipes nationales + effectifs** (`apiFootball.js` +615 =
+  uniquement de NOUVELLES fonctions, nos fixtures `getTeamFixtures`/`mapFixture` intactes ; nouveau
+  `NationalTeamsSection.jsx`). 3 conflits fédération résolus en **combinant les deux features** (boutique
+  fédération **+** équipes nationales) dans `federations.js`, `useFederationDetail.js`, `FederationDetail.jsx`.
+  Aucun impact sur la billetterie (fixtures préservées). Builds OK.
 - **2026-08-13 (db)** — **Reversement plateforme Option A (charge unique + revshare async) + pages paiement + vues reversements**.
   **Paiement** (`checkout.js`) refondu selon PaieCashCoin : la vente d'un produit plateforme est
   **débitée UNE fois** vers le compte `paiecashstore` (`recipientSlug`), puis la commission (10%) est
