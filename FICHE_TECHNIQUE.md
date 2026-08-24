@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-14 (dc)** — **Intégration des chantiers stagiaire** (revue + merge sans conflit, sur base `db`).
+  `feature/ux-improvements` : checkout amélioré (étape **« Récapitulatif »** + validation des champs en
+  direct, popup infos manquantes) — **notre logique Option A préservée** (boutiqueSlug, OrderSuccess/Failure,
+  succès en `step 3`) — + **recherche mobile responsive** (`HeroSearch`). `feature/federation-features` :
+  **boutique + gestion produits de fédération** (`marketplace/federations.js`, `FederationDetail`,
+  `AdminFederationEdit`, `FederationClubsGrid`). Vérifié : builds OK, aucun de nos fichiers plateforme/
+  commissions/shop-live touché. NB : `feature/shop-ux-improvements` ignorée (sous-ensemble de ux) ;
+  `feature/federation-national-teams` en attente (base ancienne + chevauchement fédération à résoudre + revue apiFootball).
 - **2026-08-13 (db)** — **Reversement plateforme Option A (charge unique + revshare async) + pages paiement + vues reversements**.
   **Paiement** (`checkout.js`) refondu selon PaieCashCoin : la vente d'un produit plateforme est
   **débitée UNE fois** vers le compte `paiecashstore` (`recipientSlug`), puis la commission (10%) est
