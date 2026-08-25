@@ -7,11 +7,17 @@ const express = require('express');
 
 const {
   requireAuth,
+  optionalAuth,
 } = require('../../middleware/auth');
+
+// Filtre IA anti-abus du chat (même moteur que le Fan Club).
+const prepublish = require('../../services/moderation/prepublish');
 
 const tenants = require('../../db/tenants');
 const products = require('../../db/products');
 const shopLive = require('../../db/shopLive');
+// Streaming vidéo : MediaLive (RTMP→HLS, mêmes accès OBS auto que le Fan Club).
+const byteplus = require('../../services/byteplus');
 
 const {
   isConfigured,
@@ -72,6 +78,17 @@ function normalizeClub(tenant) {
   };
 }
 
+// Nom de flux MediaLive stable par room (persisté dans metadata.streamName).
+// Généré une seule fois : slug du club + id room → flux unique et lisible.
+async function getOrCreateRoomStreamName(room) {
+  if (room.metadata?.streamName) return room.metadata.streamName;
+  const tenant = await tenants.getTenantById(room.tenant_id).catch(() => null);
+  const base = `${tenant?.slug || 'club'}-shop`.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
+  const streamName = `${base}-${String(room.id).replace(/-/g, '').slice(0, 8)}`;
+  await shopLive.updateRoom(room.id, { metadata: { ...(room.metadata || {}), streamName } });
+  return streamName;
+}
+
 function publicRoom(room) {
   if (!room) {
     return null;
@@ -89,6 +106,12 @@ function publicRoom(room) {
       buildViewerUrl(room.view_url_path) ||
       room.viewer_url ||
       null,
+
+    // Flux HLS public (MediaLive) — lu par notre lecteur natif (sans iframe).
+    streamUrl:
+      room.metadata?.streamName
+        ? byteplus.playUrl(room.metadata.streamName)
+        : null,
 
     replayUrl:
       room.replay_url,
@@ -377,79 +400,15 @@ router.post(
           },
         });
 
-      const activity =
-        await createActivity({
-          name: title,
-
-          clubSlug:
-            tenant.slug,
-
-          scheduledAt,
-
-          scheduledEndAt,
-
-          // IsBeginLiveEnable=1 verrouille la diffusion AVANT l'heure programmée
-          // (le studio reste bloqué en « Preview » avec un compte à rebours). On
-          // le laisse à false : l'horaire programmé ne sert qu'à annoncer le live
-          // (teaser/compte à rebours côté fans), le club passe en direct quand il
-          // veut via « Démarrer le live ».
-          enforceStartTime: false,
-
-          autoEnd:
-            Boolean(
-              scheduledEndAt
-            ),
-
-          latencyMode:
-            req.body
-              ?.latencyMode ||
-            'normal',
-
-          coverImage:
-            req.body?.coverUrl ||
-            tenant.logo_url ||
-            null,
-
-          verticalCoverImage:
-            req.body
-              ?.verticalCoverUrl ||
-            null,
-
-          templateId:
-            req.body
-              ?.templateId ||
-            null,
-        });
-
-      const room =
-        await shopLive
-          .saveBytePlusActivity(
-            localRoom.id,
-            {
-              activityId:
-                activity.activityId,
-
-              viewUrlPath:
-                activity.viewUrlPath,
-            }
-          );
+      // Mode natif MediaLive (RTMP→HLS, comme le Fan Club) : pas d'activité
+      // livesaas. On génère le streamName du live et on passe la room en "ready".
+      const streamName = await getOrCreateRoomStreamName(localRoom);
+      const room = await shopLive.updateRoom(localRoom.id, { status: 'ready' });
 
       await shopLive.addEvent({
-        liveRoomId:
-          room.id,
-
-        activityId:
-          activity.activityId,
-
-        eventType:
-          'room_created',
-
-        payload: {
-          requestId:
-            activity.requestId,
-
-          title,
-        },
+        liveRoomId: room.id,
+        eventType: 'room_created',
+        payload: { title, streamName },
       });
 
       if (scheduledAt) {
@@ -464,23 +423,7 @@ router.post(
         }).catch(() => {});
       }
 
-      return ok(
-        res,
-        {
-          room,
-          activity: {
-            activityId:
-              activity.activityId,
-
-            viewUrlPath:
-              activity.viewUrlPath,
-
-            requestId:
-              activity.requestId,
-          },
-        },
-        201
-      );
+      return ok(res, { room }, 201);
     } catch (error) {
       console.error(
         '[SHOP LIVE] create:',
@@ -524,6 +467,29 @@ router.post(
     }
   }
 );
+
+// GET /api/v2/shop-live/:liveId/broadcast — accès OBS AUTO (MediaLive) du live.
+// BO-only (canManage). Serveur + clé de stream SIGNÉE (générés côté serveur,
+// jamais exposés aux supporters). Même mécanisme que le Fan Club.
+router.get('/:liveId/broadcast', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const tenant = await tenants.getTenantById(room.tenant_id);
+    if (!tenant || !canManage(req.authUser, tenant)) return fail(res, 'Accès refusé.', 403);
+    if (!byteplus.isConfigured()) return fail(res, 'Streaming natif non configuré côté serveur.', 503);
+    const streamName = await getOrCreateRoomStreamName(room);
+    const push = byteplus.pushInfo(streamName);
+    return ok(res, {
+      streamName,
+      server: push.server,
+      streamKey: push.streamKey,
+      expire: push.expire,
+      playUrl: byteplus.playUrl(streamName),
+      isLive: room.status === 'live',
+    });
+  } catch (err) { return fail(res, 'Accès diffusion indisponible : ' + err.message, 500); }
+});
 
 // PUT /api/v2/shop-live/:liveId/products
 // Remplace/complète la sélection des produits du live.
@@ -950,82 +916,23 @@ router.post(
         );
       }
 
-      if (
-        !room.byteplus_activity_id
-      ) {
-        return fail(
-          res,
-          'Le live BytePlus n’est pas encore prêt.',
-          409
-        );
-      }
+      // MediaLive : on garantit le streamName (flux HLS + accès OBS) avant le direct.
+      await getOrCreateRoomStreamName(room);
 
-      let updatedRoom =
-        await shopLive.markRoomLive(
-          room.id
-        );
-
-      // Lien de diffusion NAVIGATEUR (le club passe en direct depuis sa webcam,
-      // sans login BytePlus). Best-effort : si BytePlus échoue, le live reste
-      // "live" et on renvoie broadcastError pour info.
-      let broadcastError = null;
-      let broadcastExpireAt = null;
-      try {
-        // Lien web-push valable ~300 s côté BytePlus : on demande 300 s pour que
-        // le compte à rebours affiché au club soit exact. Le club peut régénérer
-        // un lien frais à tout moment via POST /:liveId/broadcast-url.
-        const push =
-          await getWebPushClientUrl(
-            room.byteplus_activity_id,
-            300
-          );
-        broadcastExpireAt = push.expireAt;
-        updatedRoom =
-          await shopLive.setBroadcastUrls(
-            room.id,
-            { hostUrl: push.url }
-          );
-      } catch (webpushError) {
-        broadcastError =
-          webpushError.message;
-        console.error(
-          '[shop-live] URL de diffusion indisponible :',
-          webpushError.message
-        );
-      }
+      const updatedRoom =
+        await shopLive.markRoomLive(room.id);
 
       await shopLive
         .addEvent({
           liveRoomId: room.id,
-
-          activityId:
-            room.byteplus_activity_id,
-
-          eventType:
-            'room_started',
-
-          payload: {
-            startedBy:
-              req.authUser.id,
-
-            startedAt:
-              updatedRoom.started_at,
-          },
+          eventType: 'room_started',
+          payload: { startedBy: req.authUser.id, startedAt: updatedRoom.started_at },
         })
         .catch((eventError) => {
-          console.error(
-            '[shop-live] Impossible d’enregistrer room_started :',
-            eventError.message
-          );
+          console.error('[shop-live] Impossible d’enregistrer room_started :', eventError.message);
         });
 
-      return ok(res, {
-        room: updatedRoom,
-        broadcastUrl:
-          updatedRoom.host_url || null,
-        broadcastExpireAt,
-        broadcastError,
-      });
+      return ok(res, { room: updatedRoom });
     } catch (error) {
       return fail(
         res,
@@ -1486,5 +1393,116 @@ router.patch(
     }
   }
 );
+
+// ═══════════════════════════════════════════════════════════════
+// Chat en direct du Live Boutique (façon Whatnot).
+// Lecture publique (optionalAuth) ; écriture réservée aux connectés,
+// filtrée par l'IA anti-abus (pas de charte — accès simplifié boutique).
+// ═══════════════════════════════════════════════════════════════
+
+// Filtre IA avant publication d'un message. Renvoie la réponse 422 (et true)
+// si le message est bloqué ; null si autorisé. Fail-open si le service est
+// indisponible (ne bloque jamais une vente pour une panne de modération).
+async function chatPublishGate(res, { tenantId, authorId, content }) {
+  const v = await prepublish
+    .screenBeforePublish({ contentType: 'message', tenantId, authorId, content })
+    .catch(() => ({ allowed: true, degraded: true }));
+  if (v.allowed) return null;
+  res.status(422).json({
+    success: false,
+    data: { moderation: { status: 'blocked', reason: v.reason, categories: v.ai?.categories || [] } },
+    error: v.reason || 'Message refusé par la modération.',
+  });
+  return true;
+}
+
+// Le membre connecté est-il modérateur de ce live (= gère le club) ?
+async function isRoomModerator(authUser, room) {
+  if (!authUser) return false;
+  const tenant = await tenants.getTenantById(room.tenant_id).catch(() => null);
+  return tenant ? canManage(authUser, tenant) : false;
+}
+
+// GET /api/v2/shop-live/:liveId/chat — messages + likeCount + canModerate (public).
+router.get('/:liveId/chat', optionalAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const data = await shopLive.getChat(room.id, req.authUser?.id || null);
+    const canModerate = await isRoomModerator(req.authUser, room);
+    return ok(res, { ...data, canModerate });
+  } catch (err) {
+    // Fail-open : le chat ne doit jamais casser l'affichage du live.
+    return ok(res, { messages: [], likeCount: 0, canModerate: false });
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/chat/messages — poster une question ou une réponse (connecté).
+router.post('/:liveId/chat/messages', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+
+    const content = String(req.body?.content || '').trim();
+    if (!content) return fail(res, 'Message vide.', 400);
+    if (content.length > 2000) return fail(res, 'Message trop long (2000 max).', 400);
+
+    const blocked = await chatPublishGate(res, {
+      tenantId: room.tenant_id, authorId: req.authUser.id, content,
+    });
+    if (blocked) return; // 422 déjà renvoyé
+
+    // Un message du club/modérateur porte le badge « Club ».
+    const isHost = await isRoomModerator(req.authUser, room);
+    const replyTo = req.body?.replyTo ? String(req.body.replyTo) : null;
+
+    const message = await shopLive.createChatMessage(room.id, req.authUser.id, content, { isHost, replyTo });
+    return ok(res, { message }, 201);
+  } catch (err) {
+    return fail(res, 'Envoi impossible : ' + err.message, 500);
+  }
+});
+
+// DELETE /api/v2/shop-live/:liveId/chat/messages/:messageId — auteur, ou club (modération).
+router.delete('/:liveId/chat/messages/:messageId', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const tenant = await tenants.getTenantById(room.tenant_id).catch(() => null);
+    const force = tenant ? canManage(req.authUser, tenant) : false;
+
+    const result = await shopLive.deleteChatMessage(room.id, req.params.messageId, req.authUser.id, { force });
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'MSG_NOT_FOUND') return fail(res, err.message, 404);
+    if (err.code === 'MSG_FORBIDDEN') return fail(res, err.message, 403);
+    return fail(res, 'Suppression impossible : ' + err.message, 500);
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/chat/messages/:messageId/reactions — bascule un emoji.
+router.post('/:liveId/chat/messages/:messageId/reactions', requireAuth, async (req, res) => {
+  try {
+    const emoji = String(req.body?.emoji || '');
+    const result = await shopLive.toggleChatReaction(req.params.messageId, req.authUser.id, emoji);
+    return ok(res, result);
+  } catch (err) {
+    if (err.code === 'BAD_EMOJI') return fail(res, err.message, 400);
+    return fail(res, 'Réaction impossible : ' + err.message, 500);
+  }
+});
+
+// POST /api/v2/shop-live/:liveId/like — un « like » (cœur flottant). Renvoie le total.
+router.post('/:liveId/like', requireAuth, async (req, res) => {
+  try {
+    const room = await shopLive.getRoomById(req.params.liveId);
+    if (!room) return fail(res, 'Live introuvable.', 404);
+    const by = Number(req.body?.count) || 1;
+    const likeCount = await shopLive.incrementLike(room.id, by);
+    return ok(res, { likeCount });
+  } catch (err) {
+    return fail(res, 'Like impossible : ' + err.message, 500);
+  }
+});
 
 module.exports = router;

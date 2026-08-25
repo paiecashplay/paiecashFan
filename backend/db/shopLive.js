@@ -104,6 +104,22 @@ async function updateRoom(
   return room;
 }
 
+// Enregistre les identifiants OBS (push stream) du live dans metadata.obs.
+// ⚠️ La clé de stream est secrète : ne jamais l'exposer via publicRoom / aux fans.
+async function saveObsCredentials(id, { server, streamKey } = {}) {
+  const room = await getRoomById(id);
+  return updateRoom(id, {
+    metadata: {
+      ...(room?.metadata || {}),
+      obs: {
+        server: server || null,
+        streamKey: streamKey || null,
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  });
+}
+
 async function saveBytePlusActivity(
   id,
   {
@@ -390,11 +406,214 @@ async function addEvent({
   return data;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Chat en direct du Live Boutique (façon Whatnot) — messages, réactions,
+// et compteur de « likes » (cœurs flottants). Miroir du chat Fan Club,
+// mais scopé à une salle de live (live_room_id).
+// ═══════════════════════════════════════════════════════════════
+
+const CHAT_REACTIONS = ['👍', '👎', '❤️', '😂', '😮', '🔥'];
+
+// Récupère les profils (auteurs) pour un ensemble d'ids.
+async function fetchChatProfiles(ids) {
+  const uniq = [...new Set(ids.filter(Boolean))];
+  if (!uniq.length) return {};
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, display_name, avatar_url')
+    .in('id', uniq);
+  const map = {};
+  (data || []).forEach((p) => {
+    const name = p.display_name || 'Supporter';
+    map[p.id] = { id: p.id, name, avatar: p.avatar_url || null };
+  });
+  return map;
+}
+
+// Agrège les réactions des messages affichés : { [messageId]: [{emoji,count,mine}] }
+async function chatReactionsFor(messageIds, currentUserId) {
+  if (!messageIds.length) return {};
+  const { data } = await supabase
+    .from('shop_live_message_reactions')
+    .select('message_id, user_id, emoji')
+    .in('message_id', messageIds);
+
+  const byMessage = {};
+  for (const r of data || []) {
+    const bucket = (byMessage[r.message_id] ||= {});
+    const entry = (bucket[r.emoji] ||= { emoji: r.emoji, count: 0, mine: false });
+    entry.count += 1;
+    if (currentUserId && r.user_id === currentUserId) entry.mine = true;
+  }
+  // Ordre stable = celui de la palette (évite que les puces sautent au re-render).
+  return Object.fromEntries(
+    Object.entries(byMessage).map(([id, m]) => [id, CHAT_REACTIONS.filter((e) => m[e]).map((e) => m[e])])
+  );
+}
+
+// Résout les extraits de citation (reply_to) : { [id]: { id, author, content } }.
+// On lit même les messages supprimés pour que la citation reste lisible.
+async function resolveQuotes(replyIds, knownById) {
+  const wanted = [...new Set(replyIds.filter(Boolean))];
+  if (!wanted.length) return {};
+  const missing = wanted.filter((id) => !knownById[id]);
+  let extra = [];
+  if (missing.length) {
+    const { data } = await supabase
+      .from('shop_live_messages')
+      .select('id, author_id, content')
+      .in('id', missing);
+    extra = data || [];
+  }
+  const all = [...Object.values(knownById), ...extra];
+  const profiles = await fetchChatProfiles(all.map((m) => m.author_id));
+  const map = {};
+  for (const m of all) {
+    if (!wanted.includes(m.id)) continue;
+    map[m.id] = {
+      id: m.id,
+      author: profiles[m.author_id]?.name || 'Supporter',
+      content: (m.content || '').slice(0, 140),
+    };
+  }
+  return map;
+}
+
+// Les messages publiés d'une salle (chrono), enrichis auteur + réactions + likeCount.
+async function getChat(liveRoomId, currentUserId) {
+  const [{ data: room }, { data: messages, error }] = await Promise.all([
+    supabase.from('shop_live_rooms').select('like_count').eq('id', liveRoomId).maybeSingle(),
+    supabase
+      .from('shop_live_messages')
+      .select('id, author_id, content, created_at, is_host, reply_to')
+      .eq('live_room_id', liveRoomId)
+      .eq('moderation_status', 'published')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true })
+      .limit(200),
+  ]);
+
+  if (error) throw new Error(`getShopLiveChat: ${error.message}`);
+
+  const rows = messages || [];
+  const profiles = await fetchChatProfiles(rows.map((m) => m.author_id));
+  const reactions = await chatReactionsFor(rows.map((m) => m.id), currentUserId);
+  const knownById = Object.fromEntries(rows.map((m) => [m.id, m]));
+  const quotes = await resolveQuotes(rows.map((m) => m.reply_to), knownById);
+
+  return {
+    likeCount: Number(room?.like_count || 0),
+    messages: rows.map((m) => ({
+      id: m.id,
+      authorId: m.author_id,
+      author: profiles[m.author_id]?.name || 'Supporter',
+      avatar: profiles[m.author_id]?.avatar || null,
+      content: m.content,
+      createdAt: m.created_at,
+      isHost: !!m.is_host,
+      replyTo: m.reply_to ? quotes[m.reply_to] || null : null,
+      reactions: reactions[m.id] || [],
+    })),
+  };
+}
+
+async function createChatMessage(liveRoomId, authorId, content, { isHost = false, replyTo = null } = {}) {
+  // La citation doit appartenir à la même salle (anti-usurpation).
+  let validReplyTo = null;
+  if (replyTo) {
+    const { data: target } = await supabase
+      .from('shop_live_messages')
+      .select('id, author_id, content')
+      .eq('id', replyTo)
+      .eq('live_room_id', liveRoomId)
+      .maybeSingle();
+    if (target) validReplyTo = target;
+  }
+
+  const { data, error } = await supabase
+    .from('shop_live_messages')
+    .insert({ live_room_id: liveRoomId, author_id: authorId, content, is_host: !!isHost, reply_to: validReplyTo?.id || null })
+    .select('id, author_id, content, created_at, is_host, reply_to')
+    .single();
+  if (error) throw new Error(`createShopLiveMessage: ${error.message}`);
+
+  const profiles = await fetchChatProfiles([authorId, validReplyTo?.author_id].filter(Boolean));
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    author: profiles[authorId]?.name || 'Supporter',
+    avatar: profiles[authorId]?.avatar || null,
+    content: data.content,
+    createdAt: data.created_at,
+    isHost: !!data.is_host,
+    replyTo: validReplyTo
+      ? { id: validReplyTo.id, author: profiles[validReplyTo.author_id]?.name || 'Supporter', content: (validReplyTo.content || '').slice(0, 140) }
+      : null,
+    reactions: [],
+  };
+}
+
+// Suppression douce d'un message (auteur uniquement, ou modération BO).
+async function deleteChatMessage(liveRoomId, messageId, authorId, { force = false } = {}) {
+  const { data: existing, error: findError } = await supabase
+    .from('shop_live_messages')
+    .select('id, author_id')
+    .eq('id', messageId)
+    .eq('live_room_id', liveRoomId)
+    .is('deleted_at', null)
+    .maybeSingle();
+  if (findError) throw new Error(findError.message);
+  if (!existing) { const e = new Error('Message introuvable.'); e.code = 'MSG_NOT_FOUND'; throw e; }
+  if (!force && existing.author_id !== authorId) {
+    const e = new Error('Tu ne peux supprimer que tes propres messages.'); e.code = 'MSG_FORBIDDEN'; throw e;
+  }
+
+  const { error } = await supabase
+    .from('shop_live_messages')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', messageId)
+    .eq('live_room_id', liveRoomId);
+  if (error) throw new Error(error.message);
+  return { id: messageId, deleted: true };
+}
+
+// Bascule une réaction emoji (poser / retirer). Renvoie l'état après action.
+async function toggleChatReaction(messageId, userId, emoji) {
+  if (!CHAT_REACTIONS.includes(emoji)) {
+    const e = new Error('Réaction non autorisée.'); e.code = 'BAD_EMOJI'; throw e;
+  }
+  const { data: existing } = await supabase
+    .from('shop_live_message_reactions')
+    .select('message_id').eq('message_id', messageId).eq('user_id', userId).eq('emoji', emoji).maybeSingle();
+
+  if (existing) {
+    await supabase.from('shop_live_message_reactions')
+      .delete().eq('message_id', messageId).eq('user_id', userId).eq('emoji', emoji);
+    return { emoji, reacted: false };
+  }
+  const { error } = await supabase
+    .from('shop_live_message_reactions')
+    .insert({ message_id: messageId, user_id: userId, emoji });
+  if (error) throw new Error(error.message);
+  return { emoji, reacted: true };
+}
+
+// Incrémente le compteur de « likes » (cœurs flottants). Renvoie le nouveau total.
+async function incrementLike(liveRoomId, by = 1) {
+  const { data, error } = await supabase.rpc('shop_live_increment_like', {
+    p_room_id: liveRoomId,
+    p_by: Math.max(1, Math.min(20, Number(by) || 1)),
+  });
+  if (error) throw new Error(`incrementShopLiveLike: ${error.message}`);
+  return Number(data || 0);
+}
+
 module.exports = {
   createRoom,
   getRoomById,
   getCurrentRoomByTenant,
   updateRoom,
+  saveObsCredentials,
   saveBytePlusActivity,
   markRoomFailed,
   markRoomLive,
@@ -408,4 +627,11 @@ module.exports = {
   featureProduct,
 
   addEvent,
+
+  // Chat en direct (façon Whatnot)
+  getChat,
+  createChatMessage,
+  deleteChatMessage,
+  toggleChatReaction,
+  incrementLike,
 };

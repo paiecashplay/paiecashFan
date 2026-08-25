@@ -21,9 +21,20 @@ function isConfigured() {
   return Boolean(API_KEY);
 }
 
+// Clé API dédiée au compte « PaieCash Store » (reversement des commissions
+// plateforme → club). Distincte de PAIECASHCOIN_API_KEY (le store est un user
+// PCC à part qui s'auto-authentifie pour débiter SON propre solde).
+const STORE_API_KEY = process.env.PAIECASH_STORE_API_KEY || '';
+
+function isStoreConfigured() {
+  return Boolean(STORE_API_KEY);
+}
+
 // Appel bas niveau : ajoute l'auth Bearer + parse l'enveloppe { success, data, error }.
-async function call(path, { method = 'GET', body } = {}) {
-  if (!API_KEY) {
+// `apiKey` permet d'utiliser une clé différente (ex. celle du PaieCash Store).
+async function call(path, { method = 'GET', body, apiKey } = {}) {
+  const key = apiKey || API_KEY;
+  if (!key) {
     throw new Error('PAIECASHCOIN_API_KEY manquante côté serveur');
   }
 
@@ -32,7 +43,7 @@ async function call(path, { method = 'GET', body } = {}) {
     res = await fetch(`${API_URL}${path}`, {
       method,
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${key}`,
         ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
@@ -82,13 +93,36 @@ async function quote({ userEmail, amountEur, preferredMode }) {
 //                         cardAmountEur, stripeCheckoutUrl }
 async function execute({
   userEmail, userAuthId, amountEur, description, merchantRef, merchantName,
-  preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+  recipientSlug, preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+  apiKey,
 }) {
   return call('/pay/execute', {
     method: 'POST',
+    apiKey,
     body: {
       userEmail, userAuthId, amountEur, description, merchantRef, merchantName,
-      preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+      recipientSlug, preferredMode, bnplInstallments, successUrl, cancelUrl, origin, idempotencyKey,
+    },
+  });
+}
+
+// Reversement de commission plateforme → club, en PCC pur (instantané, sans Stripe).
+// Débite le solde du PaieCash Store (clé STORE_API_KEY) et crédite le club.
+async function payoutToClub({ clubSlug, amountEur, description, idempotencyKey, origin }) {
+  if (!STORE_API_KEY) throw new Error('PAIECASH_STORE_API_KEY manquante côté serveur');
+  const storeEmail = process.env.PAIECASH_STORE_EMAIL || 'paiecashstore@paiecashcoin.com';
+  return call('/pay/execute', {
+    method: 'POST',
+    apiKey: STORE_API_KEY,
+    body: {
+      userEmail: storeEmail,
+      amountEur,
+      description,
+      recipientSlug: clubSlug,
+      merchantRef: `paiecashfan:revshare:${idempotencyKey}`,
+      preferredMode: 'pcc_full',
+      idempotencyKey,
+      origin: origin || process.env.PUBLIC_APP_URL || 'https://paiecashfan.com',
     },
   });
 }
@@ -99,4 +133,4 @@ async function history({ userId, limit = 20 }) {
   return call(`/pay/history?userId=${encodeURIComponent(userId)}&limit=${limit}`);
 }
 
-module.exports = { isConfigured, resolveUser, quote, execute, history };
+module.exports = { isConfigured, isStoreConfigured, resolveUser, quote, execute, payoutToClub, history };

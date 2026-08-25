@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import ShopLiveObs from './ShopLiveObs';
+import { ShopLiveChat } from './ShopLiveChat';
+import { useShopLiveChat } from '@/hooks/useShopLiveChat';
 
 import {
   AlertCircle,
@@ -127,6 +130,11 @@ export default function ShopLiveTab({ club }) {
 
     error: productsError,
   } = useClubProducts(tenantId);
+
+  // Chat en direct pour la modération (le club répond aux questions depuis le BO).
+  const liveChat = useShopLiveChat(room?.id || null, {
+    enabled: ['ready', 'live'].includes(room?.status),
+  });
     const [createOpen, setCreateOpen] =
     useState(false);
 
@@ -586,35 +594,6 @@ export default function ShopLiveTab({ club }) {
                     <Radio size={16} className="animate-pulse" />
                     Diffusion en cours
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleOpenStudio}
-                    disabled={isBusy}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-ink-900 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {loadingAction === 'studio' ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Radio size={16} />
-                    )}
-                    Ouvrir le studio de diffusion
-                  </button>
-
-                  {studioSecondsLeft !== null && (
-                    <p
-                      className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
-                        studioSecondsLeft > 0
-                          ? 'text-bone-500'
-                          : 'text-amber-400'
-                      }`}
-                    >
-                      <Clock size={12} />
-                      {studioSecondsLeft > 0
-                        ? `Lien valable encore ${studioSecondsLeft}s`
-                        : 'Lien expiré — recliquez pour un lien frais'}
-                    </p>
-                  )}
                 </div>
               )}
             </div>
@@ -687,39 +666,22 @@ export default function ShopLiveTab({ club }) {
           </div>
         </section>
 
-        {/* Consignes de diffusion (le lien studio BytePlus expire en ~5 min) */}
-        {room.status === 'live' && (
-          <section className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.05] p-4 sm:p-5">
-            <div className="flex items-start gap-3">
-              <Info size={18} className="mt-0.5 shrink-0 text-amber-400" />
-              <div className="min-w-0">
-                <h3 className="text-sm font-bold text-amber-200">
-                  Pour que le direct s’affiche chez les supporters
-                </h3>
-                <p className="mt-1 text-xs leading-5 text-bone-400">
-                  Le lien du studio n’est valable qu’environ <b className="text-bone-200">5 minutes</b>.
-                  Dès qu’il s’ouvre, enchaînez sans attendre :
-                </p>
-                <ol className="mt-3 space-y-1.5 text-xs leading-5 text-bone-300">
-                  <li>
-                    <b className="text-bone-100">1.</b> Cliquez sur
-                    <b className="text-bone-100"> « Ouvrir le studio de diffusion »</b> (un onglet BytePlus s’ouvre).
-                  </li>
-                  <li>
-                    <b className="text-bone-100">2.</b> Autorisez la
-                    <b className="text-bone-100"> caméra et le micro</b> dans le navigateur.
-                  </li>
-                  <li>
-                    <b className="text-bone-100">3.</b> Dans le studio, cliquez sur
-                    <b className="text-bone-100"> « Start / Go Live »</b> pour lancer réellement la diffusion.
-                  </li>
-                </ol>
-                <p className="mt-3 text-[11px] leading-5 text-bone-500">
-                  Si l’écran reste sur « preview » ou que le lien a expiré, recliquez sur
-                  « Ouvrir le studio de diffusion » : un lien frais est généré à chaque fois.
-                </p>
-              </div>
+        {/* Diffusion OBS (MediaLive) — accès générés automatiquement */}
+        {['ready', 'live'].includes(room.status) && (
+          <ShopLiveObs liveId={room.id} />
+        )}
+
+        {/* Modération du chat : le club répond aux questions des supporters */}
+        {['ready', 'live'].includes(room.status) && (
+          <section className="space-y-2">
+            <div>
+              <h3 className="font-display text-base font-bold text-bone-50">Modération du chat</h3>
+              <p className="text-xs text-bone-500">
+                Réponds aux questions des supporters (ton message porte le badge « Club »). Utilise
+                « Répondre » pour citer une question précise.
+              </p>
             </div>
+            <ShopLiveChat chat={liveChat} className="h-[480px]" />
           </section>
         )}
 

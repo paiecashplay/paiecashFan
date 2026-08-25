@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, Shield, Globe, ShoppingBag, AlertTriangle, Clock,
-  TrendingUp, Receipt, ChevronRight
+  TrendingUp, Receipt, ChevronRight, HandCoins, Sparkles
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -11,15 +11,21 @@ export function AdminOverview() {
   const [data, setData]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState('');
+  const [payouts, setPayouts] = useState(null);  // { paidPcc, pendingPcc, count }
 
   useEffect(() => {
     apiFetch('/api/v2/admin/overview')
       .then((json) => setData(json.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+    // Reversements plateforme (commissions clubs) — chargement séparé, non bloquant.
+    apiFetch('/api/v2/admin/platform/commissions')
+      .then((json) => setPayouts(json.data?.totals || null))
+      .catch(() => {});
   }, []);
 
   const fmt = (n) => (n == null ? null : Number(n).toLocaleString('fr-FR'));
+  const fmtPcc = (n) => Number(n || 0).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
 
   return (
     <div className="space-y-8 max-w-5xl">
@@ -44,6 +50,32 @@ export function AdminOverview() {
         <StatCard loading={loading} icon={<Receipt size={18} />}     label="Transactions" value={fmt(data?.totalTransactions)}   color="rose" />
         <StatCard loading={loading} icon={<TrendingUp size={18} />}  label="Volume PCC"   value={data?.totalVolumePCC != null ? `${fmt(data.totalVolumePCC)} PCC` : null} color="gold" />
       </div>
+
+      {/* Reversements aux clubs (commissions produits plateforme) */}
+      <Link
+        to="/admin/platform"
+        className="group block rounded-2xl border border-gold-500/20 bg-gradient-to-br from-gold-500/[0.08] to-emerald-500/[0.04] p-5 transition-all hover:border-gold-500/40"
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl border border-gold-500/25 bg-gold-500/10 text-gold-400"><HandCoins size={20} /></span>
+            <div>
+              <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-bone-500 font-bold">
+                <Sparkles size={11} className="text-gold-400" /> Reversements aux clubs
+              </p>
+              <p className="mt-1 font-display text-2xl font-black text-bone-50">
+                {payouts == null ? <Skeleton className="h-7 w-24" /> : <>{fmtPcc(payouts.pendingPcc)} <span className="text-sm text-amber-400">PCC à reverser</span></>}
+              </p>
+              {payouts != null && (
+                <p className="mt-0.5 text-xs text-bone-400">
+                  Déjà reversé : <span className="font-bold text-emerald-400">{fmtPcc(payouts.paidPcc)} PCC</span> · {payouts.count || 0} vente(s)
+                </p>
+              )}
+            </div>
+          </div>
+          <ChevronRight size={18} className="shrink-0 text-bone-600 transition-colors group-hover:text-gold-400" />
+        </div>
+      </Link>
 
       {/* Alertes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

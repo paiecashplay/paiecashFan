@@ -172,20 +172,14 @@ function FederationClubCard({ club, index, cardBackground }) {
           {/* Logo bien en évidence — comme la capture */}
           <div className="mt-5">
             {club.logo ? (
-              <div
-                className="h-16 w-16 md:h-20 md:w-20 grid place-items-center rounded-xl backdrop-blur-md"
-                style={{
-                  background: 'rgba(4,8,13,0.5)',
-                  border: '1px solid rgba(255,255,255,0.12)'
-                }}
-              >
+              
                 <img
                   src={club.logo}
                   alt={club.name}
-                  className="h-12 w-12 md:h-14 md:w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
+                  className="h-16 w-16 md:h-20 md:w-20 object-contain drop"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
-              </div>
+              
             ) : (
               <div
                 className="h-16 w-16 md:h-20 md:w-20 rounded-xl grid place-items-center font-display font-black text-lg backdrop-blur-md"

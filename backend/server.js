@@ -55,6 +55,19 @@ app.use('/api/crypto/webhooks', (req, res, next) => {
 // ─── Webhooks ──────────────────────────────────────────────
 app.use('/webhook', webhooksRoutes);
 
+// Webhook PaieCashCoin : capture le body BRUT (vérif HMAC) AVANT express.json.
+const v2PccWebhook = require('./routes/v2/webhooks/paiecashcoin');
+app.use('/api/v2/webhooks/paiecashcoin', (req, res, next) => {
+  let data = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) => { data += chunk; });
+  req.on('end', () => {
+    req.rawBody = data;
+    try { req.body = data ? JSON.parse(data) : {}; } catch { req.body = {}; }
+    next();
+  });
+}, v2PccWebhook);
+
 // ─── Middleware ────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -136,6 +149,7 @@ const v2AdminCrudClubs = require('./routes/v2/admin/clubs-crud');
 const v2AdminUsers    = require('./routes/v2/admin/users');
 const v2AdminModeration = require('./routes/v2/admin/moderation');
 const v2AdminPrizes   = require('./routes/v2/admin/prizes');
+const v2AdminPlatform = require('./routes/v2/admin/platform');
 const v2Live          = require('./routes/v2/live');
 const v2ShopLive = require('./routes/v2/shop-live');
 
@@ -173,6 +187,7 @@ app.use('/api/v2/betting/pools', v2BettingPools);
 // sinon le guard super_admin de governance les intercepte → 403 pour le club_admin.
 app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);   // club_admin (scope) + super_admin
 app.use('/api/v2/admin/prizes', v2AdminPrizes);          // club_admin (son club) + super_admin
+app.use('/api/v2/admin/platform', v2AdminPlatform);      // super_admin : produits plateforme + reversements
 app.use('/api/v2/admin', v2AdminGov);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);
@@ -228,6 +243,10 @@ const server = httpServer.listen(PORT, () => {
   // Tombola : tirage automatique des campagnes arrivées à échéance (toutes les 5 min)
   const { runTombolaDraws } = require('./jobs/tombolaDraw');
   cron.schedule('*/5 * * * *', () => { runTombolaDraws(); });
+
+  // Revshare : rattrape les reversements de commission plateforme en attente/échec (toutes les 5 min)
+  const revshareProcessor = require('./services/revshareProcessor');
+  cron.schedule('*/5 * * * *', () => { revshareProcessor.processPending().catch(() => {}); });
 
   // Gains : relance automatique des gagnants sans adresse (cadence gérée dans le job, exécuté chaque heure)
   const { runPrizeReminders } = require('./jobs/prizeReminders');

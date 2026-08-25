@@ -1,7 +1,7 @@
 # 🪪 PaieCashFan — Fiche technique (carte d'identité de l'application)
 
 > Document vivant : **mis à jour à chaque commit** (section « Journal des évolutions »).
-> Dernière mise à jour : 2026-08-04.
+> Dernière mise à jour : 2026-08-13.
 
 ## 1. C'est quoi ?
 **PaieCashFan** est une plateforme web pour les **fans de football** (et clubs / fédérations) :
@@ -135,6 +135,75 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-13 (db)** — **Reversement plateforme Option A (charge unique + revshare async) + pages paiement + vues reversements**.
+  **Paiement** (`checkout.js`) refondu selon PaieCashCoin : la vente d'un produit plateforme est
+  **débitée UNE fois** vers le compte `paiecashstore` (`recipientSlug`), puis la commission (10%) est
+  **reversée au club en PCC pur** de façon asynchrone (`services/paiecashcoin.payoutToClub` avec
+  `PAIECASH_STORE_API_KEY`). File **`revshare_pending`** + **`webhook_events`** (migration
+  `revshare-pending.sql`), processeur `services/revshareProcessor` (déclenché après la vente pcc_full,
+  par le **webhook** `payment.completed` — `routes/v2/webhooks/paiecashcoin.js`, HMAC `X-PCC-Signature`
+  + idempotence `event.id` — et par un **cron 5 min**). **Pages paiement** partagées (`CheckoutResult.jsx`,
+  utilisées par le modal PCC ET le retour Stripe `CheckoutReturn`) : **succès** (fond stade + confettis +
+  fidélité) et **échec** (pistes de résolution), tous modes. **Reversements** : card sur le **dashboard
+  super-admin** (`AdminOverview` → `/admin/platform`) et **BO club** (`MonClubBO` : `ClubPayoutsCard` +
+  endpoint scopé `clubs-crud/clubs/:id/commissions`) ; le **KPI « Revenus nets »** du club inclut les
+  reversements reçus (et masque le « -100% » trompeur). **Fixes** : bouton « Acheter » de la billetterie
+  (onClick manquant), « Continuer mes achats » revient à la boutique du club. ⚠️ Prod : appliquer
+  `revshare-pending.sql` ; env Railway store/webhook déjà posés.
+- **2026-08-13 (da)** — **Produits « plateforme » (ex. lunettes Aivora) dans toutes les boutiques + commission clubs**.
+  Un produit marqué `is_global` (possédé par le tenant caché **PaieCash Store**, slug `paiecash-store`)
+  s'affiche automatiquement dans **toutes** les boutiques de clubs (**union dynamique** dans
+  `marketplace/clubs.js` : produits du club + produits globaux actifs ; badge doré « Partenaire » ;
+  pas de copie → les clubs créés plus tard sont alimentés d'office). **Paiement réparti** au checkout
+  (`checkout.js`) : sur une ligne plateforme, `(100-taux)%` → PaieCash Store, `taux%` (défaut 10,
+  via `products.metadata.commissionPct`) → **club de la boutique** (`boutiqueSlug`), le fan paie le
+  même total (2 `pcc.execute`) ; commission tracée dans **`platform_commissions`** (statut `paid`, ou
+  `pending` si la 2ᵉ patte échoue / paiement carte). **Migration `platform-products.sql`** :
+  `products.is_global`, tenant PaieCash Store, table `platform_commissions` (RLS deny-all). **BO
+  super-admin `/admin/platform`** (route `admin/platform.js`, `AdminPlatform.jsx`) : onglet
+  « Produits plateforme » (CRUD + case « Afficher dans toutes les boutiques » + taux %) et onglet
+  « Reversements » (totaux + par club + historique). Le store est masqué du listing public des clubs.
+  ⚠️ Prérequis prod : créer le marchand `paiecash-store` côté PaieCashCoin (sinon l'achat échoue).
+- **2026-08-11 (cz)** — **Live Boutique : modération du chat façon Whatnot (le club répond aux questions)**.
+  **BDD** (migration `shop-live-chat-moderation.sql`, appliquée en prod) : colonnes `is_host`
+  (message du club/modérateur → badge) et `reply_to` (citation d'une question, `ON DELETE SET NULL`)
+  sur `shop_live_messages`. **Backend** : `POST /chat/messages` marque `is_host` si l'auteur
+  `canManage` le club et accepte `replyTo` (validé même salle) ; `GET /chat` renvoie `isHost`,
+  `replyTo` (extrait auteur+contenu, même supprimé) et `canModerate` ; suppression déjà ouverte au
+  club via `canManage`. **Front** : `ShopLiveChat` gagne le **badge « Club »** (doré) + fond
+  distinct sur les messages hôte, le rendu de **citation**, et un bouton **« Répondre »** (bandeau
+  « Réponse à… » au-dessus de la saisie) ; le hook `useShopLiveChat` porte `canModerate` + `replyTo`.
+  Nouveau **panneau « Modération du chat » dans le BO** (`ShopLiveTab`) : le club répond depuis le
+  back-office pendant la présentation caméra. Testé local. NB « modérateur » = compte gérant le club.
+- **2026-08-11 (cy)** — **Live Boutique : chat en direct + likes façon Whatnot**.
+  Les acheteurs peuvent enfin **interagir avec le vendeur** pendant le live shopping.
+  **BDD** (migration `shop-live-chat.sql`, appliquée en prod) : `shop_live_messages`
+  (id, live_room_id, author_id, content, moderation_status, deleted_at) +
+  `shop_live_message_reactions` (miroir du chat Fan Club, palette 6 emojis, RLS deny-all)
+  + colonne `like_count` sur `shop_live_rooms` + fonction `shop_live_increment_like` (incrément
+  atomique). **Backend** (`routes/v2/shop-live.js` + `db/shopLive.js`) : `GET /:id/chat`
+  (public, messages + likeCount), `POST /:id/chat/messages` (connecté, **filtre IA `prepublish`**
+  anti-abus, pas de charte), `DELETE` d'un message (auteur, ou club via `canManage`),
+  `POST .../reactions` (bascule emoji), `POST /:id/like` (cœur → total). **Front** : hook
+  `useShopLiveChat` (polling 5 s, écritures optimistes, réactions, likes), panneau `ShopLiveChat`
+  (questions + auto-scroll + réactions + suppression + CTA connexion), `LiveHearts` (cœurs
+  flottants sur la vidéo à chaque incrément de like, soi **et** autres viewers) + bouton ❤️.
+  Intégré à `ClubShopLive` (panneau sous les produits, et rail droit en plein écran). Testé local.
+- **2026-08-11 (cx)** — **Live Boutique : migration de BytePlus livesaas → MediaLive (RTMP/HLS)**.
+  Le module *live shopping* réutilise désormais **le même pipeline que le Live Fan Club**
+  (`services/byteplus.js`, push RTMP signé → pull HLS) au lieu de l'API livesaas (bloquée en
+  « Preview » côté console). **Backend** (`routes/v2/shop-live.js`) : `getOrCreateRoomStreamName`
+  attribue à chaque room un **`streamName` stable** (`{slug}-shop-{id8}`, stocké en `metadata`),
+  nouvel endpoint **BO-only `GET /shop-live/:id/broadcast`** (auth `canManage`) qui renvoie les
+  **accès OBS auto-générés** (`server` + `streamKey` signée md5, valable ~7 j via `pushTtl`) —
+  jamais exposés aux fans ; `publicRoom` expose seulement `streamUrl` (HLS public). Création et
+  `/start` nettoyés de l'ancien code livesaas (`createActivity`/webpush). **Front** : nouveau
+  panneau `ShopLiveObs.jsx` (Serveur + Clé auto, copier/révéler/régénérer, **guide diffusion
+  complet** démarrer/arrêter + anti-écho + rappel clé) ; viewer fan `ClubShopLive.jsx` passe de
+  l'iframe livesaas au **`StreamPlayer` HLS** de l'app ; retrait du studio navigateur livesaas du
+  BO. **Vrai logo PaieCashFan** dans la sidebar du BO club (`MonClubBO.jsx`). Process en 2 temps
+  (OBS « Démarrer le streaming » → BO « Démarrer le live »). Testé en local (OBS → caméra → viewer
+  HLS + produits + chat). ⚠️ Prod : ajouter `BYTEPLUS_PUSH_AUTH_KEY` sur Railway.
 - **2026-08-09 (cw)** — **Refonte de l'espace Fan `/mon-compte` en dashboard + système d'amis + notifications**.
   **Dashboard Fan plein écran** (hors Navbar publique, branche routing dédiée `FanDashboardLayout`
   + `<Outlet>`, sidebar identité/nav groupée/déconnexion, topbar recherche+notifs+avatar, drawer

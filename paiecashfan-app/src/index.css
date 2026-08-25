@@ -192,3 +192,34 @@
   .pcc-gold-card::before,
   .pcc-gold-card::after { animation: none; }
 }
+
+/* ── Cœurs flottants du Live Boutique (façon Whatnot) ─────────────── */
+.pcf-heart {
+  position: absolute;
+  bottom: 0;
+  will-change: transform, opacity;
+  animation: pcf-heart-rise var(--pcf-heart-dur, 2.6s) ease-out forwards;
+  pointer-events: none;
+  user-select: none;
+}
+@keyframes pcf-heart-rise {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  12%  { opacity: 1; }
+  40%  { transform: translateY(-40%) translateX(var(--pcf-heart-x, 0)) scale(1); }
+  100% { transform: translateY(-105%) translateX(calc(var(--pcf-heart-x, 0) * -1)) scale(1.15); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pcf-heart { animation-duration: 0.01s; opacity: 0; }
+}
+
+/* ── Confettis de la page de confirmation de commande ─────────────── */
+@keyframes pcf-confetti-fall {
+  0%   { transform: translateY(-12vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(88vh) rotate(720deg);  opacity: 0; }
+}
+.pcf-confetti-piece {
+  position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px;
+  will-change: transform, opacity; pointer-events: none;
+  animation: pcf-confetti-fall var(--pcf-dur, 3s) linear var(--pcf-delay, 0s) forwards;
+}
+@media (prefers-reduced-motion: reduce) { .pcf-confetti-piece { display: none; } }

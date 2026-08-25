@@ -1,8 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
-import { Maximize2, ShoppingBag, Star, X } from 'lucide-react';
+import { Heart, Maximize2, ShoppingBag, Star, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { Container } from '@/components/ui/Container';
+import { StreamPlayer } from '@/components/fanclub/StreamPlayer';
+import { useShopLiveChat } from '@/hooks/useShopLiveChat';
+import { ShopLiveChat } from './ShopLiveChat';
+import { LiveHearts } from './LiveHearts';
+
+// Bouton « like » (cœur) façon Whatnot, posé en bas à droite de la vidéo.
+function LikeButton({ chat, className = '' }) {
+  const bump = () => {
+    if (!chat.isLoggedIn) return;
+    chat.sendLike();
+  };
+  return (
+    <button
+      type="button"
+      onClick={bump}
+      disabled={!chat.isLoggedIn}
+      title={chat.isLoggedIn ? 'J\'aime' : 'Connecte-toi pour aimer'}
+      className={`group inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-3 py-2 text-xs font-black text-white backdrop-blur transition hover:bg-black/70 disabled:opacity-60 ${className}`}
+    >
+      <Heart size={15} className="text-red-400 transition group-active:scale-125 group-hover:fill-red-400" />
+      <span className="tabular-nums">{chat.likeCount.toLocaleString('fr-FR')}</span>
+    </button>
+  );
+}
 
 const pccOf = (p) => Number(p?.pcc_price ?? p?.price_pcc ?? 0);
 const eurOf = (p) => Number(p?.eur_price ?? 0);
@@ -45,8 +69,11 @@ export function ClubShopLive({ slug }) {
   }, [slug]);
 
   const room = data?.room || null;
-  // On n'affiche la section QUE si un live est réellement en cours.
-  if (!room || room.status !== 'live' || !room.viewerUrl) return null;
+  // Chat + likes (façon Whatnot) : polling scopé à la salle, actif seulement en direct.
+  const chat = useShopLiveChat(room?.id || null, { enabled: room?.status === 'live' });
+
+  // On n'affiche la section QUE si un live est réellement en cours (flux HLS présent).
+  if (!room || room.status !== 'live' || !room.streamUrl) return null;
 
   const products = Array.isArray(data.products) ? data.products : [];
   const featuredId = room.featuredProductId || null;
@@ -78,17 +105,12 @@ export function ClubShopLive({ slug }) {
         {room.title && <p className="mb-6 text-sm text-bone-400">{room.title}</p>}
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-          {/* Vidéo — page de visionnage hébergée BytePlus */}
+          {/* Vidéo — lecteur HLS natif (MediaLive) + cœurs flottants (façon Whatnot) */}
           <div>
-            <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
-              <iframe
-                src={room.viewerUrl}
-                title={room.title || 'Live Boutique'}
-                className="h-full w-full"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowFullScreen
-                frameBorder="0"
-              />
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <StreamPlayer isLive provider="hls" url={room.streamUrl} />
+              <LiveHearts likeCount={chat.likeCount} />
+              <LikeButton chat={chat} className="absolute bottom-3 right-3 z-30" />
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <button
@@ -96,16 +118,8 @@ export function ClubShopLive({ slug }) {
                 onClick={() => setFs(true)}
                 className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"
               >
-                <Maximize2 size={13} /> Plein écran &amp; chat
+                <Maximize2 size={13} /> Plein écran
               </button>
-              <a
-                href={room.viewerUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-bone-500 transition-colors hover:text-bone-300"
-              >
-                Ouvrir dans un onglet ↗
-              </a>
             </div>
           </div>
 
@@ -119,7 +133,7 @@ export function ClubShopLive({ slug }) {
               <p className="text-sm text-bone-500">Aucun produit associé à ce live pour le moment.</p>
             )}
 
-            <div className="space-y-2.5 lg:max-h-[440px] lg:overflow-y-auto lg:pr-1">
+            <div className="space-y-2.5 lg:max-h-[240px] lg:overflow-y-auto lg:pr-1">
               {ordered.map((it) => {
                 const p = it.product;
                 if (!p) return null;
@@ -157,11 +171,14 @@ export function ClubShopLive({ slug }) {
                 );
               })}
             </div>
+
+            {/* Chat en direct (façon Whatnot) : questions au vendeur + réactions */}
+            <ShopLiveChat chat={chat} className="h-[440px]" />
           </div>
         </div>
       </Container>
 
-      {/* Plein écran in-app : large (chat BytePlus visible) + bouton Fermer. */}
+      {/* Plein écran in-app : vidéo + chat en direct (rail droit) + bouton Fermer. */}
       {fs && (
         <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -180,15 +197,16 @@ export function ClubShopLive({ slug }) {
               <X size={16} /> Fermer
             </button>
           </div>
-          <div className="min-h-0 flex-1 px-2 pb-2 sm:px-4 sm:pb-4">
-            <iframe
-              src={room.viewerUrl}
-              title={room.title || 'Live Boutique'}
-              className="h-full w-full rounded-xl border border-white/10 bg-black"
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              allowFullScreen
-              frameBorder="0"
-            />
+          <div className="grid min-h-0 flex-1 gap-2 px-2 pb-2 sm:px-4 sm:pb-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="relative h-full overflow-hidden rounded-xl border border-white/10 bg-black">
+              <StreamPlayer isLive provider="hls" url={room.streamUrl} />
+              <LiveHearts likeCount={chat.likeCount} seed={7} />
+              <LikeButton chat={chat} className="absolute bottom-3 right-3 z-30" />
+            </div>
+            {/* Chat en direct — rail de droite (masqué en dessous de lg) */}
+            <div className="hidden min-h-0 lg:block">
+              <ShopLiveChat chat={chat} className="h-full" />
+            </div>
           </div>
         </div>
       )}
