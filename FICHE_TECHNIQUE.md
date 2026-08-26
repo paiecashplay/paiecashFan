@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-27 (dd)** — **Navigation & recherche contextuelle Club/Fédération** (chantier stagiaire, mergé
+  sans conflit sur base `dc`, `feature/club-navigation-fixes`). Menu latéral (`ClubSideActions` /
+  `SideDock`) accessible sur les pages club (billetterie, fan club) desktop+mobile ; **« Suivre ce
+  club »** corrigé & synchronisé sans refresh (`FavoriteClubButton` + `useFavoriteClub`) ; **recherche
+  contextuelle** sur la page Club (joueurs/produits/palmarès, `ClubContextSearchModal`) et Fédération
+  (sélections nationales/clubs/produits, `FederationContextSearchModal`) ; recherche **masquée** sur la
+  Billetterie (refonte à venir) et sur le chat Fan Club. Vérifié : **badge Partenaire (ClubDetail)** et
+  **fusion équipes nationales + boutique fédération (FederationDetail)** préservés ; build OK.
 - **2026-08-14 (dc)** — **Intégration des chantiers stagiaire** (revue + merge sans conflit, sur base `db`).
   `feature/ux-improvements` : checkout amélioré (étape **« Récapitulatif »** + validation des champs en
   direct, popup infos manquantes) — **notre logique Option A préservée** (boutiqueSlug, OrderSuccess/Failure,
