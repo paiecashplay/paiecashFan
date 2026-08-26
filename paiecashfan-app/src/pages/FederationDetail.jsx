@@ -17,6 +17,7 @@ import { afcMembers } from '@/data/afc-members';
 import NationalTeamsSection from '@/components/federation/NationalTeamsSection';
 import { cn } from '@/lib/cn';
 import { MerchandiseSection } from '@/pages/ClubDetail';
+import { FederationContextSearchModal } from '@/components/federation/FederationContextSearchModal';
 
 // ── Registry des datasets par fédération ───────────────────────────
 // Chaque entrée : { members, founded, heroVideo?, heroGradient? }
@@ -100,7 +101,7 @@ export function FederationDetail() {
 
   // 2) Fédération nationale en base → vue dynamique
   if (loading) return <FedLoading />;
-  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} hub={dbHub} products={dbProducts} nationalTeams={nationalTeams} />;
+  if (dbFed) return <DynamicFederationView federation={dbFed} members={dbMembers} hub={dbHub} products={dbProducts} nationalTeams={nationalTeams}/>;
 
   // 3) Repli : entrée statique sans dataset, ou inconnue
   const federation = federations.find((f) => f.id === fedId);
@@ -131,7 +132,7 @@ const DIVISION_RANK = {
 };
 const divisionRank = (name) => DIVISION_RANK[name] ?? 50;
 
-function DynamicFederationView({ federation, members, hub, products, nationalTeams }) {
+function DynamicFederationView({ federation, members, hub, products, nationalTeams}) {
   const safeNationalTeams = {
     men: nationalTeams?.men || [],
     women: nationalTeams?.women || [],
@@ -152,6 +153,8 @@ function DynamicFederationView({ federation, members, hub, products, nationalTea
     countryFlag:  federation.flag_emoji || '',
     league:       m.league_name || null,
   }));
+
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Regroupement par division (Ligue 1/2, Bundesliga/2.Bundesliga…) pour la
   // lisibilité. Les divisions taguées d'abord (plus grosse en tête), les clubs
@@ -180,10 +183,12 @@ function DynamicFederationView({ federation, members, hub, products, nationalTea
   const conf = federation.confederation_code;
   const backTo = conf ? `/federations/${conf.toLowerCase()}` : '/';
 
+  
+
   return (
     <>
       {/* Dock d'actions flottant (bas centré, ou rail gauche sur très grand écran) */}
-      <FedSideActions primaryColor={color} hasProducts={products?.length > 0} />
+      <FedSideActions primaryColor={color} hasProducts={products?.length > 0} onSearch={() => setSearchOpen(true)}/>
 
       {/* ═══ HERO plein écran (comme un club) ═══════════════════════ */}
       <section className="relative overflow-hidden border-b border-white/5 min-h-[68vh] flex flex-col">
@@ -291,6 +296,16 @@ function DynamicFederationView({ federation, members, hub, products, nationalTea
         )}
       </div>
 
+      {searchOpen && (
+        <FederationContextSearchModal
+          nationalTeams={safeNationalTeams}
+          clubs={clubs}
+          products={products || []}
+          primaryColor={color}
+          onClose={() => setSearchOpen(false)}
+        />
+      )}
+
       {/* Espace bas pour le dock mobile (barre flottante en bas < md) */}
       <div className="pb-32 md:pb-0" />
     </>
@@ -333,7 +348,7 @@ function FedStat({ value, label, accent = '#10b981', reduce = false }) {
 // Réutilise le dock partagé (SideDock). Le bouton « Boutique » des clubs est
 // remplacé par « Clubs » (ballon) placé EN PREMIER : une fédération liste des
 // clubs, pas des produits.
-function FedSideActions({ primaryColor, hasProducts = false }) {
+function FedSideActions({ primaryColor, hasProducts = false,  onSearch }) {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -353,11 +368,11 @@ function FedSideActions({ primaryColor, hasProducts = false }) {
     ...(hasProducts
     ? [{key: 'shop', icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise')}]
     : []),
-    { key: 'play',  icon: Trophy,     label: 'Palmarès',   onClick: () => scrollTo('trophies') },
-    { key: 'games', icon: Dices,      label: 'Effectif',   onClick: () => scrollTo('squad') },
-    { key: 'like',  icon: Heart,      label: 'J\'aime' },
+    //{ key: 'play',  icon: Trophy,     label: 'Palmarès',   onClick: () => scrollTo('trophies') },
+    //{ key: 'games', icon: Dices,      label: 'Effectif',   onClick: () => scrollTo('squad') },
+    //{ key: 'like',  icon: Heart,      label: 'J\'aime' },
     { key: 'share', icon: Share2,     label: 'Partager',   onClick: handleShare },
-    { key: 'find',  icon: Search,     label: 'Rechercher' }
+    { key: 'find',  icon: Search,     label: 'Rechercher', onClick: onSearch}
   ];
 
   return <SideDock actions={actions} accent={primaryColor} />;

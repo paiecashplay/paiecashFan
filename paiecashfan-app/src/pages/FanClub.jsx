@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {  Video, Users, Radio, LogIn} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -24,6 +24,7 @@ import { usePresence } from '@/hooks/usePresence';
 import { useLiveMatch } from '@/hooks/useLiveMatch';
 import { useStream } from '@/hooks/useStream';
 import { StreamPlayer } from '@/components/fanclub/StreamPlayer';
+import { ClubSideActions } from '@/components/club/ClubSideActions';
 
 
 // Club par défaut quand on arrive sur /fan-club sans slug.
@@ -33,6 +34,7 @@ export function FanClub() {
   const { slug: routeSlug } = useParams();
   const slug = routeSlug || DEFAULT_SLUG;
   const { club: dbClub } = useClubDetail(slug);
+  const navigate = useNavigate();
 
   const club = {
     slug,
@@ -231,245 +233,258 @@ export function FanClub() {
   }
 
   return (
-    <section className="py-16 md:py-20">
-      <Container>
-        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-6 md:p-8">
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full blur-3xl opacity-30"
-            style={{ background: club.primaryColor }}
-          />
+    <div className="relative">
+      <ClubSideActions
+        primaryColor={club.primaryColor}
+        clubSlug={slug}
+        clubId={club.id}
+        showSearch={false}
+      />
 
-          <div className="relative">
-            <div className="flex items-start justify-between gap-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
-                <Radio size={13} />
-                Fan Club Live
+      <div className="md:pl-24 2xl:pl-0">
+        <section className="py-16 md:py-20">
+          <Container>
+            <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-6 md:p-8">
+              <div
+                className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full blur-3xl opacity-30"
+                style={{ background: club.primaryColor }}
+              />
+
+              <div className="relative">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
+                    <Radio size={13} />
+                    Fan Club Live
+                  </div>
+
+                  {/* ⭐ Suivre ce club en favori directement depuis le salon */}
+                  {club.id && <FavoriteClubButton tenantId={club.id} />}
+                </div>
+
+                <h1 className="mt-5 break-words font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl md:text-6xl">
+                  {club.name}
+                </h1>
+
+                <p className="mt-3 max-w-2xl text-sm md:text-base text-bone-400">
+                  Regarde le live officiel du club, échange avec tous les supporters ou crée ton espace privé avec tes amis.
+                </p>
               </div>
+            </header>
 
-              {/* ⭐ Suivre ce club en favori directement depuis le salon */}
-              {club.id && <FavoriteClubButton tenantId={club.id} />}
+            {/* Sanction active → bandeau en tête du salon */}
+            {mode === 'club' && access?.activeSanction && (
+              <div className="mt-4"><ActiveSanctionBanner sanction={access.activeSanction} /></div>
+            )}
+
+            {!user && (
+              <div className="mt-4 flex flex-col items-start justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4 sm:flex-row sm:items-center">
+                <p className="text-sm text-bone-200">
+                  <span className="font-bold text-emerald-400">Connecte-toi</span> pour publier, commenter et discuter avec les supporters.
+                </p>
+                <Link
+                  to="/login"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300 transition"
+                >
+                  <LogIn size={14} /> Se connecter
+                </Link>
+              </div>
+            )}
+
+            <div className="mt-6 grid gap-3 md:mt-8 md:grid-cols-2">
+              <StreamingModeCard
+                active={mode === 'club'}
+                icon={<Video size={22} />}
+                title="Streaming Fan Club"
+                badge="Public"
+                description="Regarde le live officiel avec tous les supporters du club."
+                meta={feedLoading ? 'Chargement...' : `${new Intl.NumberFormat('fr-FR').format(counters.supportersCount)} supporters`}
+                color="emerald"
+                onClick={() => setMode('club')}
+              />
+              <StreamingModeCard
+                active={mode === 'friends'}
+                icon={<Users size={22} />}
+                title="Mon Streaming"
+                badge="Privé"
+                description="Regarde le même live, mais discute seulement avec tes amis."
+                meta="Salon privé"
+                color="sky"
+                onClick={() => setMode('friends')}
+              />
+            </div>
+            <LiveMatchBanner
+              mode={mode}
+              match={liveMatch}
+              counters={counters}
+            />
+            <LiveQuickActions
+              mode={mode}
+              club={club}
+              onReact={handleLiveReaction}
+              fanPoints={fanPoints}
+            />
+
+            <ClubShopLive slug={slug} />
+
+            <ClubFixtures slug={slug} />
+
+            {/* Streaming à GAUCHE + chat à DROITE dès `lg` (1024 px). Avant, le
+                côte-à-côte n'arrivait qu'à `xl` (1280 px) : sur un écran un peu
+                moins large, le chat basculait sous la vidéo. */}
+            <div className="mt-6 grid gap-5 md:mt-8 lg:h-[68vh] lg:min-h-[440px] lg:max-h-[680px] lg:[grid-template-rows:1fr] lg:grid-cols-[minmax(0,1.5fr)_400px] xl:grid-cols-[minmax(0,1.5fr)_420px]">
+              <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40 lg:flex lg:flex-col lg:h-full">
+                <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <div>
+                    <h2 className="text-sm font-black uppercase tracking-[0.18em] text-bone-100">
+                      Live officiel
+                    </h2>
+                    <p className="mt-1 text-xs text-bone-500">
+                      {mode === 'club'
+                        ? 'Vous regardez avec tous les supporters.'
+                        : 'Vous regardez avec votre salon privé.'}
+                    </p>
+                  </div>
+
+                  {stream.isLive ? (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                      Live
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-bone-500">
+                      Hors ligne
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative overflow-hidden bg-ink-950 lg:flex-1 lg:min-h-0">
+                  <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} url={stream.url} />
+
+                  {/* Réactions flottantes par-dessus la vidéo */}
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    {liveReactions.map((reaction, index) => (
+                      <span
+                        key={reaction.id}
+                        className="absolute bottom-6 text-4xl animate-bounce"
+                        style={{ left: `${20 + index * 14}%` }}
+                      >
+                        {reaction.emoji}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <LiveChat
+                mode={mode}
+                club={club}
+                messages={visibleMessages}
+                loading={feedLoading}
+                error={feedError}
+                isEmpty={isChatEmpty}
+                onRetry={reloadFeed}
+                onSendMessage={handleSendMessage}
+                onUpdateMessage={updateMessage}
+                onDeleteMessage={deleteMessage}
+                access={access}
+                currentUserId={user?.id}
+                onReport={(m) => setReportTarget(m)}
+                onHideUser={hideUser}
+                onOpenCharter={() => setCharterOpen(true)}
+                onToggleReaction={(messageId, emoji) => { if (ensureCanWrite()) toggleMessageReaction(messageId, emoji); }}
+              />
             </div>
 
-            <h1 className="mt-5 break-words font-display text-3xl font-black uppercase text-bone-50 sm:text-4xl md:text-6xl">
-              {club.name}
-            </h1>
+              <div className="mt-6">
+                <ParticipantsPanel
+                  mode={mode}
+                  fans={fans}
+                  club={club}
+                  loading={feedLoading}
+                  error={feedError}
+                  onRetry={reloadFeed}
+                />
+              </div>
 
-            <p className="mt-3 max-w-2xl text-sm md:text-base text-bone-400">
-              Regarde le live officiel du club, échange avec tous les supporters ou crée ton espace privé avec tes amis.
-            </p>
-          </div>
-        </header>
+            <div className="mt-10">
+              <div className="mb-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-400">
+                  Communauté
+                </p>
 
-        {/* Sanction active → bandeau en tête du salon */}
-        {mode === 'club' && access?.activeSanction && (
-          <div className="mt-4"><ActiveSanctionBanner sanction={access.activeSanction} /></div>
-        )}
-
-        {!user && (
-          <div className="mt-4 flex flex-col items-start justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4 sm:flex-row sm:items-center">
-            <p className="text-sm text-bone-200">
-              <span className="font-bold text-emerald-400">Connecte-toi</span> pour publier, commenter et discuter avec les supporters.
-            </p>
-            <Link
-              to="/login"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300 transition"
-            >
-              <LogIn size={14} /> Se connecter
-            </Link>
-          </div>
-        )}
-
-        <div className="mt-6 grid gap-3 md:mt-8 md:grid-cols-2">
-          <StreamingModeCard
-            active={mode === 'club'}
-            icon={<Video size={22} />}
-            title="Streaming Fan Club"
-            badge="Public"
-            description="Regarde le live officiel avec tous les supporters du club."
-            meta={feedLoading ? 'Chargement...' : `${new Intl.NumberFormat('fr-FR').format(counters.supportersCount)} supporters`}
-            color="emerald"
-            onClick={() => setMode('club')}
-          />
-          <StreamingModeCard
-            active={mode === 'friends'}
-            icon={<Users size={22} />}
-            title="Mon Streaming"
-            badge="Privé"
-            description="Regarde le même live, mais discute seulement avec tes amis."
-            meta="Salon privé"
-            color="sky"
-            onClick={() => setMode('friends')}
-          />
-        </div>
-        <LiveMatchBanner
-          mode={mode}
-          match={liveMatch}
-          counters={counters}
-        />
-        <LiveQuickActions
-          mode={mode}
-          club={club}
-          onReact={handleLiveReaction}
-          fanPoints={fanPoints}
-        />
-
-        <ClubShopLive slug={slug} />
-
-        <ClubFixtures slug={slug} />
-
-        {/* Streaming à GAUCHE + chat à DROITE dès `lg` (1024 px). Avant, le
-            côte-à-côte n'arrivait qu'à `xl` (1280 px) : sur un écran un peu
-            moins large, le chat basculait sous la vidéo. */}
-        <div className="mt-6 grid gap-5 md:mt-8 lg:h-[68vh] lg:min-h-[440px] lg:max-h-[680px] lg:[grid-template-rows:1fr] lg:grid-cols-[minmax(0,1.5fr)_400px] xl:grid-cols-[minmax(0,1.5fr)_420px]">
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/40 lg:flex lg:flex-col lg:h-full">
-            <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-              <div>
-                <h2 className="text-sm font-black uppercase tracking-[0.18em] text-bone-100">
-                  Live officiel
+                <h2 className="mt-2 break-words font-display text-2xl font-black uppercase text-bone-50 sm:text-3xl">
+                  Publications des supporters
                 </h2>
-                <p className="mt-1 text-xs text-bone-500">
-                  {mode === 'club'
-                    ? 'Vous regardez avec tous les supporters.'
-                    : 'Vous regardez avec votre salon privé.'}
+
+                <p className="mt-2 text-sm text-bone-400">
+                  Continue les discussions, partage tes réactions et échange avec les fans même hors live.
                 </p>
               </div>
 
-              {stream.isLive ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
-                  Live
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-bone-500">
-                  Hors ligne
-                </span>
-              )}
+              <ClubFanCommunity
+                club={club}
+                fans={fans}
+                posts={posts}
+                comments={comments}
+                newPost={newPost}
+                setNewPost={setNewPost}
+                onPublish={handlePublish}
+                onUpdatePost={handleUpdatePost}
+                onDeletePost={handleDeletePost}
+                onLikePost={handleLikePost}
+                onAddComment={handleAddComment}
+                onUpdateComment={handleUpdateComment}
+                onDeleteComment={handleDeleteComment}
+                currentUserId={user?.id}
+                onReport={(m) => setReportTarget(m)}
+                onHideUser={hideUser}
+                loading={feedLoading}
+                error={feedError}
+                isEmpty={feedIsEmpty}
+                onRetry={reloadFeed}
+                mode={mode}
+              />
             </div>
+          </Container>
 
-            <div className="relative overflow-hidden bg-ink-950 lg:flex-1 lg:min-h-0">
-              <StreamPlayer isLive={stream.isLive} provider={stream.provider} id={stream.id} url={stream.url} />
+          {/* ── Modération : charte d'entrée + signalement ────────── */}
+          <AnimatePresence>
+            {charterOpen && access && (
+              <CharterEntryModal
+                access={access}
+                busy={charterBusy}
+                onAccept={acceptCharter}
+                onClose={() => { setCharterOpen(false); setCharterDismissed(true); }}
+              />
+            )}
+          </AnimatePresence>
 
-              {/* Réactions flottantes par-dessus la vidéo */}
-              <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                {liveReactions.map((reaction, index) => (
-                  <span
-                    key={reaction.id}
-                    className="absolute bottom-6 text-4xl animate-bounce"
-                    style={{ left: `${20 + index * 14}%` }}
-                  >
-                    {reaction.emoji}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </section>
+          <AnimatePresence>
+            {reportTarget && (
+              <ReportMessageModal
+                message={reportTarget}
+                onSubmit={submitReport}
+                onClose={() => setReportTarget(null)}
+              />
+            )}
+          </AnimatePresence>
 
-          <LiveChat
-            mode={mode}
-            club={club}
-            messages={visibleMessages}
-            loading={feedLoading}
-            error={feedError}
-            isEmpty={isChatEmpty}
-            onRetry={reloadFeed}
-            onSendMessage={handleSendMessage}
-            onUpdateMessage={updateMessage}
-            onDeleteMessage={deleteMessage}
-            access={access}
-            currentUserId={user?.id}
-            onReport={(m) => setReportTarget(m)}
-            onHideUser={hideUser}
-            onOpenCharter={() => setCharterOpen(true)}
-            onToggleReaction={(messageId, emoji) => { if (ensureCanWrite()) toggleMessageReaction(messageId, emoji); }}
-          />
-        </div>
+          {/* Publication refusée par l'IA avant diffusion (lot 6) */}
+          <AnimatePresence>
+            {blocked && (
+              <BlockedMessageModal
+                moderation={blocked.moderation}
+                draft={blocked.draft}
+                onRewrite={() => { setNewPost(blocked.draft || ''); setBlocked(null); }}
+                onClose={() => setBlocked(null)}
+              />
+            )}
+          </AnimatePresence>
+        </section>
+      </div>
 
-          <div className="mt-6">
-            <ParticipantsPanel
-              mode={mode}
-              fans={fans}
-              club={club}
-              loading={feedLoading}
-              error={feedError}
-              onRetry={reloadFeed}
-            />
-          </div>
-
-        <div className="mt-10">
-          <div className="mb-5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-400">
-              Communauté
-            </p>
-
-            <h2 className="mt-2 break-words font-display text-2xl font-black uppercase text-bone-50 sm:text-3xl">
-              Publications des supporters
-            </h2>
-
-            <p className="mt-2 text-sm text-bone-400">
-              Continue les discussions, partage tes réactions et échange avec les fans même hors live.
-            </p>
-          </div>
-
-          <ClubFanCommunity
-            club={club}
-            fans={fans}
-            posts={posts}
-            comments={comments}
-            newPost={newPost}
-            setNewPost={setNewPost}
-            onPublish={handlePublish}
-            onUpdatePost={handleUpdatePost}
-            onDeletePost={handleDeletePost}
-            onLikePost={handleLikePost}
-            onAddComment={handleAddComment}
-            onUpdateComment={handleUpdateComment}
-            onDeleteComment={handleDeleteComment}
-            currentUserId={user?.id}
-            onReport={(m) => setReportTarget(m)}
-            onHideUser={hideUser}
-            loading={feedLoading}
-            error={feedError}
-            isEmpty={feedIsEmpty}
-            onRetry={reloadFeed}
-            mode={mode}
-          />
-        </div>
-      </Container>
-
-      {/* ── Modération : charte d'entrée + signalement ────────── */}
-      <AnimatePresence>
-        {charterOpen && access && (
-          <CharterEntryModal
-            access={access}
-            busy={charterBusy}
-            onAccept={acceptCharter}
-            onClose={() => { setCharterOpen(false); setCharterDismissed(true); }}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {reportTarget && (
-          <ReportMessageModal
-            message={reportTarget}
-            onSubmit={submitReport}
-            onClose={() => setReportTarget(null)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Publication refusée par l'IA avant diffusion (lot 6) */}
-      <AnimatePresence>
-        {blocked && (
-          <BlockedMessageModal
-            moderation={blocked.moderation}
-            draft={blocked.draft}
-            onRewrite={() => { setNewPost(blocked.draft || ''); setBlocked(null); }}
-            onClose={() => setBlocked(null)}
-          />
-        )}
-      </AnimatePresence>
-    </section>
+      <div className="pb-32 md:pb-12" />
+    </div>
   );
 }
 

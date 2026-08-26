@@ -35,6 +35,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { formatPCC } from '@/data/clubMerchandise';
 import { buildDefaultTicketing } from '@/utils/ticketingPrices';
+import { ClubSideActions } from '@/components/club/ClubSideActions';
 
 const PAY_MODES = [
   {
@@ -249,265 +250,276 @@ export function ClubBilletterie() {
 
   return (
     <div className="relative overflow-hidden">
+      <ClubSideActions
+        primaryColor={club.primaryColor}
+        clubSlug={slug}
+        clubId={club.id}
+        showSearch={false}
+      />
+
+    <div className="md:pl-24 2xl:pl-0">
+
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.06),transparent_38%)]" />
-
-      <section className="relative py-14 md:py-20">
-        <Container>
-          <Link
-            to={`/clubs/${slug}`}
-            className="inline-flex items-center gap-2 text-sm text-bone-400 hover:text-bone-50"
-          >
-            <ArrowLeft size={16} />
-            Retour au club
-          </Link>
-
-          <div className="mt-8 flex items-center gap-5">
-            <div className="grid h-20 w-20 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-              {club.logo && (
-                <img
-                  src={club.logo}
-                  alt={club.name}
-                  className="max-h-full max-w-full object-contain"
-                />
-              )}
-            </div>
-
-            <div>
-              <h1 className="mt-3 font-display text-4xl font-black uppercase text-bone-50 md:text-6xl">
-                {club.name}
-              </h1>
-
-              <p className="mt-2 text-bone-400">
-                Billets et abonnements pour ce club.
-              </p>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <Container className="relative pb-8">
-        <GlassCard className="p-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex gap-2 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive =
-                  activeTab === tab.id;
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() =>
-                      setActiveTab(tab.id)
-                    }
-                    className={[
-                      'inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-5 text-xs font-black uppercase tracking-[0.18em] transition-all',
-                      isActive
-                        ? 'bg-emerald-400 text-ink-900 shadow-lg shadow-emerald-400/20'
-                        : 'border border-white/10 bg-white/[0.04] text-bone-300 hover:text-bone-50',
-                    ].join(' ')}
-                  >
-                    <Icon size={15} />
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setIsCartOpen(true)
-              }
-              className="inline-flex h-11 items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-5 text-bone-100 transition-all hover:border-emerald-400/40"
+        
+        <section className="relative py-14 md:py-20">
+          <Container>
+            <Link
+              to={`/clubs/${slug}`}
+              className="inline-flex items-center gap-2 text-sm text-bone-400 hover:text-bone-50"
             >
-              <ShoppingCart
-                size={18}
-                className="text-emerald-400"
+              <ArrowLeft size={16} />
+              Retour au club
+            </Link>
+
+            <div className="mt-8 flex items-center gap-5">
+              <div className="grid h-20 w-20 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+                {club.logo && (
+                  <img
+                    src={club.logo}
+                    alt={club.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                )}
+              </div>
+
+              <div>
+                <h1 className="mt-3 font-display text-4xl font-black uppercase text-bone-50 md:text-6xl">
+                  {club.name}
+                </h1>
+
+                <p className="mt-2 text-bone-400">
+                  Billets et abonnements pour ce club.
+                </p>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <Container className="relative pb-8">
+          <GlassCard className="p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex gap-2 overflow-x-auto">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive =
+                    activeTab === tab.id;
+
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() =>
+                        setActiveTab(tab.id)
+                      }
+                      className={[
+                        'inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full px-5 text-xs font-black uppercase tracking-[0.18em] transition-all',
+                        isActive
+                          ? 'bg-emerald-400 text-ink-900 shadow-lg shadow-emerald-400/20'
+                          : 'border border-white/10 bg-white/[0.04] text-bone-300 hover:text-bone-50',
+                      ].join(' ')}
+                    >
+                      <Icon size={15} />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setIsCartOpen(true)
+                }
+                className="inline-flex h-11 items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-5 text-bone-100 transition-all hover:border-emerald-400/40"
+              >
+                <ShoppingCart
+                  size={18}
+                  className="text-emerald-400"
+                />
+
+                <span className="text-xs font-black uppercase tracking-[0.18em]">
+                  Panier
+                </span>
+
+                <span className="grid h-6 min-w-[24px] place-items-center rounded-full bg-emerald-400 px-1 text-[11px] font-black text-ink-900">
+                  {cart.length}
+                </span>
+              </button>
+            </div>
+          </GlassCard>
+        </Container>
+
+        <Container className="relative pb-24">
+          {offers.length === 0 ? (
+            <div className="rounded-3xl border border-white/10 bg-white/[0.03] px-6 py-14 text-center">
+              <Ticket
+                size={32}
+                className="mx-auto text-bone-600"
               />
 
-              <span className="text-xs font-black uppercase tracking-[0.18em]">
-                Panier
-              </span>
+              <h2 className="mt-4 text-base font-bold text-bone-200">
+                Aucune offre disponible
+              </h2>
 
-              <span className="grid h-6 min-w-[24px] place-items-center rounded-full bg-emerald-400 px-1 text-[11px] font-black text-ink-900">
-                {cart.length}
-              </span>
-            </button>
-          </div>
-        </GlassCard>
-      </Container>
-
-      <Container className="relative pb-24">
-        {offers.length === 0 ? (
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] px-6 py-14 text-center">
-            <Ticket
-              size={32}
-              className="mx-auto text-bone-600"
-            />
-
-            <h2 className="mt-4 text-base font-bold text-bone-200">
-              Aucune offre disponible
-            </h2>
-
-            <p className="mt-2 text-sm text-bone-500">
-              Ce club ne propose actuellement aucune
-              offre dans cette catégorie.
-            </p>
-          </div>
-        ) : (
-          <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {offers.map((offer, index) => (
-              <motion.article
-                key={offer.id}
-                initial={{
-                  opacity: 0,
-                  y: 18,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                whileHover={{
-                  y: -6,
-                  scale: 1.015,
-                }}
-                viewport={{
-                  once: true,
-                }}
-                transition={{
-                  delay: index * 0.04,
-                }}
-                onClick={() =>
-                  setSelectedOffer(offer)
-                }
-                className="h-full cursor-pointer"
-              >
-                <GlassCard className="flex h-full flex-col border border-white/10 p-6 transition-all hover:border-emerald-400/40">
-                  <div className="flex flex-1 flex-col">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
-                      {offer.type ===
-                      'subscription'
-                        ? 'Abonnement'
-                        : 'Billet'}
-                    </p>
-
-                    <h3 className="mt-3 font-display text-2xl font-black uppercase text-bone-50">
-                      {offer.name}
-                    </h3>
-
-                    {offer.duration && (
-                      <p className="mt-2 text-xs text-bone-500">
-                        {offer.duration}
+              <p className="mt-2 text-sm text-bone-500">
+                Ce club ne propose actuellement aucune
+                offre dans cette catégorie.
+              </p>
+            </div>
+          ) : (
+            <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {offers.map((offer, index) => (
+                <motion.article
+                  key={offer.id}
+                  initial={{
+                    opacity: 0,
+                    y: 18,
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  whileHover={{
+                    y: -6,
+                    scale: 1.015,
+                  }}
+                  viewport={{
+                    once: true,
+                  }}
+                  transition={{
+                    delay: index * 0.04,
+                  }}
+                  onClick={() =>
+                    setSelectedOffer(offer)
+                  }
+                  className="h-full cursor-pointer"
+                >
+                  <GlassCard className="flex h-full flex-col border border-white/10 p-6 transition-all hover:border-emerald-400/40">
+                    <div className="flex flex-1 flex-col">
+                      <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
+                        {offer.type ===
+                        'subscription'
+                          ? 'Abonnement'
+                          : 'Billet'}
                       </p>
-                    )}
 
-                    <TicketingPrice
-                      price={offer.price}
-                      priceEur={offer.price_eur}
-                      prefix="À partir de "
-                      className="mt-6 block font-display text-2xl font-black leading-tight text-emerald-400"
-                    />
+                      <h3 className="mt-3 font-display text-2xl font-black uppercase text-bone-50">
+                        {offer.name}
+                      </h3>
 
-                    <p className="mt-4 text-sm text-bone-300">
-                      {offer.description}
-                    </p>
-
-                    <ul className="mt-5 space-y-2">
-                      {(offer.benefits || []).map(
-                        (benefit, benefitIndex) => (
-                          <li
-                            key={`benefit-${benefitIndex}`}
-                            className="flex items-center gap-2 text-xs text-bone-300"
-                          >
-                            <Check
-                              size={13}
-                              className="shrink-0 text-emerald-400"
-                            />
-
-                            {benefit}
-                          </li>
-                        )
+                      {offer.duration && (
+                        <p className="mt-2 text-xs text-bone-500">
+                          {offer.duration}
+                        </p>
                       )}
-                    </ul>
 
-                    <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-bone-400">
-                        <ShieldCheck
-                          size={14}
-                          className="text-emerald-400"
-                        />
+                      <TicketingPrice
+                        price={offer.price}
+                        priceEur={offer.price_eur}
+                        prefix="À partir de "
+                        className="mt-6 block font-display text-2xl font-black leading-tight text-emerald-400"
+                      />
 
-                        Conditions
-                      </div>
+                      <p className="mt-4 text-sm text-bone-300">
+                        {offer.description}
+                      </p>
 
-                      <ul className="mt-3 space-y-1.5">
-                        {(offer.conditions || []).map(
-                          (condition, conditionIndex) => (
+                      <ul className="mt-5 space-y-2">
+                        {(offer.benefits || []).map(
+                          (benefit, benefitIndex) => (
                             <li
-                              key={`condition-${conditionIndex}`}
-                              className="text-xs text-bone-400"
+                              key={`benefit-${benefitIndex}`}
+                              className="flex items-center gap-2 text-xs text-bone-300"
                             >
-                              • {condition}
+                              <Check
+                                size={13}
+                                className="shrink-0 text-emerald-400"
+                              />
+
+                              {benefit}
                             </li>
                           )
                         )}
                       </ul>
+
+                      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-bone-400">
+                          <ShieldCheck
+                            size={14}
+                            className="text-emerald-400"
+                          />
+
+                          Conditions
+                        </div>
+
+                        <ul className="mt-3 space-y-1.5">
+                          {(offer.conditions || []).map(
+                            (condition, conditionIndex) => (
+                              <li
+                                key={`condition-${conditionIndex}`}
+                                className="text-xs text-bone-400"
+                              >
+                                • {condition}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <Button
-                      variant="primary"
-                      size="md"
-                      className="min-w-[150px] justify-center"
-                      onClick={() => setSelectedOffer(offer)}
-                    >
-                      <ShoppingBag size={15} />
+                    <div className="mt-6 flex justify-end">
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="min-w-[150px] justify-center"
+                        onClick={() => setSelectedOffer(offer)}
+                      >
+                        <ShoppingBag size={15} />
 
-                      {offer.type ===
-                      'subscription'
-                        ? 'Souscrire'
-                        : 'Acheter'}
-                    </Button>
-                  </div>
-                </GlassCard>
-              </motion.article>
-            ))}
-          </div>
+                        {offer.type ===
+                        'subscription'
+                          ? 'Souscrire'
+                          : 'Acheter'}
+                      </Button>
+                    </div>
+                  </GlassCard>
+                </motion.article>
+              ))}
+            </div>
+          )}
+        </Container>
+
+        {selectedOffer && (
+          <TicketingOfferModal
+            club={club}
+            offer={selectedOffer}
+            onClose={() =>
+              setSelectedOffer(null)
+            }
+            onAddToCart={(item) =>
+              addItem({
+                ...item,
+                clubSlug: slug,
+              })
+            }
+          />
         )}
-      </Container>
 
-      {selectedOffer && (
-        <TicketingOfferModal
-          club={club}
-          offer={selectedOffer}
-          onClose={() =>
-            setSelectedOffer(null)
-          }
-          onAddToCart={(item) =>
-            addItem({
-              ...item,
-              clubSlug: slug,
-            })
-          }
-        />
-      )}
-
-      {isCartOpen && (
-        <TicketingCartModal
-          cart={cart}
-          onClose={() =>
-            setIsCartOpen(false)
-          }
-          onRemoveItem={(indexToRemove) =>
-            removeItem(indexToRemove)
-          }
-          onClearCart={clear}
-          navigate={navigate}
-        />
-      )}
+        {isCartOpen && (
+          <TicketingCartModal
+            cart={cart}
+            onClose={() =>
+              setIsCartOpen(false)
+            }
+            onRemoveItem={(indexToRemove) =>
+              removeItem(indexToRemove)
+            }
+            onClearCart={clear}
+            navigate={navigate}
+          />
+        )}
+      </div>
+      <div className="pb-32 md:pb-12" />
     </div>
   );
 }

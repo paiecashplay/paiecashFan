@@ -23,6 +23,7 @@ export function useFederationDetail(slug) {
   const [products, setProducts] = useState([]);
   const [nationalTeams, setNationalTeams] = useState({men: [], women: [], youth: []});
 
+
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
     let cancelled = false;

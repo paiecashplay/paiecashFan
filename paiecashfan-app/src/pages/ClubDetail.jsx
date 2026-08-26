@@ -1,32 +1,32 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams, Navigate, useNavigate} from 'react-router-dom';
+import { Link, useParams,  Navigate, useNavigate} from 'react-router-dom';
 import { ClubShopLive } from '@/components/shop-live/ClubShopLive';
 import {
   motion, AnimatePresence,
   useScroll, useTransform, useReducedMotion, animate
 } from 'framer-motion';
 import {
-  ArrowLeft, Globe, Wallet, CreditCard, Search,
-  ShoppingBag, Trophy, Dices, Heart, Share2, Award, Ticket,
-  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown, Volleyball, Radio,
+  ArrowLeft, Globe, Wallet, CreditCard,
+  ShoppingBag, Trophy,  Award,
+  Plus, Minus, Check, X, ChevronLeft, ChevronRight, ChevronDown,
   Layers, CalendarClock, Loader2, MapPin, Sparkles
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { getFederationClubs, getClubFederation } from '@/data/clubsRegistry';
-import { mockWallet, mockFans, mockTransactions, fallbackHeroStats, onlineCount } from '@/data/clubMocks';
+import { fallbackHeroStats} from '@/data/clubMocks';
 import { PRODUCT_CATEGORIES, defaultMerchandise, formatPCC, formatEuro} from '@/data/clubMerchandise';
 import { FederationClubsGrid } from '@/components/club/FederationClubsGrid';
 import { ClubCommunitySection } from '@/components/club/ClubCommunitySection';
-import { SideDock } from '@/components/SideDock';
 import { useClubDetail } from '@/hooks/useClubDetail';
 import { useFanFeed } from '@/hooks/useFanFeed';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { FavoriteClubButton } from '@/components/club/FavoriteClubButton';
 import { useCart } from '@/context/CartContext';
-import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
 import { slugify } from '@/lib/slugify';
 import { cn } from '@/lib/cn';
+import { ClubSideActions } from '@/components/club/ClubSideActions';
+import { ClubContextSearchModal } from '@/components/club/ClubContextSearchModal';
 
 const fmtAmount = (n, currency = 'EUR') =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
@@ -39,6 +39,8 @@ const fmtRel = (n) =>
 export function ClubDetail() {
   const { slug } = useParams();
   const { club, players, starPlayer, trophies, products, members, loading } = useClubDetail(slug);
+
+  const [clubSearchOpen, setClubSearchOpen] = useState(false);
 
   // Le club est encore en cours de récupération.
   // Ne pas afficher "Club introuvable" pendant ce délai.
@@ -141,11 +143,10 @@ export function ClubDetail() {
       }
     : club.starPlayer;
 
-  return (
+  return (   
     <div className="relative">
       {/* Panel de side actions (mobile : barre flottante en bas, desktop : à gauche) */}
-      <SideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} clubSlug={slug}/>
-
+      <ClubSideActions primaryColor={club.primaryColor} isFederationHub={isFederationHub} clubSlug={slug} clubId={club.id} onSearch={() => setClubSearchOpen(true)}/>
       {/* ═══ HERO style marketplace (plein écran, edge-to-edge) ════════ */}
       <ClubHero club={club} backTo={backTo} loading={loading} />
 
@@ -197,6 +198,16 @@ export function ClubDetail() {
 
       {/* Espace bas pour le dock mobile (barre flottante en bas < md) */}
       <div className="pb-32 md:pb-12" />
+
+      {clubSearchOpen && (
+        <ClubContextSearchModal
+          players={squadList}
+          products={products}
+          trophies={trophyList}
+          primaryColor={club.primaryColor}
+          onClose={() => setClubSearchOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -726,68 +737,6 @@ function TransactionsLiveSection({ items, club }) {
       </ul>
     </div>
   );
-}
-
-// ── SIDE ACTIONS (panier / trophée / dés / like / share / search) ────
-// Sur une page fédération (Tanzanie etc.), le bouton "Boutique" est
-// remplacé par "Clubs" qui scrolle vers la grille des clubs membres.
-function SideActions({ primaryColor,  isFederationHub = false, clubSlug  }) {
-  const navigate = useNavigate();
-
-  // Scroll smooth vers une section. La classe scroll-mt-20 sur la section
-  // cible compense la hauteur de la Navbar pour ne pas masquer le header.
-  const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const handleShare = async () => {
-    const shareData = {
-      title: document.title,
-      text: 'Découvre cette page sur PaieCashFan',
-      url: window.location.href
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard?.writeText(window.location.href);
-      }
-    } catch {/* user cancelled or unsupported */ }
-  };
-
-  // Page fédération : icône ballon de foot (Volleyball) au lieu du
-  // panier — visuel plus parlant pour signaler une liste de clubs.
-  const shopAction = isFederationHub
-    ? { key: 'clubs', icon: Volleyball, label: 'Clubs', onClick: () => scrollTo('clubs') }
-    : { key: 'shop', icon: ShoppingBag, label: 'Boutique', onClick: () => scrollTo('merchandise') };
-
-  const ticketingAction = {
-    key: 'ticketing',
-    icon: Ticket,
-    label: 'Billetterie',
-    onClick: () => navigate(`/clubs/${clubSlug}/billetterie`)
-  };
-
-  const fanClubAction = {
-    key: 'fanclub',
-    icon: Radio,
-    label: 'Fan Club',
-    onClick: () => navigate(`/clubs/${clubSlug}/fan-club`)
-  };
-
-  const actions = [
-    shopAction,
-    ...(!isFederationHub ? [ticketingAction, fanClubAction] : []),
-    { key: 'play', icon: Trophy, label: 'Palmarès', onClick: () => scrollTo('trophies') },
-    { key: 'games', icon: Dices, label: 'Effectif', onClick: () => scrollTo('squad') },
-    { key: 'like', icon: Heart, label: 'J\'aime' },
-    { key: 'share', icon: Share2, label: 'Partager', onClick: handleShare },
-    { key: 'find', icon: Search, label: 'Rechercher' }
-  ];
-
-  return <SideDock actions={actions} accent={primaryColor} />;
 }
 
 // ── STADIUM BACKGROUND ───────────────────────────────────────────────

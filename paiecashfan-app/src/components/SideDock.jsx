@@ -28,21 +28,30 @@ export function SideDock({ actions, accent = '#10b981' }) {
               key={a.key}
               type="button"
               onClick={a.onClick}
+              disabled={a.disabled}
               aria-label={a.label}
+              aria-pressed={a.active ?? undefined}
               title={a.label}
-              className="group relative grid h-11 w-11 place-items-center rounded-xl
-                         text-bone-300 hover:text-white cursor-pointer
-                         transition-colors duration-200 outline-none
-                         focus-visible:ring-2 focus-visible:ring-white/40"
+              className={`group relative grid h-11 w-11 place-items-center rounded-xl
+                        transition-colors duration-200 outline-none
+                        focus-visible:ring-2 focus-visible:ring-white/40
+                        disabled:cursor-not-allowed disabled:opacity-60
+                        ${
+                          a.active ? 'text-white' : 'text-bone-300 hover:text-white cursor-pointer'
+                        }`}
             >
               {/* Fond teinté qui apparaît au survol / focus */}
               <span
-                className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100
-                           group-focus-visible:opacity-100 transition-opacity duration-200"
+                className={`absolute inset-0 rounded-xl
+                            group-hover:opacity-100
+                            group-focus-visible:opacity-100
+                            transition-opacity duration-200
+                            ${a.active ? 'opacity-100' : 'opacity-0'}`}
                 style={{ background: `${accent}26`, boxShadow: `inset 0 0 0 1px ${accent}66` }}
                 aria-hidden
               />
-              <Icon size={18} strokeWidth={2.2} className="relative" />
+              <Icon size={18} strokeWidth={2.2} className="relative" fill={a.active && a.key === 'like' ? 'currentColor' : 'none'} 
+              />
 
               {/* Libellé en tooltip — au-dessus en mode bas, à droite en mode rail */}
               <span
