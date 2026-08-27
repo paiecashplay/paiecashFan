@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-27 (de)** — **Admin des sélections nationales depuis les fédérations** (chantier stagiaire,
+  mergé, `feature/federation-national-teams-admin`). Gestion complète en back-office fédération :
+  CRUD des sélections (hommes / femmes / jeunes), groupes d'affichage, visibilité publique (afficher/
+  masquer), upload de logo, gestion des effectifs avec photos joueurs, intégration **API-Football**
+  (recherche/hydratation des équipes & joueurs) — routes admin dans `clubs-crud.js` (+1247) et UI
+  `AdminFederationEdit.jsx` (+1247) ; affichage public via `NationalTeamsSection`. **3 conflits résolus**
+  (ordre `products`/`nationalTeams` dans `federations.js`, `useFederationDetail.js`, `FederationDetail.jsx`)
+  — purement cosmétiques, contenu identique des deux côtés. **Vérifié** : fixtures billetterie
+  (`getTeamFixtures`/`mapFixture`) intactes, **recherche fédération** (`FederationContextSearchModal`, chantier
+  `dd`) **préservée**, code **commissions/reversements** (`clubs-crud`) intact ; notre travail
+  paiement/plateforme non touché ; build front (2140 modules) + chargement backend OK.
 - **2026-08-27 (dd)** — **Navigation & recherche contextuelle Club/Fédération** (chantier stagiaire, mergé
   sans conflit sur base `dc`, `feature/club-navigation-fixes`). Menu latéral (`ClubSideActions` /
   `SideDock`) accessible sur les pages club (billetterie, fan club) desktop+mobile ; **« Suivre ce

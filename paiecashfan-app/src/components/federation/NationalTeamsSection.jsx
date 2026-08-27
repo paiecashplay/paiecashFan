@@ -1470,6 +1470,7 @@ function SectionTitle({
 export default function NationalTeamsSection({
   teams,
   federationColor = '#10b981',
+  federationId,
 }) {
   const reduce =
     useReducedMotion();
@@ -1594,7 +1595,7 @@ export default function NationalTeamsSection({
 
       const response =
         await fetch(
-          `/api/v2/marketplace/federations/national-teams/${team.id}/players`,
+          `/api/v2/marketplace/federations/national-teams/${team.id}/players?federationId=${federationId}`,
           {
             method:
               'GET',

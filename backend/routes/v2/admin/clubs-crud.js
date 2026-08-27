@@ -12,6 +12,7 @@ const supabase = require('../../../db/supabase');
 const apiFootball = require('../../../services/apiFootball');
 const footmercato = require('../../../services/footmercato');
 const { requireAuth, requireRole } = require('../../../middleware/auth');
+const { randomUUID } = require('crypto');
 const router   = express.Router();
 
 // Mapping postes API-Football → contrainte players_position_check (FR)
@@ -378,6 +379,1343 @@ router.get('/federations/:id/members', async (req, res) => {
     return ok(res, { members: data || [] });
   } catch (err) {
     return fail(res, err.message, 500);
+  }
+});
+
+//*****Sélections nationales
+
+// GET /api/v2/admin/clubs-crud/federations/:id/national-teams
+router.get('/federations/:id/national-teams', async (req, res) => {
+  try {
+    const { data: federation, error } = await supabase
+      .from('federations')
+      .select(`
+        id,
+        name,
+        country,
+        country_code,
+        metadata
+      `)
+      .eq('id', req.params.id)
+      .single();
+
+    if (error || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const apiTeams = await apiFootball.getNationalTeamsByCountry(
+      federation.country,
+      federation.country_code
+    );
+
+    const config =
+      federation.metadata?.nationalTeams?.teams || {};
+
+    const applyOverrides = (teams = []) => teams.map((team) => {
+      const override = config[String(team.id)] || {};
+
+      return {
+        ...team,
+
+        apiName: team.name,
+        apiLogo: team.logo,
+
+        name: override.displayName || team.name,
+        logo: override.logo || team.logo,
+        gender: override.gender || team.gender,
+        group: override.group || ((override.category || team.category) !== 'senior'
+          ? 'youth'
+          : (override.gender || team.gender) === 'female'
+            ? 'women'
+            : 'men'
+        ),
+        category: override.category || team.category,
+
+        enabled: override.enabled !== false,
+
+        displayOrder: Number(
+          override.displayOrder ?? 0
+        ),
+
+        source: 'api',
+      };
+    })
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    const manualTeamsRaw =
+      federation.metadata?.nationalTeams?.manual || [];
+
+    const manualTeams = manualTeamsRaw
+      .map((team) => ({
+        ...team,
+
+        group:
+          team.group ||
+          (
+            team.category !== 'senior'
+              ? 'youth'
+              : team.gender === 'female'
+                ? 'women'
+                : 'men'
+          ),
+
+        source: 'manual',
+      }));
+
+    const manualMen = manualTeams.filter(
+      (team) => team.group === 'men'
+    );
+
+    const manualWomen = manualTeams.filter(
+      (team) => team.group === 'women'
+    );
+
+    const manualYouth = manualTeams.filter(
+      (team) => team.group === 'youth'
+    );
+
+    const allApiTeams = [
+      ...applyOverrides(apiTeams.men),
+      ...applyOverrides(apiTeams.women),
+      ...applyOverrides(apiTeams.youth),
+    ];
+
+    const apiMen = allApiTeams.filter(
+      (team) => team.group === 'men'
+    );
+
+    const apiWomen = allApiTeams.filter(
+      (team) => team.group === 'women'
+    );
+
+    const apiYouth = allApiTeams.filter(
+      (team) => team.group === 'youth'
+    );
+
+    const sortByDisplayOrder = (teams = []) =>
+      [...teams].sort(
+        (a, b) =>
+          Number(a.displayOrder || 0) -
+          Number(b.displayOrder || 0)
+      );
+
+
+    const nationalTeams = {
+      men: sortByDisplayOrder([
+        ...apiMen,
+        ...manualMen,
+      ]),
+
+      women: sortByDisplayOrder([
+        ...apiWomen,
+        ...manualWomen,
+      ]),
+
+      youth: sortByDisplayOrder([
+        ...apiYouth,
+        ...manualYouth,
+      ]),
+    };
+
+    return ok(res, {
+      federation: {
+        id: federation.id,
+        name: federation.name,
+      },
+      nationalTeams,
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] GET error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.response?.data?.message ||
+        err.message,
+      500
+    );
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/federations/:id/national-teams
+router.post('/federations/:id/national-teams', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+
+    const {
+      name,
+      gender,
+      group,
+      category,
+      logo,
+      enabled,
+      displayOrder,
+    } = req.body || {};
+
+    if (!name || !String(name).trim()) {
+      return fail(
+        res,
+        'Le nom de la sélection est obligatoire',
+        400
+      );
+    }
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const newTeam = {
+      id: randomUUID(),
+      name: String(name).trim(),
+      gender: gender || 'male',
+      group: group || (
+        category !== 'senior' ? 'youth' : gender === 'female' ? 'women' : 'men'
+      ),
+      category: category || 'senior',
+      logo: logo || null,
+      enabled: enabled !== false,
+      displayOrder: Number(displayOrder) || 0,
+      source: 'manual',
+
+      players: {
+        local: [],
+        overrides: {},
+      },
+    };
+
+    manualTeams.push(newTeam);
+
+    metadata.nationalTeams = {
+      ...nationalTeams,
+      manual: manualTeams,
+    };
+
+    const { error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId);
+
+    if (updateError) throw updateError;
+
+    return ok(
+      res,
+      { team: newTeam },
+      201
+    );
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] POST team error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible d’ajouter la sélection',
+      500
+    );
+  }
+});
+
+// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId
+router.put('/federations/:id/national-teams/:teamId', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+
+    const {
+      displayName,
+      gender,
+      group,
+      category,
+      logo,
+      enabled,
+      displayOrder,
+    } = req.body || {};
+
+    // 1. Récupérer la fédération
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    // 2. Préserver les metadata existants
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const manualIndex = manualTeams.findIndex(
+      (team) => String(team.id) === teamId
+    );
+
+    let updatedConfig;
+    let source;
+
+    // 3A. Sélection manuelle
+    if (manualIndex !== -1) {
+      const previous = {
+        ...manualTeams[manualIndex],
+      };
+
+      const updatedTeam = {
+        ...previous,
+
+        ...(displayName !== undefined
+          ? { name: String(displayName).trim() }
+          : {}),
+
+        ...(gender !== undefined
+          ? { gender }
+          : {}),
+
+        ...(group !== undefined
+          ? { group }
+          : {}),
+
+        ...(category !== undefined
+          ? { category }
+          : {}),
+
+        ...(logo !== undefined
+          ? { logo: logo || null }
+          : {}),
+
+        ...(enabled !== undefined
+          ? { enabled: Boolean(enabled) }
+          : {}),
+
+        ...(displayOrder !== undefined
+          ? { displayOrder: Number(displayOrder) || 0 }
+          : {}),
+      };
+
+      if (!updatedTeam.name) {
+        return fail(
+          res,
+          'Le nom de la sélection est obligatoire',
+          400
+        );
+      }
+
+      manualTeams[manualIndex] = updatedTeam;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        manual: manualTeams,
+      };
+
+      updatedConfig = updatedTeam;
+      source = 'manual';
+    }
+
+    // 3B. Sélection API-Football
+    else {
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const previous = {
+        ...(teams[teamId] || {}),
+      };
+
+      const updatedOverride = {
+        ...previous,
+
+        ...(displayName !== undefined
+          ? { displayName: String(displayName).trim() }
+          : {}),
+
+        ...(gender !== undefined
+          ? { gender }
+          : {}),
+
+        ...(group !== undefined
+          ? { group }
+          : {}),
+
+        ...(category !== undefined
+          ? { category }
+          : {}),
+
+        ...(logo !== undefined
+          ? { logo: logo || null }
+          : {}),
+
+        ...(enabled !== undefined
+          ? { enabled: Boolean(enabled) }
+          : {}),
+
+        ...(displayOrder !== undefined
+          ? { displayOrder: Number(displayOrder) || 0 }
+          : {}),
+      };
+
+      teams[teamId] = updatedOverride;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+
+      updatedConfig = updatedOverride;
+      source = 'api';
+    }
+
+    // 4. Sauvegarde
+    const {
+      data: updatedFederation,
+      error: updateError,
+    } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId)
+      .select('id, name, metadata')
+      .single();
+
+    if (updateError) throw updateError;
+
+    return ok(res, {
+      federation: updatedFederation,
+      teamId,
+      source,
+      config: updatedConfig,
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] PUT team error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible de modifier la sélection',
+      500
+    );
+  }
+});
+
+// DELETE /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId
+router.delete('/federations/:id/national-teams/:teamId', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const manualIndex = manualTeams.findIndex(
+      (team) => String(team.id) === teamId
+    );
+
+    // Équipe ajoutée manuellement → suppression réelle
+    if (manualIndex !== -1) {
+      manualTeams.splice(manualIndex, 1);
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        manual: manualTeams,
+      };
+    } else {
+      // Équipe API-Football → on ne peut pas la supprimer de l'API,
+      // donc on la masque.
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      teams[teamId] = {
+        ...(teams[teamId] || {}),
+        enabled: false,
+      };
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+    }
+
+    const { error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId);
+
+    if (updateError) throw updateError;
+
+    return ok(res, {
+      teamId,
+      deleted: true,
+      source: manualIndex !== -1 ? 'manual' : 'api',
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] DELETE team error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible de supprimer la sélection',
+      500
+    );
+  }
+});
+
+//*****Joueurs selections nationales */
+// GET /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
+router.get('/federations/:id/national-teams/:teamId/players', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const nationalTeams =
+      federation.metadata?.nationalTeams || {};
+
+    // ═══════════════════════════════════════
+    // 1. CHERCHER UNE SÉLECTION MANUELLE
+    // ═══════════════════════════════════════
+    const manualTeams =
+      nationalTeams.manual || [];
+
+    const manualTeam = manualTeams.find(
+      (team) => String(team.id) === teamId
+    );
+
+    if (manualTeam) {
+      const localPlayers =
+        manualTeam.players?.local || [];
+
+      const players = localPlayers
+        .filter((player) => player.hidden !== true)
+        .map((player) => ({
+          ...player,
+          source: 'manual',
+        }));
+
+      return ok(res, {
+        team: {
+          id: manualTeam.id,
+          name: manualTeam.name,
+          source: 'manual',
+        },
+        players,
+      });
+    }
+
+    // ═══════════════════════════════════════
+    // 2. SINON → SÉLECTION API-FOOTBALL
+    // ═══════════════════════════════════════
+
+    const numericTeamId = Number(teamId);
+
+    if (!Number.isFinite(numericTeamId)) {
+      return fail(
+        res,
+        'Sélection introuvable',
+        404
+      );
+    }
+
+    const apiTeam = await apiFootball.getTeam(
+      numericTeamId
+    );
+
+    if (!apiTeam) {
+      return fail(
+        res,
+        'Sélection introuvable',
+        404
+      );
+    }
+
+    const enrichedTeam =
+      await apiFootball.enrichNationalTeamWithPlayers(
+        apiTeam
+      );
+
+    const apiPlayers =
+      enrichedTeam?.players || [];
+
+    const teamConfig =
+      nationalTeams.teams?.[teamId] || {};
+
+    const playerConfig =
+      teamConfig.players || {};
+
+    const overrides =
+      playerConfig.overrides || {};
+
+    const localPlayers =
+      playerConfig.local || [];
+
+    // ═══════════════════════════════════════
+    // 3. JOUEURS API + OVERRIDES
+    // ═══════════════════════════════════════
+
+    const players = apiPlayers
+      .map((entry) => {
+        const rawPlayer =
+          entry?.player || entry;
+
+        const playerId =
+          String(rawPlayer?.id);
+
+        const override =
+          overrides[playerId] || {};
+
+        return {
+          ...entry,
+
+          player: entry?.player
+            ? {
+                ...entry.player,
+
+                name:
+                  override.name ??
+                  entry.player.name,
+
+                photo:
+                  override.photo ??
+                  entry.player.photo,
+              }
+            : undefined,
+
+          id:
+            rawPlayer?.id,
+
+          name:
+            override.name ??
+            rawPlayer?.name,
+
+          number:
+            override.number ??
+            entry?.number ??
+            entry?.statistics?.[0]?.games?.number ??
+            null,
+
+          position: (() => {
+            const rawPosition =
+              override.position ??
+              entry?.position ??
+              entry?.statistics?.[0]?.games?.position ??
+              null;
+
+            return (
+              POSITION_FR[rawPosition] ||
+              rawPosition ||
+              null
+            );
+          })(),
+
+          photo:
+            override.photo ??
+            rawPlayer?.photo ??
+            null,
+
+          hidden:
+            override.hidden === true,
+
+          source: 'api',
+        };
+      })
+      .filter((player) => !player.hidden);
+
+    // ═══════════════════════════════════════
+    // 4. JOUEURS AJOUTÉS MANUELLEMENT
+    //    À UNE SÉLECTION API
+    // ═══════════════════════════════════════
+
+    const manualPlayers =
+      localPlayers
+        .filter(
+          (player) =>
+            player.hidden !== true
+        )
+        .map((player) => ({
+          ...player,
+          source: 'manual',
+        }));
+
+    return ok(res, {
+      team: {
+        id:
+          enrichedTeam.id ||
+          numericTeamId,
+
+        name:
+          teamConfig.displayName ||
+          enrichedTeam.name,
+
+        source: 'api',
+      },
+
+      players: [
+        ...players,
+        ...manualPlayers,
+      ],
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] GET players error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message ||
+        "Impossible de récupérer l'effectif",
+      500
+    );
+  }
+});
+
+// POST /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players
+router.post('/federations/:id/national-teams/:teamId/players', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+
+    const {
+      name,
+      number,
+      position,
+      photo,
+    } = req.body || {};
+
+    if (!name || !String(name).trim()) {
+      return fail(
+        res,
+        'Le nom du joueur est obligatoire',
+        400
+      );
+    }
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const newPlayer = {
+      id: randomUUID(),
+      name: String(name).trim(),
+      number:
+        number === '' ||
+        number === null ||
+        number === undefined
+          ? null
+          : Number(number),
+      position: position || null,
+      photo: photo || null,
+      hidden: false,
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const manualIndex = manualTeams.findIndex(
+      (team) => String(team.id) === teamId
+    );
+
+    // Sélection manuelle
+    if (manualIndex !== -1) {
+      const manualTeam = {
+        ...manualTeams[manualIndex],
+      };
+
+      const playersConfig = {
+        ...(manualTeam.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      localPlayers.push(newPlayer);
+
+      manualTeam.players = {
+        ...playersConfig,
+        local: localPlayers,
+      };
+
+      manualTeams[manualIndex] = manualTeam;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        manual: manualTeams,
+      };
+    }
+
+    // Sélection API-Football
+    else {
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      localPlayers.push(newPlayer);
+
+      playersConfig.local = localPlayers;
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+    }
+
+    const { error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId);
+
+    if (updateError) throw updateError;
+
+    return ok(
+      res,
+      {
+        teamId,
+        player: {
+          ...newPlayer,
+          source: 'manual',
+        },
+      },
+      201
+    );
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] POST player error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible d’ajouter le joueur',
+      500
+    );
+  }
+});
+
+// PUT /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
+router.put('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+    const playerId = String(req.params.playerId);
+
+    const {
+      name,
+      number,
+      position,
+      photo,
+      hidden,
+    } = req.body || {};
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const manualTeamIndex = manualTeams.findIndex(
+      (team) => String(team.id) === teamId
+    );
+
+    let source;
+
+    // ═════════════════════════════════════
+    // SÉLECTION MANUELLE
+    // ═════════════════════════════════════
+    if (manualTeamIndex !== -1) {
+      const manualTeam = {
+        ...manualTeams[manualTeamIndex],
+      };
+
+      const playersConfig = {
+        ...(manualTeam.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const playerIndex = localPlayers.findIndex(
+        (player) => String(player.id) === playerId
+      );
+
+      if (playerIndex === -1) {
+        return fail(res, 'Joueur introuvable', 404);
+      }
+
+      const previous = localPlayers[playerIndex];
+
+      const updatedPlayer = {
+        ...previous,
+
+        ...(name !== undefined
+          ? { name: String(name).trim() }
+          : {}),
+
+        ...(number !== undefined
+          ? {
+              number:
+                number === '' || number === null
+                  ? null
+                  : Number(number),
+            }
+          : {}),
+
+        ...(position !== undefined
+          ? { position: position || null }
+          : {}),
+
+        ...(photo !== undefined
+          ? { photo: photo || null }
+          : {}),
+
+        ...(hidden !== undefined
+          ? { hidden: Boolean(hidden) }
+          : {}),
+      };
+
+      if (!updatedPlayer.name) {
+        return fail(
+          res,
+          'Le nom du joueur est obligatoire',
+          400
+        );
+      }
+
+      localPlayers[playerIndex] = updatedPlayer;
+
+      manualTeam.players = {
+        ...playersConfig,
+        local: localPlayers,
+      };
+
+      manualTeams[manualTeamIndex] = manualTeam;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        manual: manualTeams,
+      };
+
+      source = 'manual';
+    }
+
+    // ═════════════════════════════════════
+    // SÉLECTION API-FOOTBALL
+    // ═════════════════════════════════════
+    else {
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const overrides = {
+        ...(playersConfig.overrides || {}),
+      };
+
+      // On cherche d'abord si c'est un joueur ajouté manuellement
+      const localIndex = localPlayers.findIndex(
+        (player) => String(player.id) === playerId
+      );
+
+      if (localIndex !== -1) {
+        const previous = localPlayers[localIndex];
+
+        const updatedPlayer = {
+          ...previous,
+
+          ...(name !== undefined
+            ? { name: String(name).trim() }
+            : {}),
+
+          ...(number !== undefined
+            ? {
+                number:
+                  number === '' || number === null
+                    ? null
+                    : Number(number),
+              }
+            : {}),
+
+          ...(position !== undefined
+            ? { position: position || null }
+            : {}),
+
+          ...(photo !== undefined
+            ? { photo: photo || null }
+            : {}),
+
+          ...(hidden !== undefined
+            ? { hidden: Boolean(hidden) }
+            : {}),
+        };
+
+        if (!updatedPlayer.name) {
+          return fail(
+            res,
+            'Le nom du joueur est obligatoire',
+            400
+          );
+        }
+
+        localPlayers[localIndex] = updatedPlayer;
+        playersConfig.local = localPlayers;
+
+        source = 'manual';
+      } else {
+        // Sinon joueur venant réellement d'API-Football
+        const previous = {
+          ...(overrides[playerId] || {}),
+        };
+
+        overrides[playerId] = {
+          ...previous,
+
+          ...(name !== undefined
+            ? { name: String(name).trim() }
+            : {}),
+
+          ...(number !== undefined
+            ? {
+                number:
+                  number === '' || number === null
+                    ? null
+                    : Number(number),
+              }
+            : {}),
+
+          ...(position !== undefined
+            ? { position: position || null }
+            : {}),
+
+          ...(photo !== undefined
+            ? { photo: photo || null }
+            : {}),
+
+          ...(hidden !== undefined
+            ? { hidden: Boolean(hidden) }
+            : {}),
+        };
+
+        playersConfig.overrides = overrides;
+
+        source = 'api';
+      }
+
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+    }
+
+    const { error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId);
+
+    if (updateError) throw updateError;
+
+    return ok(res, {
+      teamId,
+      playerId,
+      source,
+      updated: true,
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] PUT player error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible de modifier le joueur',
+      500
+    );
+  }
+});
+
+// DELETE /api/v2/admin/clubs-crud/federations/:id/national-teams/:teamId/players/:playerId
+router.delete('/federations/:id/national-teams/:teamId/players/:playerId', async (req, res) => {
+  try {
+    const federationId = req.params.id;
+    const teamId = String(req.params.teamId);
+    const playerId = String(req.params.playerId);
+
+    const { data: federation, error: fedError } = await supabase
+      .from('federations')
+      .select('id, metadata')
+      .eq('id', federationId)
+      .single();
+
+    if (fedError || !federation) {
+      return fail(res, 'Fédération introuvable', 404);
+    }
+
+    const metadata = {
+      ...(federation.metadata || {}),
+    };
+
+    const nationalTeams = {
+      ...(metadata.nationalTeams || {}),
+    };
+
+    const manualTeams = [
+      ...(nationalTeams.manual || []),
+    ];
+
+    const manualTeamIndex = manualTeams.findIndex(
+      (team) => String(team.id) === teamId
+    );
+
+    let source;
+
+    // ═════════════════════════════════════
+    // SÉLECTION MANUELLE
+    // ═════════════════════════════════════
+    if (manualTeamIndex !== -1) {
+      const manualTeam = {
+        ...manualTeams[manualTeamIndex],
+      };
+
+      const playersConfig = {
+        ...(manualTeam.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const exists = localPlayers.some(
+        (player) => String(player.id) === playerId
+      );
+
+      if (!exists) {
+        return fail(res, 'Joueur introuvable', 404);
+      }
+
+      manualTeam.players = {
+        ...playersConfig,
+        local: localPlayers.filter(
+          (player) => String(player.id) !== playerId
+        ),
+      };
+
+      manualTeams[manualTeamIndex] = manualTeam;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        manual: manualTeams,
+      };
+
+      source = 'manual';
+    }
+
+    // ═════════════════════════════════════
+    // SÉLECTION API-FOOTBALL
+    // ═════════════════════════════════════
+    else {
+      const teams = {
+        ...(nationalTeams.teams || {}),
+      };
+
+      const teamConfig = {
+        ...(teams[teamId] || {}),
+      };
+
+      const playersConfig = {
+        ...(teamConfig.players || {}),
+      };
+
+      const localPlayers = [
+        ...(playersConfig.local || []),
+      ];
+
+      const overrides = {
+        ...(playersConfig.overrides || {}),
+      };
+
+      const localIndex = localPlayers.findIndex(
+        (player) => String(player.id) === playerId
+      );
+
+      // Joueur ajouté manuellement à une sélection API
+      if (localIndex !== -1) {
+        playersConfig.local = localPlayers.filter(
+          (player) => String(player.id) !== playerId
+        );
+
+        source = 'manual';
+      } else {
+        // Joueur provenant d'API-Football → on le masque
+        overrides[playerId] = {
+          ...(overrides[playerId] || {}),
+          hidden: true,
+        };
+
+        playersConfig.overrides = overrides;
+
+        source = 'api';
+      }
+
+      teamConfig.players = playersConfig;
+      teams[teamId] = teamConfig;
+
+      metadata.nationalTeams = {
+        ...nationalTeams,
+        teams,
+      };
+    }
+
+    const { error: updateError } = await supabase
+      .from('federations')
+      .update({ metadata })
+      .eq('id', federationId);
+
+    if (updateError) throw updateError;
+
+    return ok(res, {
+      teamId,
+      playerId,
+      source,
+      deleted: true,
+    });
+
+  } catch (err) {
+    console.error(
+      '[admin national-teams] DELETE player error:',
+      err.message
+    );
+
+    return fail(
+      res,
+      err.message || 'Impossible de supprimer le joueur',
+      500
+    );
   }
 });
 

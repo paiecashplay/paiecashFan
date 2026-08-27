@@ -467,6 +467,17 @@ async function getCurrentSquad(teamId) {
   return squad.players || [];
 }
 
+function getFullPlayerName(player = {}) {
+  const firstname = String(player.firstname || '').trim();
+  const lastname = String(player.lastname || '').trim();
+
+  if (firstname && lastname) {
+    return `${firstname} ${lastname}`;
+  }
+
+  return player.name || '';
+}
+
 // ── Joueurs d'une équipe pour une compétition (ex: Ligue 1 2023-2024) ─────
 async function getPlayersByCompetition({teamId, leagueId, season}) {
   let page = 1;
@@ -485,7 +496,19 @@ async function getPlayersByCompetition({teamId, leagueId, season}) {
 
     check(data);
 
-    players.push(...(data.response || []));
+    const pagePlayers = (data.response || []).map((entry) => {
+    if (!entry?.player) return entry;
+
+    return {
+      ...entry,
+      player: {
+        ...entry.player,
+        name: getFullPlayerName(entry.player),
+      },
+    };
+  });
+
+    players.push(...pagePlayers);
 
     totalPages = data.paging?.total || 1;
     page += 1;

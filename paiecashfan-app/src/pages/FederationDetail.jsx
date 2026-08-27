@@ -258,6 +258,7 @@ function DynamicFederationView({ federation, members, hub, products, nationalTea
         <NationalTeamsSection
           teams={safeNationalTeams}
           federationColor={color}
+          federationId={federation.id}
         />
 
         {/* Clubs membres */}
@@ -279,7 +280,7 @@ function DynamicFederationView({ federation, members, hub, products, nationalTea
           )}
         </div>
 
-        {/* Boutique de la fédération */}
+        {/* ═══ BOUTIQUE DE LA FÉDÉRATION ═══════════════════ */}
         {products?.length > 0 && hub && (
           <MerchandiseSection
             club={{
