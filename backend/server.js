@@ -22,6 +22,7 @@ const cryptoRoutes = require('./routes/crypto');
 
 const webhooksRoutes = require('./routes/webhooks');
 const miscRoutes = require('./routes/misc');
+const internalRoutes = require('./routes/internal');
 
 // LOTO Game Routes
 const lotoRoutes = require('./routes/loto');
@@ -104,6 +105,9 @@ app.use('/api/crypto', cryptoRoutes);
 app.use('/api/betting', bettingRoutes);
 app.use('/api/admin/betting', adminBettingRoutes);
 app.use('/api/loto', lotoRoutes);
+// Endpoints server-to-server partenaires (PaieCashCoin) — auth par clé Bearer,
+// monté AVANT le catch-all '/api' pour ne pas être intercepté par miscRoutes.
+app.use('/api/internal', internalRoutes);
 app.use('/api', miscRoutes);
 
 const { authMiddleware } = require('./middlewares/auth');
