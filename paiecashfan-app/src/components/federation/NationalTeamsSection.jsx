@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
+import { apiUrl } from '@/lib/api';
 
 /* ═══════════════════════════════════════════════════════════════
    Normalisation joueurs
@@ -1595,7 +1596,9 @@ export default function NationalTeamsSection({
 
       const response =
         await fetch(
-          `/api/v2/marketplace/federations/national-teams/${team.id}/players?federationId=${federationId}`,
+          apiUrl(
+            `/api/v2/marketplace/federations/national-teams/${team.id}/players?federationId=${federationId}`
+          ),
           {
             method:
               'GET',
