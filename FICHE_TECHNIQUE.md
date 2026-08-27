@@ -135,6 +135,20 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-27 (dg)** — **Correctif effectif équipes nationales (URL API absolue en prod)**. Le bouton
+  « Voir l'effectif » (`NationalTeamsSection`) faisait un `fetch('/api/v2/...')` relatif → en prod
+  (front Vercel / back Railway séparés) tapait le domaine du front, recevait `index.html` d'où l'erreur
+  `Unexpected token '<', "<!DOCTYPE"... is not valid JSON`. Passé par le helper `apiUrl()` (préfixe
+  `VITE_API_BASE`). Invisible en local (même origine / proxy Vite). Bug latent de la branche stagiaire,
+  pas du merge.
+- **2026-08-27 (df)** — **Liaison de comptes PaieCashCoin ↔ PaieCashFan (endpoint server-to-server)**.
+  `POST /api/internal/verify-subscriber` (`backend/routes/internal.js`) : PCC vérifie qu'un email
+  possède un compte PaieCashFan (bonus +5% PCC à la liaison). Auth par clé partagée
+  `Authorization: Bearer <INTERNAL_API_KEY>` (env Railway uniquement, jamais front, `timingSafeEqual`) ;
+  503 si clé absente, 401 si mauvaise. Lookup dans **Supabase Auth** (source de vérité : email + Google),
+  réponse `{ exists, subscribed, userId?, plan?, subscribedSince? }`. PaieCashFan n'ayant pas de plan
+  payant : `subscribed` = compte actif, `plan` = null, `subscribedSince` = date de création. Monté
+  avant le catch-all `/api`. Testé bout en bout (401/400/exists true/false).
 - **2026-08-27 (de)** — **Admin des sélections nationales depuis les fédérations** (chantier stagiaire,
   mergé, `feature/federation-national-teams-admin`). Gestion complète en back-office fédération :
   CRUD des sélections (hommes / femmes / jeunes), groupes d'affichage, visibilité publique (afficher/
