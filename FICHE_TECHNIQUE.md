@@ -135,6 +135,22 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-28 (di)** — **Formulaire de contact + support**. Page `/contact` (`pages/Contact.jsx`,
+  nom/email/sujet/message, honeypot anti-bot, pré-remplissage si connecté). Backend
+  `POST /api/v2/contact` (`routes/v2/contact.js`) : validation, throttle IP, **archivage best-effort**
+  (`contact_messages`, migration fournie) + **notification email** vers `CONTACT_EMAIL`
+  (défaut `contact@paiecashfan.com`) via **Resend** (`services/mailer.js`, ajout `reply_to` = expéditeur).
+  « Contacter le support » (billetterie) + « Aide »/« Contact » du footer → `/contact`. **Config prod
+  requise** : `RESEND_API_KEY`, `RESEND_FROM` (domaine vérifié), réception via Cloudflare Email Routing.
+- **2026-08-28 (dh)** — **Refonte billetterie (page club + landing)**. Page club
+  `/clubs/:slug/billetterie` refondue (maquettes) : hero immersif (photo stade + stats stade/fondation/
+  compétition), onglet Abonnements (offre détaillée + « Choisissez votre formule » dérivée des offres +
+  avantages + aide), onglet Billets (**vrais matchs à domicile** via fixtures API-Football `?next=20`,
+  « Voir tous les matchs » déplie sur place, carte « Prochain match », repli carte d'offre billet si pas
+  de calendrier), barre de réassurance. Landing `/billetterie` enrichie (hero stade + cartes clubs
+  compactes ville/ligue/chips). Paiement **5×** (pas 10) + mention **CB** à côté de PCC. Toute la logique
+  panier/checkout/recharge préservée ; tarifs = fallback `buildDefaultTicketing` (placeholders séminés
+  par slug) tant que le BO/Redtaag ne fournit pas les vrais. `live.js` accepte `next`/`last` bornés.
 - **2026-08-27 (dg)** — **Correctif effectif équipes nationales (URL API absolue en prod)**. Le bouton
   « Voir l'effectif » (`NationalTeamsSection`) faisait un `fetch('/api/v2/...')` relatif → en prod
   (front Vercel / back Railway séparés) tapait le domaine du front, recevait `index.html` d'où l'erreur

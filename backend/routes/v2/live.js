@@ -141,7 +141,11 @@ router.get('/club/:slug/fixtures', async (req, res) => {
     const teamId = t.metadata?.api_football_id || null;
     if (!teamId || !process.env.API_FOOTBALL_KEY) return ok(res, { available: false, recent: [], upcoming: [] });
 
-    const { recent, upcoming } = await apiFootball.getTeamFixtures(teamId, { last: 5, next: 3 });
+    // next/last paramétrables (bornés) : la page billetterie demande un
+    // calendrier plus large pour « Voir tous les matchs ».
+    const next = Math.min(Math.max(parseInt(req.query.next, 10) || 3, 1), 30);
+    const last = Math.min(Math.max(parseInt(req.query.last, 10) || 5, 0), 15);
+    const { recent, upcoming } = await apiFootball.getTeamFixtures(teamId, { last, next });
     // Rattache les slugs des adversaires inscrits (batch, une seule requête).
     const ids = [...recent, ...upcoming].flatMap((m) => [m.homeTeamId, m.awayTeamId]).filter((x) => x != null);
     const slugByAfid = await tenants.slugsByApiFootballIds(ids).catch(() => ({}));

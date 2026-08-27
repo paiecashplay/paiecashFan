@@ -41,6 +41,7 @@ import { AdminFederationEdit } from './pages/admin/AdminFederationEdit';
 import { AdminApplications } from './pages/admin/AdminApplications';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
+import { Contact } from './pages/Contact';
 import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
@@ -331,6 +332,7 @@ export default function App() {
                   <Route path="/reset-password" element={<ResetPassword />} />
                   {/* Anciennes URLs → nouveau dashboard Fan (compat) */}
                   <Route path="/parametres" element={<Navigate to="/mon-compte/parametres" replace />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route path="*" element={<Home />} />
                   <Route path="/billetterie" element={<Billetterie />} />
                 </Routes>

@@ -175,6 +175,9 @@ app.use('/api/v2/clubs', v2FanFeed);
 app.use('/api/v2/tombola', v2Tombola);
 app.use('/api/v2/bingo', v2Bingo);
 app.use('/api/v2/live', v2Live);
+
+const v2Contact = require('./routes/v2/contact');
+app.use('/api/v2/contact', v2Contact);
 app.use('/api/v2/shop-live', v2ShopLive);
 app.use('/api/v2/marketplace/search', v2MarketSearch);
 app.use('/api/v2/onboarding', v2Onboarding);

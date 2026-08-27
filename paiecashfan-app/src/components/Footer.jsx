@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Container } from './ui/Container';
 
 const columns = [
@@ -47,16 +48,31 @@ export function Footer() {
                 {col.title}
               </h4>
               <ul className="mt-5 space-y-3">
-                {col.links.map(link => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-bone-200 hover:text-emerald-400 transition-colors"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                {col.links.map(link => {
+                  const to =
+                    link === 'Contact' || link === 'Aide'
+                      ? '/contact'
+                      : null;
+                  return (
+                    <li key={link}>
+                      {to ? (
+                        <Link
+                          to={to}
+                          className="text-sm text-bone-200 hover:text-emerald-400 transition-colors"
+                        >
+                          {link}
+                        </Link>
+                      ) : (
+                        <a
+                          href="#"
+                          className="text-sm text-bone-200 hover:text-emerald-400 transition-colors"
+                        >
+                          {link}
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

@@ -37,7 +37,7 @@ export function buildDefaultTicketing(club) {
         benefits: [
           'Accès aux matchs à domicile',
           'Priorité billetterie',
-          'Paiement possible en 10 fois avec 5 % de frais'
+          'Paiement possible en 5 fois avec 5 % de frais'
         ],
         conditions: [
           'Offre soumise aux disponibilités',

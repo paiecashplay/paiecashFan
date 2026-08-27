@@ -8,7 +8,9 @@ const supabase = require('../db/supabase');
 const FROM = process.env.RESEND_FROM || 'PaieCashFan <onboarding@resend.dev>';
 
 // Envoie un email. Retourne true si envoyé, false si pas d'infra / erreur.
-async function sendEmail({ to, subject, html }) {
+// `replyTo` (optionnel) : adresse à laquelle les réponses doivent partir
+// (ex. l'expéditeur d'un formulaire de contact).
+async function sendEmail({ to, subject, html, replyTo }) {
   const key = process.env.RESEND_API_KEY;
   const recipients = (Array.isArray(to) ? to : [to]).filter(Boolean);
   if (!key) {
@@ -17,10 +19,12 @@ async function sendEmail({ to, subject, html }) {
   }
   if (!recipients.length) return false;
   try {
+    const payload = { from: FROM, to: recipients, subject, html };
+    if (replyTo) payload.reply_to = replyTo;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: FROM, to: recipients, subject, html }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const t = await res.text().catch(() => '');

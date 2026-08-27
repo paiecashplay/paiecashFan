@@ -8,12 +8,13 @@ import {
 import { motion } from 'framer-motion';
 import {
   CalendarDays,
-  Check,
+  CreditCard,
   Loader2,
+  MapPin,
   Search,
-  ShieldCheck,
   ShoppingBag,
   Ticket,
+  Wallet,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -840,9 +841,30 @@ export function Billetterie() {
       {/* Dégradé très discret */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(16,185,129,0.025),transparent_42%)]" />
 
-      {/* En-tête */}
-      <section className="relative py-14 md:py-20">
-        <Container>
+      {/* En-tête immersif */}
+      <section className="relative overflow-hidden py-14 md:py-20">
+        {/* Fond stade discret */}
+        <div className="pointer-events-none absolute inset-0">
+          <img
+            src="/images/stadium-bg.png"
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-ink-950/25 via-ink-950/55 to-ink-950" />
+          {/* Voile gauche pour garder le texte lisible */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink-950/80 via-ink-950/30 to-transparent" />
+        </div>
+
+        <Container className="relative">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-300"
+          >
+            <Ticket size={13} />
+            Billetterie officielle
+          </motion.div>
 
           <motion.h1
             initial={{
@@ -853,7 +875,7 @@ export function Billetterie() {
               opacity: 1,
               y: 0,
             }}
-            className="mt-3 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-bone-50 md:text-6xl"
+            className="mt-4 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-bone-50 md:text-6xl"
           >
             Billets & abonnements
           </motion.h1>
@@ -864,6 +886,36 @@ export function Billetterie() {
             Recherchez un club pour accéder à ses
             billets et abonnements.
           </p>
+
+          {/* Strip d'infos */}
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            {[
+              {
+                icon: Ticket,
+                label: !loadingList
+                  ? `${displayedClubs.length} club${
+                      displayedClubs.length > 1 ? 's' : ''
+                    } disponible${
+                      displayedClubs.length > 1 ? 's' : ''
+                    }`
+                  : 'Chargement…',
+              },
+              { icon: Wallet, label: 'Paiement en PCC' },
+              { icon: CreditCard, label: 'Paiement en CB' },
+              { icon: CalendarDays, label: 'Paiement en 5×' },
+            ].map((info) => {
+              const Icon = info.icon;
+              return (
+                <span
+                  key={info.label}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs font-bold text-bone-200"
+                >
+                  <Icon size={14} className="text-emerald-400" />
+                  {info.label}
+                </span>
+              );
+            })}
+          </div>
         </Container>
       </section>
 
@@ -996,19 +1048,19 @@ export function Billetterie() {
                   Boolean(detailsByKey[clubKey]);
 
                 return offers.map((offer) => {
-                  const visibleBenefits =
-                    Array.isArray(
-                      offer.benefits
-                    )
-                      ? offer.benefits.slice(0, 3)
-                      : [];
-
-                  const visibleConditions =
-                    Array.isArray(
-                      offer.conditions
-                    )
-                      ? offer.conditions.slice(0, 3)
-                      : [];
+                  const highlights = [
+                    {
+                      icon:
+                        offer.type === 'subscription'
+                          ? CalendarDays
+                          : Ticket,
+                      label:
+                        offer.type === 'subscription'
+                          ? 'Saison complète'
+                          : 'Match à domicile',
+                    },
+                    { icon: Wallet, label: 'Paiement PCC' },
+                  ];
 
                   return (
                     <motion.article
@@ -1022,7 +1074,7 @@ export function Billetterie() {
                         y: 0,
                       }}
                       whileHover={{
-                        y: -4,
+                        y: -5,
                       }}
                       onViewportEnter={() => {
                         if (
@@ -1061,14 +1113,14 @@ export function Billetterie() {
                       }}
                       role="link"
                       tabIndex={0}
-                      className="h-full cursor-pointer outline-none"
+                      className="group h-full cursor-pointer outline-none"
                     >
-                      <GlassCard className="relative flex h-full min-h-[520px] flex-col overflow-hidden rounded-[26px] border border-emerald-400/20 bg-ink-950/80 p-6 transition-all hover:border-emerald-400/40">
-                        {/* Halo discret */}
+                      <GlassCard className="relative flex h-full flex-col overflow-hidden rounded-[24px] border border-white/10 bg-ink-950/70 transition-all hover:border-emerald-400/40">
+                        {/* Halo couleur club */}
                         <div
-                          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+                          className="pointer-events-none absolute inset-0 opacity-[0.10] transition-opacity group-hover:opacity-20"
                           style={{
-                            background: `radial-gradient(circle at top right, ${club.primaryColor}, transparent 52%)`,
+                            background: `radial-gradient(circle at 15% 0%, ${club.primaryColor}, transparent 55%)`,
                           }}
                         />
 
@@ -1083,134 +1135,112 @@ export function Billetterie() {
                           </div>
                         )}
 
-                        <div className="relative flex flex-1 flex-col">
-                          {/* Club */}
-                          <div className="flex min-h-[72px] items-start gap-4">
-                            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[20px] border border-white/10 bg-white/[0.035] p-2.5">
-                              {club.logo ? (
-                                <img
-                                  src={club.logo}
-                                  alt={club.clubName}
-                                  className="max-h-full max-w-full object-contain"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <Ticket
-                                  size={24}
-                                  className="text-emerald-400"
-                                />
-                              )}
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-400">
-                                {offer.type ===
-                                'subscription'
-                                  ? 'Abonnement'
-                                  : 'Billet'}
-                              </p>
-
-                              <h3 className="mt-2 font-display text-xl font-black uppercase leading-tight text-bone-50">
-                                {offer.name}
-                              </h3>
-
-                              {club.city && (
-                                <p className="mt-1 text-xs text-bone-500">
-                                  {club.city}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Prix PCC · euro */}
-                          <div className="mt-6 min-h-[64px]">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-bone-500">
-                              Prix
-                            </p>
-
-                            <p className="mt-1 break-words font-display text-2xl font-black leading-tight text-emerald-400">
-                              {offer.price !== null &&
-                              offer.price !==
-                                undefined ? (
-                                <>
-                                  À partir de{' '}
-                                  {formatPCC(
-                                    offer.price
-                                  )}{' '}
-                                  PCC
-                                  {offer.price_eur !==
-                                    null &&
-                                  offer.price_eur !==
-                                    undefined
-                                    ? ` · ${formatEuro(
-                                        offer.price_eur
-                                      )} €`
-                                    : ''}
-                                </>
-                              ) : (
-                                'Voir les tarifs'
-                              )}
-                            </p>
-                          </div>
-
-                          {/* Description */}
-                          <p className="mt-3 min-h-[42px] text-sm leading-6 text-bone-300">
-                            {offer.description}
-                          </p>
-
-                          {/* Avantages */}
-                          <ul className="mt-5 min-h-[76px] space-y-2">
-                            {visibleBenefits.map(
-                              (benefit, benefitIndex) => (
-                                <li
-                                  key={`benefit-${benefitIndex}`}
-                                  className="flex items-start gap-2 text-[13px] leading-5 text-bone-300"
-                                >
-                                  <Check
-                                    size={15}
-                                    className="mt-0.5 shrink-0 text-emerald-400"
-                                  />
-
-                                  <span>
-                                    {benefit}
-                                  </span>
-                                </li>
-                              )
-                            )}
-                          </ul>
-
-                          {/* Conditions */}
-                          <div className="mt-5 min-h-[108px] rounded-[22px] border border-white/10 bg-white/[0.025] p-4">
-                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-bone-400">
-                              <ShieldCheck
-                                size={15}
+                        {/* En-tête club */}
+                        <div className="relative flex items-center gap-4 p-5">
+                          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] p-2.5">
+                            {club.logo ? (
+                              <img
+                                src={club.logo}
+                                alt={club.clubName}
+                                className="max-h-full max-w-full object-contain"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <Ticket
+                                size={24}
                                 className="text-emerald-400"
                               />
-
-                              Conditions
-                            </div>
-
-                            <ul className="mt-3 space-y-1.5">
-                              {visibleConditions.map(
-                                (condition, conditionIndex) => (
-                                  <li
-                                    key={`condition-${conditionIndex}`}
-                                    className="text-[13px] leading-5 text-bone-500"
-                                  >
-                                    • {condition}
-                                  </li>
-                                )
-                              )}
-                            </ul>
+                            )}
                           </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate font-display text-xl font-black uppercase leading-tight text-bone-50">
+                              {club.clubName}
+                            </h3>
+                            <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-bone-500">
+                              {club.city && (
+                                <>
+                                  <MapPin
+                                    size={11}
+                                    className="shrink-0"
+                                  />
+                                  {club.city}
+                                </>
+                              )}
+                              {club.league && (
+                                <span className="truncate">
+                                  · {club.league}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+
+                          <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-emerald-300">
+                            {offer.type === 'subscription'
+                              ? 'Abonnement'
+                              : 'Billet'}
+                          </span>
                         </div>
 
-                        {/* Bouton aligné */}
-                        <div className="relative mt-5 flex justify-end">
+                        <div className="relative mx-5 h-px bg-white/5" />
+
+                        {/* Prix + description */}
+                        <div className="relative px-5 py-4">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-bone-500">
+                            À partir de
+                          </p>
+                          <p className="mt-1 break-words font-display text-2xl font-black leading-tight text-emerald-400">
+                            {offer.price !== null &&
+                            offer.price !== undefined ? (
+                              <>
+                                {formatPCC(offer.price)} PCC
+                                {offer.price_eur !== null &&
+                                offer.price_eur !== undefined
+                                  ? ` · ${formatEuro(
+                                      offer.price_eur
+                                    )} €`
+                                  : ''}
+                              </>
+                            ) : (
+                              'Voir les tarifs'
+                            )}
+                          </p>
+                          {offer.description && (
+                            <p className="mt-2 text-[13px] leading-5 text-bone-400">
+                              {offer.description}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Points clés + CTA */}
+                        <div className="relative mt-auto px-5 pb-5">
+                          <div className="flex flex-wrap gap-1.5">
+                            {highlights.map((highlight) => {
+                              const Icon = highlight.icon;
+                              return (
+                                <span
+                                  key={highlight.label}
+                                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-bold text-bone-300"
+                                >
+                                  <Icon
+                                    size={11}
+                                    className="text-emerald-400"
+                                  />
+                                  {highlight.label}
+                                </span>
+                              );
+                            })}
+                            {offer.totalOffers > 1 && (
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-bold text-bone-300">
+                                {offer.totalOffers} formules
+                              </span>
+                            )}
+                          </div>
+
                           <Button
                             variant="primary"
                             size="md"
-                            className="min-w-[185px] justify-center rounded-full text-sm"
+                            className="mt-4 w-full justify-center rounded-full text-sm"
                             onClick={(event) => {
                               event.stopPropagation();
 
