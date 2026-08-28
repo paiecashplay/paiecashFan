@@ -12,7 +12,7 @@ const columns = [
   },
   {
     title: 'Support',
-    links: ['Aide', 'Contact', 'Statut', 'CGU', 'Confidentialité']
+    links: ['FAQ', 'Contact', 'Statut', 'CGU', 'Confidentialité']
   }
 ];
 
