@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle2,
+  ChevronDown,
   Clock,
-  LifeBuoy,
+  Headphones,
+  HelpCircle,
   Loader2,
   Mail,
   Send,
   ShieldCheck,
+  UserRound,
 } from 'lucide-react';
 
 import { Container } from '@/components/ui/Container';
@@ -19,6 +24,14 @@ import { useAuth } from '@/context/AuthContext';
 
 const CONTACT_EMAIL = 'contact@paiecashfan.com';
 
+const SUBJECTS = [
+  'Billet ou abonnement',
+  'Boutique / commande',
+  'Compte et connexion',
+  'Paiement / PaieCashCoin',
+  'Autre',
+];
+
 export function Contact() {
   const { user } = useAuth();
 
@@ -26,13 +39,13 @@ export function Contact() {
     name: '',
     email: '',
     subject: '',
+    orderRef: '',
     message: '',
     company: '', // honeypot anti-bot (masqué)
   });
   const [status, setStatus] = useState('idle'); // idle | sending | success
   const [error, setError] = useState('');
 
-  // Pré-remplissage si connecté.
   useEffect(() => {
     if (!user) return;
     setForm((prev) => ({
@@ -78,33 +91,63 @@ export function Contact() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden pb-20">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(16,185,129,0.05),transparent_42%)]" />
 
-      {/* En-tête */}
-      <section className="relative py-14 md:py-20">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-300"
-          >
-            <LifeBuoy size={13} />
-            Support
-          </motion.div>
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <Container className="relative pt-10 md:pt-14">
+        <GlassCard className="relative overflow-hidden border border-white/10 p-8 md:p-12">
+          {/* Fond stade + halo (éclairci) */}
+          <div className="pointer-events-none absolute inset-0">
+            <img
+              src="/images/stadium-bg.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-full w-3/4 object-cover opacity-[0.55]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/40 to-transparent" />
+            <div
+              className="absolute inset-0 opacity-40"
+              style={{
+                background:
+                  'radial-gradient(circle at 78% 45%, rgba(16,185,129,0.28), transparent 42%)',
+              }}
+            />
+          </div>
 
-          <h1 className="mt-4 font-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-bone-50 md:text-6xl">
-            Contactez-nous
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-bone-300 md:text-base">
-            Une question sur un billet, un abonnement, votre compte ou un
-            paiement ? Écrivez-nous, notre équipe vous répond au plus vite.
-          </p>
-        </Container>
-      </section>
+          {/* Casque support (image fournie) */}
+          <img
+            src="/images/assistance_icon.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute right-6 top-1/2 hidden w-[130px] -translate-y-1/2 object-contain drop-shadow-[0_0_30px_rgba(16,185,129,0.4)] md:block lg:right-12 lg:w-[160px]"
+          />
 
-      <Container className="relative pb-24">
-        <div className="grid gap-5 lg:grid-cols-[1.4fr_0.9fr]">
+          <div className="relative">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-300"
+            >
+              <Headphones size={13} />
+              Support
+            </motion.div>
+
+            <h1 className="mt-4 font-display text-4xl font-black uppercase leading-[0.9] tracking-tight text-bone-50 md:text-6xl">
+              Contactez-nous
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-bone-300 md:text-base">
+              Une question sur un billet, un abonnement, votre compte ou un
+              paiement ? Notre équipe vous répond au plus vite.
+            </p>
+          </div>
+        </GlassCard>
+      </Container>
+
+      {/* ── Grille principale ────────────────────────────────── */}
+      <Container className="relative mt-6">
+        <div className="grid gap-5 lg:grid-cols-[1.5fr_0.9fr]">
           {/* Formulaire */}
           <GlassCard className="border border-white/10 p-6 md:p-8">
             {status === 'success' ? (
@@ -126,6 +169,7 @@ export function Contact() {
                     setForm((prev) => ({
                       ...prev,
                       subject: '',
+                      orderRef: '',
                       message: '',
                     }));
                   }}
@@ -134,133 +178,195 @@ export function Contact() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Honeypot (masqué aux humains) */}
-                <input
-                  type="text"
-                  name="company"
-                  value={form.company}
-                  onChange={update('company')}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="hidden"
-                />
+              <>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                  Nous sommes là pour vous aider
+                </p>
+                <p className="mt-2 text-sm text-bone-400">
+                  Remplissez le formulaire ci-dessous, nous vous répondrons
+                  rapidement.
+                </p>
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Nom">
-                    <input
-                      type="text"
-                      value={form.name}
-                      onChange={update('name')}
-                      placeholder="Votre nom"
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field label="Email">
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={update('email')}
-                      placeholder="vous@email.com"
-                      className={inputClass}
-                    />
-                  </Field>
-                </div>
-
-                <Field label="Sujet (optionnel)">
+                <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+                  {/* Honeypot */}
                   <input
                     type="text"
-                    value={form.subject}
-                    onChange={update('subject')}
-                    placeholder="Ex. Question sur un abonnement"
-                    className={inputClass}
+                    name="company"
+                    value={form.company}
+                    onChange={update('company')}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hidden"
                   />
-                </Field>
 
-                <Field label="Message">
-                  <textarea
-                    value={form.message}
-                    onChange={update('message')}
-                    placeholder="Décrivez votre demande…"
-                    rows={6}
-                    className="w-full resize-y rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-bone-100 outline-none transition placeholder:text-bone-500 focus:border-emerald-400/50"
-                  />
-                </Field>
-
-                {error && (
-                  <div className="flex items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
-                    <span>{error}</span>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field label="Nom complet">
+                      <input
+                        type="text"
+                        value={form.name}
+                        onChange={update('name')}
+                        placeholder="Votre nom complet"
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="Email">
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={update('email')}
+                        placeholder="vous@email.com"
+                        className={inputClass}
+                      />
+                    </Field>
                   </div>
-                )}
 
-                <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    disabled={status === 'sending'}
-                    className="min-w-[190px] justify-center"
-                  >
-                    {status === 'sending' ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        Envoi…
-                      </>
-                    ) : (
-                      <>
-                        <Send size={16} />
-                        Envoyer le message
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
+                  <Field label="Sujet">
+                    <div className="relative">
+                      <select
+                        value={form.subject}
+                        onChange={update('subject')}
+                        className={`${inputClass} appearance-none pr-10 ${
+                          form.subject ? 'text-bone-100' : 'text-bone-500'
+                        }`}
+                      >
+                        <option value="">Sélectionnez un sujet</option>
+                        {SUBJECTS.map((subject) => (
+                          <option key={subject} value={subject}>
+                            {subject}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-bone-500"
+                      />
+                    </div>
+                  </Field>
+
+                  <Field label="Numéro de commande (optionnel)">
+                    <input
+                      type="text"
+                      value={form.orderRef}
+                      onChange={update('orderRef')}
+                      placeholder="Ex. #PCF-2026-0012"
+                      className={inputClass}
+                    />
+                  </Field>
+
+                  <Field label="Votre message">
+                    <textarea
+                      value={form.message}
+                      onChange={update('message')}
+                      placeholder="Décrivez votre demande en détail…"
+                      rows={6}
+                      className="w-full resize-y rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-bone-100 outline-none transition placeholder:text-bone-500 focus:border-emerald-400/50"
+                    />
+                  </Field>
+
+                  {error && (
+                    <div className="flex items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                    <p className="flex items-start gap-2 text-[12px] leading-5 text-bone-500">
+                      <ShieldCheck
+                        size={15}
+                        className="mt-0.5 shrink-0 text-emerald-400"
+                      />
+                      Vos données sont sécurisées et utilisées uniquement pour
+                      traiter votre demande.
+                    </p>
+
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      disabled={status === 'sending'}
+                      className="w-full shrink-0 justify-center sm:w-auto"
+                    >
+                      {status === 'sending' ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Envoi…
+                        </>
+                      ) : (
+                        <>
+                          <Send size={16} />
+                          Envoyer le message
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </>
             )}
           </GlassCard>
 
-          {/* Infos */}
+          {/* Colonne latérale */}
           <div className="flex flex-col gap-5">
+            {/* Nous joindre */}
             <GlassCard className="border border-white/10 p-6">
               <p className="text-[11px] font-black uppercase tracking-[0.2em] text-bone-400">
                 Nous joindre
               </p>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="mt-4 flex items-start gap-3 text-bone-100 transition hover:text-emerald-300"
-              >
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06]">
-                  <Mail size={16} className="text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold">Email</p>
-                  <p className="text-[13px] text-bone-400">{CONTACT_EMAIL}</p>
-                </div>
-              </a>
-              <div className="mt-4 flex items-start gap-3">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06]">
-                  <Clock size={16} className="text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-bone-50">
-                    Temps de réponse
-                  </p>
-                  <p className="text-[13px] text-bone-400">
-                    En général sous 24-48h ouvrées
-                  </p>
-                </div>
+              <div className="mt-4 space-y-4">
+                <InfoRow
+                  icon={Mail}
+                  title="Email"
+                  href={`mailto:${CONTACT_EMAIL}`}
+                >
+                  {CONTACT_EMAIL}
+                </InfoRow>
+                <InfoRow icon={Clock} title="Temps de réponse">
+                  En général sous 24 à 48h ouvrées
+                </InfoRow>
+                <InfoRow icon={Headphones} title="Support dédié">
+                  Notre équipe est à votre écoute
+                </InfoRow>
               </div>
             </GlassCard>
 
+            {/* FAQ */}
             <GlassCard className="border border-white/10 p-6">
-              <div className="flex items-start gap-3">
-                <ShieldCheck size={18} className="mt-0.5 shrink-0 text-emerald-400" />
-                <p className="text-[13px] leading-6 text-bone-300">
-                  Vos données ne servent qu'à traiter votre demande. Elles ne
-                  sont ni revendues ni utilisées à des fins commerciales.
-                </p>
-              </div>
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-bone-400">
+                Questions fréquentes
+              </p>
+              <p className="mt-3 text-sm leading-6 text-bone-300">
+                Retrouvez les réponses aux questions les plus fréquentes dans
+                notre FAQ.
+              </p>
+              <Link
+                to="/faq"
+                className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-sm font-semibold text-bone-100 backdrop-blur transition-all hover:border-emerald-500/50 hover:bg-white/10"
+              >
+                <HelpCircle size={15} />
+                Consulter la FAQ
+              </Link>
+            </GlassCard>
+
+            {/* Aide immédiate */}
+            <GlassCard className="border border-white/10 p-6">
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-bone-400">
+                Besoin d'aide immédiate ?
+              </p>
+              <p className="mt-3 text-sm leading-6 text-bone-300">
+                Consultez vos commandes et gérez votre compte directement depuis
+                votre espace.
+              </p>
+              <Link
+                to={user ? '/mon-compte' : '/login'}
+                className="mt-4 inline-flex h-11 w-full items-center justify-between gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-sm font-semibold text-bone-100 backdrop-blur transition-all hover:border-emerald-500/50 hover:bg-white/10"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <UserRound size={15} />
+                  Accéder à mon compte
+                </span>
+                <ArrowRight size={15} />
+              </Link>
             </GlassCard>
           </div>
         </div>
@@ -281,4 +387,29 @@ function Field({ label, children }) {
       {children}
     </label>
   );
+}
+
+function InfoRow({ icon: Icon, title, href, children }) {
+  const body = (
+    <>
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06]">
+        <Icon size={16} className="text-emerald-400" />
+      </div>
+      <div>
+        <p className="text-sm font-bold text-bone-50">{title}</p>
+        <p className="text-[13px] text-bone-400">{children}</p>
+      </div>
+    </>
+  );
+  if (href) {
+    return (
+      <a
+        href={href}
+        className="flex items-start gap-3 transition hover:opacity-80"
+      >
+        {body}
+      </a>
+    );
+  }
+  return <div className="flex items-start gap-3">{body}</div>;
 }

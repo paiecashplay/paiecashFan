@@ -42,6 +42,7 @@ import { AdminApplications } from './pages/admin/AdminApplications';
 import { Billetterie } from './pages/Billetterie';
 import { ClubBilletterie } from './pages/ClubBilletterie';
 import { Contact } from './pages/Contact';
+import { FAQ } from './pages/FAQ';
 import { MonClub } from './pages/MonClub';
 import { MonClubBO } from './pages/MonClubBO';
 import { Transactions } from './pages/Transaction';
@@ -333,6 +334,7 @@ export default function App() {
                   {/* Anciennes URLs → nouveau dashboard Fan (compat) */}
                   <Route path="/parametres" element={<Navigate to="/mon-compte/parametres" replace />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/faq" element={<FAQ />} />
                   <Route path="*" element={<Home />} />
                   <Route path="/billetterie" element={<Billetterie />} />
                 </Routes>

@@ -10,6 +10,7 @@ create table if not exists public.contact_messages (
   name       text        not null,
   email      text        not null,
   subject    text,
+  order_ref  text,
   message    text        not null,
   ip         text,
   handled    boolean     not null default false,

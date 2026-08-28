@@ -50,9 +50,11 @@ export function Footer() {
               <ul className="mt-5 space-y-3">
                 {col.links.map(link => {
                   const to =
-                    link === 'Contact' || link === 'Aide'
+                    link === 'Contact'
                       ? '/contact'
-                      : null;
+                      : link === 'Aide'
+                        ? '/faq'
+                        : null;
                   return (
                     <li key={link}>
                       {to ? (

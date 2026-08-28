@@ -36,6 +36,7 @@ router.post('/', async (req, res) => {
     const name = clean(req.body?.name, 120);
     const email = clean(req.body?.email, 200);
     const subject = clean(req.body?.subject, 160);
+    const orderRef = clean(req.body?.orderRef, 60);
     const message = clean(req.body?.message, 5000);
 
     if (!name || !isEmail(email) || !message) {
@@ -71,6 +72,7 @@ router.post('/', async (req, res) => {
         name,
         email,
         subject: subject || null,
+        order_ref: orderRef || null,
         message,
         ip,
       });
@@ -88,6 +90,7 @@ router.post('/', async (req, res) => {
         <p style="margin:2px 0"><strong>Nom :</strong> ${esc(name)}</p>
         <p style="margin:2px 0"><strong>Email :</strong> ${esc(email)}</p>
         ${subject ? `<p style="margin:2px 0"><strong>Sujet :</strong> ${esc(subject)}</p>` : ''}
+        ${orderRef ? `<p style="margin:2px 0"><strong>N° de commande :</strong> ${esc(orderRef)}</p>` : ''}
         <p style="margin:12px 0 4px"><strong>Message :</strong></p>
         <p style="white-space:pre-wrap;border-left:3px solid #10b981;padding-left:12px;margin:0">${esc(message)}</p>
       </div>`;

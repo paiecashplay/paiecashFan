@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-28 (dj)** — **Page contact restylée (maquette) + page FAQ**. `/contact` refondue : hero
+  (fond stade éclairci + halo + image casque `assistance_icon.png`), formulaire enrichi (sujet en
+  menu déroulant, **n° de commande** optionnel transmis dans l'email + archive `order_ref`), colonne
+  droite (Nous joindre · **Questions fréquentes** → `/faq` · **Accéder à mon compte** → `/login` ou
+  `/mon-compte` si connecté). Nouvelle page **`/faq`** (`pages/FAQ.jsx`) : accordéon, 9 Q/R brouillon
+  (PCC, paiement PCC/CB 5×, billets, remboursement, compte, bonus +5%, boutique) + encart contact.
+  Footer : « Aide » → `/faq`. **Chat en direct** de la maquette **non implémenté** (todo, à activer
+  quand le trafic le justifiera).
 - **2026-08-28 (di)** — **Formulaire de contact + support**. Page `/contact` (`pages/Contact.jsx`,
   nom/email/sujet/message, honeypot anti-bot, pré-remplissage si connecté). Backend
   `POST /api/v2/contact` (`routes/v2/contact.js`) : validation, throttle IP, **archivage best-effort**
