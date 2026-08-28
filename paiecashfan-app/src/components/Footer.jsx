@@ -52,7 +52,7 @@ export function Footer() {
                   const to =
                     link === 'Contact'
                       ? '/contact'
-                      : link === 'Aide'
+                      : link === 'FAQ'
                         ? '/faq'
                         : null;
                   return (
