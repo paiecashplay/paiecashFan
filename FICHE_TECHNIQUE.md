@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-28 (dk)** — **Panier unifié en surface (2 circuits conservés)**. Le panier billetterie
+  (`useTicketingCart`) passe de hook local à **contexte partagé** (`TicketingCartProvider`, wrap dans
+  `App.jsx`) → synchro temps réel. **Badge navbar combiné** (boutique + billetterie, `CartMenu`). Page
+  `/panier` = **2 sections** : Billetterie (nouveau composant partagé `components/cart/TicketingCart.jsx`
+  — liste + modes de paiement + checkout `/api/v2/checkout/ticketing` + recharge) et Boutique (checkout
+  existant), chacune son **circuit de règlement propre**. **Bandeau récap combiné** en haut quand les
+  deux sont présents (total global + mention « réglées séparément »). Page billetterie club : bouton
+  « Panier » → `/panier` (modale panier en page supprimée). **Fusion du paiement (1 seul règlement)
+  reportée à Redtaag** (siège/nominatif/émission externe → à concevoir une fois). NB : provider en `.js`
+  via `createElement` (pas de JSX en `.js` pour le build).
 - **2026-08-28 (dj)** — **Page contact restylée (maquette) + page FAQ**. `/contact` refondue : hero
   (fond stade éclairci + halo + image casque `assistance_icon.png`), formulaire enrichi (sujet en
   menu déroulant, **n° de commande** optionnel transmis dans l'email + archive `order_ref`), colonne

@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { useCart } from '@/context/CartContext';
+import { useTicketingCart } from '@/hooks/useTicketingCart';
+import { TicketingCart } from '@/components/cart/TicketingCart';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 
@@ -15,8 +17,21 @@ const STEPS = ['Panier', 'Livraison', 'Paiement', 'Confirmation'];
 
 export function CartPage() {
   const { items, club, totalItems, totalPrice, totalEur, updateQty, removeItem, openCheckout } = useCart();
+  const { cart: ticketing } = useTicketingCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const hasBoutique = items.length > 0;
+  const hasBillet = ticketing.length > 0;
+
+  // Récap combiné (billetterie + boutique) — pour lire l'ensemble comme un seul
+  // panier même si le règlement se fait par deux circuits distincts.
+  const billetPcc = ticketing.reduce((s, i) => s + Number(i.totalPrice || 0), 0);
+  const billetEur = ticketing.reduce((s, i) => s + Number(i.totalEur || 0), 0);
+  const billetUnits = ticketing.reduce((s, i) => s + Number(i.quantity || 1), 0);
+  const grandPcc = totalPrice + billetPcc;
+  const grandEur = totalEur + billetEur;
+  const grandUnits = totalItems + billetUnits;
   const [promo, setPromo] = useState('');
   const [promoMsg, setPromoMsg] = useState('');
   const [balance, setBalance] = useState(null);
@@ -29,17 +44,22 @@ export function CartPage() {
 
   const shopHref = club?.slug ? `/clubs/${club.slug}` : '/boutique';
 
-  if (!items.length) {
+  if (!hasBoutique && !hasBillet) {
     return (
       <section className="py-16 md:py-24">
         <Container>
           <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-ink-900/50 p-10 text-center">
             <ShoppingBag className="mx-auto text-bone-600" size={40} />
             <h1 className="mt-4 font-display text-2xl font-black uppercase text-bone-50">Ton panier est vide</h1>
-            <p className="mt-2 text-sm text-bone-400">Découvre les boutiques officielles des clubs.</p>
-            <Link to="/boutique" className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-400 px-6 py-3 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300">
-              <ShoppingBag size={14} /> Voir la boutique
-            </Link>
+            <p className="mt-2 text-sm text-bone-400">Découvre les boutiques officielles des clubs et la billetterie.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link to="/boutique" className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-6 py-3 text-xs font-black uppercase tracking-wider text-ink-900 hover:bg-emerald-300">
+                <ShoppingBag size={14} /> Voir la boutique
+              </Link>
+              <Link to="/billetterie" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-xs font-black uppercase tracking-wider text-bone-200 hover:text-bone-50">
+                <Ticket size={14} /> Voir la billetterie
+              </Link>
+            </div>
           </div>
         </Container>
       </section>
@@ -55,9 +75,46 @@ export function CartPage() {
             <h1 className="font-display text-4xl font-black uppercase tracking-tight text-bone-50 sm:text-5xl">Votre panier</h1>
             <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-bone-400"><ShieldCheck size={13} className="text-emerald-400" /> Paiement 100% sécurisé en <span className="font-bold text-emerald-400">PaieCashCoin (PCC)</span></p>
           </div>
-          <Stepper current={0} />
+          {hasBoutique && <Stepper current={0} />}
         </div>
 
+        {/* Récap combiné : un seul panier, deux règlements */}
+        {hasBoutique && hasBillet && (
+          <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] text-emerald-400">
+                <ShoppingBag size={18} />
+              </span>
+              <div>
+                <p className="font-display text-lg font-black uppercase text-bone-50">
+                  {grandUnits} article{grandUnits > 1 ? 's' : ''} au total
+                </p>
+                <p className="mt-0.5 text-xs text-bone-400">
+                  Billetterie et boutique sont réglées séparément (deux circuits distincts).
+                </p>
+              </div>
+            </div>
+            <div className="text-right sm:pl-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-bone-400">
+                Total du panier
+              </p>
+              <p className="font-display text-2xl font-black text-emerald-400 tabular-nums leading-none">
+                {fmt(grandPcc)} PCC
+              </p>
+              <p className="mt-1 text-xs text-bone-500 tabular-nums">{fmt(grandEur)} €</p>
+            </div>
+          </div>
+        )}
+
+        {/* Section Billetterie (billets & abonnements, circuit d'émission propre) */}
+        {hasBillet && (
+          <div className="mt-8">
+            <TicketingCart />
+          </div>
+        )}
+
+        {/* Section Boutique */}
+        {hasBoutique && (
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
           {/* Colonne articles */}
           <div>
@@ -168,6 +225,7 @@ export function CartPage() {
             )}
           </aside>
         </div>
+        )}
 
         {/* Bandeau réassurance */}
         <div className="mt-10 grid grid-cols-1 gap-4 rounded-3xl border border-white/10 bg-ink-900/40 p-5 sm:grid-cols-3">

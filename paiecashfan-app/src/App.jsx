@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { TicketingCartProvider } from '@/hooks/useTicketingCart';
 import { CheckoutModal } from '@/components/cart/CheckoutModal';
 import { CartToast } from '@/components/cart/CartToast';
 import { CartPage } from './pages/CartPage';
@@ -220,6 +221,7 @@ export default function App() {
   return (
     <AuthProvider>
      <CartProvider>
+     <TicketingCartProvider>
       {/* Modal de checkout premium + toast d'ajout (globaux) */}
       <CheckoutModal />
       <CartToast />
@@ -345,6 +347,7 @@ export default function App() {
           }
         />
       </Routes>
+     </TicketingCartProvider>
      </CartProvider>
     </AuthProvider>
   );
