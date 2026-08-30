@@ -64,7 +64,13 @@ function resolveOffers(tenant) {
     const price = Number(o.price) || 0;
     // price_eur peut être vide côté BO → repli sur le prix PCC (1 EUR = 1 PCC).
     const priceEur = o.price_eur === '' || o.price_eur == null ? price : Number(o.price_eur) || 0;
-    map.set(o.id, { id: o.id, type: o.type, name: o.name, price, price_eur: priceEur });
+    // `redtaag` (optionnel) = mapping vers Redtaag { event, section, categorie,
+    // articleId } saisi au BO. Présent → l'émission du billet est déléguée à
+    // Redtaag après paiement ; absent → billet "maison" (provisoire).
+    map.set(o.id, {
+      id: o.id, type: o.type, name: o.name, price, price_eur: priceEur,
+      redtaag: o.redtaag || null,
+    });
   }
   return map;
 }

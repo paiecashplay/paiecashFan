@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-30 (dl)** — **Intégration Redtaag : service + branchement checkout (émission de billets)**.
+  Nouveau `backend/services/redtaag.js` (auth JWT en Bearer **+ Cookie** `token=`, lectures, bookSeat/
+  bookByArticle, addToCart, orderCart, **ipn**, helper `emitPrepaidTickets` — flux vérifié en live :
+  `bookSeat → addtocart → ordercart (sans finalize) → ipn Completed` = billet émis, **sans poste de
+  caisse**). Checkout billetterie (`checkout.js`) : après paiement **PCC** d'un billet, émission Redtaag
+  **best-effort** pour les offres portant un mapping `{event,section,categorie,articleId}` (via
+  `ticketingPricing.resolveOffers` → orderItems) ; **gated** (`redtaag.isConfigured()` + mapping) → no-op
+  sinon (paiement jamais cassé). ⚠️ `REDTAAG_*` **hors Railway** → inerte en prod tant que non configuré.
+  **Restant** : mapping saisissable au BO, rail carte/Stripe (async), **livraison du billet** (email non
+  reçu + `/ticketdocuments` & `/ticketsearch` = 405 pour notre clé → question envoyée à Redtaag).
 - **2026-08-28 (dk)** — **Panier unifié en surface (2 circuits conservés)**. Le panier billetterie
   (`useTicketingCart`) passe de hook local à **contexte partagé** (`TicketingCartProvider`, wrap dans
   `App.jsx`) → synchro temps réel. **Badge navbar combiné** (boutique + billetterie, `CartMenu`). Page

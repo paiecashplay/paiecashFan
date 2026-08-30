@@ -36,9 +36,58 @@ function commissionPctOf(product) {
   return Math.min(100, Math.max(0, raw));
 }
 const { resolveOffers } = require('../../../services/ticketingPricing');
+const redtaag = require('../../../services/redtaag');
 
 const router = express.Router();
 router.use(requireAuth);
+
+// Contact nominatif pour Redtaag à partir de l'utilisateur connecté.
+function redtaagContact(u) {
+  const name = String(u?.display_name || '').trim();
+  const parts = name ? name.split(/\s+/) : [];
+  const firstname = parts[0] || String(u?.email || '').split('@')[0] || 'Client';
+  const lastname = parts.slice(1).join(' ') || 'PaieCashFan';
+  return { firstname, lastname, email: u?.email || '', mobile: '' };
+}
+
+// Émission des billets via Redtaag APRÈS paiement (best-effort : n'échoue
+// JAMAIS le checkout — le fan a déjà payé). Ne concerne que les offres billet
+// disposant d'un mapping Redtaag { event, section, categorie, articleId }.
+// Le résultat (réfs commande Redtaag ou erreur) est tracé dans les notes.
+async function emitRedtaagTickets(order, group, contact) {
+  if (!order || !redtaag.isConfigured()) return;
+  const items = (group.orderItems || []).filter(
+    (it) => it.type === 'ticket' && it.redtaag && it.redtaag.event
+  );
+  if (!items.length) return;
+
+  const emitted = [];
+  for (const it of items) {
+    try {
+      const r = await redtaag.emitPrepaidTickets({
+        event: it.redtaag.event,
+        section: it.redtaag.section,
+        categorie: it.redtaag.categorie,
+        articleId: it.redtaag.articleId,
+        quantity: it.quantity,
+        contact,
+        amountEur: round2((it.price_eur || 0) * it.quantity),
+        paymentRef: `pcf-order-${order.id}`,
+      });
+      emitted.push({
+        offerId: it.offerId,
+        cartRef: r?.order?.cart_reference || null,
+        redtaagOrders: Object.keys(r?.confirm?.orders || {}),
+      });
+    } catch (e) {
+      console.error(`[CHECKOUT] Redtaag émission échec (order ${order.id}, offre ${it.offerId}):`, e.message);
+      emitted.push({ offerId: it.offerId, error: e.message });
+    }
+  }
+  if (emitted.length) {
+    await mergeNotes(order, { redtaag: emitted }).catch(() => {});
+  }
+}
 
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400, extra = {}) =>
@@ -94,7 +143,7 @@ async function buildGroups(items, res) {
       const qty = offer.type === 'subscription' ? 1 : line.quantity;
       clubTotalEur += offer.price_eur * qty;
       clubTotalPcc += offer.price * qty;
-      orderItems.push({ offerId: offer.id, name: offer.name, type: offer.type, quantity: qty, price: offer.price, price_eur: offer.price_eur });
+      orderItems.push({ offerId: offer.id, name: offer.name, type: offer.type, quantity: qty, price: offer.price, price_eur: offer.price_eur, redtaag: offer.redtaag || null });
     }
     clubTotalEur = round2(clubTotalEur);
     if (clubTotalEur <= 0) { fail(res, `Montant invalide pour ${tenant.name}.`); return null; }
@@ -378,6 +427,11 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
         await grantGameEntitlements(order);   // tombola : crée le(s) ticket(s)
+        // Billetterie : émission des billets via Redtaag (best-effort) pour les
+        // offres qui ont un mapping Redtaag. N'échoue jamais le paiement.
+        if (kind === 'ticketing') {
+          await emitRedtaagTickets(order, g, redtaagContact(req.authUser));
+        }
       } catch (e) {
         console.error(`[CHECKOUT] pcc_full: paiement OK mais échec createOrder (${g.tenant.slug}):`, e.message);
       }
