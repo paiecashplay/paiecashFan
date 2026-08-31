@@ -372,7 +372,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
           order = await ordersDb.createOrder({
             user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
             items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-            notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+            notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pending: true, createdAt: new Date().toISOString(), shipping: (g.kind || kind) === 'ticketing' ? undefined : shipping, shippingStatus: ((g.kind || kind) === 'ticketing' || !shipping) ? undefined : 'preparing' }),
           });
         } catch (e) {
           console.error('[CHECKOUT] platform createOrder:', e.message);
@@ -430,7 +430,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
         const order = await ordersDb.createOrder({
           user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
           items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-          notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+          notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping: (g.kind || kind) === 'ticketing' ? undefined : shipping, shippingStatus: ((g.kind || kind) === 'ticketing' || !shipping) ? undefined : 'preparing' }),
         });
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
@@ -462,7 +462,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
   const order = await ordersDb.createOrder({
     user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
     items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-    notes: JSON.stringify({ kind: g.kind || kind, mode, pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+    notes: JSON.stringify({ kind: g.kind || kind, mode, pending: true, createdAt: new Date().toISOString(), shipping: (g.kind || kind) === 'ticketing' ? undefined : shipping, shippingStatus: ((g.kind || kind) === 'ticketing' || !shipping) ? undefined : 'preparing' }),
   });
 
   // Produit plateforme payé par carte : le split n'est pas possible en une seule
