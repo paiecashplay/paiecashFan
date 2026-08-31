@@ -57,6 +57,13 @@ function CheckoutInner({ cart, onClose }) {
     total_pcc: i.totalPrice, total_eur: i.totalEur, image: null,
   }));
 
+  // La carte (Stripe) ne règle qu'UN marchand par session → indisponible dès que
+  // le panier couvre plusieurs groupes (mixte billets+boutique, ou plusieurs
+  // clubs). Dans ces cas, seul le PCC (multi-clubs) fonctionne.
+  const billetClubs = new Set(ticketingCart.map((i) => i.clubSlug).filter(Boolean));
+  const groupCount = (items.length > 0 ? 1 : 0) + billetClubs.size;
+  const cardAvailable = groupCount <= 1;
+
   const [step, setStep] = useState(minStep);      // 0 Livraison · 1 Paiement · 2 Récapitulatif · 3 Succès
   // Pré-remplissage : on réutilise l'adresse de la dernière commande (stockée en
   // local sur cet appareil) → plus besoin de tout resaisir à chaque fois.
@@ -80,6 +87,11 @@ function CheckoutInner({ cart, onClose }) {
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(null);    // snapshot pour l'écran de confirmation
   const [failed, setFailed] = useState(null);          // { message } → écran d'échec plein écran
+
+  // Panier multi-groupes → la carte n'est plus proposée : on force le PCC.
+  useEffect(() => {
+    if (!cardAvailable && payMethod === 'card') setPayMethod('pcc');
+  }, [cardAvailable, payMethod]);
 
   const set = (k) => (e) => { const value = e.target.value;
     setForm((f) => ({
@@ -290,7 +302,7 @@ function CheckoutInner({ cart, onClose }) {
           {/* Gauche (formulaire / confirmation) */}
           <div className={`flex-1 px-5 py-6 sm:px-8 ${step === 2 ? 'overflow-visible lg:w-[65%]' : 'min-h-0 overflow-y-auto lg:w-full'}`}>
             {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} fieldErrors={fieldErrors} />}
-            {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} />}
+            {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} cardAvailable={cardAvailable} />}
             {step === 2 && <StepRecap form={form} shippingMethod={shippingMethod} payMethod={payMethod} setStep={setStep} needsShipping={needsShipping} />}
             {error && <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
             {step < 2 && <div className="mt-7 border-t border-white/[0.08] pt-5">
@@ -664,16 +676,17 @@ function StepLivraison({ form, set, shippingMethod, setShippingMethod, fieldErro
   );
 }
 
-function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge }) {
+function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailable = true }) {
   return (
     <div>
       <SectionTitle icon={Wallet} title="Mode de paiement" />
       <div className="space-y-3">
         <RadioCard active={payMethod === 'pcc'} onClick={() => setPayMethod('pcc')} icon={Wallet}
           title="PaieCashCoin (PCC)" desc="Débit de ton solde PCC" wide />
-        <RadioCard active={payMethod === 'card'} onClick={() => setPayMethod('card')} icon={CreditCard}
-          title="Carte bancaire" desc="Paiement carte sécurisé via Stripe" wide />
-        <RadioCard active={false} onClick={() => {}} icon={CreditCard} title="PayPal" desc="Bientôt disponible" wide disabled />
+        <RadioCard active={payMethod === 'card'} onClick={() => cardAvailable && setPayMethod('card')} icon={CreditCard}
+          title="Carte bancaire"
+          desc={cardAvailable ? 'Paiement carte sécurisé via Stripe' : 'Indisponible pour un panier multi-clubs — réglez en PCC'}
+          wide disabled={!cardAvailable} />
       </div>
 
       {topUp && (
