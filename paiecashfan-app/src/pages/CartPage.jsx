@@ -90,7 +90,8 @@ export function CartPage() {
                   {grandUnits} article{grandUnits > 1 ? 's' : ''} au total
                 </p>
                 <p className="mt-0.5 text-xs text-bone-400">
-                  Billetterie et boutique sont réglées séparément (deux circuits distincts).
+                  Billetterie et boutique sont réglées en une seule fois au
+                  paiement.
                 </p>
               </div>
             </div>

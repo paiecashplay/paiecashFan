@@ -7,6 +7,7 @@ import {
   Star, RotateCw, LifeBuoy, ArrowRight, XCircle, CalendarDays, Hash, Award,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useTicketingCart } from '@/hooks/useTicketingCart';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import { PccRechargeModal } from '@/components/wallet/PccRechargeModal';
@@ -40,10 +41,23 @@ export function CheckoutModal() {
 
 function CheckoutInner({ cart, onClose }) {
   const { items, totalPrice, totalEur, clear, club } = cart;
+  const { cart: ticketingCart, clear: clearTicketing } = useTicketingCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(0);            // 0 Livraison · 1 Paiement · 2 Récapitulatif · 3 Succès
+  // Panier unifié : billetterie + boutique. La livraison n'est demandée que s'il
+  // y a des produits physiques (boutique) ; les billets sont dématérialisés.
+  const hasBillets = ticketingCart.length > 0;
+  const needsShipping = items.length > 0;
+  const minStep = needsShipping ? 0 : 1;
+  const billetsPcc = ticketingCart.reduce((s, i) => s + Number(i.totalPrice || 0), 0);
+  const billetsEur = ticketingCart.reduce((s, i) => s + Number(i.totalEur || 0), 0);
+  const billetItems = ticketingCart.map((i) => ({
+    id: `billet-${i.id}`, name: i.name, quantity: i.quantity,
+    total_pcc: i.totalPrice, total_eur: i.totalEur, image: null,
+  }));
+
+  const [step, setStep] = useState(minStep);      // 0 Livraison · 1 Paiement · 2 Récapitulatif · 3 Succès
   // Pré-remplissage : on réutilise l'adresse de la dernière commande (stockée en
   // local sur cet appareil) → plus besoin de tout resaisir à chaque fois.
   const [form, setForm] = useState(() => {
@@ -81,9 +95,9 @@ function CheckoutInner({ cart, onClose }) {
       });
     }
   };
-  const feePcc = shippingFee(form.country, shippingMethod);   // frais selon la zone (pays)
-  const grandPcc = totalPrice + feePcc;
-  const grandEur = totalEur + feePcc;
+  const feePcc = needsShipping ? shippingFee(form.country, shippingMethod) : 0;   // frais selon la zone (pays)
+  const grandPcc = totalPrice + billetsPcc + feePcc;
+  const grandEur = totalEur + billetsEur + feePcc;
 
   //const infoOk = form.firstName && form.lastName && form.email && form.address1 && form.postalCode && form.city;
 
@@ -115,32 +129,56 @@ function CheckoutInner({ cart, onClose }) {
     // Mémorise la boutique en cours pour y revenir après le retour Stripe (carte).
     try { if (club?.slug) sessionStorage.setItem('pcf_return_boutique', club.slug); } catch { /* noop */ }
     try {
-      const res = await apiFetch('/api/v2/checkout/boutique', {
-        method: 'POST',
-        body: JSON.stringify({
-          items: items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null })),
-          // Club de la boutique visitée → reversement des 10% sur les produits plateforme.
-          boutiqueSlug: club?.slug || null,
-          mode: payMethod === 'card' ? 'card_full' : 'pcc_full',
-          shippingMethod,
-          origin: window.location.origin,
-          shipping: {
-            firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone,
-            address1: form.address1, address2: form.address2, postalCode: form.postalCode, city: form.city, country: form.country,
-          },
-        }),
-      });
-      // Mémorise l'adresse de livraison pour la pré-remplir la prochaine fois.
-      try {
-        localStorage.setItem('pcf_delivery', JSON.stringify({
-          firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone,
-          address1: form.address1, address2: form.address2, postalCode: form.postalCode, city: form.city, country: form.country,
-        }));
-      } catch { /* stockage indisponible → tant pis */ }
+      const modeStr = payMethod === 'card' ? 'card_full' : 'pcc_full';
+      const shippingBody = {
+        firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone,
+        address1: form.address1, address2: form.address2, postalCode: form.postalCode, city: form.city, country: form.country,
+      };
+      const boutiquePayload = items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size || null }));
+      const ticketingPayload = ticketingCart
+        .filter((i) => i.clubSlug)
+        .map((i) => ({ clubSlug: i.clubSlug, offerId: i.id, quantity: i.quantity }));
+
+      let res;
+      if (hasBillets) {
+        // Panier mixte (ou billets seuls) → endpoint unifié /mixed.
+        res = await apiFetch('/api/v2/checkout/mixed', {
+          method: 'POST',
+          body: JSON.stringify({
+            ticketing: ticketingPayload,
+            boutique: boutiquePayload,
+            boutiqueSlug: club?.slug || null,
+            mode: modeStr,
+            shippingMethod,
+            origin: window.location.origin,
+            ...(needsShipping ? { shipping: shippingBody } : {}),
+          }),
+        });
+      } else {
+        // Boutique seule → endpoint historique (inchangé).
+        res = await apiFetch('/api/v2/checkout/boutique', {
+          method: 'POST',
+          body: JSON.stringify({
+            items: boutiquePayload,
+            // Club de la boutique visitée → reversement des 10% sur les produits plateforme.
+            boutiqueSlug: club?.slug || null,
+            mode: modeStr,
+            shippingMethod,
+            origin: window.location.origin,
+            shipping: shippingBody,
+          }),
+        });
+      }
+
+      // Mémorise l'adresse de livraison (uniquement s'il y a une livraison).
+      if (needsShipping) {
+        try { localStorage.setItem('pcf_delivery', JSON.stringify(shippingBody)); } catch { /* stockage indisponible */ }
+      }
       if (res?.data?.redirect) { window.location.href = res.data.redirect; return; }
-      // PCC → payé immédiatement : on fige le récap puis on vide le panier.
-      setConfirmed({ items: [...items], feePcc, grandPcc, grandEur, order: res?.data?.orders?.[0] || null });
+      // PCC → payé immédiatement : on fige le récap puis on vide les paniers.
+      setConfirmed({ items: [...items, ...billetItems], feePcc, grandPcc, grandEur, order: res?.data?.orders?.[0] || null });
       await clear();
+      await clearTicketing();
       setStep(3); setPaying(false);
     } catch (err) {
       const msg = err?.message || 'Paiement impossible pour le moment.';
@@ -151,7 +189,7 @@ function CheckoutInner({ cart, onClose }) {
     }
   }
 
-  const summaryItems = confirmed?.items || items;
+  const summaryItems = confirmed?.items || [...items, ...billetItems];
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-6">
@@ -204,7 +242,7 @@ function CheckoutInner({ cart, onClose }) {
       >
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-4 sm:px-8">
-          <button onClick={step === 0 ? onClose : () => setStep((s) => Math.max(0, s - 1))}
+          <button onClick={step === minStep ? onClose : () => setStep((s) => Math.max(minStep, s - 1))}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-bone-400 hover:text-bone-100">
             <ArrowLeft size={15} /> Retour
           </button>
@@ -253,7 +291,7 @@ function CheckoutInner({ cart, onClose }) {
           <div className={`flex-1 px-5 py-6 sm:px-8 ${step === 2 ? 'overflow-visible lg:w-[65%]' : 'min-h-0 overflow-y-auto lg:w-full'}`}>
             {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} fieldErrors={fieldErrors} />}
             {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} />}
-            {step === 2 && <StepRecap form={form} shippingMethod={shippingMethod} payMethod={payMethod} setStep={setStep} />}
+            {step === 2 && <StepRecap form={form} shippingMethod={shippingMethod} payMethod={payMethod} setStep={setStep} needsShipping={needsShipping} />}
             {error && <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
             {step < 2 && <div className="mt-7 border-t border-white/[0.08] pt-5">
                 <button
@@ -272,13 +310,13 @@ function CheckoutInner({ cart, onClose }) {
                 <button
                   type="button"
                   onClick={
-                    step === 0
+                    step === minStep
                       ? onClose
-                      : () => setStep(0)
+                      : () => setStep(minStep)
                   }
                   className="mt-2 w-full text-center text-[11px] font-bold uppercase tracking-wider text-bone-500 hover:text-bone-300"
                 >
-                  {step === 0
+                  {step === minStep
                     ? 'Retour au panier'
                     : 'Modifier la livraison'}
                 </button>
@@ -314,8 +352,10 @@ function CheckoutInner({ cart, onClose }) {
               </div>
 
               <div className="mt-5 space-y-2 border-t border-white/10 pt-4 text-sm">
-                <Row label={`Sous-total (${cart.totalItems} art.)`} value={`${fmt(totalPrice)} PCC`} sub={`${fmt(totalEur)} €`} />
-                <Row label="Livraison" value={feePcc ? `${fmt(feePcc)} PCC` : 'Gratuit'} valueCls={feePcc ? '' : 'text-emerald-400'} />
+                <Row label={`Sous-total (${cart.totalItems + billetItems.reduce((s, i) => s + i.quantity, 0)} art.)`} value={`${fmt(totalPrice + billetsPcc)} PCC`} sub={`${fmt(totalEur + billetsEur)} €`} />
+                {needsShipping && (
+                  <Row label="Livraison" value={feePcc ? `${fmt(feePcc)} PCC` : 'Gratuit'} valueCls={feePcc ? '' : 'text-emerald-400'} />
+                )}
               </div>
               <div className="mt-5 flex items-end justify-between rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.05] p-4">
                 <span className="text-xs uppercase tracking-[0.2em] text-bone-400 font-black">Total</span>
@@ -387,8 +427,9 @@ function ProgressSteps({ step }) {
   );
 }
 
-function StepRecap({ form, shippingMethod, payMethod, setStep }) {
+function StepRecap({ form, shippingMethod, payMethod, setStep, needsShipping = true }) {
   const recapCards = [
+    ...(needsShipping ? [
     {
       icon: MapPin,
       title: 'Livraison',
@@ -442,6 +483,8 @@ function StepRecap({ form, shippingMethod, payMethod, setStep }) {
         </>
       ),
     },
+
+    ] : []),
 
     {
       icon: payMethod === 'card' ? CreditCard : Wallet,

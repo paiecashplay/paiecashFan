@@ -156,7 +156,7 @@ async function buildGroups(items, res) {
     clubTotalEur = round2(clubTotalEur);
     if (clubTotalEur <= 0) { fail(res, `Montant invalide pour ${tenant.name}.`); return null; }
     grandTotalEur += clubTotalEur;
-    groups.push({ tenant, merchantRef: `paiecashfan:${tenant.slug}`, orderItems, totalEur: clubTotalEur, totalPcc: round2(clubTotalPcc) });
+    groups.push({ kind: 'ticketing', tenant, merchantRef: `paiecashfan:${tenant.slug}`, orderItems, totalEur: clubTotalEur, totalPcc: round2(clubTotalPcc) });
   }
   return { groups, grandTotalEur: round2(grandTotalEur) };
 }
@@ -209,7 +209,7 @@ async function buildBoutiqueGroups(items, res, originSlug = null) {
     if (totalEur <= 0) { fail(res, `Montant invalide pour ${g.tenant.name}.`); return null; }
     grandTotalEur += totalEur;
 
-    const group = { tenant: g.tenant, merchantRef: `paiecashfan:${g.tenant.slug}`, orderItems: g.orderItems, totalEur, totalPcc: round2(g.totalPcc) };
+    const group = { kind: 'boutique', tenant: g.tenant, merchantRef: `paiecashfan:${g.tenant.slug}`, orderItems: g.orderItems, totalEur, totalPcc: round2(g.totalPcc) };
 
     // Répartition plateforme→club : si ce groupe est le PaieCash Store et que la
     // boutique d'origine est un vrai club différent, on prépare la commission.
@@ -372,7 +372,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
           order = await ordersDb.createOrder({
             user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
             items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-            notes: JSON.stringify({ kind, mode: 'pcc_full', pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+            notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
           });
         } catch (e) {
           console.error('[CHECKOUT] platform createOrder:', e.message);
@@ -381,7 +381,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
 
         const pay = await pcc.execute({
           userEmail: email, userAuthId: authId, amountEur: g.totalEur,
-          description: describe(kind, g.tenant, g.orderItems),
+          description: describe(g.kind || kind, g.tenant, g.orderItems),
           merchantRef: `paiecashfan:${STORE_SLUG}:${order.id}`, recipientSlug: STORE_SLUG,
           merchantName: 'PaieCash Store', preferredMode: 'pcc_full', idempotencyKey: String(order.id),
         });
@@ -417,7 +417,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
       // ── Groupe club normal ──
       const pay = await pcc.execute({
         userEmail: email, userAuthId: authId, amountEur: g.totalEur,
-        description: describe(kind, g.tenant, g.orderItems), merchantRef: g.merchantRef,
+        description: describe(g.kind || kind, g.tenant, g.orderItems), merchantRef: g.merchantRef,
         merchantName: g.tenant.name || 'PaieCashFan', preferredMode: 'pcc_full',
       });
       // pcc_full aboutit immédiatement (status 'completed' avec le nouveau
@@ -430,14 +430,15 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
         const order = await ordersDb.createOrder({
           user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
           items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-          notes: JSON.stringify({ kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+          notes: JSON.stringify({ kind: g.kind || kind, mode: 'pcc_full', pccReference: pay.reference, pccTransactionId: pay.transactionId ?? null, pccUsed: pay.pccUsed, paidAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
         });
         orderId = order.id;
         await ordersDb.updateOrderStatus(order.id, 'completed');
         await grantGameEntitlements(order);   // tombola : crée le(s) ticket(s)
         // Billetterie : émission des billets via Redtaag (best-effort) pour les
         // offres qui ont un mapping Redtaag. N'échoue jamais le paiement.
-        if (kind === 'ticketing') {
+        // `g.kind` (panier mixte) prime sur le kind global du checkout.
+        if ((g.kind || kind) === 'ticketing') {
           await emitRedtaagTickets(order, g, redtaagContact(req.authUser));
         }
       } catch (e) {
@@ -461,7 +462,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
   const order = await ordersDb.createOrder({
     user_id: authId, tenant_id: g.tenant.id, transaction_id: null,
     items: g.orderItems, total_pcc: g.totalPcc, total_eur: g.totalEur,
-    notes: JSON.stringify({ kind, mode, pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
+    notes: JSON.stringify({ kind: g.kind || kind, mode, pending: true, createdAt: new Date().toISOString(), shipping, shippingStatus: shipping ? 'preparing' : undefined }),
   });
 
   // Produit plateforme payé par carte : le split n'est pas possible en une seule
@@ -483,7 +484,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
   try {
     pay = await pcc.execute({
       userEmail: email, userAuthId: authId, amountEur: g.totalEur,
-      description: describe(kind, g.tenant, g.orderItems),
+      description: describe(g.kind || kind, g.tenant, g.orderItems),
       merchantRef: isPlatform ? `paiecashfan:${STORE_SLUG}:${order.id}` : g.merchantRef,
       recipientSlug: isPlatform ? STORE_SLUG : undefined,
       merchantName: isPlatform ? 'PaieCash Store' : (g.tenant.name || 'PaieCashFan'), preferredMode: mode,
@@ -503,6 +504,9 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
     await ordersDb.updateOrderStatus(order.id, 'completed');
     const fresh = await ordersDb.getOrderById(order.id).catch(() => order);
     await grantGameEntitlements(fresh || order);   // tombola : crée le(s) ticket(s)
+    if ((g.kind || kind) === 'ticketing') {
+      await emitRedtaagTickets(fresh || order, g, redtaagContact(req.authUser));
+    }
     return ok(res, { paid: true, mode: pay.mode, orders: [{ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId: order.id, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc }] });
   }
 
@@ -567,6 +571,58 @@ router.post('/boutique', async (req, res) => {
     return settleCheckout(req, res, { ...built, mode, kind: 'boutique', shipping: shippingFull });
   } catch (err) {
     console.error('[CHECKOUT] Erreur:', err.message);
+    return fail(res, `Échec du paiement : ${err.message}`, 500);
+  }
+});
+
+// POST /api/v2/checkout/mixed — panier unifié billetterie + boutique.
+// Body: { ticketing:[{clubSlug,offerId,quantity}], boutique:[{product_id,quantity,size?}],
+//         boutiqueSlug?, mode?, origin?, shipping?, shippingMethod? }
+// Chaque groupe garde son `kind` (émission Redtaag pour les billets, livraison
+// pour la boutique). En PCC : paiement multi-clubs OK. En carte : un seul
+// marchand à la fois (contrainte Stripe existante).
+router.post('/mixed', async (req, res) => {
+  try {
+    if (!pcc.isConfigured()) return fail(res, 'Paiement momentanément indisponible (configuration manquante).', 503);
+    const ticketingItems = Array.isArray(req.body?.ticketing) ? req.body.ticketing : [];
+    const boutiqueItems = Array.isArray(req.body?.boutique) ? req.body.boutique : [];
+    if (!ticketingItems.length && !boutiqueItems.length) return fail(res, 'Panier vide.');
+    const mode = MODES.includes(req.body?.mode) ? req.body.mode : 'pcc_full';
+
+    const groups = [];
+    let grandTotalEur = 0;
+    let shippingFull = null;
+
+    // Billetterie
+    if (ticketingItems.length) {
+      const bt = await buildGroups(ticketingItems, res);
+      if (!bt) return; // a déjà répondu
+      groups.push(...bt.groups);
+      grandTotalEur += bt.grandTotalEur;
+    }
+
+    // Boutique (adresse de livraison requise pour les produits physiques)
+    if (boutiqueItems.length) {
+      const shipping = cleanShipping(req.body?.shipping);
+      if (!shipping) return fail(res, 'Adresse de livraison requise pour les produits boutique.');
+      const shippingMethod = req.body?.shippingMethod === 'express' ? 'express' : 'standard';
+      const zone = shippingZone(shipping.country);
+      const shippingFeeEur = SHIPPING_ZONES[zone]?.[shippingMethod] ?? 0;
+      const bb = await buildBoutiqueGroups(boutiqueItems, res, req.body?.boutiqueSlug || null);
+      if (!bb) return; // a déjà répondu
+      if (shippingFeeEur > 0 && bb.groups.length) {
+        bb.groups[0].totalEur = round2(bb.groups[0].totalEur + shippingFeeEur);
+        bb.groups[0].totalPcc = round2(bb.groups[0].totalPcc + shippingFeeEur);
+        bb.grandTotalEur = round2(bb.grandTotalEur + shippingFeeEur);
+      }
+      shippingFull = { ...shipping, method: shippingMethod, zone, feeEur: shippingFeeEur };
+      groups.push(...bb.groups);
+      grandTotalEur += bb.grandTotalEur;
+    }
+
+    return settleCheckout(req, res, { groups, grandTotalEur: round2(grandTotalEur), mode, kind: 'mixed', shipping: shippingFull });
+  } catch (err) {
+    console.error('[CHECKOUT] Erreur (mixed):', err.message);
     return fail(res, `Échec du paiement : ${err.message}`, 500);
   }
 });

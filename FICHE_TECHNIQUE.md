@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-31 (dm)** — **Panier & paiement UNIFIÉS (billetterie + boutique en un seul règlement)** +
+  page succès billetterie. Backend : nouvel endpoint `POST /api/v2/checkout/mixed` (billetterie +
+  boutique) ; `settleCheckout` gère le **`kind` par groupe** (`g.kind`) → livraison pour la boutique,
+  émission Redtaag pour les billets, dans une même commande multi-groupes (PCC multi-clubs ; carte =
+  1 marchand à la fois, contrainte Stripe existante). Front : `CheckoutModal` étendu (lit les 2 paniers,
+  **saute l'étape Livraison** s'il n'y a que des billets, totaux combinés, POST `/mixed`, vide les 2
+  paniers, récap combiné) ; `TicketingCart` simplifié → bouton **« Passer au paiement »** ouvre le
+  **modal commun** (`openCheckout`) — plus de checkout inline. Page de succès billetterie = la vraie
+  `OrderSuccessView` (fond stade + confetti + « e-billet envoyé par email »). Le mail Redtaag part
+  désormais (contact avec **prenom/nom**). **À tester en prod** (chemin de paiement).
 - **2026-08-30 (dl)** — **Intégration Redtaag : service + branchement checkout (émission de billets)**.
   Nouveau `backend/services/redtaag.js` (auth JWT en Bearer **+ Cookie** `token=`, lectures, bookSeat/
   bookByArticle, addToCart, orderCart, **ipn**, helper `emitPrepaidTickets` — flux vérifié en live :
