@@ -111,6 +111,64 @@ const getSaleQuotas = (eventId) => call('GET', `/salequotas/${eventId}`);
 const checkSeats = (eventId) => call('GET', `/checkseats/${eventId}`);
 const getAllSeats = (eventId) => call('GET', `/allseats/${eventId}`);
 
+// ─── Events en vente + génération d'offres billet ──────────────
+// Liste des events actuellement en vente (matchs).
+async function eventsForSale() {
+  const r = await call('POST', '/eventsforsale', {});
+  return Array.isArray(r?.data) ? r.data : [];
+}
+
+// Construit des offres billet PaieCashFan à partir d'un event Redtaag :
+// tire les tarifs (/prices) + déduit la section de chaque catégorie (/allseats).
+// Chaque offre porte son mapping `redtaag` → l'achat émettra le billet.
+async function buildOffersFromEvent(eventId) {
+  const [prices, seats] = await Promise.all([
+    getPrices(eventId),
+    getAllSeats(eventId),
+  ]);
+
+  const seatdetails = seats?.data?.seatdetails || {};
+  // Section pour une catégorie : première section ayant la catégorie avec des
+  // places à vendre (TO_SELL>0), sinon la première section qui la contient.
+  const sectionForCat = (cat) => {
+    let fallback = null;
+    for (const [section, cats] of Object.entries(seatdetails)) {
+      if (cats && cats[cat]) {
+        if (fallback === null) fallback = section;
+        if (Number(cats[cat].TO_SELL) > 0) return section;
+      }
+    }
+    return fallback;
+  };
+
+  const offers = [];
+  const data = prices?.data || {};
+  for (const [category, block] of Object.entries(data)) {
+    const articles = block?.articles || {};
+    for (const [articleId, art] of Object.entries(articles)) {
+      const price = Number(art.price ?? art.prix) || 0;
+      if (price <= 0) continue; // tarif gratuit/invalide → non vendable via checkout
+      const cat = art.categorie || category;
+      const section = sectionForCat(cat);
+      if (section == null) continue;
+      offers.push({
+        id: `redtaag-${eventId}-${articleId}`,
+        type: 'ticket',
+        name: art.libelle || 'Billet',
+        price,
+        price_eur: price,
+        redtaag: {
+          event: Number(eventId),
+          section: Number(section),
+          categorie: cat,
+          articleId: Number(articleId),
+        },
+      });
+    }
+  }
+  return offers;
+}
+
 // ─── Réservation ───────────────────────────────────────────────
 // Placement numéroté : réserve `combien` sièges d'une catégorie.
 const bookSeat = ({ event, section, categorie, combien = 1 }) =>
@@ -262,6 +320,8 @@ module.exports = {
   getSaleQuotas,
   checkSeats,
   getAllSeats,
+  eventsForSale,
+  buildOffersFromEvent,
   bookSeat,
   bookByArticle,
   addToCart,

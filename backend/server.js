@@ -154,6 +154,7 @@ const v2AdminUsers    = require('./routes/v2/admin/users');
 const v2AdminModeration = require('./routes/v2/admin/moderation');
 const v2AdminPrizes   = require('./routes/v2/admin/prizes');
 const v2AdminPlatform = require('./routes/v2/admin/platform');
+const v2AdminRedtaag  = require('./routes/v2/admin/redtaag');
 const v2Live          = require('./routes/v2/live');
 const v2ShopLive = require('./routes/v2/shop-live');
 
@@ -195,6 +196,7 @@ app.use('/api/v2/betting/pools', v2BettingPools);
 app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);   // club_admin (scope) + super_admin
 app.use('/api/v2/admin/prizes', v2AdminPrizes);          // club_admin (son club) + super_admin
 app.use('/api/v2/admin/platform', v2AdminPlatform);      // super_admin : produits plateforme + reversements
+app.use('/api/v2/admin/redtaag', v2AdminRedtaag);        // super_admin : attribution events Redtaag → clubs
 app.use('/api/v2/admin', v2AdminGov);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);

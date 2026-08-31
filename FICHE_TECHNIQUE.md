@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-08-31 (dn)** — **Billetterie Redtaag : attribution event→club au BO + auto-import des tarifs**.
+  Service `redtaag.js` : `eventsForSale()` + `buildOffersFromEvent(id)` (tire `/prices` + section via
+  `/allseats` → offres billet avec mapping Redtaag ; ignore les tarifs 0€). Route super-admin
+  `/api/v2/admin/redtaag` (GET events + club assigné, POST `/map` {eventId,tenantId} = importe les tarifs
+  comme offres dans `metadata.ticketing` du club, DELETE `/map/:eventId`). Table `redtaag_event_clubs`
+  (index, migration fournie). Écran super-admin `AdminRedtaag` (menu « Billetterie ») : liste les matchs
+  Redtaag en vente → menu déroulant club → assigner/retirer. **Assigner = billets achetables sur la
+  billetterie du club + achat émet le billet** (câblage checkout déjà en place). Les tarifs ne sont PAS
+  re-saisis (auto depuis Redtaag) ; seule l'attribution event→club est manuelle (compte Redtaag unique).
+  **Aussi : masqué PayPal ; carte désactivée pour panier multi-groupes (Stripe = 1 marchand/session).**
 - **2026-08-31 (dm)** — **Panier & paiement UNIFIÉS (billetterie + boutique en un seul règlement)** +
   page succès billetterie. Backend : nouvel endpoint `POST /api/v2/checkout/mixed` (billetterie +
   boutique) ; `settleCheckout` gère le **`kind` par groupe** (`g.kind`) → livraison pour la boutique,

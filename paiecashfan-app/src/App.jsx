@@ -27,6 +27,7 @@ import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminClubs } from './pages/admin/AdminClubs';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminPlatform } from './pages/admin/AdminPlatform';
+import { AdminRedtaag } from './pages/admin/AdminRedtaag';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminTombola } from './pages/admin/AdminTombola';
 import { AdminPrizes } from './pages/admin/AdminPrizes';
@@ -249,6 +250,7 @@ export default function App() {
           <Route path="clubs/:id/edit"      element={<AdminClubEdit />} />
           <Route path="products"            element={<AdminProducts />} />
           <Route path="platform"            element={<AdminPlatform />} />
+          <Route path="redtaag"             element={<AdminRedtaag />} />
           <Route path="orders"              element={<AdminOrders />} />
           <Route path="tombola"             element={<AdminTombola />} />
           <Route path="prizes"              element={<AdminPrizes />} />
