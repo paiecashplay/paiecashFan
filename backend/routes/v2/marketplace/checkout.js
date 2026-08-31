@@ -42,12 +42,20 @@ const router = express.Router();
 router.use(requireAuth);
 
 // Contact nominatif pour Redtaag à partir de l'utilisateur connecté.
+// Redtaag exige nom + prénom pour envoyer l'e-billet par email (retour support
+// 2026-08-31). Le contact accepte 2 variantes de clés (EN firstname/lastname
+// + FR prenom/nom) → on renseigne les DEUX pour être sûr que le nom s'enregistre.
 function redtaagContact(u) {
   const name = String(u?.display_name || '').trim();
   const parts = name ? name.split(/\s+/) : [];
   const firstname = parts[0] || String(u?.email || '').split('@')[0] || 'Client';
   const lastname = parts.slice(1).join(' ') || 'PaieCashFan';
-  return { firstname, lastname, email: u?.email || '', mobile: '' };
+  return {
+    firstname, lastname,
+    prenom: firstname, nom: lastname,
+    email: u?.email || '',
+    mobile: '',
+  };
 }
 
 // Émission des billets via Redtaag APRÈS paiement (best-effort : n'échoue
