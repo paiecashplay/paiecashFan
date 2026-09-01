@@ -31,6 +31,10 @@ const lotoRoutes = require('./routes/loto');
 const bettingRoutes = require('./routes/betting');
 const adminBettingRoutes = require('./routes/admin-betting');
 
+// Events routes
+const v2Events = require('./routes/v2/events');
+const v2AdminEvents = require('./routes/v2/admin/events');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -179,6 +183,8 @@ app.use('/api/v2/live', v2Live);
 const v2Contact = require('./routes/v2/contact');
 app.use('/api/v2/contact', v2Contact);
 app.use('/api/v2/shop-live', v2ShopLive);
+
+app.use('/api/v2/events', v2Events);
 app.use('/api/v2/marketplace/search', v2MarketSearch);
 app.use('/api/v2/onboarding', v2Onboarding);
 app.use('/api/v2/me', v2Me);
@@ -195,6 +201,8 @@ app.use('/api/v2/betting/pools', v2BettingPools);
 app.use('/api/v2/admin/clubs-crud', v2AdminCrudClubs);   // club_admin (scope) + super_admin
 app.use('/api/v2/admin/prizes', v2AdminPrizes);          // club_admin (son club) + super_admin
 app.use('/api/v2/admin/platform', v2AdminPlatform);      // super_admin : produits plateforme + reversements
+
+app.use('/api/v2/admin/events', v2AdminEvents);          // super_admin
 app.use('/api/v2/admin', v2AdminGov);
 app.use('/api/v2/admin/users', v2AdminUsers);
 app.use('/api/v2/admin/moderation', v2AdminModeration);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { HeroFuturist } from '@/components/HeroFuturist';
@@ -6,9 +6,31 @@ import { HeroSearch } from '@/components/HeroSearch';
 import { PrepaidESIMSection } from '@/components/PrepaidESIMSection';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { CategoryContent } from '@/components/CategoryContent';
+import { useSearchParams } from 'react-router-dom';
 
 export function Home() {
-  const [activeCategory, setActiveCategory] = useState('fr');
+  
+  const [searchParams] = useSearchParams();
+
+  const categoryFromUrl = searchParams.get('category');
+
+  const [activeCategory, setActiveCategory] = useState(
+    categoryFromUrl || 'fr'
+  );
+
+  useEffect(() => {
+    const category = searchParams.get('category');
+
+    if (category) {
+      setActiveCategory(category);
+
+      setTimeout(() => {
+        document
+          .getElementById('tabs')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [searchParams]);
 
   return (
     <>

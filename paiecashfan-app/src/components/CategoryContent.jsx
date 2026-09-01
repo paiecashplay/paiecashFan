@@ -6,7 +6,7 @@ import { LeagueSection } from './LeagueSection';
 import { FederationCard } from './FederationCard';
 import { EventCard } from './EventCard';
 import { DataSourceBadge } from './DataSourceBadge';
-import { ligue1, otherSports, events } from '@/data/leagues';
+import { ligue1, otherSports } from '@/data/leagues';
 import { federations as fallbackFederations, normalizeFederation } from '@/data/federations';
 import { useApi } from '@/hooks/useApi';
 import { apiFetch } from '@/lib/api';
@@ -33,7 +33,7 @@ export function CategoryContent({ active }) {
             </div>
           )}
           {active === 'federations' && <FederationsGridLive />}
-          {active === 'events'      && <EventsGrid items={events} />}
+          {active === 'events' && <EventsGridLive />}
         </motion.div>
       </AnimatePresence>
     </Container>
@@ -177,6 +177,38 @@ function FederationsSkeleton() {
       ))}
     </div>
   );
+}
+
+
+function EventsGridLive() {
+  const { data, loading, error } = useApi('/api/v2/events', {
+    fallback: { success: true, data: [] }
+  });
+
+  const items = data?.data || [];
+
+  if (loading) {
+    return (
+      <section className="space-y-6">
+        <Skeleton className="h-9 w-52" />
+        <div className="grid gap-3 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-2xl" />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error && !items.length) {
+    return (
+      <p className="text-center text-sm text-red-400 py-16">
+        Impossible de charger les événements.
+      </p>
+    );
+  }
+
+  return <EventsGrid items={items} />;
 }
 
 function EventsGrid({ items }) {

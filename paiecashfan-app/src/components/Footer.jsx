@@ -54,7 +54,9 @@ export function Footer() {
                       ? '/contact'
                       : link === 'FAQ'
                         ? '/faq'
-                        : null;
+                          : link === 'Évènements'
+                            ? '/?category=events#tabs'
+                            : null;
                   return (
                     <li key={link}>
                       {to ? (

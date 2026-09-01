@@ -51,6 +51,8 @@ import { MonCompte } from './pages/MonCompte';
 import { Parametres } from './pages/Parametres';
 import { FanDashboardLayout } from './pages/mon-compte/FanDashboardLayout';
 import { FanOverview } from './pages/mon-compte/FanOverview';
+import { EventDetail } from './pages/EventDetail';
+import { AdminEvents } from './pages/admin/AdminEvents';
 import {
   FanCommandes, FanPccPage, FanGainsPage, FanActivitesPage, FanModerationPage,
   FanClubsPage, FanAmisPage, FanClassementsPage, FanProfilPage, FanSecuritePage, FanParametresPage,
@@ -249,6 +251,7 @@ export default function App() {
           <Route path="clubs/:id/edit"      element={<AdminClubEdit />} />
           <Route path="products"            element={<AdminProducts />} />
           <Route path="platform"            element={<AdminPlatform />} />
+          <Route path="events"              element={<AdminEvents />} />
           <Route path="orders"              element={<AdminOrders />} />
           <Route path="tombola"             element={<AdminTombola />} />
           <Route path="prizes"              element={<AdminPrizes />} />
@@ -310,6 +313,7 @@ export default function App() {
                   <Route path="/federations/:fedId" element={<FederationDetail />} />
                   <Route path="/clubs/:slug" element={<ClubDetail />} />
                   <Route path="/clubs/:slug/billetterie" element={<ClubBilletterie />} />
+                  <Route path="/events/:slug"            element={<EventDetail />} />
                   <Route path="/clubs/:slug/fan-club" element={<FanClub />} />
                   <Route path="/tombola/sport-bingo" element={<SportBingo />} />
                   <Route path="/tombola/resultats" element={<BingoResults />} />
