@@ -537,6 +537,8 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
     });
   } catch (e) {
     await ordersDb.updateOrderStatus(order.id, 'cancelled').catch(() => {});
+    // Trace le refus côté logs (diagnostic) : mode, destinataire visé, code PCC.
+    console.warn(`[CHECKOUT] paiement refusé ${mode} order=${order.id} recipient=${isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? bridgeRecipient(email, g.tenant.slug) : g.tenant.slug)} code=${e.code || '-'} : ${e.message}`);
     // Erreur métier connue (marchand non éligible, Bridge indispo…) → message clair,
     // le fan garde son panier et peut choisir un autre moyen de paiement.
     const friendly = PCC_FRIENDLY_ERRORS[e.code];
