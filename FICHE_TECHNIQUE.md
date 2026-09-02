@@ -135,6 +135,11 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-02 (ds)** — **Fix Bridge : bouton « Continuer » (étape paiement) désactivé pour bridge**.
+  La liste blanche du bouton (`CheckoutModal`) n'autorisait que `pcc`+`card` → avec `payMethod:'bridge'`
+  le bouton restait `disabled` : clic sans effet, **aucun appel réseau, rien en console** (symptôme piège).
+  Ajout de `bridge`. ⚠️ Rappel : les vars `BRIDGE_TEST_RECIPIENT_SLUG`/`BRIDGE_TEST_EMAIL` vont sur le
+  backend **PaieCashFan** (Railway, sert `/api/v2/...`), PAS sur le backend PaieCashCoin.
 - **2026-09-02 (dr)** — **Bridge : prêt à tester en sandbox (marchand test) + erreurs claires**.
   PCC a livré l'API v1 (E2E ok, tx PCC-BR-000012 sandbox). Bridge est **éligible marchand par
   marchand** (chez PCC : `business_mode` + `kyb_status='verified'` + `business_iban`). Ajout d'un
