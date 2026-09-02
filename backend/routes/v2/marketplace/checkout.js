@@ -120,6 +120,20 @@ const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 // Comme la carte, c'est un flux à redirection (SCA banque) → PaieCashCoin renvoie
 // une URL de redirection. Le webhook PCC confirme ensuite (payment.completed).
 const MODES = ['pcc_full', 'pcc_split', 'card_full', 'bnpl', 'bridge_single'];
+// SANDBOX UNIQUEMENT : force le recipientSlug des virements Bridge vers le
+// marchand test KYB-validé chez PCC (ex. 'valery'), pour valider le flux avant
+// que les vrais clubs soient KYB. NE PAS poser cette variable en prod (sinon les
+// virements iraient au compte test au lieu du club). Vide en prod → slug du club.
+const BRIDGE_TEST_SLUG = (process.env.BRIDGE_TEST_RECIPIENT_SLUG || '').trim();
+// Erreurs PCC "métier" (config marchand / indispo) → messages clairs au fan,
+// pour qu'il bascule sur un autre moyen plutôt qu'un 502 opaque.
+const PCC_FRIENDLY_ERRORS = {
+  MERCHANT_NOT_ELIGIBLE: "Le virement instantané n'est pas encore disponible pour ce club. Choisis un autre moyen de paiement (PCC ou carte).",
+  MERCHANT_MISSING_IBAN: "Le virement instantané n'est pas encore disponible pour ce club. Choisis un autre moyen de paiement (PCC ou carte).",
+  BRIDGE_UNAVAILABLE: "Le service de virement instantané est momentanément indisponible. Réessaie dans un instant ou choisis un autre moyen.",
+  BRIDGE_DYNAMIC_BENEFICIARY_DISABLED: "Le virement instantané est temporairement indisponible. Choisis un autre moyen de paiement.",
+  SELF_PAYMENT: "Tu ne peux pas régler ta propre boutique.",
+};
 const safeParse = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || {}); } catch { return {}; } };
 const KIND_LABEL = { ticketing: 'Billetterie', boutique: 'Boutique' };
 const describe = (kind, tenant, items) => `${KIND_LABEL[kind] || 'PaieCashFan'} ${tenant.name} — ${items.reduce((s, i) => s + i.quantity, 0)} article(s)`;
@@ -506,7 +520,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
       // recipientSlug OBLIGATOIRE pour bridge_single (bénéficiaire dynamique du
       // virement). Le slug PCC du club = notre tenant.slug (cf. reversement
       // commission). Pour la carte on garde undefined (résolu via merchantRef).
-      recipientSlug: isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? g.tenant.slug : undefined),
+      recipientSlug: isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? (BRIDGE_TEST_SLUG || g.tenant.slug) : undefined),
       merchantName: isPlatform ? 'PaieCash Store' : (g.tenant.name || 'PaieCashFan'), preferredMode: mode,
       bnplInstallments: req.body?.bnplInstallments,
       successUrl: `${origin}/checkout/success?order=${order.id}`,
@@ -515,7 +529,10 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
     });
   } catch (e) {
     await ordersDb.updateOrderStatus(order.id, 'cancelled').catch(() => {});
-    return fail(res, 'Paiement impossible : ' + e.message, 502);
+    // Erreur métier connue (marchand non éligible, Bridge indispo…) → message clair,
+    // le fan garde son panier et peut choisir un autre moyen de paiement.
+    const friendly = PCC_FRIENDLY_ERRORS[e.code];
+    return fail(res, friendly || ('Paiement impossible : ' + e.message), friendly ? 400 : 502);
   }
 
   // Cas limite : PaieCashCoin a finalement tout couvert en PCC.
