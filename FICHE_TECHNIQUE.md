@@ -135,6 +135,12 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-03 (du)** — **Bridge OK en sandbox (PCC-BR-000014 payée) + UX solde + multi-testeurs**.
+  1er virement Bridge réussi (PCC a débloqué sa config). `CheckoutModal` : **note** sous carte/virement
+  rappelant que le débit se fait sur la banque/carte, **pas sur le solde PCC** (qui reste inchangé — la
+  cliente s'était fait surprendre). `BRIDGE_TEST_EMAIL` accepte maintenant une **liste** (`,`/`;`) →
+  plusieurs testeurs routés vers le marchand test. **Attendu ensuite : KYB des vrais clubs chez PCC**
+  (jusque-là Bridge n'aboutit que pour les comptes de la liste ; vrais clubs → « pas encore dispo »).
 - **2026-09-02 (dt)** — **Bridge testé bout en bout (sandbox) + point d'archi destinataire**. Flux validé :
   front → back PaieCashFan → PCC (décodage erreurs OK). Refus de paiement désormais **loggués**
   (`[CHECKOUT] paiement refusé <mode> recipient=… code=…`) pour diagnostic. **Décision d'archi** : le
