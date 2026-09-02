@@ -135,6 +135,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-02 (dt)** — **Bridge testé bout en bout (sandbox) + point d'archi destinataire**. Flux validé :
+  front → back PaieCashFan → PCC (décodage erreurs OK). Refus de paiement désormais **loggués**
+  (`[CHECKOUT] paiement refusé <mode> recipient=… code=…`) pour diagnostic. **Décision d'archi** : le
+  destinataire d'un virement Bridge n'est **jamais saisi par le fan** (pas d'IBAN/slug au checkout, ≠
+  Revolut/P2P) — marketplace → destinataire = **club qui vend** (auto, `recipientSlug=tenant.slug`) ; le
+  RIB se configure **côté club, une fois, au KYB chez PCC**. Test : acheteur==marchand `valery` →
+  `SELF_PAYMENT` → utiliser un 2e compte fan et pointer `BRIDGE_TEST_EMAIL` dessus.
 - **2026-09-02 (ds)** — **Fix Bridge : bouton « Continuer » (étape paiement) désactivé pour bridge**.
   La liste blanche du bouton (`CheckoutModal`) n'autorisait que `pcc`+`card` → avec `payMethod:'bridge'`
   le bouton restait `disabled` : clic sans effet, **aucun appel réseau, rien en console** (symptôme piège).
