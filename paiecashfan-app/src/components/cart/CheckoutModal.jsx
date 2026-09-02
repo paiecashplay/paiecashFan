@@ -718,6 +718,18 @@ function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailabl
         )}
       </div>
 
+      {/* Virement/carte = débit externe : on rassure que le solde PCC ne bouge pas. */}
+      {(payMethod === 'bridge' || payMethod === 'card') && cardAvailable && (
+        <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <Wallet size={16} className="mt-0.5 shrink-0 text-emerald-400" />
+          <p className="text-sm leading-relaxed text-bone-300">
+            {payMethod === 'bridge'
+              ? <>Le <strong className="text-bone-100">virement</strong> débite ton <strong className="text-bone-100">compte bancaire</strong> — pas ton solde PaieCashCoin. Ton solde <strong className="text-bone-100">PCC reste inchangé</strong>.</>
+              : <>Le paiement par <strong className="text-bone-100">carte</strong> débite ta carte — pas ton solde PaieCashCoin. Ton solde <strong className="text-bone-100">PCC reste inchangé</strong>.</>}
+          </p>
+        </div>
+      )}
+
       {topUp && (
         <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
           <p className="text-sm text-amber-200">{topUp.message || 'Solde PCC insuffisant.'}</p>

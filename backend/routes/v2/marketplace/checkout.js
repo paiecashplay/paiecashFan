@@ -126,9 +126,13 @@ const MODES = ['pcc_full', 'pcc_split', 'card_full', 'bnpl', 'bridge_single'];
 // (BRIDGE_TEST_EMAIL) → un vrai fan paie TOUJOURS son club, même si ces variables
 // restent posées en prod. Les DEUX doivent être définies pour que l'override joue.
 const BRIDGE_TEST_SLUG = (process.env.BRIDGE_TEST_RECIPIENT_SLUG || '').trim();
-const BRIDGE_TEST_EMAIL = (process.env.BRIDGE_TEST_EMAIL || '').trim().toLowerCase();
+// Liste d'emails testeurs (séparés par , ou ;) : pratique pour laisser plusieurs
+// personnes (toi + le client + la stagiaire…) tester Bridge en sandbox, chacune
+// routée vers le marchand test. Les autres comptes paient toujours leur vrai club.
+const BRIDGE_TEST_EMAILS = (process.env.BRIDGE_TEST_EMAIL || '')
+  .split(/[,;]/).map((s) => s.trim().toLowerCase()).filter(Boolean);
 function bridgeRecipient(email, clubSlug) {
-  if (BRIDGE_TEST_SLUG && BRIDGE_TEST_EMAIL && String(email || '').trim().toLowerCase() === BRIDGE_TEST_EMAIL) {
+  if (BRIDGE_TEST_SLUG && BRIDGE_TEST_EMAILS.includes(String(email || '').trim().toLowerCase())) {
     return BRIDGE_TEST_SLUG;
   }
   return clubSlug;
