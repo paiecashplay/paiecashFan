@@ -97,6 +97,20 @@ async function emitRedtaagTickets(order, group, contact) {
   }
 }
 
+// Émission Redtaag pour une commande complétée en ASYNC (retour Stripe/Bridge).
+// Le paiement immédiat PCC émet déjà dans le handler ; ici on couvre les modes à
+// redirection (carte/bridge_single) qui ne se confirment qu'au polling /status.
+// Idempotent : on n'émet que si la commande est bien billetterie et n'a pas déjà
+// de trace `redtaag` dans ses notes (évite tout double-débit à la relance du poll).
+async function emitRedtaagForAsyncOrder(order, authUser) {
+  const notes = safeParse(order.metadata?.notes);
+  if (notes.redtaag) return;                          // déjà émis
+  const items = order.metadata?.items || [];
+  const tickets = items.filter((it) => it.type === 'ticket' && it.redtaag && it.redtaag.event);
+  if (!tickets.length) return;                        // pas de billet Redtaag
+  await emitRedtaagTickets(order, { orderItems: items }, redtaagContact(authUser));
+}
+
 const ok = (res, data) => res.status(200).json({ success: true, data, error: '' });
 const fail = (res, msg, s = 400, extra = {}) =>
   res.status(s).json({ success: false, data: null, error: msg, ...extra });
@@ -489,7 +503,10 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
       userEmail: email, userAuthId: authId, amountEur: g.totalEur,
       description: describe(g.kind || kind, g.tenant, g.orderItems),
       merchantRef: isPlatform ? `paiecashfan:${STORE_SLUG}:${order.id}` : g.merchantRef,
-      recipientSlug: isPlatform ? STORE_SLUG : undefined,
+      // recipientSlug OBLIGATOIRE pour bridge_single (bénéficiaire dynamique du
+      // virement). Le slug PCC du club = notre tenant.slug (cf. reversement
+      // commission). Pour la carte on garde undefined (résolu via merchantRef).
+      recipientSlug: isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? g.tenant.slug : undefined),
       merchantName: isPlatform ? 'PaieCash Store' : (g.tenant.name || 'PaieCashFan'), preferredMode: mode,
       bnplInstallments: req.body?.bnplInstallments,
       successUrl: `${origin}/checkout/success?order=${order.id}`,
@@ -513,10 +530,18 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
     return ok(res, { paid: true, mode: pay.mode, orders: [{ clubSlug: g.tenant.slug, clubName: g.tenant.name, orderId: order.id, reference: pay.reference, totalEur: g.totalEur, totalPcc: g.totalPcc }] });
   }
 
-  if (pay?.stripeCheckoutUrl && pay?.reference) {
-    await mergeNotes(order, { pccReference: pay.reference, pccPlanned: pay.pccPlanned ?? 0, cardAmountEur: pay.cardAmountEur ?? g.totalEur, mode: pay.mode });
-    console.log(`[CHECKOUT] ${kind} ${pay.mode} → Stripe — order=${order.id} ref=${pay.reference}`);
-    return ok(res, { redirect: pay.stripeCheckoutUrl, orderId: order.id, reference: pay.reference, mode: pay.mode });
+  // Redirection SCA : Stripe (carte/mixte/BNPL) OU Bridge (virement instantané).
+  const redirectUrl = pay?.stripeCheckoutUrl || pay?.bridgeCheckoutUrl;
+  if (redirectUrl && pay?.reference) {
+    await mergeNotes(order, {
+      pccReference: pay.reference, pccPlanned: pay.pccPlanned ?? 0,
+      cardAmountEur: pay.cardAmountEur ?? g.totalEur, mode: pay.mode,
+      // Bridge applique une petite surcharge (frais open-banking) → tracée pour le reçu.
+      ...(pay.bridgeSurchargeEur != null ? { bridgeSurchargeEur: pay.bridgeSurchargeEur } : {}),
+      ...(pay.bridgeTotalCharged != null ? { bridgeTotalCharged: pay.bridgeTotalCharged } : {}),
+    });
+    console.log(`[CHECKOUT] ${kind} ${pay.mode} → ${pay.bridgeCheckoutUrl ? 'Bridge' : 'Stripe'} — order=${order.id} ref=${pay.reference}`);
+    return ok(res, { redirect: redirectUrl, orderId: order.id, reference: pay.reference, mode: pay.mode });
   }
 
   await ordersDb.updateOrderStatus(order.id, 'cancelled').catch(() => {});
@@ -679,6 +704,7 @@ router.get('/status', async (req, res) => {
         if (tx?.status === 'completed') {
           await ordersDb.updateOrderStatus(order.id, 'completed');
           await grantGameEntitlements(order);   // tombola payée par carte : crée le ticket
+          await emitRedtaagForAsyncOrder(order, req.authUser);   // billet payé par carte/bridge : émet l'e-billet
           return ok(res, { status: 'completed', order: shape({ ...order, status: 'completed' }) });
         }
         if (tx && ['failed', 'refunded'].includes(tx.status)) {

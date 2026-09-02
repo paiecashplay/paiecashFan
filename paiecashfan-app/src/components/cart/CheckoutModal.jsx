@@ -712,7 +712,7 @@ function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailabl
         {bridgeEnabled && (
           <RadioCard active={payMethod === 'bridge'} onClick={() => cardAvailable && setPayMethod('bridge')} icon={Zap}
             title="Virement instantané"
-            desc={cardAvailable ? 'Virement bancaire instantané via Bridge' : 'Indisponible pour un panier multi-clubs — réglez en PCC'}
+            desc={cardAvailable ? 'Virement bancaire instantané via Bridge (petits frais bancaires)' : 'Indisponible pour un panier multi-clubs — réglez en PCC'}
             wide disabled={!cardAvailable} />
         )}
       </div>
