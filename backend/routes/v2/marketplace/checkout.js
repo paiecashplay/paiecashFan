@@ -120,11 +120,19 @@ const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 // Comme la carte, c'est un flux à redirection (SCA banque) → PaieCashCoin renvoie
 // une URL de redirection. Le webhook PCC confirme ensuite (payment.completed).
 const MODES = ['pcc_full', 'pcc_split', 'card_full', 'bnpl', 'bridge_single'];
-// SANDBOX UNIQUEMENT : force le recipientSlug des virements Bridge vers le
-// marchand test KYB-validé chez PCC (ex. 'valery'), pour valider le flux avant
-// que les vrais clubs soient KYB. NE PAS poser cette variable en prod (sinon les
-// virements iraient au compte test au lieu du club). Vide en prod → slug du club.
+// SANDBOX : force le recipientSlug des virements Bridge vers le marchand test
+// KYB-validé chez PCC (ex. 'valery'), pour valider le flux avant que les vrais
+// clubs soient KYB. FAIL-SAFE : n'agit QUE pour le compte de test désigné
+// (BRIDGE_TEST_EMAIL) → un vrai fan paie TOUJOURS son club, même si ces variables
+// restent posées en prod. Les DEUX doivent être définies pour que l'override joue.
 const BRIDGE_TEST_SLUG = (process.env.BRIDGE_TEST_RECIPIENT_SLUG || '').trim();
+const BRIDGE_TEST_EMAIL = (process.env.BRIDGE_TEST_EMAIL || '').trim().toLowerCase();
+function bridgeRecipient(email, clubSlug) {
+  if (BRIDGE_TEST_SLUG && BRIDGE_TEST_EMAIL && String(email || '').trim().toLowerCase() === BRIDGE_TEST_EMAIL) {
+    return BRIDGE_TEST_SLUG;
+  }
+  return clubSlug;
+}
 // Erreurs PCC "métier" (config marchand / indispo) → messages clairs au fan,
 // pour qu'il bascule sur un autre moyen plutôt qu'un 502 opaque.
 const PCC_FRIENDLY_ERRORS = {
@@ -520,7 +528,7 @@ async function settleCheckout(req, res, { groups, grandTotalEur, mode, kind, shi
       // recipientSlug OBLIGATOIRE pour bridge_single (bénéficiaire dynamique du
       // virement). Le slug PCC du club = notre tenant.slug (cf. reversement
       // commission). Pour la carte on garde undefined (résolu via merchantRef).
-      recipientSlug: isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? (BRIDGE_TEST_SLUG || g.tenant.slug) : undefined),
+      recipientSlug: isPlatform ? STORE_SLUG : (mode === 'bridge_single' ? bridgeRecipient(email, g.tenant.slug) : undefined),
       merchantName: isPlatform ? 'PaieCash Store' : (g.tenant.name || 'PaieCashFan'), preferredMode: mode,
       bnplInstallments: req.body?.bnplInstallments,
       successUrl: `${origin}/checkout/success?order=${order.id}`,
