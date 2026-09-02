@@ -135,6 +135,17 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-02 (dq)** — **Bridge branché de bout en bout (`bridge_single`)** — contrat d'API PCC reçu.
+  Checkout (chemin carte/redirection) : `recipientSlug=tenant.slug` **obligatoire** pour `bridge_single`
+  (bénéficiaire dynamique du virement ; = slug PCC du club, cf. reversement commission), `undefined`
+  pour la carte. Gère la redirection **`bridgeCheckoutUrl`** comme `stripeCheckoutUrl` et trace la
+  **surcharge Bridge** (`bridgeSurchargeEur`/`bridgeTotalCharged`) dans les notes. **`/status`** :
+  émission **Redtaag au retour async** (carte/bridge) via helper idempotent `emitRedtaagForAsyncOrder`
+  — indispensable car Bridge est **redirection uniquement** (pas de complétion immédiate PCC), sinon
+  l'e-billet ne s'émettait jamais. Réponse PCC : `status:pending_bridge` + `bridgeCheckoutUrl`, confirmé
+  par webhook `payment.completed` (réconcilié via `/pay/history`, mode-agnostique). Front : mention
+  « petits frais bancaires » sur l'option. **Reste : activer `VITE_BRIDGE_ENABLED=true` sur Vercel** dès
+  que PCC est prêt côté marchand (Business+KYB + IBAN configuré). Cleanup doublons clubs : **migration passée**.
 - **2026-09-02 (dp)** — **UX Bridge (virement instantané) + job images de stade + club recherchable**.
   Bridge : mode **`bridge_single`** ajouté aux `MODES` du checkout (flux à redirection type carte,
   initié par PaieCashCoin ; webhook PCC agnostique du mode → parsé sans souci). Front : option
