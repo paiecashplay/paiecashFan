@@ -325,7 +325,8 @@ function CheckoutInner({ cart, onClose }) {
                   disabled={
                     step === 1 &&
                     payMethod !== 'pcc' &&
-                    payMethod !== 'card'
+                    payMethod !== 'card' &&
+                    payMethod !== 'bridge'
                   }
                   className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-4 text-xs font-black uppercase tracking-[0.16em] text-ink-900 transition hover:bg-emerald-300 disabled:opacity-60">
                   Continuer
