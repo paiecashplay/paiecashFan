@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-02 (dr)** — **Bridge : prêt à tester en sandbox (marchand test) + erreurs claires**.
+  PCC a livré l'API v1 (E2E ok, tx PCC-BR-000012 sandbox). Bridge est **éligible marchand par
+  marchand** (chez PCC : `business_mode` + `kyb_status='verified'` + `business_iban`). Ajout d'un
+  override **fail-safe** `BRIDGE_TEST_RECIPIENT_SLUG` + `BRIDGE_TEST_EMAIL` : force le `recipientSlug`
+  des virements Bridge vers le marchand test KYB (ex. `valery`) **uniquement pour le compte de test
+  désigné** (par email) → un vrai fan paie toujours son club, même variables laissées en prod. Erreurs
+  métier PCC (`MERCHANT_NOT_ELIGIBLE`, `MERCHANT_MISSING_IBAN`, `BRIDGE_UNAVAILABLE`,
+  `BRIDGE_DYNAMIC_BENEFICIARY_DISABLED`, `SELF_PAYMENT`) → messages clairs (400, panier conservé)
+  pour le rollout progressif club par club. **Reste : (1) tester en sandbox, (2) faire KYB les vrais
+  clubs chez PCC, (3) bascule Bridge prod côté PCC (dynamic beneficiary + Railway).**
 - **2026-09-02 (dq)** — **Bridge branché de bout en bout (`bridge_single`)** — contrat d'API PCC reçu.
   Checkout (chemin carte/redirection) : `recipientSlug=tenant.slug` **obligatoire** pour `bridge_single`
   (bénéficiaire dynamique du virement ; = slug PCC du club, cf. reversement commission), `undefined`
