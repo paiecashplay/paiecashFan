@@ -135,6 +135,16 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-02 (dp)** — **UX Bridge (virement instantané) + job images de stade + club recherchable**.
+  Bridge : mode **`bridge_single`** ajouté aux `MODES` du checkout (flux à redirection type carte,
+  initié par PaieCashCoin ; webhook PCC agnostique du mode → parsé sans souci). Front : option
+  **« Virement instantané »** dans `CheckoutModal` (`payMethod:'bridge'` → `bridge_single`), **masquée**
+  tant que `VITE_BRIDGE_ENABLED!=='true'` (à activer quand PCC expose Bridge) ; carte ET bridge =
+  redirection mono-marchand → indispo panier multi-groupes (repli PCC). **Aucune install Bridge côté
+  PaieCashFan : tout passe par PaieCashCoin.** Job **`backend/scripts/fix-stadium-images.js`** : détecte
+  le placeholder api-sports (taille 29416 + md5 68ac0d…) et remplace UNIQUEMENT ces images par celle du
+  club parent (W/jeunes → club principal) sinon vide → fond `stadium-bg.png` ; vraies photos intactes
+  (dry-run par défaut, `--apply` pour écrire). Menu club du BO Billetterie = combobox **recherchable**.
 - **2026-08-31 (dn)** — **Billetterie Redtaag : attribution event→club au BO + auto-import des tarifs**.
   Service `redtaag.js` : `eventsForSale()` + `buildOffersFromEvent(id)` (tire `/prices` + section via
   `/allseats` → offres billet avec mapping Redtaag ; ignore les tarifs 0€). Route super-admin

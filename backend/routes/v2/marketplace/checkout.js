@@ -102,7 +102,10 @@ const fail = (res, msg, s = 400, extra = {}) =>
   res.status(s).json({ success: false, data: null, error: msg, ...extra });
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
-const MODES = ['pcc_full', 'pcc_split', 'card_full', 'bnpl'];
+// `bridge_single` = virement instantané via Bridge (initié par PaieCashCoin).
+// Comme la carte, c'est un flux à redirection (SCA banque) → PaieCashCoin renvoie
+// une URL de redirection. Le webhook PCC confirme ensuite (payment.completed).
+const MODES = ['pcc_full', 'pcc_split', 'card_full', 'bnpl', 'bridge_single'];
 const safeParse = (s) => { try { return typeof s === 'string' ? JSON.parse(s) : (s || {}); } catch { return {}; } };
 const KIND_LABEL = { ticketing: 'Billetterie', boutique: 'Boutique' };
 const describe = (kind, tenant, items) => `${KIND_LABEL[kind] || 'PaieCashFan'} ${tenant.name} — ${items.reduce((s, i) => s + i.quantity, 0)} article(s)`;

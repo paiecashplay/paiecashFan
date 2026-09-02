@@ -15,6 +15,10 @@ import { OrderSuccessView, OrderFailureView } from './CheckoutResult';
 import { shippingFee, shippingZone, ZONE_LABEL } from '@/lib/shipping';
 
 const fmt = (n) => new Intl.NumberFormat('fr-FR').format(Number(n || 0));
+// Virement instantané (Bridge) : activé via VITE_BRIDGE_ENABLED=true dès que
+// PaieCashCoin expose Bridge (mode `bridge_single`). Tant que false → option
+// affichée mais désactivée (« Bientôt disponible »).
+const BRIDGE_ENABLED = import.meta.env.VITE_BRIDGE_ENABLED === 'true';
 const SHIP = { standard: { label: 'Standard', delay: '4 à 6 jours ouvrés' }, express: { label: 'Express', delay: '24-48h' } };
 //const STEPS = ['Livraison', 'Paiement', 'Confirmation'];
 const STEPS = ['Livraison', 'Paiement', 'Récapitulatif'];
@@ -90,7 +94,11 @@ function CheckoutInner({ cart, onClose }) {
 
   // Panier multi-groupes → la carte n'est plus proposée : on force le PCC.
   useEffect(() => {
-    if (!cardAvailable && payMethod === 'card') setPayMethod('pcc');
+    // Carte ET virement (Bridge) = flux à redirection mono-marchand : on
+    // repasse en PCC si le panier couvre plusieurs groupes.
+    if (!cardAvailable && (payMethod === 'card' || payMethod === 'bridge')) {
+      setPayMethod('pcc');
+    }
   }, [cardAvailable, payMethod]);
 
   const set = (k) => (e) => { const value = e.target.value;
@@ -141,7 +149,12 @@ function CheckoutInner({ cart, onClose }) {
     // Mémorise la boutique en cours pour y revenir après le retour Stripe (carte).
     try { if (club?.slug) sessionStorage.setItem('pcf_return_boutique', club.slug); } catch { /* noop */ }
     try {
-      const modeStr = payMethod === 'card' ? 'card_full' : 'pcc_full';
+      const modeStr =
+        payMethod === 'card'
+          ? 'card_full'
+          : payMethod === 'bridge'
+            ? 'bridge_single'
+            : 'pcc_full';
       const shippingBody = {
         firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone,
         address1: form.address1, address2: form.address2, postalCode: form.postalCode, city: form.city, country: form.country,
@@ -302,7 +315,7 @@ function CheckoutInner({ cart, onClose }) {
           {/* Gauche (formulaire / confirmation) */}
           <div className={`flex-1 px-5 py-6 sm:px-8 ${step === 2 ? 'overflow-visible lg:w-[65%]' : 'min-h-0 overflow-y-auto lg:w-full'}`}>
             {step === 0 && <StepLivraison form={form} set={set} shippingMethod={shippingMethod} setShippingMethod={setShippingMethod} fieldErrors={fieldErrors} />}
-            {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} cardAvailable={cardAvailable} />}
+            {step === 1 && <StepPaiement payMethod={payMethod} setPayMethod={setPayMethod} topUp={topUp} onRecharge={() => setRechargeOpen(true)} form={form} shippingMethod={shippingMethod} cardAvailable={cardAvailable} bridgeEnabled={BRIDGE_ENABLED} />}
             {step === 2 && <StepRecap form={form} shippingMethod={shippingMethod} payMethod={payMethod} setStep={setStep} needsShipping={needsShipping} />}
             {error && <p className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
             {step < 2 && <div className="mt-7 border-t border-white/[0.08] pt-5">
@@ -499,20 +512,29 @@ function StepRecap({ form, shippingMethod, payMethod, setStep, needsShipping = t
     ] : []),
 
     {
-      icon: payMethod === 'card' ? CreditCard : Wallet,
+      icon:
+        payMethod === 'card'
+          ? CreditCard
+          : payMethod === 'bridge'
+            ? Zap
+            : Wallet,
       title: 'Paiement',
       content: (
         <>
           <p className="font-black text-bone-50">
             {payMethod === 'card'
               ? 'Carte bancaire'
-              : 'PaieCashCoin (PCC)'}
+              : payMethod === 'bridge'
+                ? 'Virement instantané'
+                : 'PaieCashCoin (PCC)'}
           </p>
 
           <p className="mt-1 text-sm text-bone-500">
             {payMethod === 'card'
               ? 'Paiement sécurisé par carte bancaire'
-              : 'Paiement avec votre solde PCC'}
+              : payMethod === 'bridge'
+                ? 'Virement bancaire instantané via Bridge'
+                : 'Paiement avec votre solde PCC'}
           </p>
         </>
       ),
@@ -676,7 +698,7 @@ function StepLivraison({ form, set, shippingMethod, setShippingMethod, fieldErro
   );
 }
 
-function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailable = true }) {
+function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailable = true, bridgeEnabled = false }) {
   return (
     <div>
       <SectionTitle icon={Wallet} title="Mode de paiement" />
@@ -687,6 +709,12 @@ function StepPaiement({ payMethod, setPayMethod, topUp, onRecharge, cardAvailabl
           title="Carte bancaire"
           desc={cardAvailable ? 'Paiement carte sécurisé via Stripe' : 'Indisponible pour un panier multi-clubs — réglez en PCC'}
           wide disabled={!cardAvailable} />
+        {bridgeEnabled && (
+          <RadioCard active={payMethod === 'bridge'} onClick={() => cardAvailable && setPayMethod('bridge')} icon={Zap}
+            title="Virement instantané"
+            desc={cardAvailable ? 'Virement bancaire instantané via Bridge' : 'Indisponible pour un panier multi-clubs — réglez en PCC'}
+            wide disabled={!cardAvailable} />
+        )}
       </div>
 
       {topUp && (
