@@ -902,6 +902,8 @@ function TicketsView({
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1.6fr_0.95fr]">
+      {/* Colonne principale : calendrier des matchs + billets/formules du club */}
+      <div className="flex flex-col gap-5">
       {/* Liste des matchs */}
       <GlassCard className="border border-white/10 p-6">
         <h2 className="font-display text-2xl font-black uppercase text-bone-50">
@@ -944,35 +946,17 @@ function TicketsView({
               Chargement des matchs…
             </div>
           ) : matches.length === 0 ? (
-            tickets.length > 0 ? (
-              // Pas encore de calendrier (fixtures) → on affiche les offres
-              // billet existantes (tarifs back stagiaire) pour ne pas rester
-              // vide. Les billets par match arriveront via Redtaag / fixtures.
-              <div className="space-y-3">
-                {tickets.map((offer) => (
-                  <TicketOfferCard
-                    key={offer.id}
-                    offer={offer}
-                    onSelect={() => onSelectOffer(offer)}
-                  />
-                ))}
-                <p className="pt-1 text-center text-[11px] text-bone-500">
-                  Les billets par match seront disponibles dès
-                  l'annonce du calendrier.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-12 text-center">
-                <Ticket size={28} className="mx-auto text-bone-600" />
-                <p className="mt-3 text-sm text-bone-300">
-                  Aucun billet disponible pour le moment.
-                </p>
-                <p className="mt-1 text-xs text-bone-500">
-                  Les prochaines affiches apparaîtront ici dès leur
-                  annonce.
-                </p>
-              </div>
-            )
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-12 text-center">
+              <Ticket size={28} className="mx-auto text-bone-600" />
+              <p className="mt-3 text-sm text-bone-300">
+                Aucun match à domicile programmé pour le moment.
+              </p>
+              <p className="mt-1 text-xs text-bone-500">
+                {tickets.length > 0
+                  ? 'Retrouve les billets et formules du club ci-dessous.'
+                  : 'Les prochaines affiches apparaîtront ici dès leur annonce.'}
+              </p>
+            </div>
           ) : (
             visibleMatches.map((match) => (
               <MatchRow
@@ -1003,6 +987,28 @@ function TicketsView({
           </button>
         )}
       </GlassCard>
+
+      {/* Billets & formules du club (offres saisies au BO) */}
+      {tickets.length > 0 && (
+        <GlassCard className="border border-white/10 p-6">
+          <h2 className="font-display text-2xl font-black uppercase text-bone-50">
+            Billets & formules
+          </h2>
+          <p className="mt-1 text-sm text-bone-400">
+            Billets et offres proposés par le club.
+          </p>
+          <div className="mt-4 space-y-3">
+            {tickets.map((offer) => (
+              <TicketOfferCard
+                key={offer.id}
+                offer={offer}
+                onSelect={() => onSelectOffer(offer)}
+              />
+            ))}
+          </div>
+        </GlassCard>
+      )}
+      </div>
 
       {/* Prochain match + réassurance + aide */}
       <div className="flex flex-col gap-5">
