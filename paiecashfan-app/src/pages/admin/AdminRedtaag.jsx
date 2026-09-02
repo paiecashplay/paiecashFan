@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Ticket, Loader2, Check, X, RefreshCw } from 'lucide-react';
+import { Ticket, Loader2, Check, X, RefreshCw, ChevronDown, Search } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 // Super-admin : attribue chaque event Redtaag (match en vente) à un club.
@@ -143,20 +143,13 @@ export function AdminRedtaag() {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  <select
+                  <ClubCombo
+                    clubs={clubs}
                     value={choice[ev.id] ?? ev.tenantId ?? ''}
-                    onChange={(e) =>
-                      setChoice((c) => ({ ...c, [ev.id]: e.target.value }))
+                    onChange={(id) =>
+                      setChoice((c) => ({ ...c, [ev.id]: id }))
                     }
-                    className="h-10 min-w-[180px] rounded-xl border border-white/10 bg-ink-950 px-3 text-sm text-bone-100 outline-none focus:border-emerald-400/50"
-                  >
-                    <option value="">Choisir un club…</option>
-                    {clubs.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                  />
 
                   <button
                     onClick={() => assign(ev.id)}
@@ -186,6 +179,77 @@ export function AdminRedtaag() {
             );
           })}
         </div>
+      )}
+    </div>
+  );
+}
+
+// Sélecteur de club avec recherche (tape « Pa » → clubs correspondants).
+function ClubCombo({ clubs, value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const selected = clubs.find((c) => c.id === value);
+  const query = q.trim().toLowerCase();
+  const filtered = query
+    ? clubs.filter((c) => c.name.toLowerCase().includes(query))
+    : clubs;
+
+  return (
+    <div className="relative w-[220px]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-10 w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-ink-950 px-3 text-left text-sm text-bone-100 outline-none transition hover:border-white/20 focus:border-emerald-400/50"
+      >
+        <span className={selected ? 'truncate' : 'truncate text-bone-500'}>
+          {selected ? selected.name : 'Choisir un club…'}
+        </span>
+        <ChevronDown size={15} className="shrink-0 text-bone-500" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-ink-950 shadow-2xl">
+            <div className="flex items-center gap-2 border-b border-white/10 px-3">
+              <Search size={14} className="text-bone-500" />
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Rechercher un club…"
+                className="h-10 w-full bg-transparent text-sm text-bone-100 outline-none placeholder:text-bone-500"
+              />
+            </div>
+            <div className="max-h-64 overflow-y-auto py-1">
+              {filtered.length === 0 ? (
+                <p className="px-3 py-3 text-xs text-bone-500">
+                  Aucun club trouvé.
+                </p>
+              ) : (
+                filtered.slice(0, 200).map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => {
+                      onChange(c.id);
+                      setOpen(false);
+                      setQ('');
+                    }}
+                    className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm transition hover:bg-white/[0.05] ${
+                      c.id === value ? 'text-emerald-300' : 'text-bone-200'
+                    }`}
+                  >
+                    <span className="truncate">{c.name}</span>
+                    {c.id === value && (
+                      <Check size={14} className="shrink-0 text-emerald-400" />
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
