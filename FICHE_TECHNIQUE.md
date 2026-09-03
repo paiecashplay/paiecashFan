@@ -135,6 +135,13 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-03 (dv)** — **BO Billetterie Redtaag : recherche club serveur + nom club assigné + mode d'emploi**.
+  Le combo club chargeait `?limit=500` mais le backend **plafonne à 100** → seuls les 100 premiers clubs
+  (alpha) chargés, filtre côté client → OM/PSG/Paris FC introuvables. Passage en **recherche SERVEUR**
+  débouncée (`/admin/clubs?search=`, ilike name/slug/ville…) → tous trouvables. Endpoint
+  `/admin/redtaag/events` renvoie désormais **`tenantName`** (l'affichage « Assigné à X » ne dépend plus
+  de la liste chargée). Bloc **« Comment ça marche »** (4 étapes) ajouté pour les admins : assigner =
+  importe les tarifs du match comme billets du club → achat émet le vrai billet Redtaag (QR email).
 - **2026-09-03 (du)** — **Bridge OK en sandbox (PCC-BR-000014 payée) + UX solde + multi-testeurs**.
   1er virement Bridge réussi (PCC a débloqué sa config). `CheckoutModal` : **note** sous carte/virement
   rappelant que le débit se fait sur la banque/carte, **pas sur le solde PCC** (qui reste inchangé — la
