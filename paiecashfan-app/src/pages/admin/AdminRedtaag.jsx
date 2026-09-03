@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Ticket, Loader2, Check, X, RefreshCw, ChevronDown, Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Ticket, Loader2, Check, X, RefreshCw, ChevronDown, Search, Info } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 // Super-admin : attribue chaque event Redtaag (match en vente) à un club.
@@ -7,7 +7,6 @@ import { apiFetch } from '@/lib/api';
 // la billetterie du club les affiche et l'achat émet le billet.
 export function AdminRedtaag() {
   const [events, setEvents] = useState([]);
-  const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(null); // eventId en cours
@@ -17,19 +16,8 @@ export function AdminRedtaag() {
     setLoading(true);
     setError('');
     try {
-      const [evRes, clubRes] = await Promise.all([
-        apiFetch('/api/v2/admin/redtaag/events'),
-        apiFetch('/api/v2/admin/clubs?limit=500'),
-      ]);
+      const evRes = await apiFetch('/api/v2/admin/redtaag/events');
       setEvents(evRes?.data?.events || []);
-      const rawClubs =
-        clubRes?.data?.clubs || clubRes?.data || clubRes?.clubs || [];
-      setClubs(
-        rawClubs
-          .map((c) => ({ id: c.id || c.uuid, name: c.name || c.club_name }))
-          .filter((c) => c.id && c.name)
-          .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
-      );
     } catch (err) {
       setError(err?.message || 'Chargement impossible.');
     } finally {
@@ -74,8 +62,6 @@ export function AdminRedtaag() {
     }
   }
 
-  const clubName = (id) => clubs.find((c) => c.id === id)?.name || '—';
-
   return (
     <div className="p-6 md:p-8">
       <div className="flex items-center justify-between gap-4">
@@ -95,6 +81,34 @@ export function AdminRedtaag() {
         >
           <RefreshCw size={14} /> Rafraîchir
         </button>
+      </div>
+
+      {/* Mode d'emploi pour les admins. */}
+      <div className="mt-5 flex gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.05] p-4">
+        <Info size={18} className="mt-0.5 shrink-0 text-emerald-400" />
+        <div className="text-sm leading-relaxed text-bone-300">
+          <p className="font-bold text-bone-100">Comment ça marche</p>
+          <ol className="mt-1.5 list-decimal space-y-1 pl-4 marker:text-emerald-400/70">
+            <li>
+              Chaque ligne = un <strong className="text-bone-100">match en vente sur Redtaag</strong>.
+              Choisis le <strong className="text-bone-100">club</strong> auquel il appartient (recherche
+              par nom), puis clique <strong className="text-bone-100">Assigner</strong>.
+            </li>
+            <li>
+              À l'attribution, les <strong className="text-bone-100">tarifs du match sont importés</strong>{' '}
+              comme billets dans la billetterie de ce club : les fans les voient et peuvent les acheter.
+            </li>
+            <li>
+              À l'achat, le <strong className="text-bone-100">vrai billet Redtaag est émis</strong>{' '}
+              automatiquement (QR envoyé par email au fan).
+            </li>
+            <li>
+              <strong className="text-bone-100">Réassigner</strong> déplace les billets vers un autre
+              club ; la <strong className="text-bone-100">croix rouge</strong> les retire (le match n'est
+              plus en vente chez ce club).
+            </li>
+          </ol>
+        </div>
       </div>
 
       {error && (
@@ -136,7 +150,7 @@ export function AdminRedtaag() {
                   </p>
                   {assigned && (
                     <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-2.5 py-1 text-[11px] font-bold text-emerald-300">
-                      <Check size={12} /> Assigné à {clubName(ev.tenantId)} ·{' '}
+                      <Check size={12} /> Assigné à {ev.tenantName || '—'} ·{' '}
                       {ev.offerCount} tarif(s)
                     </p>
                   )}
@@ -144,8 +158,8 @@ export function AdminRedtaag() {
 
                 <div className="flex shrink-0 items-center gap-2">
                   <ClubCombo
-                    clubs={clubs}
                     value={choice[ev.id] ?? ev.tenantId ?? ''}
+                    defaultLabel={ev.tenantName || ''}
                     onChange={(id) =>
                       setChoice((c) => ({ ...c, [ev.id]: id }))
                     }
@@ -184,25 +198,58 @@ export function AdminRedtaag() {
   );
 }
 
-// Sélecteur de club avec recherche (tape « Pa » → clubs correspondants).
-function ClubCombo({ clubs, value, onChange }) {
+// Sélecteur de club avec RECHERCHE CÔTÉ SERVEUR : indispensable car la base
+// compte des centaines de clubs (bien plus que la limite d'une page). On
+// interroge /admin/clubs?search= à chaque frappe (débouncé) → tous les clubs
+// sont trouvables, pas seulement les 100 premiers.
+function ClubCombo({ value, defaultLabel = '', onChange }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
-  const selected = clubs.find((c) => c.id === value);
-  const query = q.trim().toLowerCase();
-  const filtered = query
-    ? clubs.filter((c) => c.name.toLowerCase().includes(query))
-    : clubs;
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [label, setLabel] = useState(defaultLabel);
+  const boxRef = useRef(null);
+
+  // Le libellé du bouton suit le club assigné (fourni par le parent).
+  useEffect(() => { setLabel(defaultLabel); }, [defaultLabel]);
+
+  // Recherche serveur débouncée (250 ms), uniquement quand le menu est ouvert.
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const term = q.trim();
+        const res = await apiFetch(
+          `/api/v2/admin/clubs?limit=100${term ? `&search=${encodeURIComponent(term)}` : ''}`
+        );
+        const raw = res?.data?.clubs || [];
+        if (alive) {
+          setResults(
+            raw
+              .map((c) => ({ id: c.id, name: c.name }))
+              .filter((c) => c.id && c.name)
+          );
+        }
+      } catch {
+        if (alive) setResults([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 250);
+    return () => { alive = false; clearTimeout(t); };
+  }, [q, open]);
 
   return (
-    <div className="relative w-[220px]">
+    <div className="relative w-[220px]" ref={boxRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex h-10 w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-ink-950 px-3 text-left text-sm text-bone-100 outline-none transition hover:border-white/20 focus:border-emerald-400/50"
       >
-        <span className={selected ? 'truncate' : 'truncate text-bone-500'}>
-          {selected ? selected.name : 'Choisir un club…'}
+        <span className={label ? 'truncate' : 'truncate text-bone-500'}>
+          {label || 'Choisir un club…'}
         </span>
         <ChevronDown size={15} className="shrink-0 text-bone-500" />
       </button>
@@ -220,19 +267,21 @@ function ClubCombo({ clubs, value, onChange }) {
                 placeholder="Rechercher un club…"
                 className="h-10 w-full bg-transparent text-sm text-bone-100 outline-none placeholder:text-bone-500"
               />
+              {loading && <Loader2 size={13} className="animate-spin text-bone-500" />}
             </div>
             <div className="max-h-64 overflow-y-auto py-1">
-              {filtered.length === 0 ? (
+              {results.length === 0 ? (
                 <p className="px-3 py-3 text-xs text-bone-500">
-                  Aucun club trouvé.
+                  {loading ? 'Recherche…' : 'Aucun club trouvé.'}
                 </p>
               ) : (
-                filtered.slice(0, 200).map((c) => (
+                results.map((c) => (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => {
                       onChange(c.id);
+                      setLabel(c.name);
                       setOpen(false);
                       setQ('');
                     }}

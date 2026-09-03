@@ -51,6 +51,14 @@ router.get('/events', async (req, res) => {
     const byEvent = Object.fromEntries(
       (maps || []).map((m) => [String(m.redtaag_event_id), m])
     );
+    // Nom du club assigné (pour l'affichage), sans dépendre d'une liste côté front.
+    const tenantIds = [...new Set((maps || []).map((m) => m.tenant_id).filter(Boolean))];
+    let nameById = {};
+    if (tenantIds.length) {
+      const { data: ts } = await supabase
+        .from('tenants').select('id, name').in('id', tenantIds);
+      nameById = Object.fromEntries((ts || []).map((t) => [t.id, t.name]));
+    }
     const list = events.map((e) => {
       const d = e.data || {};
       const m = byEvent[String(e.id)] || null;
@@ -61,6 +69,7 @@ router.get('/events', async (req, res) => {
         endSale: d.fin_vente || null,
         sold: Number(d.vendu) || 0,
         tenantId: m?.tenant_id || null,
+        tenantName: m?.tenant_id ? (nameById[m.tenant_id] || null) : null,
         offerCount: m?.offer_count || 0,
       };
     });
