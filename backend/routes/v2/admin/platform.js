@@ -18,6 +18,24 @@ const fail = (res, msg,  s = 400) => res.status(s).json({ success: false, data: 
 
 const STORE_SLUG = 'paiecash-store';
 
+// Normalise la liste des cibles globales (clubs/federations) : tableau de chaînes
+const DEFAULT_GLOBAL_TARGETS = ['clubs', 'federations'];
+
+function normalizeGlobalTargets(value, fallback = DEFAULT_GLOBAL_TARGETS) {
+  if (!Array.isArray(value)) {
+    return [...fallback];
+  }
+
+  return [
+    ...new Set(
+      value
+        .filter((target) => typeof target === 'string')
+        .map((target) => target.trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
+}
+
 // Le tenant marchand « PaieCash Store » (créé par la migration platform-products.sql).
 async function getStore() {
   const { data } = await supabase
@@ -51,13 +69,14 @@ router.post('/products', async (req, res) => {
     const store = await getStore();
     if (!store) return fail(res, 'Compte « PaieCash Store » introuvable (migration manquante).', 404);
 
-    const { name, description, eur_price, pcc_price, images, sizes, display_order, status = 'active', stock, commissionPct } = req.body;
+    const { name, description, eur_price, pcc_price, images, sizes, display_order, status = 'active', stock, commissionPct, globalTargets, } = req.body;
     if (!name) return fail(res, 'Le nom est requis.');
     const pcc = Number(pcc_price);
     if (!pcc || pcc <= 0) return fail(res, 'Le prix PCC est requis et doit être supérieur à 0.');
 
     const imagesArr = Array.isArray(images) ? images.filter(Boolean) : [];
     const pct = commissionPct != null ? Math.min(100, Math.max(0, Number(commissionPct))) : 10;
+    const targets = normalizeGlobalTargets(globalTargets);
 
     const { data, error } = await supabase.from('products').insert({
       tenant_id:     store.id,
@@ -73,7 +92,7 @@ router.post('/products', async (req, res) => {
       stock:         stock != null ? Number(stock) : -1,
       status,
       is_global:     true,
-      metadata:      { commissionPct: pct, platformOwned: true },
+      metadata:      { commissionPct: pct, platformOwned: true, globalTargets: targets },
     }).select().single();
     if (error) throw error;
     return ok(res, { product: data }, 201);
@@ -92,13 +111,41 @@ router.put('/products/:id', async (req, res) => {
       updates.image_url = arr[0] || null;
     }
     // Taux de commission → metadata (fusion pour ne pas écraser le reste).
-    if (req.body.commissionPct !== undefined) {
-      const { data: cur } = await supabase.from('products').select('metadata').eq('id', req.params.id).maybeSingle();
-      const pct = Math.min(100, Math.max(0, Number(req.body.commissionPct) || 0));
-      updates.metadata = { ...(cur?.metadata || {}), commissionPct: pct, platformOwned: true };
+    // Métadonnées plateforme : reversement + cibles de diffusion.
+    // On fusionne avec l'existant pour ne pas écraser les autres metadata.
+    if (req.body.commissionPct !== undefined || req.body.globalTargets !== undefined) {
+      const { data: cur, error: curErr } = await supabase
+        .from('products')
+        .select('metadata')
+        .eq('id', req.params.id)
+        .maybeSingle();
+
+      if (curErr) throw curErr;
+
+      const currentMetadata = cur?.metadata || {};
+
+      const nextMetadata = {
+        ...currentMetadata,
+        platformOwned: true,
+      };
+
+      if (req.body.commissionPct !== undefined) {
+        nextMetadata.commissionPct = Math.min(
+          100,
+          Math.max(0, Number(req.body.commissionPct) || 0)
+        );
+      }
+
+      if (req.body.globalTargets !== undefined) {
+        nextMetadata.globalTargets = normalizeGlobalTargets(
+          req.body.globalTargets,
+          []
+        );
+      }
+
+      updates.metadata = nextMetadata;
     }
-    const { data, error } = await supabase
-      .from('products').update(updates).eq('id', req.params.id).eq('is_global', true).select().single();
+    const { data, error } = await supabase.from('products').update(updates).eq('id', req.params.id).eq('is_global', true).select().single();
     if (error) throw error;
     return ok(res, { product: data });
   } catch (err) { return fail(res, err.message, 500); }

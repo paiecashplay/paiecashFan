@@ -33,7 +33,7 @@ async function recordCommission(data) {
 async function summaryByClub() {
   const { data, error } = await supabase
     .from('platform_commissions')
-    .select('club_tenant_id, commission_pcc, commission_eur, status, club:tenants!platform_commissions_club_tenant_id_fkey(id, name, slug, logo_url)');
+    .select('club_tenant_id, commission_pcc, commission_eur, status, club:tenants!platform_commissions_club_tenant_id_fkey(id, name, slug, logo_url, is_federation_hub)');
   if (error) throw new Error(`summaryByClub: ${error.message}`);
 
   const byClub = new Map();
@@ -42,6 +42,7 @@ async function summaryByClub() {
     const agg = byClub.get(key) || {
       clubId: r.club_tenant_id,
       club: r.club || null,
+      beneficiaryType: r.club?.is_federation_hub ? 'federation' : 'club',
       paidPcc: 0, paidEur: 0, pendingPcc: 0, pendingEur: 0, count: 0,
     };
     agg.count += 1;
@@ -56,11 +57,19 @@ async function summaryByClub() {
 async function listCommissions({ limit = 100 } = {}) {
   const { data, error } = await supabase
     .from('platform_commissions')
-    .select('id, order_id, product_id, gross_pcc, rate, commission_pcc, commission_eur, pcc_reference, status, created_at, club:tenants!platform_commissions_club_tenant_id_fkey(name, slug), product:products(name)')
+    .select('id, order_id, product_id, gross_pcc, rate, commission_pcc, commission_eur, pcc_reference, status, created_at, club:tenants!platform_commissions_club_tenant_id_fkey(name, slug, is_federation_hub), product:products(name)')
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error) throw new Error(`listCommissions: ${error.message}`);
-  return data || [];
+  
+  return (data || []).map((row) => ({
+  ...row,
+
+  beneficiaryType: row.club?.is_federation_hub
+    ? 'federation'
+    : 'club',
+  }));
+  
 }
 
 // Totaux globaux (bandeau récap).

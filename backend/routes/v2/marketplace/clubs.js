@@ -88,7 +88,7 @@ router.get('/:slugOrId', async (req, res) => {
       // Produits « plateforme » (ex. Aivora) : affichés dans TOUTES les boutiques.
       supabase
         .from('products')
-        .select('id, name, description, eur_price, pcc_price, images, sizes, category_slug, display_order, status, is_global')
+        .select('id, name, description, eur_price, pcc_price, images, sizes, category_slug, display_order, status, is_global, metadata')
         .eq('is_global', true)
         .eq('status', 'active')
         .order('display_order', { ascending: true })
@@ -99,7 +99,21 @@ router.get('/:slugOrId', async (req, res) => {
     // Fusionne : produits du club + produits plateforme (badgés, en tête).
     const clubProducts = productsRes.data || [];
     const globalProducts = (club.is_federation_hub ? [] : (globalRes.data || []))
-      .map((p) => ({ ...p, isGlobal: true }));
+      .filter((product) => {
+        const targets = product.metadata?.globalTargets;
+
+        // Ancien produit global sans globalTargets :
+        // on conserve le comportement historique.
+        if (!Array.isArray(targets)) {
+          return true;
+        }
+
+        return targets.includes('clubs');
+      }).map((p) => ({
+        ...p,
+        isGlobal: true
+      })
+    );
     const allProducts = [...globalProducts, ...clubProducts];
 
     // Page fédération : si ce tenant est un hub, on récupère les clubs membres

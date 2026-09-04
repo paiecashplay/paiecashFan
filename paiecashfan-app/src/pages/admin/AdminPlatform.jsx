@@ -1,5 +1,5 @@
 // BO Super Admin — Produits « plateforme » (ex. lunettes Aivora) affichés dans
-// toutes les boutiques + vue « Reversements » (10% reversés aux clubs).
+// diffusion des produits plateforme + vue « Reversements » vers les bénéficiaires.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Plus, RefreshCw, Pencil, Trash2, Loader2, X, Upload, Coins, HandCoins, Store } from 'lucide-react';
@@ -16,6 +16,14 @@ const STATUS_META = {
   pending: { label: 'En attente', cls: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
   failed:  { label: 'Échec',      cls: 'text-red-400 bg-red-500/10 border-red-500/20' },
 };
+
+const GLOBAL_TARGET_OPTIONS = [
+  { value: 'clubs', label: 'Clubs' },
+  { value: 'federations', label: 'Fédérations' },
+
+  // Plus tard :
+  // { value: 'leagues', label: 'Ligues' },
+];
 
 export function AdminPlatform() {
   const [tab, setTab] = useState('products');
@@ -38,7 +46,7 @@ export function AdminPlatform() {
           <h1 className="font-display text-2xl font-black text-bone-50 flex items-center gap-2">
             <Sparkles size={22} className="text-gold-400" /> Plateforme
           </h1>
-          <p className="text-sm text-bone-400 mt-1">Produits partenaires (toutes boutiques) & reversements aux clubs</p>
+          <p className="text-sm text-bone-400 mt-1"> Produits plateforme & reversements aux bénéficiaires </p>
         </div>
       </div>
 
@@ -130,7 +138,7 @@ function ProductsTab({ store, showToast }) {
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="mb-4 rounded-full bg-gold-500/10 p-4"><Sparkles size={26} className="text-gold-400" /></div>
             <h3 className="text-lg font-bold text-bone-100">Aucun produit plateforme</h3>
-            <p className="mt-2 text-sm text-bone-500 max-w-sm">Crée un produit (ex. lunettes Aivora) : il apparaîtra dans la boutique de tous les clubs.</p>
+            <p className="mt-2 text-sm text-bone-500 max-w-sm">  Crée un produit plateforme (ex. lunettes Aivora) : il apparaîtra dans les boutiques de tous les clubs et de toutes les fédérations.</p>
           </div>
         ) : (
           <table className="w-full text-sm">
@@ -138,7 +146,7 @@ function ProductsTab({ store, showToast }) {
               <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
                 <th className="text-left px-5 py-3 font-semibold">Produit</th>
                 <th className="text-left px-5 py-3 font-semibold">Prix</th>
-                <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Commission club</th>
+                <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Reversement (%)</th>
                 <th className="text-left px-5 py-3 font-semibold">Boutiques</th>
                 <th className="px-5 py-3" />
               </tr>
@@ -199,21 +207,47 @@ function ProductsTab({ store, showToast }) {
 function ProductForm({ product, storeMissing, onClose, onSaved }) {
   const { uploadImage, uploading } = useImageUpload();
   const fileRef = useRef(null);
-  const [form, setForm] = useState(() => ({
-    name: product?.name || '',
-    description: product?.description || '',
-    eur_price: product?.eur_price ?? '',
-    pcc_price: product?.pcc_price ?? '',
-    stock: product?.stock ?? -1,
-    commissionPct: product?.metadata?.commissionPct ?? 10,
-    image: product?.image_url || (Array.isArray(product?.images) ? product.images[0] : '') || '',
-    status: product?.status || 'active',
-    is_global: product?.is_global ?? true,
-  }));
+  const [form, setForm] = useState(() => {
+    const savedTargets = product?.metadata?.globalTargets;
+
+    return {
+      name: product?.name || '',
+      description: product?.description || '',
+      eur_price: product?.eur_price ?? '',
+      pcc_price: product?.pcc_price ?? '',
+      stock: product?.stock ?? -1,
+      commissionPct: product?.metadata?.commissionPct ?? 10,
+      image:
+        product?.image_url ||
+        (Array.isArray(product?.images) ? product.images[0] : '') ||
+        '',
+      status: product?.status || 'active',
+
+      globalTargets: Array.isArray(savedTargets)
+        ? savedTargets
+        : ['clubs', 'federations'],
+    };
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target?.type === 'checkbox' ? e.target.checked : e.target.value }));
+
+  function toggleGlobalTarget(target) {
+    setForm((current) => {
+      const targets = current.globalTargets || [];
+
+      const exists = targets.includes(target);
+
+      return {
+        ...current,
+        globalTargets: exists
+          ? targets.filter((item) => item !== target)
+          : [...targets, target],
+      };
+    });
+  }
+
 
   async function onFile(e) {
     const file = e.target.files?.[0];
@@ -227,6 +261,10 @@ function ProductForm({ product, storeMissing, onClose, onSaved }) {
     setError('');
     if (!form.name.trim()) { setError('Le nom est requis.'); return; }
     if (!Number(form.pcc_price) || Number(form.pcc_price) <= 0) { setError('Le prix PCC doit être > 0.'); return; }
+    if (!form.globalTargets.length) {
+      setError('Sélectionne au moins une cible de diffusion.');
+      return;
+    }
     setSaving(true);
     try {
       const body = {
@@ -238,7 +276,11 @@ function ProductForm({ product, storeMissing, onClose, onSaved }) {
         stock: Number(form.stock),
         commissionPct: Number(form.commissionPct),
         status: form.status,
-        is_global: !!form.is_global,
+
+        globalTargets: form.globalTargets,
+
+        // Global dès qu'au moins une cible est sélectionnée.
+        is_global: form.globalTargets.length > 0,
       };
       const j = product
         ? await apiFetch(`/api/v2/admin/platform/products/${product.id}`, { method: 'PUT', body: JSON.stringify(body) })
@@ -302,15 +344,45 @@ function ProductForm({ product, storeMissing, onClose, onSaved }) {
               <input type="number" step="1" value={form.stock} onChange={set('stock')} className={input} />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-bone-300">Commission club (%)</label>
+              <label className="mb-1 block text-xs font-semibold text-bone-300">Reversement (%)</label>
               <input type="number" min="0" max="100" step="0.5" value={form.commissionPct} onChange={set('commissionPct')} className={input} />
+              <p className="mt-1 text-[10px] text-bone-500">Même pourcentage appliqué aux clubs et aux fédérations. </p>
             </div>
           </div>
 
-          <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 cursor-pointer">
-            <input type="checkbox" checked={form.is_global} onChange={set('is_global')} className="h-4 w-4 accent-emerald-500" />
-            <span className="text-sm text-bone-200">Afficher dans <b>toutes les boutiques</b> des clubs</span>
-          </label>
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+            <p className="text-xs font-semibold text-bone-300">
+              Diffusion du produit
+            </p>
+
+            <p className="mt-1 text-[10px] text-bone-500">
+              Sélectionne les types de boutiques dans lesquelles ce produit sera disponible.
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-4">
+              {GLOBAL_TARGET_OPTIONS.map((target) => {
+                const checked = form.globalTargets.includes(target.value);
+
+                return (
+                  <label
+                    key={target.value}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleGlobalTarget(target.value)}
+                      className="h-4 w-4 accent-emerald-500"
+                    />
+
+                    <span className="text-sm text-bone-200">
+                      {target.label}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
 
           {error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
         </div>
@@ -333,88 +405,253 @@ function PayoutsTab() {
 
   async function load() {
     setLoading(true);
-    try { const j = await apiFetch('/api/v2/admin/platform/commissions'); setData(j.data || null); }
-    catch { setData(null); }
+    try {
+      const j = await apiFetch('/api/v2/admin/platform/commissions');
+      setData(j.data || null);
+    } catch {
+      setData(null);
+    }
     setLoading(false);
   }
-  useEffect(() => { load(); }, []);
 
-  const totals = data?.totals || { paidPcc: 0, pendingPcc: 0, count: 0 };
+  useEffect(() => {
+    load();
+  }, []);
+
+  const totals = data?.totals || {
+    paidPcc: 0,
+    pendingPcc: 0,
+    count: 0,
+  };
+
   const summary = data?.summary || [];
   const recent = data?.recent || [];
 
-  if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-emerald-400" /></div>;
+  if (loading) {
+    return (
+      <div className="p-8 flex justify-center">
+        <Loader2 className="animate-spin text-emerald-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
       {/* Bandeau totaux */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard icon={HandCoins} label="Total reversé aux clubs" value={`${fmtPcc(totals.paidPcc)} PCC`} accent="text-emerald-400" />
-        <StatCard icon={Coins} label="En attente (à régulariser)" value={`${fmtPcc(totals.pendingPcc)} PCC`} accent="text-amber-400" />
-        <StatCard icon={Store} label="Ventes plateforme" value={totals.count} accent="text-bone-100" />
+        <StatCard
+          icon={HandCoins}
+          label="Total reversé aux bénéficiaires"
+          value={`${fmtPcc(totals.paidPcc)} PCC`}
+          accent="text-emerald-400"
+        />
+
+        <StatCard
+          icon={Coins}
+          label="En attente de reversement"
+          value={`${fmtPcc(totals.pendingPcc)} PCC`}
+          accent="text-amber-400"
+        />
+
+        <StatCard
+          icon={Store}
+          label="Ventes plateforme"
+          value={totals.count}
+          accent="text-bone-100"
+        />
       </div>
 
-      {/* Totaux par club */}
+      {/* Totaux par bénéficiaire */}
       <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
         <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-bone-100">Par club</h3>
-          <button onClick={load} className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center"><RefreshCw size={13} /></button>
-        </div>
-        {summary.length === 0 ? (
-          <p className="px-5 py-8 text-center text-sm text-bone-500">Aucun reversement pour l'instant.</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
-                <th className="text-left px-5 py-3 font-semibold">Club</th>
-                <th className="text-left px-5 py-3 font-semibold">Ventes</th>
-                <th className="text-left px-5 py-3 font-semibold">Reversé</th>
-                <th className="text-left px-5 py-3 font-semibold">En attente</th>
-              </tr>
-            </thead>
-            <tbody>
-              {summary.map((s) => (
-                <tr key={s.clubId || 'x'} className="border-b border-white/5 last:border-0">
-                  <td className="px-5 py-3 font-semibold text-bone-100">{s.club?.name || '—'}</td>
-                  <td className="px-5 py-3 text-bone-300">{s.count}</td>
-                  <td className="px-5 py-3 font-mono text-emerald-400">{fmtPcc(s.paidPcc)} PCC</td>
-                  <td className="px-5 py-3 font-mono text-amber-400">{s.pendingPcc > 0 ? `${fmtPcc(s.pendingPcc)} PCC` : '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+          <h3 className="text-sm font-bold text-bone-100">
+            Par bénéficiaire
+          </h3>
 
-      {/* Historique */}
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
-        <div className="px-5 py-3 border-b border-white/5"><h3 className="text-sm font-bold text-bone-100">Historique récent</h3></div>
-        {recent.length === 0 ? (
-          <p className="px-5 py-8 text-center text-sm text-bone-500">—</p>
+          <button
+            onClick={load}
+            className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center"
+          >
+            <RefreshCw size={13} />
+          </button>
+        </div>
+
+        {summary.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-bone-500">
+            Aucun reversement pour l'instant.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[560px]">
               <thead>
                 <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
-                  <th className="text-left px-5 py-3 font-semibold">Date</th>
-                  <th className="text-left px-5 py-3 font-semibold">Club</th>
-                  <th className="text-left px-5 py-3 font-semibold">Produit</th>
-                  <th className="text-left px-5 py-3 font-semibold">Taux</th>
-                  <th className="text-left px-5 py-3 font-semibold">Commission</th>
-                  <th className="text-left px-5 py-3 font-semibold">Statut</th>
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Bénéficiaire
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Ventes
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Reversé
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    En attente
+                  </th>
                 </tr>
               </thead>
+
+              <tbody>
+                {summary.map((s) => (
+                  <tr
+                    key={s.clubId || 'x'}
+                    className="border-b border-white/5 last:border-0"
+                  >
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-bone-100">
+                          {s.club?.name || '—'}
+                        </span>
+
+                        <span
+                          className={cn(
+                            'inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold',
+                            s.beneficiaryType === 'federation'
+                              ? 'border-blue-400/30 bg-blue-400/10 text-blue-300'
+                              : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+                          )}
+                        >
+                          {s.beneficiaryType === 'federation'
+                            ? 'Fédération'
+                            : 'Club'}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-3 text-bone-300">
+                      {s.count}
+                    </td>
+
+                    <td className="px-5 py-3 font-mono text-emerald-400">
+                      {fmtPcc(s.paidPcc)} PCC
+                    </td>
+
+                    <td className="px-5 py-3 font-mono text-amber-400">
+                      {s.pendingPcc > 0
+                        ? `${fmtPcc(s.pendingPcc)} PCC`
+                        : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Historique */}
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+        <div className="px-5 py-3 border-b border-white/5">
+          <h3 className="text-sm font-bold text-bone-100">
+            Historique récent
+          </h3>
+        </div>
+
+        {recent.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-bone-500">
+            —
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[650px]">
+              <thead>
+                <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-bone-500">
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Date
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Bénéficiaire
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Produit
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Taux
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Reversement
+                  </th>
+
+                  <th className="text-left px-5 py-3 font-semibold">
+                    Statut
+                  </th>
+                </tr>
+              </thead>
+
               <tbody>
                 {recent.map((r) => {
-                  const m = STATUS_META[r.status] || STATUS_META.pending;
+                  const m =
+                    STATUS_META[r.status] ||
+                    STATUS_META.pending;
+
                   return (
-                    <tr key={r.id} className="border-b border-white/5 last:border-0">
-                      <td className="px-5 py-3 text-xs text-bone-400 whitespace-nowrap">{fmtDate(r.created_at)}</td>
-                      <td className="px-5 py-3 text-bone-200">{r.club?.name || '—'}</td>
-                      <td className="px-5 py-3 text-bone-300">{r.product?.name || '—'}</td>
-                      <td className="px-5 py-3 text-bone-400">{Number(r.rate)}%</td>
-                      <td className="px-5 py-3 font-mono text-emerald-400">{fmtPcc(r.commission_pcc)} PCC</td>
-                      <td className="px-5 py-3"><span className={cn('inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold', m.cls)}>{m.label}</span></td>
+                    <tr
+                      key={r.id}
+                      className="border-b border-white/5 last:border-0"
+                    >
+                      <td className="px-5 py-3 text-xs text-bone-400 whitespace-nowrap">
+                        {fmtDate(r.created_at)}
+                      </td>
+
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-bone-200">
+                            {r.club?.name || '—'}
+                          </span>
+
+                          <span
+                            className={cn(
+                              'inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold',
+                              r.beneficiaryType === 'federation'
+                                ? 'border-blue-400/30 bg-blue-400/10 text-blue-300'
+                                : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+                            )}
+                          >
+                            {r.beneficiaryType === 'federation'
+                              ? 'Fédération'
+                              : 'Club'}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-3 text-bone-300">
+                        {r.product?.name || '—'}
+                      </td>
+
+                      <td className="px-5 py-3 text-bone-400">
+                        {Number(r.rate)}%
+                      </td>
+
+                      <td className="px-5 py-3 font-mono text-emerald-400">
+                        {fmtPcc(r.commission_pcc)} PCC
+                      </td>
+
+                      <td className="px-5 py-3">
+                        <span
+                          className={cn(
+                            'inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold',
+                            m.cls
+                          )}
+                        >
+                          {m.label}
+                        </span>
+                      </td>
                     </tr>
                   );
                 })}

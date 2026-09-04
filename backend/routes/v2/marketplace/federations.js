@@ -470,27 +470,81 @@ router.get('/:slugOrId', async (req, res) => {
     let products = [];
 
     if (hub?.id) {
-      const { data: hubProducts, error: productsErr } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          description,
-          eur_price,
-          pcc_price,
-          images,
-          sizes,
-          category_slug,
-          display_order,
-          status
-        `)
-        .eq('tenant_id', hub.id)
-        .eq('status', 'active')
-        .order('display_order', { ascending: true });
+      const [hubProductsRes, globalProductsRes] = await Promise.all([
+        // Produits propres à la fédération
+        supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            description,
+            eur_price,
+            pcc_price,
+            images,
+            sizes,
+            category_slug,
+            display_order,
+            status,
+            is_global,
+            metadata
+          `)
+          .eq('tenant_id', hub.id)
+          .eq('status', 'active')
+          .order('display_order', { ascending: true }),
 
-      if (productsErr) throw productsErr;
+        // Produits plateforme globaux
+        supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            description,
+            eur_price,
+            pcc_price,
+            images,
+            sizes,
+            category_slug,
+            display_order,
+            status,
+            is_global,
+            metadata
+          `)
+          .eq('is_global', true)
+          .eq('status', 'active')
+          .order('display_order', { ascending: true }),
+      ]);
 
-      products = hubProducts || [];
+      if (hubProductsRes.error) {
+        throw hubProductsRes.error;
+      }
+
+      if (globalProductsRes.error) {
+        throw globalProductsRes.error;
+      }
+
+      const hubProducts = hubProductsRes.data || [];
+
+      const globalProducts = (globalProductsRes.data || []).filter((product) => {
+        const targets = product.metadata?.globalTargets;
+
+        // Ancien produit global sans globalTargets :
+        // on continue à l'afficher.
+        if (!Array.isArray(targets)) {
+          return true;
+        }
+
+        // Dans une fédération, seuls les produits
+        // ciblant "federations" sont affichés.
+        return targets.includes('federations');
+        }).map((product) => ({
+          ...product,
+          isGlobal: true,
+        }));
+
+      products = [
+        ...globalProducts,
+        ...hubProducts,
+      ];
     }
 
     return ok(res, {
