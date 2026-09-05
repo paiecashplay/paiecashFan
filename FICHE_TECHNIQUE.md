@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-05 (dx)** — **Billetterie club : responsive mobile piloté par les données (PSG vs Nice) + reorder**.
+  Mystère « PSG déborde, Nice non » = **contenus longs** (titres offres VIP, gros prix abonnement
+  « 16 237,25 PCC ») dans cartes 3 colonnes à prix/bouton `shrink-0` → écrasent le milieu (titre 1 mot/ligne),
+  **chevauchent le bouton** et forcent la largeur > viewport (rognée par `overflow-hidden` du root). Fix :
+  `TicketOfferCard` + `MatchRow` **empilés sur mobile** (`flex-col sm:flex-row`, prix+bouton en rangée dessous),
+  `break-words` sur titres/prix, `min-w-0` sur les colonnes des grilles (abonnement + modal détail). **Reorder
+  mobile** : « Billets & formules » avant « Billets matchs » (`order-1/2`, normal en `lg`). Règle : toute carte
+  à colonne prix `shrink-0` doit s'empiler sur mobile, sinon un contenu long déborde.
 - **2026-09-05 (dw)** — **Responsive mobile (Android/iOS) : correctifs débordement horizontal**. Audit du
   site (code globalement discipliné : `min-w-0`/`truncate`/`overflow-x-auto` sur carrousels). Corrigé :
   **CheckoutModal (panier)** grilles prénom/nom + CP/ville → `grid-cols-1 sm:grid-cols-2` ; **ClubBilletterie**
