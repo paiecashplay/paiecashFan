@@ -135,6 +135,14 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-05 (dw)** — **Responsive mobile (Android/iOS) : correctifs débordement horizontal**. Audit du
+  site (code globalement discipliné : `min-w-0`/`truncate`/`overflow-x-auto` sur carrousels). Corrigé :
+  **CheckoutModal (panier)** grilles prénom/nom + CP/ville → `grid-cols-1 sm:grid-cols-2` ; **ClubBilletterie**
+  `min-w-0` sur colonnes des grilles (hero + tickets) → pistes grid ne débordent plus (fin du clip à droite,
+  `overflow-hidden` du root rognait) ; **tables admin** (Clubs/Users/Products/Federations/Platform) wrapper
+  `overflow-hidden`→`overflow-x-auto` (scroll au lieu de coupe ; colonnes secondaires déjà `hidden md:table-cell`) ;
+  **AdminRedtaag** combo `w-full sm:w-[220px]` + rangée `flex-wrap`. Reste (moyen, à confirmer visuellement) :
+  cartes stats `grid-cols-2` sans `min-w-0` dans certains BO, `LiveMatchBanner` 3 col. À re-tester sur device.
 - **2026-09-03 (dv)** — **BO Billetterie Redtaag : recherche club serveur + nom club assigné + mode d'emploi**.
   Le combo club chargeait `?limit=500` mais le backend **plafonne à 100** → seuls les 100 premiers clubs
   (alpha) chargés, filtre côté client → OM/PSG/Paris FC introuvables. Passage en **recherche SERVEUR**
