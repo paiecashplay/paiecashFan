@@ -502,7 +502,7 @@ function MetaChip({ label, value }) {
   return (
     <div className="px-3 py-2 md:px-4 md:py-2.5">
       <div className="text-[8px] uppercase tracking-[0.22em] text-bone-400 font-bold">{label}</div>
-      <div className="text-[11px] md:text-xs font-mono text-bone-100 mt-0.5">{value}</div>
+      <div className="text-[11px] md:text-xs font-mono text-bone-100 mt-0.5 whitespace-nowrap">{value}</div>
     </div>
   );
 }

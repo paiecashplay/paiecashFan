@@ -102,10 +102,10 @@ function TicketingPrice({
     <span className={className}>
       {prefix}
 
+      {/* Chaque prix reste insécable (nombre + unité) ; la coupure ne se fait
+          qu'au séparateur « · » → « 374,50 € » ne se retrouve jamais coupé. */}
       {pccPrice !== null && (
-        <>
-          {formatPCC(pccPrice)} PCC
-        </>
+        <span className="whitespace-nowrap">{formatPCC(pccPrice)} PCC</span>
       )}
 
       {pccPrice !== null &&
@@ -113,9 +113,7 @@ function TicketingPrice({
         ' · '}
 
       {euroPrice !== null && (
-        <>
-          {formatEuro(euroPrice)} €
-        </>
+        <span className="whitespace-nowrap">{formatEuro(euroPrice)} €</span>
       )}
     </span>
   );
