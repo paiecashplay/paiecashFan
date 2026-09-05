@@ -135,6 +135,10 @@ Voir aussi **`TODO.md`** (sécurité pré-vérif documents, infra email prod Res
 ## 10. Journal des évolutions
 > Le plus récent en haut. Mis à jour à chaque commit.
 
+- **2026-09-05 (dy)** — **Finition responsive : prix insécables + nom président non coupé**. `TicketingPrice` :
+  chaque prix (nombre + unité) dans un `span whitespace-nowrap` → coupure uniquement au « · » (fini le « € »
+  seul sur sa ligne). `MetaChip` (home club, `ClubDetail`) : valeur `whitespace-nowrap` → le nom du président
+  ne se coupe plus en plein milieu (le chip entier passe à la ligne si besoin).
 - **2026-09-05 (dx)** — **Billetterie club : responsive mobile piloté par les données (PSG vs Nice) + reorder**.
   Mystère « PSG déborde, Nice non » = **contenus longs** (titres offres VIP, gros prix abonnement
   « 16 237,25 PCC ») dans cartes 3 colonnes à prix/bouton `shrink-0` → écrasent le milieu (titre 1 mot/ligne),
