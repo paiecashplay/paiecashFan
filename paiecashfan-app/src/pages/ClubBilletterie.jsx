@@ -347,7 +347,7 @@ export function ClubBilletterie() {
 
             <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.05fr] lg:items-stretch">
               {/* Identité club + stats */}
-              <div className="flex flex-col justify-between">
+              <div className="flex min-w-0 flex-col justify-between">
                 <div className="flex items-start gap-5">
                   <div
                     className="grid h-24 w-24 shrink-0 place-items-center rounded-[22px] border border-white/10 bg-white/[0.04] p-3"
@@ -903,7 +903,7 @@ function TicketsView({
   return (
     <div className="grid gap-5 lg:grid-cols-[1.6fr_0.95fr]">
       {/* Colonne principale : calendrier des matchs + billets/formules du club */}
-      <div className="flex flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-5">
       {/* Liste des matchs */}
       <GlassCard className="border border-white/10 p-6">
         <h2 className="font-display text-2xl font-black uppercase text-bone-50">
@@ -1011,7 +1011,7 @@ function TicketsView({
       </div>
 
       {/* Prochain match + réassurance + aide */}
-      <div className="flex flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-5">
         {nextMatch && (
           <NextMatchCard
             match={nextMatch}

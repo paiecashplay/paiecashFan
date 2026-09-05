@@ -159,7 +159,7 @@ export function AdminUsers() {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         {loading ? (
           <div className="p-6 space-y-3">
             {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}

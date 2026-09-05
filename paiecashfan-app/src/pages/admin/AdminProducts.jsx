@@ -99,7 +99,7 @@ export function AdminProducts() {
         />
       </div>
 
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         {loading ? (
           <div className="p-6 space-y-3">
             {Array.from({ length: 6 }).map((_, i) => 

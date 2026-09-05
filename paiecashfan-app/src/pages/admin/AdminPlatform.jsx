@@ -123,7 +123,7 @@ function ProductsTab({ store, showToast }) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         {loading ? (
           <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-emerald-400" /></div>
         ) : products.length === 0 ? (
@@ -355,7 +355,7 @@ function PayoutsTab() {
       </div>
 
       {/* Totaux par club */}
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
           <h3 className="text-sm font-bold text-bone-100">Par club</h3>
           <button onClick={load} className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 text-bone-400 hover:text-bone-100 grid place-items-center"><RefreshCw size={13} /></button>
@@ -387,7 +387,7 @@ function PayoutsTab() {
       </div>
 
       {/* Historique */}
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         <div className="px-5 py-3 border-b border-white/5"><h3 className="text-sm font-bold text-bone-100">Historique récent</h3></div>
         {recent.length === 0 ? (
           <p className="px-5 py-8 text-center text-sm text-bone-500">—</p>

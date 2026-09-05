@@ -156,7 +156,7 @@ export function AdminRedtaag() {
                   )}
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
                   <ClubCombo
                     value={choice[ev.id] ?? ev.tenantId ?? ''}
                     defaultLabel={ev.tenantName || ''}
@@ -242,7 +242,7 @@ function ClubCombo({ value, defaultLabel = '', onChange }) {
   }, [q, open]);
 
   return (
-    <div className="relative w-[220px]" ref={boxRef}>
+    <div className="relative w-full min-w-[160px] flex-1 sm:w-[220px] sm:flex-none" ref={boxRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

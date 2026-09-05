@@ -68,7 +68,7 @@ export function AdminFederations() {
           className="w-full h-10 pl-9 pr-4 rounded-xl border border-white/10 bg-ink-800/60 text-sm text-bone-100 placeholder:text-bone-600 focus:outline-none focus:border-emerald-500/40" />
       </div>
 
-      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-hidden">
+      <div className="rounded-2xl border border-white/8 bg-ink-800/40 overflow-x-auto">
         {loading ? (
           <div className="p-6 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
         ) : filtered.length === 0 ? (

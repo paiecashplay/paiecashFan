@@ -663,7 +663,7 @@ function StepLivraison({ form, set, shippingMethod, setShippingMethod, fieldErro
   return (
     <div>
       <SectionTitle icon={User} title="Informations personnelles" />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Prénom *" value={form.firstName} onChange={set('firstName')} error={fieldErrors.firstName} />
         <Field label="Nom *" value={form.lastName} onChange={set('lastName')} error={fieldErrors.lastName}/>
       </div>
@@ -673,7 +673,7 @@ function StepLivraison({ form, set, shippingMethod, setShippingMethod, fieldErro
       <SectionTitle icon={MapPin} title="Adresse de livraison" className="mt-7" />
       <Field label="Adresse *" value={form.address1} onChange={set('address1')} error={fieldErrors.address1}/>
       <Field label="Complément" value={form.address2} onChange={set('address2')} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Code postal *" value={form.postalCode} onChange={set('postalCode')}  error={fieldErrors.postalCode}/>
         <Field label="Ville *" value={form.city} onChange={set('city')} error={fieldErrors.city}/>
       </div>
