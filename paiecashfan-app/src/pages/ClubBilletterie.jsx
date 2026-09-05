@@ -665,7 +665,7 @@ function SubscriptionsView({
   return (
     <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr_0.95fr]">
       {/* Détail de l'offre sélectionnée */}
-      <GlassCard className="flex flex-col border border-emerald-400/20 p-6">
+      <GlassCard className="flex min-w-0 flex-col border border-emerald-400/20 p-6">
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-400">
           Abonnement
           {offer.duration ? ` · ${offer.duration}` : ''}
@@ -685,7 +685,7 @@ function SubscriptionsView({
           price={offer.price}
           priceEur={offer.price_eur}
           prefix="À partir de "
-          className="mt-5 block font-display text-3xl font-black text-emerald-400"
+          className="mt-5 block break-words font-display text-3xl font-black text-emerald-400"
         />
 
         <ul className="mt-5 space-y-2.5">
@@ -736,7 +736,7 @@ function SubscriptionsView({
       </GlassCard>
 
       {/* Choix de la formule / tribune */}
-      <GlassCard className="flex flex-col border border-white/10 p-5">
+      <GlassCard className="flex min-w-0 flex-col border border-white/10 p-5">
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-bone-400">
           {subscriptions.length > 1
             ? 'Choisissez votre formule'
@@ -809,7 +809,7 @@ function SubscriptionsView({
       </GlassCard>
 
       {/* Avantages + aide */}
-      <div className="flex flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-5">
         <AdvantagesCard />
         <HelpCard />
       </div>
@@ -904,8 +904,8 @@ function TicketsView({
     <div className="grid gap-5 lg:grid-cols-[1.6fr_0.95fr]">
       {/* Colonne principale : calendrier des matchs + billets/formules du club */}
       <div className="flex min-w-0 flex-col gap-5">
-      {/* Liste des matchs */}
-      <GlassCard className="border border-white/10 p-6">
+      {/* Liste des matchs — sur mobile, affichée APRÈS « Billets & formules » */}
+      <GlassCard className="order-2 border border-white/10 p-6 lg:order-1">
         <h2 className="font-display text-2xl font-black uppercase text-bone-50">
           Billets matchs
         </h2>
@@ -988,9 +988,9 @@ function TicketsView({
         )}
       </GlassCard>
 
-      {/* Billets & formules du club (offres saisies au BO) */}
+      {/* Billets & formules du club (offres saisies au BO) — mobile: AVANT les matchs */}
       {tickets.length > 0 && (
-        <GlassCard className="border border-white/10 p-6">
+        <GlassCard className="order-1 border border-white/10 p-6 lg:order-2">
           <h2 className="font-display text-2xl font-black uppercase text-bone-50">
             Billets & formules
           </h2>
@@ -1030,49 +1030,53 @@ function TicketsView({
 // reprend les tarifs back existants pour ne jamais afficher un onglet vide.
 function TicketOfferCard({ offer, onSelect }) {
   return (
-    <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-emerald-400/30">
-      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06]">
-        <Ticket size={20} className="text-emerald-400" />
-      </div>
+    <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-emerald-400/30 sm:flex-row sm:items-start">
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06]">
+          <Ticket size={20} className="text-emerald-400" />
+        </div>
 
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
-          Billet
-        </p>
-        <h3 className="mt-0.5 font-display text-lg font-black uppercase leading-tight text-bone-50">
-          {offer.name}
-        </h3>
-        {offer.description && (
-          <p className="mt-1 text-[13px] leading-5 text-bone-400">
-            {offer.description}
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+            Billet
           </p>
-        )}
-        <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-          {(offer.benefits || []).slice(0, 3).map((benefit, index) => (
-            <li
-              key={`t-benefit-${index}`}
-              className="flex items-center gap-1.5 text-[11px] text-bone-500"
-            >
-              <Check size={12} className="shrink-0 text-emerald-400" />
-              {benefit}
-            </li>
-          ))}
-        </ul>
+          <h3 className="mt-0.5 break-words font-display text-lg font-black uppercase leading-tight text-bone-50">
+            {offer.name}
+          </h3>
+          {offer.description && (
+            <p className="mt-1 text-[13px] leading-5 text-bone-400">
+              {offer.description}
+            </p>
+          )}
+          <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            {(offer.benefits || []).slice(0, 3).map((benefit, index) => (
+              <li
+                key={`t-benefit-${index}`}
+                className="flex items-center gap-1.5 text-[11px] text-bone-500"
+              >
+                <Check size={12} className="shrink-0 text-emerald-400" />
+                {benefit}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="shrink-0 text-right">
-        <p className="text-[10px] uppercase tracking-wider text-bone-500">
-          À partir de
-        </p>
-        <TicketingPrice
-          price={offer.price}
-          priceEur={offer.price_eur}
-          className="block font-display text-lg font-black leading-tight text-emerald-400"
-        />
+      <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 sm:block sm:shrink-0 sm:border-0 sm:pt-0 sm:text-right">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-bone-500">
+            À partir de
+          </p>
+          <TicketingPrice
+            price={offer.price}
+            priceEur={offer.price_eur}
+            className="block break-words font-display text-lg font-black leading-tight text-emerald-400"
+          />
+        </div>
         <Button
           variant="primary"
           size="sm"
-          className="mt-2 justify-center"
+          className="shrink-0 justify-center sm:mt-2 sm:w-full"
           onClick={onSelect}
         >
           <ShoppingBag size={14} />
@@ -1092,62 +1096,66 @@ function MatchRow({ match, club, slug, fromPrice, onSeePlaces }) {
   const opponentLogo = isHome ? match.awayLogo : match.homeLogo;
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 transition hover:border-emerald-400/30">
-      <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border border-white/10 bg-ink-950/60">
-        <span className="font-display text-lg font-black leading-none text-emerald-400">
-          {day.day}
-        </span>
-        <span className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-bone-500">
-          {day.month}
-        </span>
-      </div>
+    <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 transition hover:border-emerald-400/30 sm:flex-row sm:items-center sm:gap-4">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border border-white/10 bg-ink-950/60">
+          <span className="font-display text-lg font-black leading-none text-emerald-400">
+            {day.day}
+          </span>
+          <span className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-bone-500">
+            {day.month}
+          </span>
+        </div>
 
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-black text-bone-50">
-          {clubName} <span className="text-bone-500">vs</span>{' '}
-          {opponent}
-        </p>
-        <p className="mt-0.5 truncate text-[11px] text-bone-500">
-          {[match.competition, formatRound(match.round)]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-        {match.venue && (
-          <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-bone-500">
-            <MapPin size={11} className="shrink-0" />
-            {match.venue}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-black text-bone-50">
+            {clubName} <span className="text-bone-500">vs</span>{' '}
+            {opponent}
           </p>
+          <p className="mt-0.5 truncate text-[11px] text-bone-500">
+            {[match.competition, formatRound(match.round)]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+          {match.venue && (
+            <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-bone-500">
+              <MapPin size={11} className="shrink-0" />
+              {match.venue}
+            </p>
+          )}
+        </div>
+
+        {opponentLogo && (
+          <img
+            src={opponentLogo}
+            alt={opponent}
+            className="hidden h-10 w-10 shrink-0 object-contain lg:block"
+            loading="lazy"
+          />
         )}
       </div>
 
-      <div className="shrink-0 text-right">
-        {fromPrice !== null && (
-          <>
-            <p className="text-[10px] uppercase tracking-wider text-bone-500">
-              À partir de
-            </p>
-            <p className="font-display text-lg font-black text-emerald-400">
-              {formatPCC(fromPrice)} PCC
-            </p>
-          </>
-        )}
+      <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 sm:block sm:shrink-0 sm:border-0 sm:pt-0 sm:text-right">
+        <div className="min-w-0">
+          {fromPrice !== null && (
+            <>
+              <p className="text-[10px] uppercase tracking-wider text-bone-500">
+                À partir de
+              </p>
+              <p className="break-words font-display text-lg font-black text-emerald-400">
+                {formatPCC(fromPrice)} PCC
+              </p>
+            </>
+          )}
+        </div>
         <button
           type="button"
           onClick={onSeePlaces}
-          className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-400 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300"
+          className="mt-0 inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-400 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink-900 transition hover:bg-emerald-300 sm:mt-1"
         >
           Voir les places
         </button>
       </div>
-
-      {opponentLogo && (
-        <img
-          src={opponentLogo}
-          alt={opponent}
-          className="hidden h-10 w-10 shrink-0 object-contain lg:block"
-          loading="lazy"
-        />
-      )}
     </div>
   );
 }
@@ -1338,14 +1346,14 @@ function TicketingOfferModal({
         className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-ink-950 p-6 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-400">
               {isSubscription
                 ? 'Abonnement'
                 : 'Billet'}
             </div>
 
-            <h3 className="mt-2 font-display text-2xl font-black uppercase text-bone-50 md:text-3xl">
+            <h3 className="mt-2 break-words font-display text-2xl font-black uppercase text-bone-50 md:text-3xl">
               {offer.name}
             </h3>
 
@@ -1371,7 +1379,7 @@ function TicketingOfferModal({
           price={offer.price}
           priceEur={offer.price_eur}
           prefix="À partir de "
-          className="mt-6 block font-display text-3xl font-black text-emerald-400"
+          className="mt-6 block break-words font-display text-3xl font-black text-emerald-400"
         />
 
         <p className="mt-5 text-sm text-bone-300">
